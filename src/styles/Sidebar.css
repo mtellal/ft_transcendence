@@ -1,0 +1,7 @@
+.sidebar
+{
+    background-color: antiquewhite;
+    grid-row: 2 / span 8;
+    grid-column: 1 / span 2;
+    border-right: 1px solid rgba(0, 0, 0);
+}
