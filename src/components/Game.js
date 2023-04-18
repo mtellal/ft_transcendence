@@ -35,10 +35,22 @@ export default function Game()
         setPlayers([player1, player2])
     }
 
-    function drawPalyer(p1)
+    function drawPalyer(p1, color)
     {
         context.beginPath();
         context.fillRect(p1.x, p1.y, p1.width, p1.height);
+        context.fillStyle = "black"
+    }
+
+    function moveUp(player)
+    {
+        console.log(player)
+        const newPlayer = {
+            ...player, 
+            y: player.y - 5
+        }
+
+        setPlayers(prev => [newPlayer, prev[1]])
     }
 
     React.useEffect(() => {
@@ -52,7 +64,7 @@ export default function Game()
         }
 
         const cont = initCanvas(newDim.height, newDim.width);
-        initPlayers(newDim.height, newDim.width);
+        const p = initPlayers(newDim.height, newDim.width);
 
         window.addEventListener("resize", (e) => {
             const newDim = {
@@ -65,28 +77,27 @@ export default function Game()
 
         })
 
-        document.addEventListener("keypress", e => {
-            console.log(e.key)
-            if (e.keyCode === 38)
-            {
-                console.log("up")
-            }
-
-        })
-
     }, [])
+
+    function salut(e)
+    {
+        console.log("salut")
+    }
 
     React.useEffect(() => {
         console.log("use effect ")
-        if (players.length)
-            players.map(p => drawPalyer(p))
-    })
+        players.map(p => drawPalyer(p))
+    }, [players])
     
     return (
-        <div className="game">
+        <div className="game"
+            onKeyUp={salut}
+            onResize={salut}
+        >
             <canvas 
                 ref={canvasRef} 
                 className="game--canvas" 
+                onKeyUp={e => console.log("wdfwfw")}
             >
 
             </canvas>
