@@ -2,11 +2,46 @@ import React from "react";
 
 import '../styles/Sidebar.css'
 
-export default function Sidebar()
+function MenuElement(props)
 {
     return (
+        <div className="menu--element">
+            <span class="material-symbols-outlined">
+                {props.icon}
+            </span>
+            <p className="menu--element-title" >{props.title}</p>
+        </div>
+    )
+}
+
+export default function Sidebar()
+{
+
+    const menuElement = [
+        {
+            title: "Profile", 
+            icon: "account_circle"
+        },
+        {
+            title: "History", 
+            icon: "history"
+        },
+        {
+            title: "Friends", 
+            icon: "group"
+        },
+        {
+            title: "Chat", 
+            icon: "chat"
+        }
+    ] 
+
+    const menu = menuElement.map(e => <MenuElement title={e.title} icon={e.icon} />)
+
+    return (
         <span className="sidebar">
-            <p>Sidebar</p>
+            <h2 className="sidebar--title" >Menu</h2>
+            {menu}
         </span>
     )
 }

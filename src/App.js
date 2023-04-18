@@ -1,4 +1,5 @@
 import './App.css';
+import Footer from './components/Footer';
 import Game from './components/Game';
 
 import Header from './components/Header'
@@ -10,7 +11,7 @@ function App() {
       <Header />
       <Sidebar />
       <Game />
-      <p>Footer</p>
+      <Footer />
     </div>
   );
 }

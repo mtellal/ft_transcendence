@@ -1,6 +1,6 @@
 .header
 {
-    background-color: rgb(255, 175, 121);
+    background-color: rgb(255, 255, 255);
     min-height: 7vh;
     width: 100%;
     margin: 0;
@@ -8,15 +8,16 @@
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid rgb(192, 192, 192);
 }
 
 .header--pong
 {
-    margin: 0 10vh;
+    font-size: xx-large;
+    margin: 0 5vh;
     font-family: 'Righteous';
     letter-spacing: 2px;
-    border: 1px solid antiquewhite;
     padding: 1vh 1vh ;
     border-radius: 5px;
+    text-decoration: underline;
 }

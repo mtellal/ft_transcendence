@@ -1,7 +1,36 @@
 .sidebar
 {
-    background-color: antiquewhite;
-    grid-row: 2 / span 8;
-    grid-column: 1 / span 2;
+    grid-row: 2 / span 18;
+    grid-column: 1 / span 4;
     border-right: 1px solid rgba(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar--title
+{
+    padding: 0 10%;
+}
+
+.menu--element
+{
+    width: 70%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    padding: 0 10%;
+}
+
+.menu--element:hover
+{
+    background-color: rgb(228, 228, 228);
+}
+
+.menu--element-title
+{
+    width: 100%;
+    font-size: large;
+    text-align: center;
+    font-weight: 500;
 }

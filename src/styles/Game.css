@@ -1,6 +1,6 @@
 .game
 {
-    background-color: aqua;
-    grid-column: 3 / -1;
-    grid-row: 2 / span 8;
+    background-color: rgb(243, 255, 251);
+    grid-column: 5 / -1;
+    grid-row: 2 / span 18;
 }

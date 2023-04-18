@@ -1,0 +1,29 @@
+.footer
+{
+    background-color: rgb(245, 245, 245);
+    grid-column: 1 / -1;
+    border-top: 1px solid rgb(180, 180, 180);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer--authors
+{
+    margin: 0;
+    padding: 0.5vh 0;
+}
+
+.footer--copyright
+{
+    margin: 0;
+    font-size: small;
+}
+
+.author--link
+{
+    text-decoration: none;
+    font-weight: 600;
+    color: black;
+}
