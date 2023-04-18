@@ -3,4 +3,12 @@
     background-color: rgb(243, 255, 251);
     grid-column: 5 / -1;
     grid-row: 2 / span 18;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.game--canvas
+{
+    background-color: antiquewhite;
 }
