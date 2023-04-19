@@ -6,19 +6,17 @@ import Game from './components/Game';
 
 import Header from './components/Header'
 import Sidebar from './components/SideBar';
+import Login from './components/Login';
 
 function App() {
 
   return (
     <div className="App" >
+      <Login />
       <Header />
       <Sidebar />
-      <Game />
+      <Game launch={false} />
       <Footer />
-      {/* <canvas ref={canvasRef}>
-
-      </canvas>
-      <button onClick={resetHandler}>reset</button> */}
     </div>
   );
 }

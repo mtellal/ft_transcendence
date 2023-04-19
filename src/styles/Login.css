@@ -1,0 +1,96 @@
+.login
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login--form
+{
+    min-height: 30%;
+    width: 30%;
+    background-color: rgb(216, 216, 216);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5% 5%;
+    box-shadow: 0 5px 10px black;
+}
+
+.login--img
+{
+    width: 30%;
+    align-self: center;
+}
+
+
+.login--input
+{
+    margin: 5% 0;
+    width: 80%;
+    border-radius: 5px;
+    height: 3vh;
+}
+
+.login--button
+{
+    width: 50%;
+    padding: 5%;
+    margin-top: 5%;
+    align-self: center ;
+    background-color: rgb(87, 87, 87);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: medium;
+}
+
+.login--button:active
+{
+    background-color: rgb(163, 163, 163);
+    border: 1px solid black;
+}
+
+
+/* IconInput component */
+
+.iconinput
+{
+    height: 4vw;
+    width: 80%;
+    background-color: rgb(202, 202, 202);
+    display: flex;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 2px 2px;
+    margin: 5% 0;
+    align-items: center;
+}
+
+.iconinput--icon
+{
+    padding: 2%;
+    display: flex;
+    align-items: center;
+}
+
+.inconinput--input
+{
+    height: 100%;
+    width: 100%;
+    margin-left: 2px;
+    padding-left: 5px;
+    border: none;
+    font-family: 'inter', sans-serif;
+}
+
+.inconinput--input:focus
+{
+    outline: none;
+    border: none;
+}

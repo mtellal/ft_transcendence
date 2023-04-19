@@ -5,13 +5,15 @@ import '../styles/Game.css'
 let up;
 let down;
 
-export default function Game()
+export default function Game(props)
 {
     const canvasRef = React.useRef();
     const animationID = React.useRef(0);
     const player1Ref = React.useRef({x:10, y:10, width:100, height:100})
     const player2Ref = React.useRef({x:10, y:10, width:100, height:100})
     const ballRef = React.useRef({x:0, y:0, velx:0, vely:0, radius:0})
+
+    const [scores, setScores] = React.useState({p1:0, p2:0})
 
     function initPlayers(canvasHeight, canvasWidth)
     {
@@ -65,9 +67,24 @@ export default function Game()
         context.fill();
     }
 
+    function drawPlayground(context)
+    {
+        const canvas = canvasRef.current;
+
+        context.beginPath();
+        context.arc(canvas.width / 2, canvas.height / 2, 50, 0, Math.PI * 2);
+        context.fillStyle = '#FFD8B8'
+        context.fill();
+        context.stroke();
+        context.fillStyle = 'black'
+        context.fillRect(canvas.width / 2, 0, 1, canvas.height)
+    }
+
+
     function draw(context)
     {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+        drawPlayground(context)
         drawPlayers(context);
         drawBall(context);
     }
@@ -103,6 +120,14 @@ export default function Game()
             p1.y += 5;
     }
 
+    function movePlayer()
+    {
+        if (up)
+            moveUp();
+        else if (down)
+            moveDown();
+    }
+
     function moveBall()
     {
         const canvas = canvasRef.current;
@@ -125,7 +150,13 @@ export default function Game()
 
         if (nextPosX < 0 || nextPosX > canvas.width)
         {
+            if (nextPosX < 0)
+                setScores(prev => ({...prev, p2: prev.p2 + 1}))
+            else if (nextPosX > canvas.width)
+                setScores(prev => ({...prev, p1: prev.p1 + 1}))
+
             initBall(canvas.height, canvas.width);
+            return (1);
         }
         if (nextPosY < 0 || nextPosY > canvas.height)
         {
@@ -136,45 +167,85 @@ export default function Game()
             ball.x += ball.velx;
             ball.y += ball.vely;
         }
+        return (0)
+    }
 
+    function resizeHandler(context)
+    {
+        const canvas = canvasRef.current;
+        const width = canvas.parentNode.offsetWidth;
+        const height = canvas.parentNode.offsetHeight;
+
+        console.log(width, height)
+
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width
+          canvas.height = height
+        }
+        
+        initGame(canvas, context)
+    }
+
+    function initGame(canvas, context)
+    {
+        canvas.height = canvas.parentNode.offsetHeight;
+        canvas.width = canvas.parentNode.offsetWidth;
+
+        initPlayers(canvas.height, canvas.width);
+        initBall(canvas.height, canvas.width);
+        draw(context);
 
     }
 
 
     React.useEffect(() => {
+        
+        let newgame;
 
         const canvas = canvasRef.current;
-        canvas.height = canvas.parentNode.offsetHeight;
-        canvas.width = canvas.parentNode.offsetWidth;
-
         const context = canvas.getContext('2d');
 
-        initPlayers(canvas.height, canvas.width);
-        initBall(canvas.height, canvas.width);
+       initGame(canvas, context)
+
+        window.addEventListener('resize', () => resizeHandler(context));
 
         const game = () => {
-            if (up)
-                moveUp();
-            else if (down)
-                moveDown();
+            
+            movePlayer();
             draw(context);
-            moveBall();
-            animationID.current = window.requestAnimationFrame(game);
+            newgame = moveBall();
+            if (newgame)
+            {
+                draw(context);
+                setTimeout(() => {
+                    animationID.current = window.requestAnimationFrame(game);
+                }, 1000);
+            }
+            else
+                animationID.current = window.requestAnimationFrame(game);
+                
         }
 
-        game();
-        
+        if (props.launch)
+            game();
+
         return (() => {
             window.cancelAnimationFrame(animationID.current);
         })
 
-    }, [])
+    }, [props.launch])
 
-    
+
     return (
         <div 
             className="game"
+            onResize={() => console.log("resizing")}
         >
+            <div className="score--container">
+                <p className="score">{scores.p1}</p>
+                <p className="score">{scores.p2}</p>
+            </div>
+
             <canvas 
                 ref={canvasRef} 
                 className="game--canvas" 
