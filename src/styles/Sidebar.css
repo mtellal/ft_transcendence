@@ -1,6 +1,5 @@
 .sidebar
 {
-    background-color: rgb(255, 247, 236);
     grid-row: 2 / span 18;
     grid-column: 1 / span 4;
     border-right: 1px solid rgb(192, 192, 192);
@@ -25,7 +24,7 @@
 
 .menu--element:hover
 {
-    background-color: rgb(255, 225, 187);
+    background-color: rgb(255, 243, 229);
 }
 
 .menu--element-title
