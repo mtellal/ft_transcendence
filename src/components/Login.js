@@ -7,14 +7,14 @@ import imgLogin from '../images/icon-login.png'
 function IconInput(props)
 {
     return (
-        <div className="iconinput">
+        <label for={`input${props.icon}`} className="iconinput">
             <div className="iconinput--icon">
                 <span className="material-symbols-outlined">
                     {props.icon}
                 </span>
             </div>
-            <input className="inconinput--input" placeholder={props.placeholder} />
-        </div>
+            <input id={`input${props.icon}`} className="inconinput--input" placeholder={props.placeholder} />
+        </label>
     )
 }
 
