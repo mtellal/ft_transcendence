@@ -9,22 +9,12 @@ import Sidebar from './components/SideBar';
 
 function App() {
 
-  function func(e)
-  {
-    console.log(e, "wdfww")
-  }
-
   return (
-    <div 
-      className="App" 
-      onKeyDown={func} 
-      onKeyUp={func} 
-      onKeyDownCapture={func} 
-      tabIndex="0" >
-      {/* <Header />
+    <div className="App" >
+      <Header />
       <Sidebar />
       <Game />
-      <Footer /> */}
+      <Footer />
       {/* <canvas ref={canvasRef}>
 
       </canvas>

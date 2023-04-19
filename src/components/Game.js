@@ -2,102 +2,128 @@ import React, { useEffect } from "react";
 
 import '../styles/Game.css'
 
+let up;
+let down;
+
 export default function Game()
 {
     const canvasRef = React.useRef();
-    const [players, setPlayers] = React.useState([])
-    const [context, setContext] = React.useState();
+    const animationID = React.useRef(0);
+    const player1Ref = React.useRef({x:10, y:10, width:100, height:100})
+    const player2Ref = React.useRef({x:10, y:10, width:100, height:100})
 
     function initCanvas(h, w)
     {
         const canvas = canvasRef.current;
         canvas.height = h;
         canvas.width = w;
-        setContext(canvas.getContext('2d'));
     }
 
     function initPlayers(h, w)
     {
-        const player1 = {
-            x: w * 0.02, 
-            y: h * 0.05,
-            width: 10,
-            height: 100,
-        }
+        const player1 = player1Ref.current;
+        const player2 = player2Ref.current;
 
-        const player2 = {
-            x: w - w * 0.03, 
-            y: h * 0.05,
-            width: 10,
-            height: 100,
-        }
+        player1.x = w * 0.02;
+        player1.y = h * 0.05;
+        player1.width = 10;
+        player1.height = 100;
 
-        setPlayers([player1, player2])
+        player2.x = w - w * 0.03;
+        player2.y = h * 0.05;
+        player2.width = 10;
+        player2.height = 100;
     }
 
-    function drawPalyer(p1, color)
+    function resizeHandler(canvas)
     {
-        context.beginPath();
-        context.fillRect(p1.x, p1.y, p1.width, p1.height);
-        context.fillStyle = "black"
-    }
-
-    function moveUp(player)
-    {
-        console.log(player)
-        const newPlayer = {
-            ...player, 
-            y: player.y - 5
-        }
-
-        setPlayers(prev => [newPlayer, prev[1]])
-    }
-
-    React.useEffect(() => {
-
-        console.log("use effect []")
-        const canvas = canvasRef.current;
-
         const newDim = {
             width: canvas.parentNode.offsetWidth,
             height: canvas.parentNode.offsetHeight
         }
 
-        const cont = initCanvas(newDim.height, newDim.width);
-        const p = initPlayers(newDim.height, newDim.width);
+        initCanvas(newDim.height, newDim.width);
+        initPlayers(newDim.height, newDim.width);
+    }
 
-        window.addEventListener("resize", (e) => {
-            const newDim = {
-                width: canvasRef.current.parentNode.offsetWidth,
-                height: canvasRef.current.parentNode.offsetHeight
-            }
+    function handleKeyDown(e)
+    {
+        if (e.key === "w")
+            up = 1;
+        else if (e.key === "s")
+            down = 1;
+    }
 
-            initCanvas(newDim.height, newDim.width);
-            initPlayers(newDim.height, newDim.width)
+    function handleKeyUp(e)
+    {
+        if (e.key === "w")
+            up = 0;
+        else if (e.key === "s")
+            down = 0;
+    }
 
+    function drawPlayers(context)
+    {
+        const p1 = player1Ref.current;
+        const p2 = player2Ref.current;
+        
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+        context.beginPath();
+        context.fillRect(p1.x, p1.y, p1.width, p1.height)
+        context.fillRect(p2.x, p2.y, p2.width, p2.height)
+    }
+
+    function moveUp()
+    {
+        player1Ref.current.y -= 5;
+    }
+
+    function moveDown()
+    {
+        player1Ref.current.y += 5;
+    }
+
+    React.useEffect(() => {
+
+        console.log("use effect []")
+
+        const canvas = canvasRef.current;
+        canvas.height = canvas.parentNode.offsetHeight;
+        canvas.width = canvas.parentNode.offsetWidth;
+
+        const context = canvas.getContext('2d');
+
+        initPlayers(canvas.height, canvas.width);
+
+        const game = () => {
+            if (up)
+                moveUp();
+            else if (down)
+                moveDown();
+            drawPlayers(context);
+            animationID.current = window.requestAnimationFrame(game);
+        }
+
+
+        game();
+        return (() => {
+            window.cancelAnimationFrame(animationID.current)
         })
 
     }, [])
 
-    function salut(e)
-    {
-        console.log("salut")
-    }
-
-    React.useEffect(() => {
-        console.log("use effect ")
-        players.map(p => drawPalyer(p))
-    }, [players])
+    console.log("rendered")
     
     return (
-        <div className="game"
-            onKeyUp={salut}
-            onResize={salut}
+        <div 
+            className="game"
         >
             <canvas 
                 ref={canvasRef} 
                 className="game--canvas" 
-                onKeyUp={e => console.log("wdfwfw")}
+                onKeyUp={handleKeyUp}
+                onKeyDown={handleKeyDown}
+                tabIndex="0"
             >
 
             </canvas>

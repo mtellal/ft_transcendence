@@ -11,4 +11,10 @@
 .game--canvas
 {
     background-color: antiquewhite;
+    border: none;
+}
+
+.game--canvas:focus
+{
+    outline: none;
 }
