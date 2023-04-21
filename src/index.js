@@ -41,10 +41,7 @@ const router = createBrowserRouter([
                 path: "history",
                 element: <History />
             },
-            {
-                path: "friends",
-                element: <Friends />
-            }
+
         ]
     },
 ])

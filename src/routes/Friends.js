@@ -4,7 +4,7 @@ import '../styles/Friends.css'
 
 import img from '../images/user.png'
 
-function Friend(props)
+function FriendElement(props)
 {
     return (
         <div className="friend">
@@ -13,7 +13,7 @@ function Friend(props)
                 <img className="friend-image" src={img} />
                 <div
                     className="firend-icon-status"
-                    style={props.connected ? {backgroundColor:"#14CA00"} : null}
+                    style={props.connected ? {backgroundColor:"#14CA00"} : {backgroundColor:"red"} }
                 />
                 <div className="friend-infos">
                     <p className="username" >{props.username}</p>
@@ -33,11 +33,11 @@ function Friend(props)
     )
 }
 
-export default function Friends()
+function FriendList()
 {
     const exampleFriends = [
         {
-            username: "player",
+            username: "plawdfwfwfwfwfwfdfwfwyer",
             connected: false
         },
         {
@@ -99,13 +99,22 @@ export default function Friends()
     ]
 
     const friendsList = exampleFriends.map(e => (
-        <Friend username={e.username} connected={e.connected} />
+        <FriendElement username={e.username} connected={e.connected} />
     ))
 
     return (
-        <div className="friends">
+        <div className="friendlist">
             <h1>Friends</h1>
             {friendsList}
+        </div>
+    )
+}
+
+export default function Friends(props)
+{
+    return (
+        <div className="friends">
+            <FriendList />
         </div>
     )
 }
