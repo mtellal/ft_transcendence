@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import './App.css';
 
@@ -10,11 +10,13 @@ import Sidebar from './components/SideBar';
 
 function App() {
 
+  const location = useLocation();
+
   return (
     <div className="App" >
       <Header />
       <Sidebar />
-      <Game launch={false} />
+      {location.pathname !== "/profile" && <Game launch={false} />}
       <Footer />
       <Outlet />
     </div>

@@ -1,6 +1,6 @@
 .header
 {
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(252, 252, 252);
     min-height: 7vh;
     width: 100%;
     margin: 0;
@@ -20,4 +20,5 @@
     padding: 1vh 1vh ;
     border-radius: 5px;
     text-decoration: underline;
+    color: black;
 }

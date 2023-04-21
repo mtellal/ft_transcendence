@@ -176,8 +176,6 @@ export default function Game(props)
         const width = canvas.parentNode.offsetWidth;
         const height = canvas.parentNode.offsetHeight;
 
-        console.log(width, height)
-
         if (canvas.width !== width || canvas.height !== height) {
           canvas.width = width
           canvas.height = height
@@ -197,7 +195,6 @@ export default function Game(props)
 
     }
 
-
     React.useEffect(() => {
         
         let newgame;
@@ -207,7 +204,9 @@ export default function Game(props)
 
        initGame(canvas, context)
 
-        window.addEventListener('resize', () => resizeHandler(context));
+       const resizeEvent = () => resizeHandler(context);
+
+        window.addEventListener('resize', resizeEvent);
 
         const game = () => {
             
@@ -231,16 +230,14 @@ export default function Game(props)
 
         return (() => {
             window.cancelAnimationFrame(animationID.current);
+            window.removeEventListener('resize', resizeEvent);
         })
 
     }, [props.launch])
 
 
     return (
-        <div 
-            className="game"
-            onResize={() => console.log("resizing")}
-        >
+        <div className="game">
             <div className="score--container">
                 <p className="score">{scores.p1}</p>
                 <p className="score">{scores.p2}</p>

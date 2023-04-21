@@ -1,16 +1,17 @@
 import React from "react";
 
 import '../styles/Sidebar.css'
+import { Link } from "react-router-dom";
 
 function MenuElement(props)
 {
     return (
-        <div className="menu--element">
+        <Link to={props.route} className="menu--element">
             <span className="material-symbols-outlined">
                 {props.icon}
             </span>
             <p className="menu--element-title" >{props.title}</p>
-        </div>
+        </Link>
     )
 }
 
@@ -45,8 +46,10 @@ export default function Sidebar()
             key={e.id}
             title={e.title} 
             icon={e.icon} 
+            route={`/${e.title.toLocaleLowerCase()}`}
         />
     )
+
 
     return (
         <span className="sidebar">

@@ -1,4 +1,4 @@
-.login
+.sign-page
 {
     z-index: 2;
     position: absolute;
@@ -10,7 +10,7 @@
     align-items: center;
 }
 
-.login--form
+.sign-form
 {
     min-height: 20%;
     min-width: 20%;
@@ -24,22 +24,14 @@
     box-shadow: 0 5px 10px black;
 }
 
-.login--img
+.sign--img
 {
     width: 30%;
     align-self: center;
 }
 
 
-.login--input
-{
-    margin: 1vh 0;
-    width: 80%;
-    border-radius: 5px;
-    height: 3vh;
-}
-
-.login--button
+.sign--button
 {
     width: 50%;
     padding: 5%;
@@ -50,65 +42,32 @@
     border-radius: 5px;
     color: white;
     font-size: medium;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
 }
 
-.login--button:hover
+.sign--button:hover
 {
     cursor: pointer;
 }
 
-.login--button:active
+.sign--button:active
 {
     background-color: rgb(163, 163, 163);
     border: 1px solid black;
 }
 
-.login--signin
+.sign--link
 {
     text-decoration: underline;
+    color: black;
+    padding-top: 1vh;
 }
 
-.login--signin:hover
+.login--link:hover
 {
     cursor: pointer;
 }
 
-
-/* IconInput component */
-
-.iconinput
-{
-    height: 3vw;
-    min-height: 30px;
-    width: 80%;
-    background-color: rgb(202, 202, 202);
-    display: flex;
-    border: 1px solid black;
-    border-radius: 5px;
-    padding: 2px 2px;
-    margin: 5% 0;
-    align-items: center;
-}
-
-.iconinput--icon
-{
-    padding: 2%;
-    display: flex;
-    align-items: center;
-}
-
-.inconinput--input
-{
-    height: 100%;
-    width: 100%;
-    margin-left: 2px;
-    padding-left: 5px;
-    border: none;
-    font-family: 'inter', sans-serif;
-}
-
-.inconinput--input:focus
-{
-    outline: none;
-    border: none;
-}
