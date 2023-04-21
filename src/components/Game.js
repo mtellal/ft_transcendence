@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 
 import '../styles/Game.css'
 
+
+
 let up;
 let down;
 
-export default function Game(props)
+function Game(props)
 {
     const canvasRef = React.useRef();
     const animationID = React.useRef(0);
@@ -249,9 +251,31 @@ export default function Game(props)
                 onKeyUp={handleKeyUp}
                 onKeyDown={handleKeyDown}
                 tabIndex="0"
-            >
+                >
 
             </canvas>
         </div>
+    )
+}
+
+function PlayPage(props)
+{
+    return (
+        <div className="play-page">
+            <button onClick={props.click} className="play-button">Play</button>
+        </div>
+    )
+}
+
+
+export default function LaunchGame()
+{
+    const [play, setPlay] = React.useState(false);
+
+    return (
+        <>
+            <Game launch={play}/>
+            {!play && <PlayPage click={() => setPlay(true)} />}
+        </>
     )
 }

@@ -34,3 +34,36 @@
     font-size: 200%;
     font-family: 'inter', sans-serif;
 }
+
+
+/* ///////////  PLAY PAGE   ///////// */
+
+.play-page
+{
+    grid-column: 5 / -1;
+    grid-row: 2 / span 18;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.play-button
+{
+    height: 5%;
+    min-height: 20px;
+    width: 7%;
+    min-width: 50px;
+    border-radius: 5px;
+    border: 1px solid black;
+    cursor: pointer;
+    font-family: 'inter', sans-serif;
+    font-size: medium;
+}
+
+.play-button:hover
+{
+    background-color: rgba(0, 0, 0);
+    color: white;
+    border: 1px solid white;
+}

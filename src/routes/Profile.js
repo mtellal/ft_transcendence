@@ -65,6 +65,11 @@ function ProfilePicture()
         setImg(URL.createObjectURL(e.target.files[0]));
     }
 
+    function disconnect()
+    {
+        console.log("ProfilePicture: disconnection")
+    }
+
     return (
         <div className="profile-picture-container">
             <img className="profile-picture" src={img} />
@@ -78,6 +83,12 @@ function ProfilePicture()
                     onChange={editProfilePicture}
                 />
             </form>
+            <button 
+                className="profile-picture-button" 
+                onClick={disconnect}
+            >
+                Disconnect
+            </button>
         </div>
     )
 }

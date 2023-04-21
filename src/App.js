@@ -4,9 +4,9 @@ import { Outlet, useLocation } from 'react-router-dom';
 import './App.css';
 
 import Footer from './components/Footer';
-import Game from './components/Game';
 import Header from './components/Header'
 import Sidebar from './components/SideBar';
+import LaunchGame from './components/Game';
 
 function App() {
 
@@ -16,7 +16,7 @@ function App() {
     <div className="App" >
       <Header />
       <Sidebar />
-      {location.pathname !== "/profile" && <Game launch={false} />}
+      {(location.pathname === "/game" || location.pathname === "/" )&& <LaunchGame />}
       <Footer />
       <Outlet />
     </div>

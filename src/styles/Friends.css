@@ -1,0 +1,87 @@
+.friends
+{
+    background-color: rgb(255, 255, 255);
+    grid-column: 5 / -1;
+    grid-row: 2 / span 18;
+    margin: 0;   
+    padding: 2vh 2vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
+.friend
+{
+    height: 5vh;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 10px;
+    border-top: 1px solid black;
+    max-width: 200px;
+}
+
+.infos-div
+{
+    display: flex;
+}
+
+.friend-image
+{
+    height: 80%;
+}
+
+.firend-icon-status
+{
+    border-radius: 50%;
+    background-color: rgb(255, 0, 0);
+    height: 10px;
+    width: 10px;
+    align-self: end;
+    position: relative;
+    top: -5px;
+    left: -15px;
+    border: 2px solid rgb(255, 255, 255);
+}
+
+.friend-infos > p
+{
+    margin: 0;
+}
+
+.friend-infos
+{
+    padding-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.username
+{
+    font-size: large;
+    max-width: 15vw;
+    overflow: hidden;
+}
+
+.friend-status
+{
+    font-size: small;
+    color: grey;
+}
+
+
+.friend-actions
+{
+    background-color: rgb(212, 212, 212);
+    padding: 2% 2%;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.friend-actions:hover
+{
+    background-color: rgb(189, 186, 186);
+}

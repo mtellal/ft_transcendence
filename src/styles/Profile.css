@@ -45,7 +45,7 @@
 
 .profile-infos-button
 {
-    background-color: rgb(255, 242, 227);
+    background-color: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     border: 1px solid black;
     margin-top: 2%;
@@ -59,9 +59,9 @@
     font-size: small;
 }
 
-.profile-infos-button:active
+.profile-infos-button:hover
 {
-    background-color: rgb(228, 213, 194);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 
@@ -100,7 +100,12 @@
     cursor: pointer;
 }
 
-.profil-picture-label:active
+.profil-picture-label:hover
 {
     background-color: rgb(197, 197, 197);
+}
+
+.profile-picture-button
+{
+    cursor: pointer;
 }
