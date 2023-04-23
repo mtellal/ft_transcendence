@@ -8,12 +8,12 @@ import SignUp from './routes/Signup';
 import Game from './components/Game';
 import Profile from './routes/Profile';
 import History from './routes/History';
-import Friends from './routes/Friends';
 
 import {
     createBrowserRouter,
     RouterProvider
 } from 'react-router-dom';
+import Chat from './routes/Chat';
 
 
 const router = createBrowserRouter([
@@ -40,6 +40,10 @@ const router = createBrowserRouter([
             {
                 path: "history",
                 element: <History />
+            },
+            {
+                path: "chat",
+                element: <Chat />
             },
 
         ]

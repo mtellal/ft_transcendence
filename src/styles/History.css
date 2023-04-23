@@ -1,6 +1,5 @@
 .history
 {
-    background-color: rgb(255, 255, 255);
     grid-column: 5 / -1;
     grid-row: 2 / span 18;
     margin: 0;   

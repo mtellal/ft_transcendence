@@ -6,16 +6,22 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0 10px;
     min-width: 200px;
     overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.friends-title
+{
+    padding: 0 10%;
 }
 
 .friendlist
 {
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
+    width: 100%;
 }
 
 .friend
@@ -23,14 +29,13 @@
     height: 5vh;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
-    border-top: 1px solid black;
+    border-top: 1px solid rgb(112, 112, 112);
+    padding: 5px 10px;
 }
 
 .infos-div
 {
     display: flex;
-    width: 80%;
     overflow: hidden;
 }
 
@@ -41,10 +46,10 @@
 
 .firend-icon-status
 {
+    min-width: 10px;
+    min-height: 10px;
     border-radius: 50%;
     background-color: rgb(255, 0, 0);
-    height: 10px;
-    width: 10px;
     align-self: end;
     position: relative;
     top: -5px;
@@ -92,13 +97,4 @@
 .friend-actions:hover
 {
     background-color: rgb(189, 186, 186);
-}
-
-
-/* //////////   CHAT    ///////// */
-
-.chat
-{
-    position:sticky;
-    background-color: aqua;
 }
