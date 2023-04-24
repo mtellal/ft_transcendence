@@ -4,11 +4,25 @@ import '../styles/Chat.css'
 
 import FriendElement from "../components/FriendElement";
 
-import { examplesFriends, examplesGroup } from "../exampleDatas";
+import { examplesFriends, examplesGroup, exampleMessages } from "../exampleDatas";
+
+
+function Message(props)
+{
+
+    return (
+        <div className="message-div"
+            style={props.sender === "player1" ? {justifyContent: 'right'} : null}
+        >
+                <p className="message" style={props.sender === "player1" ? {backgroundColor: '#FFF5DD'} : null} >{props.message}</p>
+        </div>
+    )
+}
 
 function MessagesElement()
 {
 
+    const lastMessageRef = React.useRef(null);
     const [value, setValue] = React.useState("");
 
     function handleChange(e)
@@ -17,16 +31,28 @@ function MessagesElement()
         setValue(e.target.value)
     }
 
+    const messages = exampleMessages.map((m, index) => {
+        return (
+            <Message  message={m.message} sender={m.sender}/>
+        )
+    })
+
+        React.useEffect(() => {
+            lastMessageRef.current.scrollIntoView();
+        }, [])
+
     return (
-        <div className="messages-container">
+        <div  className="messages-container">
             <div className="messages-display">
-                <p>wdfwfwwdfwfwf</p>
+                {messages}
             </div>
+            <div ref={lastMessageRef}></div>
             <div className="messages-input">
                 <textarea
                     className="input"
                     value={value}
                     onChange={handleChange}
+                    placeholder="Write your message"
                     />
             </div>
         </div>

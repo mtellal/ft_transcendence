@@ -117,7 +117,6 @@
 
 .messages-container
 {
-    background-color: rgb(255, 255, 209);
     width: 70%;
     overflow-y: scroll;
     display: flex;
@@ -127,23 +126,43 @@
 .messages-display
 {
     flex: 10;
-    background-color: rgb(255, 222, 222);
-    width: 100%;
 }
 
 .messages-input
 {
-    background-color: rgba(40, 102, 102, 0.336);
+    background-color: rgb(202, 202, 202);
     word-wrap: break-word;
     padding: 2% 5%;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: sticky;
+    bottom: 0;
+    border-top: 1px solid grey;
 }
 
 .input
 {
     padding: 5px 5px;
     align-items: center;
-    resize: none;
+    font-family: 'inter', sans-serif;
+}
+
+.message-div
+{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 10px 10px;
+}
+
+.message
+{
+    max-width: 70%;
+    margin: 0;
+    margin: 5px 0;
+    background-color: rgb(235, 255, 255);
+    border: 1px solid black;
+    padding: 5px 5px;
+    border-radius: 5px;
 }

@@ -233,3 +233,82 @@ export const examplesFriends = [
     },
     
 ]
+
+export const exampleMessages = [
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player1",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    }
+]
