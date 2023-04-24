@@ -1,0 +1,115 @@
+
+.menu-container
+{
+    width: 30%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+/*      ///////     COLLECTION  ///// */
+
+.collection
+{
+    width: 100%;
+    margin: 0;
+    padding: 5% 0;
+}
+
+.collection-label
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.collection-title
+{
+    padding-left: 5%;
+}
+
+.collection-add
+{
+    padding: 5px 5px;
+    background-color: rgb(218, 218, 218);
+    cursor: pointer;
+}
+
+.collection-add:hover
+{
+    background-color: rgb(235, 235, 235);
+}
+
+.collection-list
+{
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+/* ///////  GROUP ELEMENT   ////// */
+
+.group
+{
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid black;
+    display: flex;
+    align-items: center;
+    padding: 2% 5% ;
+    min-height: 40px;
+    cursor: pointer;
+}
+
+.group > p {
+    margin: 0;
+}
+
+.group:hover
+{
+    background-color: rgb(236, 236, 236);
+}
+
+
+.group-name
+{
+    text-align: center;
+    font-size: large;
+    font-weight: 500;
+    max-width: 40%;
+    overflow: hidden;
+}
+
+.group-separator
+{
+    padding: 0 5px;
+}
+
+.group-members
+{
+    text-align: center;
+    color: gray;
+    font-size: small;
+    min-width: 10px;
+}
+
+@media (max-width: 900px)
+{
+    .group-members, .group-separator{
+        display: none;
+    }   
+    .group-name {
+        max-width: 100%;
+    }
+}
+
+.friend-chat
+{
+    cursor: pointer;
+}
+
+.friend-chat:hover
+{
+    background-color: rgb(236, 236, 236);
+}

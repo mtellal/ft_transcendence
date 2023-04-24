@@ -1,3 +1,15 @@
+
+/* 
+
+    STRUCT MESSAGE
+    {
+        id:
+        author:
+        message:
+    }
+
+*/
+
 export const examplesGroup = [
     {
         id: 1,
@@ -53,14 +65,87 @@ export const examplesFriends = [
         connected: false,
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 3,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 4,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 5,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 6,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 7,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 8,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 9,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 10,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 11,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 12,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 13,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 14,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 15,
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 16,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -72,14 +157,17 @@ export const examplesFriends = [
         connected:true,
         messages: [
             {
-                author: "friends2",
+                id:0,
+                author: "friends1",
                 message: "Hello World"
             },
             {
-                author: "friends2",
+                id: 1,
+                author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -90,14 +178,17 @@ export const examplesFriends = [
         username: "friends1",
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -109,14 +200,17 @@ export const examplesFriends = [
         connected:true,
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -128,14 +222,17 @@ export const examplesFriends = [
         connected:true,
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -146,14 +243,17 @@ export const examplesFriends = [
         username: "friends1",
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -164,14 +264,17 @@ export const examplesFriends = [
         username: "friends1",
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -182,14 +285,17 @@ export const examplesFriends = [
         username: "friends1",
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -200,14 +306,17 @@ export const examplesFriends = [
         username: "friends1",
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
@@ -218,14 +327,17 @@ export const examplesFriends = [
         username: "friends1",
         messages: [
             {
+                id:0,
                 author: "friends1",
                 message: "Hello World"
             },
             {
+                id: 1,
                 author: "friends1",
                 message: "How are you ?"
             },
             {
+                id: 2,
                 author: "me",
                 message: "Good and you ?"
             },
