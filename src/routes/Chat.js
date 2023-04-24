@@ -5,6 +5,7 @@ import '../styles/Chat.css'
 import FriendElement from "../components/FriendElement";
 
 import { examplesFriends, examplesGroup, exampleMessages } from "../exampleDatas";
+import { setSelectionRange } from "@testing-library/user-event/dist/utils";
 
 
 function Message(props)
@@ -124,7 +125,10 @@ function CollectionElement(props)
 function GroupElement(props)
 {
     return (
-        <div className="group">
+        <div className="group"
+            style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
+            onClick={() => props.click(props)}
+        >
             <p className="group-name">{props.name}</p>
             <p className="group-separator">-</p>
             <p className="group-members">{props.members} members</p>
@@ -138,10 +142,21 @@ function MenuElement(props)
 
     const [groups, setGroups] = React.useState(examplesGroup);
     const [friends, setFriends] = React.useState(examplesFriends);
+    const [currentFriend, setCurrentFriend] = React.useState();
+    const [currentGroup, setCurrentGroup] = React.useState();
 
     function handleFriendsMessage(p)
     {
-        console.log(p)
+        setCurrentFriend(p.id);
+        setCurrentGroup(null);
+        props.getElement(p);
+    }
+
+    function handleCurrentGroup(p)
+    {
+        setCurrentGroup(p.id);
+        setCurrentFriend(null);
+        props.getElement(p);
     }
 
     const groupList = groups.map(e => 
@@ -150,6 +165,8 @@ function MenuElement(props)
             id={e.id}
             name={e.name}
             members={e.members}
+            selected={currentGroup === e.id ? true : false}
+            click={handleCurrentGroup}
         />
     )
 
@@ -161,6 +178,7 @@ function MenuElement(props)
             connected={e.connected}
             chat={false}
             hover={true}
+            selected={currentFriend === e.id ? true : false}
             className="chat"
             click={handleFriendsMessage}
         />
@@ -190,7 +208,16 @@ function AddElement(props)
     {
         setValue(e.target.value);
     }
-    console.log("AddElement rendered")
+
+    function handleKeys(e)
+    {
+        if (e.key === "Enter")
+        {
+            console.log(`Search '${props.title.toLowerCase()}'`)
+            setValue("")
+        }
+
+    }
 
     return (
         <div className="add-container">
@@ -205,6 +232,7 @@ function AddElement(props)
                     className="add-input"
                     value={value}
                     onChange={handleChange}
+                    onKeyDown={handleKeys}
                     />
                 </label>
             </div>
@@ -218,6 +246,7 @@ export default function Chat()
     const [newFriend, setNewFriend] = React.useState(false);
     const [newGroup, setNewGroup] = React.useState(false);
     const [messagesDisplay, setMessagesDisplay] = React.useState(true);
+    const [conv, setConv] = React.useState();
 
     function addFriend()
     {
@@ -235,14 +264,20 @@ export default function Chat()
         setNewFriend(false)
     }
 
+    function getElement(p)
+    {
+        console.log(p)
+    }
+
     return (
         <div className="chat">
             <div className="chat-container">
                <MenuElement
                 addFriend={() => addFriend()}
                 addGroup={() => addGroup()}
+                getElement={getElement}
                />
-                { messagesDisplay &&  <MessagesElement /> }
+                { messagesDisplay &&  <MessagesElement friend={""} /> }
                 { newFriend && <AddElement title="Add a friend" />}
                 { newGroup && <AddElement title="Add a group" />}
             </div>

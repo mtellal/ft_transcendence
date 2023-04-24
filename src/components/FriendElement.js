@@ -7,6 +7,7 @@ export default function FriendElement(props)
     return (
         <div
             className={`friend ${props.className ? `friend-${props.className}` : null}` }
+            style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
         >
 
