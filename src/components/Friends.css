@@ -7,7 +7,7 @@
     justify-content: space-between;
     width: 100%;
     min-width: 200px;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     height: 100%;
 }

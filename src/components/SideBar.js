@@ -26,12 +26,17 @@ export default function Sidebar()
             icon: "account_circle"
         },
         {
-            id: 1,
+            id: 2,
+            title: "Game", 
+            icon: "sports_esports"
+        },
+        {
+            id: 3,
             title: "History", 
             icon: "history"
         },
         {
-            id: 2,
+            id: 4,
             title: "Chat", 
             icon: "chat"
         }

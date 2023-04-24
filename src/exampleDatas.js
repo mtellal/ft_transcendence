@@ -236,78 +236,97 @@ export const examplesFriends = [
 
 export const exampleMessages = [
     {
+        id:0,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:1,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:2,
+        sender: "player2",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        id:3,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:4,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:5,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:6,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:7,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
+        id:8,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:9,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:10,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:11,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:12,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:13,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:14,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:15,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:16,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:17,
         sender: "player1",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     },
     {
+        id:18,
         sender: "player2",
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     }
