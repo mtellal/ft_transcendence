@@ -7,6 +7,8 @@ import { examplesFriends, examplesGroup, exampleMessages } from "../exampleDatas
 import MessagesElement from "../components/Chat/MessagesElement";
 import MenuElement from "../components/Chat/MenuElement";
 import AddElement from "../components/Chat/AddElement";
+import { Outlet } from "react-router-dom";
+
 
 export default function Chat()
 {
@@ -51,8 +53,7 @@ export default function Chat()
                 getElement={getElement}
                />
                 { messagesDisplay &&  <MessagesElement item={item} /> }
-                { newFriend && <AddElement title="Add a friend" />}
-                { newGroup && <AddElement title="Add a group" />}
+                <Outlet />
             </div>
         </div>
     )

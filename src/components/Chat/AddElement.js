@@ -25,7 +25,7 @@ export default function AddElement(props)
     return (
         <div className="add-container">
             <div className="add-div">
-                <h2 className="add-title">{props.title}</h2>
+                <h2 className="add-title">Add a {props.title}</h2>
                 <label htmlFor="input" className="search-input">
                     <span className="material-symbols-outlined">
                         search

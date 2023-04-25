@@ -137,6 +137,12 @@ function Messages(props)
         )
     }
 
+    function renderInvitation()
+    {
+        <div className="block">
+            <p className="text-block">You have blocked <p className="friend-block">{props.name}</p></p>
+        </div>
+    }
 
     useEffect(() => {
         setBlocked(false);
@@ -152,6 +158,7 @@ function Messages(props)
                 name={props.name} 
                 connected={props.connected}
                 block={() => setBlocked(prev => !prev)}
+                invitation={() => setToggle(prev => !prev)}
             />
             <div className="messages-display">
                 {renderMessages()}

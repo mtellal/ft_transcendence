@@ -16,7 +16,7 @@
 
 .messages-input
 {
-    background-color: rgb(223, 223, 223);
+    background-color: rgb(255, 247, 237);
     word-wrap: break-word;
     padding: 2% 5%;
     display: flex;
@@ -24,7 +24,7 @@
     align-items: center;
     position: sticky;
     bottom: 0;
-    border-top: 1px solid rgb(0, 0, 0);
+    border-top: 1px solid black;
 }
 
 .input
@@ -71,6 +71,7 @@
 
 .banner
 {
+    background-color: rgb(255, 247, 237);
     flex: 0.5;
     border-bottom: 1px solid black;
     display: flex;

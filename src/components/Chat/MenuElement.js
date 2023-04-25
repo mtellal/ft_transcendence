@@ -4,6 +4,8 @@ import FriendElement from "../FriendElement";
 import { examplesFriends, examplesGroup, exampleMessages } from "../../exampleDatas";
 
 import './MenuElement.css'
+import { Link } from "react-router-dom";
+
 
 function CollectionElement(props)
 {
@@ -11,11 +13,15 @@ function CollectionElement(props)
         <div className="collection">
             <div className="collection-label">
                 <h2 className="collection-title">{props.title}</h2>
-                <div onClick={props.addClick} className="collection-add">
+                <Link 
+                    to={`/chat/add-${props.title.toLowerCase().slice(0, -1)}`} 
+                    onClick={props.addClick} 
+                    className="collection-add"
+                >
                     <span className="material-symbols-outlined">
                         add
                     </span>
-                </div>
+                </Link>
             </div>
             <div className="collection-list">
                 {props.collection}
@@ -27,14 +33,14 @@ function CollectionElement(props)
 function GroupElement(props)
 {
     return (
-        <div className="group"
+        <Link to={`/chat/${props.name}`} className="group"
             style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
         >
             <p className="group-name">{props.name}</p>
             <p className="group-separator">-</p>
             <p className="group-members">{props.members} members</p>
-        </div>
+        </Link>
     )
 }
 

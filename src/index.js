@@ -9,11 +9,14 @@ import Game from './components/Game';
 import Profile from './routes/Profile';
 import History from './routes/History';
 
+import AddElement from "./components/Chat/AddElement";
+
+
 import {
     createBrowserRouter,
     RouterProvider
 } from 'react-router-dom';
-import Chat from './routes/Chat';
+import Chat, { ChatRoute } from './routes/Chat';
 
 
 const router = createBrowserRouter([
@@ -44,8 +47,21 @@ const router = createBrowserRouter([
             {
                 path: "chat",
                 element: <Chat />,
+                children: [
+                    {
+                        path: "add-friend",
+                        element:  <AddElement title="friend" />
+                    },
+                    {
+                        path: "add-group",
+                        element:  <AddElement title="group" />
+                    }
+                ]
             },
-
+            {
+                path: "chat/:id",
+                element: <Chat />
+            }
         ]
     },
 ])

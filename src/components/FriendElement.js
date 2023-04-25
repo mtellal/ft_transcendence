@@ -1,11 +1,12 @@
 import './Friends.css'
 
 import img from '../images/user.png'
+import { Link } from 'react-router-dom'
 
 export default function FriendElement(props)
 {
     return (
-        <div
+        <Link to={`/chat/${props.username}`}
             className={`friend ${props.className ? `friend-${props.className}` : null}` }
             style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
@@ -34,6 +35,6 @@ export default function FriendElement(props)
                 </div>
             }    
 
-        </div>
+        </Link>
     )
 }

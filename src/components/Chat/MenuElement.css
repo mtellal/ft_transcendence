@@ -33,6 +33,8 @@
     padding: 5px 5px;
     background-color: rgb(218, 218, 218);
     cursor: pointer;
+    text-decoration: none;
+    color: black;
 }
 
 .collection-add:hover
@@ -52,6 +54,8 @@
 
 .group
 {
+    text-decoration: none;
+    color: black;
     margin: 0;
     padding: 0;
     border-top: 1px solid black;
