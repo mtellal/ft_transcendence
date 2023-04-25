@@ -281,6 +281,27 @@ export const examplesFriends = [
         ]
     },
     {
+        id: 7,
+        username: "friends1",
+        messages: [
+            {
+                id:0,
+                author: "friends1",
+                message: "Hello World"
+            },
+            {
+                id: 1,
+                author: "friends1",
+                message: "How are you ?"
+            },
+            {
+                id: 2,
+                author: "me",
+                message: "Good and you ?"
+            },
+        ]
+    },
+    {
         id: 8,
         username: "friends1",
         messages: [
@@ -303,27 +324,6 @@ export const examplesFriends = [
     },
     {
         id: 9,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 10,
         username: "friends1",
         messages: [
             {

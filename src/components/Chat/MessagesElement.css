@@ -10,7 +10,7 @@
 
 .messages-display
 {
-    flex: 10;
+    flex: 7;
     overflow-y: auto;
 }
 
@@ -39,6 +39,7 @@
     display: flex;
     align-items: center;
     justify-content: left;
+    padding: 0 2%;
 }
 
 .message
@@ -63,4 +64,93 @@
 .no-messages
 {
     font-size: large;
+}
+
+
+/*  ///////     BANNER      ////////// */
+
+.banner
+{
+    flex: 0.5;
+    border-bottom: 1px solid black;
+    display: flex;
+    padding: 2% 2%;
+}
+
+.banner-div1
+{
+    display: flex;
+    align-items: center;
+}
+
+.banner-pp
+{
+    height: auto;
+    width: 10%;
+}
+
+.banner-name
+{
+    margin:0;
+    padding-left: 20px;
+    font-size: x-large;
+    font-weight: 500;
+}
+
+
+.banner-status
+{
+    padding-left: 10px;
+    color: grey;
+    font-size: small;
+}
+
+
+
+.banner-div2
+{
+    display: flex;
+    align-items: center;
+}
+
+.banner-icon
+{
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.banner-icon:hover
+{
+    background-color: rgb(231, 231, 231);
+}
+
+.banner-icon:active
+{
+    background-color: white;
+}
+
+
+.block
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-block
+{
+    display: flex;
+    align-items: center;
+}
+
+.friend-block
+{
+    padding: 10px 5px;
+    font-size: large;
+    font-weight: 600;
 }

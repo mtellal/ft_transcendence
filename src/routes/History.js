@@ -51,54 +51,63 @@ export default function History(props)
 
     const exampleScores = [
         {
+            id: 0,
             player1: "faker",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "federer",
         },
         {
+            id: 1,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 2,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 3,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 4,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 5,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 6,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 7,
             player1: "joueur1",
             score1: generateScore(20),
             score2: generateScore(20),
             player2: "joueur2",
         },
         {
+            id: 8,
             player1: "joueur1",
             score1: 10,
             score2: 10,
@@ -109,6 +118,8 @@ export default function History(props)
     const listHistory = exampleScores.map(e => {
         return (
             <MatchHistory
+                key={e.id}
+                id={e.id}
                 player1={e.player1}
                 score1={e.score1}
                 score2={e.score2}
