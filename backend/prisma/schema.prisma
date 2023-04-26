@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User needs: a unique name, an avatar, 2FA, a friendlist, a match history, stats
+// Will add more as we progress
+enum Status {
+	ONLINE
+	OFFLINE
+	INGAME
+}
+
+model User {
+	id					Int @id @unique
+	username		String @unique
+	avatar			String
+	userStatus	Status @default(ONLINE)
+	friendList	Int[] @default([])
+	blockedList	Int[] @default([])
+	channelList	Int[] @default([])
+	createdAt		DateTime @default(now())
+}
+
+// For a Channel, we need an enum type representing the privacy of the channel (public, private, protected), a channel owner, one or more channel administrator, 
+// a ban list, a mute list. Might be used for private messages too, like PRIVMSG in ft_irc?
+
+enum ChannelType {
+	PUBLIC
+	PRIVATE
+	PROTECTED
+	WHISPER
+}
+
+model Channel {
+	id			Int @id @default(autoincrement())
+	ownerId	Int
+	type		ChannelType
+}
+
+// For a Game, need at least the ID of the two players involved, the score, if the match is ongoing or over. Will add more.
+model Game {
+	id		Int @id @default(autoincrement())
+}
