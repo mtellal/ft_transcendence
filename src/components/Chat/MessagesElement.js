@@ -8,81 +8,104 @@ import './MessagesElement.css'
     style and display one single message
 */
 
-function Message(props)
-{
-    function addStyle()
-    {
+function Message(props) {
+    function addStyle() {
         let obj;
 
         if (props.author === "me")
-            obj = {backgroundColor: '#FFF5DD'};
+            obj = { backgroundColor: '#FFF5DD' };
         return (obj);
     }
 
     return (
         <div className="message-div"
-            style={props.author === "me" ? {justifyContent: 'right'} : null}
+            style={props.author === "me" ? { justifyContent: 'right' } : null}
         >
-                <p
-                    className="message"
-                    style={addStyle()}
-                >
-                        {props.message}
-                    </p>
+            <p
+                className="message"
+                style={addStyle()}
+            >
+                {props.message}
+            </p>
         </div>
     )
 }
 
-function Banner(props)
-{
+/*
+    style and display an invitation
+*/
+
+function GameInvitation(props) {
     return (
-        <div className="banner">
-
-                <div className="banner-div1">
-
-                    <img 
-                        className="banner-pp"
-                        src={imgProfile}
-                        alt="profile"
-                    />
-                    <p className="banner-name" >{props.name}</p>
-                    <p 
-                        className="banner-status"
-                        style={props.connected === "disconnected" ? {color:'red'} : {color: 'green'}}
-                    >
-                        {props.connected}
-                    </p>
-
-                </div>
-                <div className="banner-div2">
-
-                    <div className="banner-icon">
-                        <span className="material-symbols-outlined">
-                            person
-                        </span>
+        <>
+            {
+                props.author === "me" ?
+                    <div className="block">
+                        <p className="text-block">You have sent an invitation to<span className="friend-block">{props.to}</span></p>
+                    </div> :
+                    <div className="block">
+                        <p className="text-block">You have recieved an invitation from<span className="friend-block">{props.author}</span></p>
                     </div>
-
-                    <div className="banner-icon">
-                        <span className="material-symbols-outlined">
-                            sports_esports
-                        </span>
-                    </div>
-
-                    <div 
-                        className="banner-icon"
-                        onClick={props.block}
-                    >
-                        <span className="material-symbols-outlined">
-                            block
-                        </span>
-                    </div>
-                    
-
-                </div>
-
-            </div>
+            }
+        </>
     )
 }
+
+function Banner(props) {
+
+    function selectStatusDiv()
+    {
+        if (props.status === "onLine")
+            return ({color:"gren"} )
+        else if (props.status === "disconnected")
+            return ({color:"red"})
+        else if (props.status === "inGame")
+            return ({color: '#FFC600'})
+    }
+
+    function selectStatusText()
+    {
+        if (props.status === "onLine")
+            return ("On line")
+        else if (props.status === "disconnected")
+            return ("Disconnected")
+        else if (props.status === "inGame") 
+        return ("In game")
+    }
+
+    return (
+        <div className="banner">
+            <div className="banner-div1">
+                <img className="banner-pp" src={imgProfile} alt="profile" />
+                <p className="banner-name" >{props.name}</p>
+                <p
+                    className="banner-status"
+                    style={selectStatusDiv()}
+                >
+                    {selectStatusText()}
+                </p>
+            </div>
+            <div className="banner-div2">
+                <div className="banner-icon">
+                    <span className="material-symbols-outlined">
+                        person
+                    </span>
+                </div>
+                <div className="banner-icon" onClick={props.invitation}>
+                    <span className="material-symbols-outlined">
+                        sports_esports
+                    </span>
+                </div>
+                <div className="banner-icon" onClick={props.block} >
+                    <span className="material-symbols-outlined">
+                        block
+                    </span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 
 
 /*
@@ -90,58 +113,76 @@ function Banner(props)
     messages are updated in parent component (MessageElement)
 */
 
-function Messages(props)
-{
+function Messages(props) {
     const lastMessageRef = React.useRef(null);
     const [value, setValue] = React.useState("");
     const [toggle, setToggle] = React.useState(false);
     const [blocked, setBlocked] = React.useState(false);
 
-    function handleChange(e)
-    {
+    function handleChange(e) {
         setValue(e.target.value)
     }
 
-
-    function handleKeys(e)
+    function newInvitation()
     {
-        if (e.key === "Enter" && value !== "" && !blocked)
-        {
-            props.newMessage(value);
+        console.log("props from Messages", props);
+        props.newMessage({
+
+            author: "me",
+            type: "invitation",
+            to: props.name,
+            status: "valid"
+        })
+    }
+
+    function handleKeys(e) {
+        if (e.key === "Enter" && value !== "" && !blocked) {
+            let newMessage = {
+                type: "text",
+                author: "me",
+                message: value
+            }
+            props.newMessage(newMessage);
             setValue("")
             setToggle(prev => !prev);
         }
     }
 
 
-    function renderMessages()
-    {
+    function renderMessages() {
         return (
-            props.messages.map(m => (
-                <Message 
-                    key={m.id}
-                    id={m.id}
-                    message={m.message}
-                    author={m.author}
-                />
-            ))
+            props.messages.map(m => {
+                if (m.type && m.type === "invitation") {
+                    return (
+                        <GameInvitation
+                            key={m.id}
+                            id={m.id}
+                            author={m.author}
+                            to={m.to}
+                            status={m.status}
+                        />
+                    )
+                }
+                else {
+                    return (
+                        <Message
+                            key={m.id}
+                            id={m.id}
+                            message={m.message}
+                            author={m.author}
+                        />
+                    )
+                }
+            })
         )
     }
 
-    function renderBlock()
-    {
+    function renderBlock() {
         return (
             <div className="block">
-                <p className="text-block">You have blocked <p className="friend-block">{props.name}</p></p>
+                <p className="text-block">You have blocked <span className="friend-block">{props.name}</span></p>
             </div>
         )
-    }
-
-    function renderInvitation()
-    {
-        <div className="block">
-            <p className="text-block">You have blocked <p className="friend-block">{props.name}</p></p>
-        </div>
     }
 
     useEffect(() => {
@@ -149,16 +190,16 @@ function Messages(props)
     }, [props.name])
 
     React.useEffect(() => {
-            lastMessageRef.current.scrollIntoView();
+        lastMessageRef.current.scrollIntoView();
     }, [toggle, props.messages, blocked])
 
     return (
         <>
             <Banner
-                name={props.name} 
-                connected={props.connected}
+                name={props.name}
+                status={props.status}
                 block={() => setBlocked(prev => !prev)}
-                invitation={() => setToggle(prev => !prev)}
+                invitation={() => newInvitation()}
             />
             <div className="messages-display">
                 {renderMessages()}
@@ -167,13 +208,13 @@ function Messages(props)
             </div>
             <div className="messages-input"
             >
-                    <input
-                        className="input"
-                        value={value}
-                        onChange={handleChange}
-                        placeholder="Write your message"
-                        onKeyDown={handleKeys}
-                    /> 
+                <input
+                    className="input"
+                    value={value}
+                    onChange={handleChange}
+                    placeholder="Write your message"
+                    onKeyDown={handleKeys}
+                />
             </div>
         </>
     )
@@ -186,34 +227,29 @@ function Messages(props)
 
 */
 
-export default function MessagesElement({item})
-{
+export default function MessagesElement({ item }) {
     const [messages, setMessages] = React.useState([]);
 
-    function newMessage(value)
-    {
+    function newMessage(message) {
 
+        console.log(message)
         let newMessage = {
-                id: messages.length + 1,
-                author: "me",
-                message: value
+            id: messages.length + 1,
+            ...message
         }
-        if (messages.length)
-        {
+        if (messages.length) {
             setMessages(prev => ([
-                ...prev, 
+                ...prev,
                 newMessage
             ]))
         }
-        else
-        {
-            setMessages([ newMessage ])
+        else {
+            setMessages([newMessage])
         }
 
     }
 
-    function NoMessages()
-    {
+    function NoMessages() {
         return (
             <div className="no-messages-div">
                 <p key={0} className="no-messages">
@@ -225,27 +261,26 @@ export default function MessagesElement({item})
 
 
     useEffect(() => {
-        if (item && item.messages)
-            setMessages(item.messages);
-        else 
+        if (item && item.conversation)
+            setMessages(item.conversation);
+        else
             setMessages([]);
     }, [item])
-    
 
     return (
-        <div  className="messages-container">
-        {
-            messages.length ? 
+        <div className="messages-container">
+            {
+                messages.length ?
 
-            <Messages 
-                messages={messages}
-                newMessage={newMessage}
-                name={item.username}
-                connected={item.connected ? "on line" : "disconnected"}
-            />
-            : 
-            <NoMessages />
-        }
+                    <Messages
+                        messages={messages}
+                        newMessage={newMessage}
+                        name={item.username}
+                        status={item.status}
+                    />
+                    :
+                    <NoMessages />
+            }
         </div>
     )
 }

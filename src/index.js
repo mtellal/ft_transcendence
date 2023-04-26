@@ -11,18 +11,20 @@ import History from './routes/History';
 
 import AddElement from "./components/Chat/AddElement";
 
+import { currentUser as user } from './exampleDatas'
 
 import {
     createBrowserRouter,
     RouterProvider
 } from 'react-router-dom';
+
 import Chat, { ChatRoute } from './routes/Chat';
 
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App />,
+        element: <App user={user} />,
         children: [
             {
                 path: "signin",
@@ -46,21 +48,25 @@ const router = createBrowserRouter([
             },
             {
                 path: "chat",
-                element: <Chat />,
+                element: <Chat user={user} />,
                 children: [
                     {
                         path: "add-friend",
-                        element:  <AddElement title="friend" />
+                        element:  <AddElement user={user} title="friend" />
                     },
                     {
                         path: "add-group",
-                        element:  <AddElement title="group" />
+                        element:  <AddElement user={user} title="group" />
                     }
                 ]
             },
             {
-                path: "chat/:id",
-                element: <Chat />
+                path: "chat/groups/:id",
+                element: <Chat user={user} />
+            },
+            {
+                path: "chat/friends/:id",
+                element: <Chat user={user} />
             }
         ]
     },

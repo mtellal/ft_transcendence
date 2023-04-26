@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import '../styles/Chat.css'
 
@@ -7,13 +7,11 @@ import { examplesFriends, examplesGroup, exampleMessages } from "../exampleDatas
 import MessagesElement from "../components/Chat/MessagesElement";
 import MenuElement from "../components/Chat/MenuElement";
 import AddElement from "../components/Chat/AddElement";
-import { Outlet } from "react-router-dom";
+import { Outlet, useRevalidator } from "react-router-dom";
 
 
-export default function Chat()
+export default function Chat(props)
 {
-    const [newFriend, setNewFriend] = React.useState(false);
-    const [newGroup, setNewGroup] = React.useState(false);
     const [messagesDisplay, setMessagesDisplay] = React.useState(true);
     const [item, setItem] = React.useState(null);
 
@@ -21,26 +19,20 @@ export default function Chat()
     {
         console.log("addFriend");
         setMessagesDisplay(false)
-        setNewFriend(true);
-        setNewGroup(false)
     }
 
     function addGroup()
     {
         console.log("add group");
-        setMessagesDisplay(prev => false)
-        setNewGroup(true)
-        setNewFriend(false)
+        setMessagesDisplay(false)
     }
 
     function getElement(p)
     {
-        if (p.username)
-            setItem(examplesFriends[p.id])
+        if (p.username && props.user.friendList)
+            setItem(props.user.friendList[p.id])
         else if (p.name)
             setItem(exampleMessages[p.id])
-        setNewFriend(false);
-        setNewGroup(false);
         setMessagesDisplay(true);
     }
 
@@ -48,11 +40,12 @@ export default function Chat()
         <div className="chat">
             <div className="chat-container">
                <MenuElement
+                user={props.user}
                 addFriend={() => addFriend()}
                 addGroup={() => addGroup()}
                 getElement={getElement}
                />
-                { messagesDisplay &&  <MessagesElement item={item} /> }
+                { messagesDisplay && <MessagesElement  user={props.user} item={item} /> }
                 <Outlet />
             </div>
         </div>

@@ -1,59 +1,50 @@
 
-/* 
-
-    STRUCT MESSAGE
-    {
-        id:
-        author:
-        message:
-    }
-
-*/
+import imgProfile from './images/user.png'
 
 export const examplesGroup = [
     {
         id: 1,
-        name: "group1",
+        username: "group1",
         members: 2,
     },
     {
         id: 2,
-        name: "wdfwfd",
+        username: "wdfwfd",
         members: 15,
     },
     {
         id: 3,
-        name: "Bros",
+        username: "Bros",
         members: 5,
     },
     {
         id: 4,
-        name: "wdf",
+        username: "wdf",
         members: 18  ,
     },
     {
         id: 5,
-        name: "wdfw",
+        username: "wdfw",
         members: 6 ,
     },
     {
         id: 6,
-        name: "rth",
+        username: "rth",
         members: 1 ,
     },
     {
         id: 7,
-        name: "ooo",
+        username: "ooo",
         members: 88  ,
     },
     {
         id: 8,
-        name: "Teaaam2",
+        username: "Teaaam2",
         members: 65  ,
     },
     {
         id: 9,
-        name: "Teamyj6m2",
+        username: "Teamyj6m2",
         members: 12 ,
     },
 ]
@@ -66,86 +57,110 @@ export const examplesFriends = [
         messages: [
             {
                 id:0,
+                type: "text",
                 author: "friends1",
                 message: "Hello World"
             },
             {
                 id: 1,
+                type: "text",
                 author: "friends1",
                 message: "How are you ?"
             },
             {
                 id: 2,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 3,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 4,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 5,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 6,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 7,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 8,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 9,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 10,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 11,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 12,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 13,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 14,
+                type: "invitation",
                 author: "me",
-                message: "Good and you ?"
+                to: "friends1",
+                status: "valid"
             },
             {
                 id: 15,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
             {
                 id: 16,
+                type: "text",
+                author: "me",
+                message: "Good and you ?"
+            },
+            {
+                id: 17,
+                type: "text",
                 author: "me",
                 message: "Good and you ?"
             },
@@ -443,3 +458,1415 @@ export const exampleMessages = [
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     }
 ]
+
+
+export const currentUser = 
+{
+    username: "currentUser",
+    password: "mypassword",
+    img: imgProfile,
+    status: "onLine",
+    friendList: [
+        {
+            id: 0,
+            username: "friend1",
+            img: imgProfile,
+            status: "onLine",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 1,
+            username: "friend2",
+            img: imgProfile,
+            status: "disconnected",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                }
+            ],
+            blocked: false
+        },
+        {
+            id: 2,
+            username: "friend3",
+            img: imgProfile,
+            status: "disconnected",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 3,
+            username: "friend4",
+            img: imgProfile,
+            status: "inGame",
+            conversation: [],
+            blocked: false
+        },
+        {
+            id: 4,
+            username: "friend5",
+            img: imgProfile,
+            status: "disconnected",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 5,
+            username: "friend6",
+            img: imgProfile,
+            status: "onLine",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 6,
+            username: "friend7",
+            img: imgProfile,
+            status: "inGame",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 7,
+            username: "friend8",
+            img: imgProfile,
+            status: "disconnected",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 8,
+            username: "friend9",
+            img: imgProfile,
+            status: "disconnected",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 9,
+            username: "friend10",
+            img: imgProfile,
+            status: "onLine",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 10,
+            username: "friend11",
+            img: imgProfile,
+            status: "onLine",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 11,
+            username: "friend12",
+            img: imgProfile,
+            status: "onLine",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+        {
+            id: 12,
+            username: "friend13",
+            img: imgProfile,
+            status: "onLine",
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friends1",
+                    message: "Hello World"
+                },
+                {
+                    id: 1,
+                    type: "text",
+                    author: "friends1",
+                    message: "How are you ?"
+                },
+                {
+                    id: 2,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 4,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 5,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 6,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 7,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 8,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 9,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 10,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 11,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 12,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 13,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 14,
+                    type: "invitation",
+                    author: "me",
+                    to: "friends1",
+                    status: "valid"
+                },
+                {
+                    id: 15,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 16,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+                {
+                    id: 17,
+                    type: "text",
+                    author: "me",
+                    message: "Good and you ?"
+                },
+            ],
+            blocked: false
+        },
+
+    ],
+
+}

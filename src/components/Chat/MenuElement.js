@@ -33,7 +33,7 @@ function CollectionElement(props)
 function GroupElement(props)
 {
     return (
-        <Link to={`/chat/${props.name}`} className="group"
+        <Link to={`/chat/groups/${props.name}`} className="group"
             style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
         >
@@ -47,9 +47,8 @@ function GroupElement(props)
 
 export default function MenuElement(props)
 {
-
     const [groups, setGroups] = React.useState(examplesGroup);
-    const [friends, setFriends] = React.useState(examplesFriends);
+    const [friends, setFriends] = React.useState(props.user.friendList);
     const [currentFriend, setCurrentFriend] = React.useState();
     const [currentGroup, setCurrentGroup] = React.useState();
 
@@ -78,17 +77,17 @@ export default function MenuElement(props)
         />
     )
 
-    const friendsList = friends.map(e => (
+    const friendsList = friends.map(f => (
         <FriendElement 
-            key={e.id}
-            id={e.id}
-            username={e.username}
-            connected={e.connected}
+            key={f.id}
+            id={f.id}
+            username={f.username}
+            status={f.status}
             chat={false}
             hover={true}
-            selected={currentFriend === e.id ? true : false}
+            selected={currentFriend === f.id ? true : false}
             className="chat"
-            click={handleFriendsMessage}
+            click={() => handleFriendsMessage(f)}
         />
     ))
 

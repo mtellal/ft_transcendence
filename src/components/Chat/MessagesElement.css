@@ -71,7 +71,6 @@
 
 .banner
 {
-    background-color: rgb(255, 247, 237);
     flex: 0.5;
     border-bottom: 1px solid black;
     display: flex;
