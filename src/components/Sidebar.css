@@ -16,6 +16,7 @@
 .menu--element
 {
     width: 70%;
+    max-width: 150px;
     border-radius: 10px;
     display: flex;
     align-items: center;

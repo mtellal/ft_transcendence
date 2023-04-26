@@ -16,15 +16,13 @@
 
 .messages-input
 {
-    background-color: rgb(255, 247, 237);
+    flex: 1;
     word-wrap: break-word;
-    padding: 2% 5%;
     display: flex;
     justify-content: center;
     align-items: center;
     position: sticky;
     bottom: 0;
-    border-top: 1px solid black;
 }
 
 .input
@@ -32,6 +30,7 @@
     padding: 5px 5px;
     align-items: center;
     font-family: 'inter', sans-serif;
+    box-shadow: 1px 1px 3px black;
 }
 
 .message-div
@@ -134,12 +133,17 @@
     background-color: white;
 }
 
-
+/*  /////   BLOCK MESSAGE   ////    */
+ 
 .block
 {
+    background-color: white;
+    border-top: 1px solid black;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: sticky;
+    bottom: 0;
 }
 
 .text-block
@@ -149,6 +153,29 @@
 }
 
 .friend-block
+{
+    padding: 10px 5px;
+    font-size: large;
+    font-weight: 600;
+}
+
+/*  /////   GAME INVITATION MESSAGE   ////    */
+
+.invitation
+{
+    background-color: rgb(255, 250, 243);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-invitation
+{
+    display: flex;
+    align-items: center;
+}
+
+.friend-invitation
 {
     padding: 10px 5px;
     font-size: large;

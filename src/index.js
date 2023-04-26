@@ -9,7 +9,9 @@ import Game from './components/Game';
 import Profile from './routes/Profile';
 import History from './routes/History';
 
-import AddElement from "./components/Chat/AddElement";
+import AddElement from "./components/Chat/Interface/AddElement";
+import Interface, { loader as friendLoader}from './components/Chat/Interface/Interface';
+
 
 import { currentUser as user } from './exampleDatas'
 
@@ -57,17 +59,18 @@ const router = createBrowserRouter([
                     {
                         path: "add-group",
                         element:  <AddElement user={user} title="group" />
+                    },
+                    {
+                        path: "groups/:groupid",
+                        element:  <Interface />
+                    },
+                    {
+                        path: "friends/:friendid",
+                        loader: friendLoader,
+                        element: <Interface />
                     }
                 ]
             },
-            {
-                path: "chat/groups/:id",
-                element: <Chat user={user} />
-            },
-            {
-                path: "chat/friends/:id",
-                element: <Chat user={user} />
-            }
         ]
     },
 ])
