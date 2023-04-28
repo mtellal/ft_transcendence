@@ -47,7 +47,7 @@ function GroupElement(props)
 
 export default function MenuElement(props)
 {
-    const [groups, setGroups] = React.useState(examplesGroup);
+    const [groups, setGroups] = React.useState(props.user.channelList);
     const [friends, setFriends] = React.useState(props.user.friendList);
     const [currentFriend, setCurrentFriend] = React.useState();
     const [currentGroup, setCurrentGroup] = React.useState();
@@ -71,7 +71,7 @@ export default function MenuElement(props)
             key={e.id}
             id={e.id}
             name={e.name}
-            members={e.members}
+            members={e.members.length}
             selected={currentGroup === e.id ? true : false}
             click={handleCurrentGroup}
         />

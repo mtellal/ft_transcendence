@@ -10,7 +10,7 @@ import Profile from './routes/Profile';
 import History from './routes/History';
 
 import AddElement from "./components/Chat/Interface/AddElement";
-import Interface, { loader as friendLoader}from './components/Chat/Interface/Interface';
+import Interface, { loader as interfaceLoader}from './components/Chat/Interface/Interface';
 
 
 import { currentUser as user } from './exampleDatas'
@@ -62,12 +62,13 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "groups/:groupid",
-                        element:  <Interface />
+                        loader: interfaceLoader,
+                        element:  <Interface user={user} group={true}/>
                     },
                     {
                         path: "friends/:friendid",
-                        loader: friendLoader,
-                        element: <Interface />
+                        loader: interfaceLoader,
+                        element: <Interface user={user} friend={true}/>
                     }
                 ]
             },

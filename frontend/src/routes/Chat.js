@@ -1,14 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
+
+import MenuElement from "../components/Chat/MenuElement";
+import { Outlet } from "react-router-dom";
 
 import '../styles/Chat.css'
-
-import { examplesFriends, examplesGroup, exampleMessages } from "../exampleDatas";
-
-import Interface from "../components/Chat/Interface/Interface";
-import MenuElement from "../components/Chat/MenuElement";
-import AddElement from "../components/Chat/Interface/AddElement";
-import { Outlet, useRevalidator } from "react-router-dom";
-
 
 export default function Chat(props)
 {

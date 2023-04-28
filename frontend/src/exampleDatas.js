@@ -1,468 +1,10 @@
 
 import imgProfile from './images/user.png'
 
-export const examplesGroup = [
-    {
-        id: 1,
-        username: "group1",
-        members: 2,
-    },
-    {
-        id: 2,
-        username: "wdfwfd",
-        members: 15,
-    },
-    {
-        id: 3,
-        username: "Bros",
-        members: 5,
-    },
-    {
-        id: 4,
-        username: "wdf",
-        members: 18  ,
-    },
-    {
-        id: 5,
-        username: "wdfw",
-        members: 6 ,
-    },
-    {
-        id: 6,
-        username: "rth",
-        members: 1 ,
-    },
-    {
-        id: 7,
-        username: "ooo",
-        members: 88  ,
-    },
-    {
-        id: 8,
-        username: "Teaaam2",
-        members: 65  ,
-    },
-    {
-        id: 9,
-        username: "Teamyj6m2",
-        members: 12 ,
-    },
-]
-
-export const examplesFriends = [
-    {
-        id: 0,
-        username: "friends1",
-        connected: false,
-        messages: [
-            {
-                id:0,
-                type: "text",
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                type: "text",
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 3,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 4,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 5,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 6,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 7,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 8,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 9,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 10,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 11,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 12,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 13,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 14,
-                type: "invitation",
-                author: "me",
-                to: "friends1",
-                status: "valid"
-            },
-            {
-                id: 15,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 16,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-            {
-                id: 17,
-                type: "text",
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 1,
-        username: "wfd",
-        connected:true,
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 2,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 3,
-        username: "friends1",
-        connected:true,
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 4,
-        username: "friends1",
-        connected:true,
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 5,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 6,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 7,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 8,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    {
-        id: 9,
-        username: "friends1",
-        messages: [
-            {
-                id:0,
-                author: "friends1",
-                message: "Hello World"
-            },
-            {
-                id: 1,
-                author: "friends1",
-                message: "How are you ?"
-            },
-            {
-                id: 2,
-                author: "me",
-                message: "Good and you ?"
-            },
-        ]
-    },
-    
-]
-
-export const exampleMessages = [
-    {
-        id:0,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:1,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:2,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:3,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:4,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:5,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:6,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:7,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:8,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:9,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:10,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:11,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:12,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:13,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:14,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:15,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:16,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:17,
-        sender: "player1",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
-        id:18,
-        sender: "player2",
-        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    }
-]
-
 
 export const currentUser = 
 {
-    username: "currentUser",
+    username: "me",
     password: "mypassword",
     img: imgProfile,
     status: "onLine",
@@ -583,7 +125,7 @@ export const currentUser =
                     message: "Good and you ?"
                 },
             ],
-            blocked: false
+            blocked: true
         },
         {
             id: 1,
@@ -1868,5 +1410,398 @@ export const currentUser =
         },
 
     ],
+    channelList: [
+        {
+            id: 0,
+            name: "group1",
+            img: imgProfile,
+            owner: "friend1",
+            administrators: [
+                "friend1",
+                "friend2",
+                "friend5"
+            ],
+            members: [
+                "me",
+                "friend1",
+                "friend2",
+                "friend5",
+                "friend7",
+                "friend9",
+            ],
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello Wwpidjbfpifbjwpifwjb wdfwpidjbfpifbjwpifwjb wdfw wf wd fwpfijborldpidjbfpifbjwpifwjb wdfw wf wd fwpfijborld wf wd fwpfijborld"
+                },
+                {
+                    id:1,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:2,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:3,
+                    type: "text",
+                    author: "friend5",
+                    message: "Hello World"
+                },
+                {
+                    id:4,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+                {
+                    id:5,
+                    type: "text",
+                    author: "friend9",
+                    message: "Hello World"
+                },
+                {
+                    id:6,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+                {
+                    id:7,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:8,
+                    type: "text",
+                    author: "me",
+                    message: "Hello World"
+                },
+                {
+                    id:9,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+                {
+                    id:10,
+                    type: "text",
+                    author: "me",
+                    message: "Hello World"
+                },
+                {
+                    id:11,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:12,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:13,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:14,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:15,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+
+                {
+                    id:16,
+                    type: "text",
+                    author: "friend9",
+                    message: "Hello World"
+                },
+                {
+                    id:17,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:18,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:19,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:20,
+                    type: "text",
+                    author: "friend5",
+                    message: "Hello World"
+                },
+                {
+                    id:21,
+                    type: "text",
+                    author: "friend7",
+                    message: "Hello World"
+                },
+                {
+                    id:22,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:23,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:24,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:25,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:26,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+            ],
+            access: "public",
+            password: "",
+            banMembers: [],
+            muteMembers: [],
+            blocked: false
+        },
+        {
+            id: 1,
+            name: "group2",
+            img: imgProfile,
+            owner: "me",
+            administrators: [
+                "me",
+                "friend1",
+                "friend5"
+            ],
+            members: [
+                "me",
+                "friend1",
+                "friend5",
+                "friend7",
+                "friend9",
+
+            ],
+            conversation: [
+                {
+                    id:0,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:1,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:2,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:3,
+                    type: "text",
+                    author: "friend5",
+                    message: "Hello World"
+                },
+                {
+                    id:4,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+                {
+                    id:5,
+                    type: "text",
+                    author: "friend9",
+                    message: "Hello World"
+                },
+                {
+                    id:6,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+                {
+                    id:7,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:8,
+                    type: "text",
+                    author: "me",
+                    message: "Hello World"
+                },
+                {
+                    id:9,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+                {
+                    id:10,
+                    type: "text",
+                    author: "me",
+                    message: "Hello World"
+                },
+                {
+                    id:11,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:12,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:13,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:14,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:15,
+                    type: "text",
+                    author: "friend8",
+                    message: "Hello World"
+                },
+
+                {
+                    id:16,
+                    type: "text",
+                    author: "friend9",
+                    message: "Hello World"
+                },
+                {
+                    id:17,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:18,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:19,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:20,
+                    type: "text",
+                    author: "friend5",
+                    message: "Hello World"
+                },
+                {
+                    id:21,
+                    type: "text",
+                    author: "friend7",
+                    message: "Hello World"
+                },
+                {
+                    id:22,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:23,
+                    type: "text",
+                    author: "friend2",
+                    message: "Hello World"
+                },
+                {
+                    id:24,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:25,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+                {
+                    id:26,
+                    type: "text",
+                    author: "friend1",
+                    message: "Hello World"
+                },
+            ],
+            access: "private",
+            password: "",
+            banMembers: [
+                "friend1",
+                "friend2",
+                "friend5",
+                "friend7",
+                "friend9"
+            ],
+            muteMembers: [],
+            blocked: true
+        }
+    ],
+    history: [
+        {
+            score: 10,
+            player: "friend1",
+            scorePlayer: 20
+        }
+    ]
 
 }

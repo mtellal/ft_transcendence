@@ -6,6 +6,8 @@ import './Interface.css'
 import { useLoaderData } from "react-router-dom";
 import { currentUser } from "../../../exampleDatas";
 
+import ProfileGroup from "./ProfileChannel";
+
 
 function BlockMessage({ username }) {
     return (
@@ -50,6 +52,12 @@ function GameInvitation(props) {
 */
 
 function Message(props) {
+
+    function isAdmin()
+    {
+        return (props.administrators.find(username => username === props.author));
+    }
+
     function addStyle() {
         let obj;
 
@@ -62,49 +70,86 @@ function Message(props) {
         <div className="message-div"
             style={props.author === "me" ? { justifyContent: 'right' } : null}
         >
-            <p
-                className="message"
-                style={addStyle()}
-            >
+            <div className="message-infos">
+               <p className="message"
+                    style={addStyle()}
+                >
                 {props.message}
-            </p>
+                </p>
+                {props.group && <p className="message-author">{props.author}</p>}
+            </div>
+            {
+                props.group && isAdmin() && <span className="material-symbols-outlined">
+                    shield_person
+                </span>
+            }
         </div>
     )
 }
 
 
 
-function Banner(props) {
+function Banner({user, channel, ...props}) {
 
     function selectStatusDiv() {
-        if (props.status === "onLine")
-            return ({ color: "green" })
-        else if (props.status === "disconnected")
-            return ({ color: "red" })
-        else if (props.status === "inGame")
-            return ({ color: '#FFC600' })
+
+        if (props.status)
+        {
+            if (props.status === "onLine")
+                return ({ color: "green" })
+            else if (props.status === "disconnected")
+                return ({ color: "red" })
+            else if (props.status === "inGame")
+                return ({ color: '#FFC600' })
+        }
+        else if (props.access)
+        {
+            if (props.access === "public")
+                return ({ color: "green" })
+            else if (props.access === "private")
+                return ({ color: "orange" })
+            else if (props.access === "private")
+                return ({ color: 'black' })
+        }
+
     }
 
     function selectStatusText() {
-        if (props.status === "onLine")
-            return ("On line")
-        else if (props.status === "disconnected")
-            return ("Disconnected")
-        else if (props.status === "inGame")
-            return ("In game")
+        if (props.status)
+        {
+            if (props.status === "onLine")
+                return ("On line")
+            else if (props.status === "disconnected")
+                return ("Disconnected")
+            else if (props.status === "inGame")
+                return ("In game")
+        }
+        else if (props.access)
+            return (props.access)
+    }
+
+    function displayMembers()
+    {
+        let members = "";
+        props.members.map(m => members += m + ", ")
+        return (members)  
     }
 
     return (
         <div className="banner">
             <div className="banner-div1">
                 <img className="banner-pp" src={props.img} alt="profile" />
-                <p className="banner-name" >{props.name}</p>
-                <p
-                    className="banner-status"
-                    style={selectStatusDiv()}
-                >
-                    {selectStatusText()}
-                </p>
+                <div className="banner-infos">
+
+                    <p className="banner-name" >{props.name}</p>
+                    <p
+                        className="banner-status"
+                        style={selectStatusDiv()}
+                        >
+                        {selectStatusText()}
+                    </p>
+                </div>
+                { props.group && <p className="banner-members">{displayMembers()}</p>}
             </div>
             <div className="banner-div2">
                 <div className="banner-icon" onClick={props.profile}>
@@ -128,7 +173,7 @@ function Banner(props) {
 }
 
 
-function Messenger({ item, blocked, invitation }) {
+function Messenger({ item, blocked, invitation, group }) {
 
     const lastMessageRef = React.useRef(null);
     const [value, setValue] = React.useState("");
@@ -194,6 +239,8 @@ function Messenger({ item, blocked, invitation }) {
                             id={m.id}
                             message={m.message}
                             author={m.author}
+                            group={group}
+                            administrators={item.administrators}
                         />
                     )
                 }
@@ -203,7 +250,6 @@ function Messenger({ item, blocked, invitation }) {
 
 
     React.useEffect(() => {
-        console.log("update item");
         if (item.conversation)
             setMessages(item.conversation);
         else
@@ -212,7 +258,6 @@ function Messenger({ item, blocked, invitation }) {
     }, [item])
 
     React.useEffect(() => {
-        console.log(item.conversation)
         lastMessageRef.current.scrollIntoView();
     }, [render, item, blocked, invitation])
 
@@ -224,7 +269,7 @@ function Messenger({ item, blocked, invitation }) {
                     item.conversation.length ?
                         renderMessages() : <NoMessages />
                 }
-                {blocked && <BlockMessage username={item.username} />}
+                {blocked && <BlockMessage username={item.username || item.name} />}
                 <div ref={lastMessageRef}></div>
             </div>
             <div className="messages-input"
@@ -242,14 +287,82 @@ function Messenger({ item, blocked, invitation }) {
     )
 }
 
+
+
+function InterfaceFriend(props)
+{
+    return (
+        <>
+            {
+                props.profile ? 
+                <Profile item={props.item} /> :
+                <Messenger 
+                    item={props.item} 
+                    blocked={props.blocked} 
+                    invitation={props.invitation} 
+                />
+            }
+        </>
+    )
+}
+
+function InterfaceGroup(props)
+{
+    return (
+        <>
+            {
+                props.profile && 
+                    <ProfileGroup 
+                        channel={props.item} 
+                        user={props.user}
+                    />
+            }
+            {
+                !props.profile &&
+                <Messenger 
+                    group={props.group} 
+                    item={props.item} 
+                    blocked={props.blocked} 
+                    invitation={props.invitation} 
+                />
+            }
+        </>
+    )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getFriend(username)
 {
     return (currentUser.friendList.find(friend => friend.username === username));
 }
 
+function getGroup(name)
+{
+    return (currentUser.channelList.find(channel => channel.name === name));
+}
+
 export function loader({params})
 {
-    const item = getFriend(params.friendid);
+    let item;
+    if (params.friendid)
+        item = getFriend(params.friendid);
+    else if (params.groupid)
+    {
+        item = getGroup(params.groupid);
+    }
     return (item);
 }
 
@@ -260,10 +373,9 @@ export function loader({params})
 
 */
 
-export default function Interface() {
+export default function Interface({user, group, friend}) {
 
     const item = useLoaderData();
-
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
     const [blocked, setBlocked] = React.useState(item.blocked);
@@ -277,11 +389,11 @@ export default function Interface() {
     }
 
     function newInvitation() {
-        if (!blocked) {
+        if (!blocked && !profile) {
             pushMessage({
                 author: "me",
                 type: "invitation",
-                to: item.username,
+                to: item.username || item.name,
                 status: "valid"
             })
         }
@@ -289,29 +401,57 @@ export default function Interface() {
     }
     
     function blockUser() {
-        setBlocked(prev => !prev);
-        item.blocked = !item.blocked;
+        if (!profile)
+        {
+            setBlocked(prev => !prev);
+            item.blocked = !item.blocked;
+        }
     }
 
+    function toggleProfile()
+    {
+        setProfile(prev => !prev);
+    }
+
+
+
     React.useEffect(() => {
-        setBlocked(false);
+        setBlocked(item.blocked);
         setProfile(false);
     }, [item])
 
     return (
         <div className="messages-container">
             <Banner
-                name={item.username}
+                name={item.username || item.name}
                 img={item.img}
                 status={item.status}
-                block={() => blockUser()}
+                access={item.access}
+                profile={() => toggleProfile()}
                 invitation={() => newInvitation()}
-                profile={() => setProfile(prev => !prev)}
+                block={() => blockUser()}
+                group={group}
+                members={item.members}
+                firend={friend}
+                channel={item}
+                user={user}
             />
             {
-                profile ? 
-                <Profile item /> :
-                <Messenger item={item} blocked={blocked} invitation={render} />
+                friend ? 
+                <InterfaceFriend 
+                    profile={profile} 
+                    item={item} 
+                    blocked={blocked} 
+                    invitation={render} 
+                /> :
+                <InterfaceGroup 
+                    group={group} 
+                    profile={profile} 
+                    item={item} 
+                    blocked={blocked} 
+                    invitation={render} 
+                    user={user}
+                />
             }
         </div>
     )
