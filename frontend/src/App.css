@@ -5,8 +5,3 @@
   display: grid;
   grid-template: repeat(20, 1fr) / repeat(20, 1fr);
 }
-
-.pointer
-{
-  cursor: pointer;
-}

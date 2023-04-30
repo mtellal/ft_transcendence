@@ -4,7 +4,7 @@ import FriendElement from "../FriendElement";
 import { examplesFriends, examplesGroup, exampleMessages } from "../../exampleDatas";
 
 import './MenuElement.css'
-import { Link } from "react-router-dom";
+import { Link, json } from "react-router-dom";
 
 
 function CollectionElement(props)
@@ -47,6 +47,7 @@ function GroupElement(props)
 
 export default function MenuElement(props)
 {
+
     const [groups, setGroups] = React.useState(props.user.channelList);
     const [friends, setFriends] = React.useState(props.user.friendList);
     const [currentFriend, setCurrentFriend] = React.useState();

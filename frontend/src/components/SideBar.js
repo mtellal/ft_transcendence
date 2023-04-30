@@ -2,7 +2,6 @@ import React from "react";
 
 import './Sidebar.css'
 import { Link } from "react-router-dom";
-import Friends from "../routes/Friends";
 
 function MenuElement(props)
 {
@@ -56,7 +55,6 @@ export default function Sidebar()
         <span className="sidebar">
             <h2 className="sidebar--title" >Menu</h2>
             {menu}
-            <Friends />
         </span>
     )
 }
