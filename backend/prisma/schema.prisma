@@ -20,6 +20,7 @@ enum Status {
 }
 
 model User {
+	email			String
 	id					Int @id @unique
 	username		String @unique
 	avatar			String
