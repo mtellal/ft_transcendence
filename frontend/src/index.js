@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App, { loader as appLoader } from './App';
 
 import SignIn from './routes/Signin';
 import SignUp from './routes/Signup';
 import Game from './components/Game';
 import Profile from './routes/Profile';
 import History from './routes/History';
+import LaunchGame from './components/Game';
+
+
 
 import AddElement from "./components/Chat/Interface/AddElement";
 import Interface, { loader as interfaceLoader}from './components/Chat/Interface/Interface';
@@ -17,32 +20,29 @@ import { currentUser as user } from './exampleDatas'
 
 import {
     createBrowserRouter,
-    RouterProvider
+    RouterProvider,
 } from 'react-router-dom';
 
-import Chat, { ChatRoute } from './routes/Chat';
+import Chat from './routes/Chat';
 
 
 const router = createBrowserRouter([
     {
         path: "/",
+        loader: appLoader,
         element: <App user={user} />,
         children: [
             {
-                path: "signin",
-                element: <SignIn />,
-            },
-            {
-                path: "signup",
-                element: <SignUp />
-            },
-            {
-                path: "game",
-                element: <Game launch={false} />
+                path: "",
+                element: <LaunchGame />
             },
             {
                 path: "profile",
                 element: <Profile />
+            },
+            {
+                path: "game",
+                element: <LaunchGame />
             },
             {
                 path: "history",
@@ -74,6 +74,26 @@ const router = createBrowserRouter([
             },
         ]
     },
+    {
+        path: "/signin",
+        element: <SignIn />,
+        children: [
+            {
+                path: "",
+                element: <App />
+            }
+        ]
+    },
+    {
+        path: "/signup",
+        element: <SignUp />,
+        children: [
+            {
+                path: "",
+                element: <App />
+            }
+        ]
+    }
 ])
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

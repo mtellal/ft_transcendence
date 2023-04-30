@@ -36,17 +36,17 @@ function ProfileInfos(props)
     return (
         <div className="form--container">
             <InfoInput 
-                if={Math.floor(Math.random() * 1000000)}
+                id={Math.floor(Math.random() * 1000000)}
                 label="Username"
 
             />
             <InfoInput 
-                if={Math.floor(Math.random() * 1000000)}
+                id={Math.floor(Math.random() * 1000000)}
                 label="Password"
 
             />  
             <InfoInput 
-                if={Math.floor(Math.random() * 1000000)}
+                id={Math.floor(Math.random() * 1000000)}
                 label="Phone number"
 
             />
@@ -55,6 +55,11 @@ function ProfileInfos(props)
         </div>
     )
 }
+
+/*
+    - update user infos with fetch a PATCH/POST method (or any other update html method)
+    - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
+*/
 
 function ProfilePicture()
 {
@@ -74,7 +79,12 @@ function ProfilePicture()
         <div className="profile-picture-container">
             <img className="profile-picture" src={img} />
             <form >
-                <label htmlFor="edit" className="profil-picture-label" >Edit</label>
+                <label 
+                    htmlFor="edit" 
+                    className="profil-picture-label"
+                >
+                    Edit
+                </label>
                 <input
                     id="edit"
                     type="file"
