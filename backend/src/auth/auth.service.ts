@@ -19,11 +19,11 @@ export class AuthService {
 		try {
 			const user = await this.prisma.user.create({
 				data: {
-					email: dto.email,
+					id: dto.id,
+					username: dto.username,
 					password: hash,
-					username: "test",
-					id: 1,
-					avatar: "test",
+					email: dto.email,
+					avatar: dto.avatar,
 				},
 			});
 			return this.signToken(user.id, user.email);
@@ -39,7 +39,7 @@ export class AuthService {
 
 	async signin(dto: AuthDto) {
 		const user = await this.prisma.user.findUnique({
-			where: { email: dto.email},
+			where: { username: dto.username},
 		})
 		if (!user) 
 			throw new ForbiddenException('Credentials incorrect',);
