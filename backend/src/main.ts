@@ -12,6 +12,7 @@ async function bootstrap() {
     .setTitle('ft_transcendence')
     .setDescription('ft_transcendence API')
     .setVersion('0.1')
+    .addBearerAuth()
     .build();
 
     const document = SwaggerModule.createDocument(app, config);
