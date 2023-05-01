@@ -22,7 +22,9 @@ enum Status {
 model User {
 	id					Int @id @unique
 	username		String @unique
+	email				String @unique
 	avatar			String
+	password		String?
 	userStatus	Status @default(ONLINE)
 	friendList	Int[] @default([])
 	blockedList	Int[] @default([])

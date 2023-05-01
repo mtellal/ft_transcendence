@@ -1,8 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from 'src/auth/guard/jwt.guard'
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import path = require('path');
+import { join } from 'path';
+import { v4 as uuidv4 } from 'uuid'
+import { Observable, of } from 'rxjs';
+import { User } from '@prisma/client';
+
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/profileImages',
+    filename: (req, file, cb) => {
+        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+        const extension: string = path.parse(file.originalname).ext;
+
+        cb(null, `${filename}${extension}`)
+    }
+  })
+}
 
 @Controller('users')
 @ApiTags('users')
@@ -20,6 +40,8 @@ export class UsersController {
   }
 
   @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const user = await this.usersService.findOne(id);
 
@@ -37,6 +59,30 @@ export class UsersController {
       throw new NotFoundException(`User with id of ${id} does not exist`);
     }
     return this.usersService.getFriends(user.friendList);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('upload')
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file', storage))
+  uploadfile(@UploadedFile() file, @Request() req) {
+    const user: User = req.user;
+    console.log(user);
+    console.log(file);
+    return this.usersService.update(user.id, {
+      avatar: file.path
+    })
+  }
+
+  @Get(':id/profileImage')
+  async getProfileImage(@Param('id', ParseIntPipe) id: number, @Res() res): Promise<any> {
+    const user = await this.usersService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id of ${id} does not exist`);
+    }
+
+    res.sendFile(join(process.cwd(), user.avatar));
   }
 
   @Post('addFriend')
