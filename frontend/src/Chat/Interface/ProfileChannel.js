@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import IconInput from "../../IconInput";
+import IconInput from "../../components/IconInput";
 
 import './ProfileChannel.css'
 

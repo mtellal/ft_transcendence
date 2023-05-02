@@ -2,13 +2,15 @@ import React from "react";
 
 import '../styles/Profile.css'
 
-
 import imgProfile from '../images/user.png'
+import jwt_decode from 'jwt-decode';
+import { redirect, useLoaderData } from "react-router-dom";
+
 
 
 function InfoInput(props)
 {
-    const [value, setValue] = React.useState("");
+    const [value, setValue] = React.useState(props.value || "");
 
     return (
         <div className="input--container">
@@ -38,18 +40,18 @@ function ProfileInfos(props)
             <InfoInput 
                 id={Math.floor(Math.random() * 1000000)}
                 label="Username"
-
+                value={props.username}
             />
             <InfoInput 
                 id={Math.floor(Math.random() * 1000000)}
                 label="Password"
-
+                value={props.password}
             />  
             <InfoInput 
                 id={Math.floor(Math.random() * 1000000)}
-                label="Phone number"
-
-            />
+                label="Email"
+                value={props.email}
+            /> 
 
             <button onClick={updateProfile} className="profile-infos-button" >Update</button>         
         </div>
@@ -103,11 +105,40 @@ function ProfilePicture()
     )
 }
 
-export default function Profile(props)
+export async function loader()
 {
+    const obj = jwt_decode(document.cookie);
+    console.log("ici", process.env.REACT_APP_BACK)
+
+    return (fetch(`${process.env.REACT_APP_BACK}/users/${obj.sub}`, {
+            headers: {
+                'Authorization':`Bearer ${document.cookie.split("=")[1]}`
+            }
+        })
+        .then(res => {
+            if (!res.ok)
+                return (redirect("/signin"));
+            console.log(res);
+            return res.json();
+        })
+        .then(data =>  data)
+        .catch(err => console.log(err))
+    )
+}
+
+
+export default function Profile()
+{
+    const loader = useLoaderData();
+    console.log("Profile loader datas => ", loader)
+
     return (
         <div className="profile">
-            <ProfileInfos />
+            <ProfileInfos 
+                username={loader && loader.username} 
+                password={loader && loader.password} 
+                email={loader && loader.email}
+            />
             <ProfilePicture />              
         </div>
     )

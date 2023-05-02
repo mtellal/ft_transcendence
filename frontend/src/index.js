@@ -3,17 +3,16 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App, { loader as appLoader } from './App';
 
-import SignIn from './routes/Signin';
+import SignIn, { loader as signinLoader } from './routes/Signin';
 import SignUp from './routes/Signup';
-import Game from './components/Game';
-import Profile from './routes/Profile';
+import Profile, { loader as profileLoader} from './routes/Profile';
+import LaunchGame from './routes/Game';
 import History from './routes/History';
-import LaunchGame from './components/Game';
 
 
 
-import AddElement from "./components/Chat/Interface/AddElement";
-import Interface, { loader as interfaceLoader}from './components/Chat/Interface/Interface';
+import AddElement from "./Chat/Interface/AddElement";
+import Interface, { loader as interfaceLoader}from './Chat/Interface/Interface';
 
 
 import { currentUser as user } from './exampleDatas'
@@ -34,18 +33,22 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "",
+                loader: appLoader,
                 element: <LaunchGame />
             },
             {
                 path: "profile",
+                loader: profileLoader,
                 element: <Profile />
             },
             {
                 path: "game",
+                loader: appLoader,
                 element: <LaunchGame />
             },
             {
                 path: "history",
+                loader: appLoader,
                 element: <History />
             },
             {
@@ -54,10 +57,12 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: "add-friend",
+                        loader: appLoader,
                         element:  <AddElement user={user} title="friend" />
                     },
                     {
                         path: "add-group",
+                        loader: appLoader,
                         element:  <AddElement user={user} title="group" />
                     },
                     {
