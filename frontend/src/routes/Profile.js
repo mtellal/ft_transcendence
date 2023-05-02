@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import imgProfile from '../images/user.png'
-// import s from '../styles/Profile.css'
 import '../styles/Profile.css'
 
 
@@ -100,17 +99,45 @@ import '../styles/Profile.css'
 // Password
 // Phone number
 
+/* Voir pour les regles a mettre en place pour le loggin,
+    le mot de passse et le phone number */
+
 class ValidatorServices {
 
-	static min(value, min){
+	static minUsername(value, min){
 		if (value.length < min && value !== "")
-			return `Veuillez taper au moins ${min} lettre(s)`;
+			return `Le nom d'utilisateur doit contenir au moins ${min} caractère(s)`;
 	}
 
-	static max(value, max) {
+	static maxUsername(value, max) {
 		if (value.length > max)
-		return `Veullez taper au plus ${max} lettre(s)`;
+	    	return `Le nom d'utilisateur doit contenir au plus ${max} caractère(s)`;
 	}
+
+	static mdp(value, min) {
+        if (value !== "") {
+            if (value.length < min)
+	    	    return `Le mot de passe doit contenir au moins ${min} caractère(s)`;
+            else if (!this.containsNumber(value))
+                return `Le mot de passe doit contenir au moins 1 chiffre`;
+            else if (!this.containsSpecialChar(value))
+               return `Le mot de passe doit contenir au moins 1 caractère spécial `;
+        }
+	}
+
+	static phoneNumber(value, nb) {
+		if (value.length !== nb && value !== "")
+	    	return `Le numero de telephone doit contenir ${nb} chiffres`;
+    }
+
+    static containsNumber(str) {
+        return /\d/.test(str);
+    }
+
+    static containsSpecialChar(str) {
+        const regex = /[ !@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/g;
+        return regex.test(str);
+    }    
 }
 
 function FieldError({ msg }) {
@@ -121,13 +148,13 @@ function FieldError({ msg }) {
 
 const VALIDATORS = {
 	username: (value) => {
-		return ValidatorServices.min(value, 3) || ValidatorServices.max(value, 20);
+		return ValidatorServices.minUsername(value, 3) || ValidatorServices.maxUsername(value, 20);
 	},
 	password: (value) => {
-		return ValidatorServices.min(value, 3)
+		return ValidatorServices.mdp(value, 8)
 	},
 	phoneNumber: (value) => {
-		return ValidatorServices.min(value, 3)
+		return ValidatorServices.phoneNumber(value, 10)
 	}
 }
 
