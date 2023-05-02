@@ -21,6 +21,7 @@
     width: 80%;
     max-width: 400px;
     min-height: 80px;
+    padding-top: 20px;
 }
 
 .input--label
@@ -108,4 +109,12 @@
 .profile-picture-button
 {
     cursor: pointer;
+}
+
+.container {
+	color: #dc3545;
+	position: absolute;
+	margin-top: 75px;
+    /* font-size: 20px; */
+    font-weight: 1000;
 }
