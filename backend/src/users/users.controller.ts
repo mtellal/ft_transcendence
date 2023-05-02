@@ -36,7 +36,7 @@ export class UsersController {
   @Get()
   @ApiQuery({
     name: 'username',
-    required: true,
+    required: false,
     type: String
   })
   async getUsers(@Query('username') username: string) {
