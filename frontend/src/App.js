@@ -1,11 +1,11 @@
 import React from 'react'
 import { Outlet, redirect } from 'react-router-dom';
-
 import './App.css';
 
 import Footer from './components/Footer';
 import Header from './components/Header'
 import Sidebar from './components/SideBar';
+import { BackendAPI } from './api/api-backend';
 
 
 export async function loader()
@@ -17,6 +17,10 @@ export async function loader()
   //return redirect("/signin");
   return null;
 }
+
+
+BackendAPI.getAllUsers();
+
 
 function App() {
 
