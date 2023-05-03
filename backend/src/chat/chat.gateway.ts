@@ -1,5 +1,5 @@
 import { NotFoundException, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,17 +17,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private jwtService: JwtService, private userService: UsersService){}
 
   @SubscribeMessage('message')
-  async handleMessage(client: Socket) {
+  async handleMessage(@MessageBody() content: string, @ConnectedSocket() client: Socket) {
     try {
       const authToken = client.handshake.auth.token;
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
       const user = await this.userService.findOne(decodedToken.id);
+      console.log(user);
     }
     catch {
       this.server.emit('Error', new UnauthorizedException());
       client.disconnect();
     }
-    this.server.emit('message', 'Message received');
+    this.server.emit('message', content);
   }
 
   async handleConnection(client: Socket) {
