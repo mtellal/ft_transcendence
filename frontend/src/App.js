@@ -19,7 +19,8 @@ export async function loader()
 }
 
 
-BackendAPI.getAllUsers();
+BackendAPI.getUser(2);
+// BackendAPI.getUserById(2);
 
 
 function App() {
