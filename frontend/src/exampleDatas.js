@@ -1,5 +1,5 @@
 
-import imgProfile from './images/user.png'
+import imgProfile from './assets/user.png'
 
 
 export const currentUser = 

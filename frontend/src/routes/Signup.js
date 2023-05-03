@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 
 import '../styles/Sign.css'
 import IconInput from "../components/IconInput";
-import imgLogin from '../images/icon-login.png'
+import imgLogin from '../assets/icon-login.png'
 
 export default function SignUp(props)
 {

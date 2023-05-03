@@ -3,7 +3,7 @@ import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
 
 import { extractCookie } from "../utils/Cookie";
 import IconInput from "../components/IconInput";
-import imgLogin from '../images/icon-login.png'
+import imgLogin from '../assets/icon-login.png'
 
 import { setCookie } from "../utils/Cookie";
 import { loginRequest } from "../utils/User";

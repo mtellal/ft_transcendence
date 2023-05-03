@@ -2,7 +2,7 @@ import React from "react";
 
 import '../styles/Profile.css'
 
-import imgProfile from '../images/user.png'
+import imgProfile from '../assets/user.png'
 import jwt_decode from 'jwt-decode';
 import { redirect, useLoaderData } from "react-router-dom";
 
