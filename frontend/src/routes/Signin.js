@@ -58,6 +58,7 @@ export default function SignIn(props) {
                         icon="person"
                         placeholder="Username"
                         getValue={value => setUsername(value)}
+                        submit={() => handleSubmit()}
                     />
                     <IconInput
                         icon="lock"

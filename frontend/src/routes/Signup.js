@@ -27,7 +27,6 @@ export default function SignUp(props)
                 method: "POST",
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({
-                    id: Math.floor(Math.random() * 10000),
                     username: username,
                     password: password,
                     email: "email",
