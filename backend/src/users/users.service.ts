@@ -19,6 +19,10 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
+  async findbyUsername(username: string) {
+    return this.prisma.user.findUnique({where: {username}})
+  }
+
   async getFriends(friendIds: number[]) {
     return this.prisma.user.findMany({
       where: {id: {in: friendIds}},

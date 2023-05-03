@@ -2,14 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, P
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard/jwt.guard'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import path = require('path');
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid'
-import { Observable, of } from 'rxjs';
 import { User } from '@prisma/client';
 
 export const storage = {
@@ -35,14 +34,25 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
+  @ApiQuery({
+    name: 'username',
+    required: false,
+    type: String
+  })
+  async getUsers(@Query('username') username: string) {
+    if (username)
+    {
+      const user = await this.usersService.findbyUsername(username);
+      if (!user) {
+        throw new NotFoundException(`User ${username} does not exist`);
+      }
+      return (user);
+    }
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async getUserbyID(@Param('id', ParseIntPipe) id: number) {
     const user = await this.usersService.findOne(id);
 
     if (!user) {
@@ -50,6 +60,17 @@ export class UsersController {
     }
     return (user);
   }
+
+  @Get()
+  async findbyUsername(@Query() username: string) {
+    const user = await this.usersService.findbyUsername(username);
+
+    if (!user) {
+      throw new NotFoundException(`User ${username} does not exist`);
+    }
+    return (user);
+  }
+
 
   @Get(':id/friends')
   async getFriends(@Param('id', ParseIntPipe) id: number) {
