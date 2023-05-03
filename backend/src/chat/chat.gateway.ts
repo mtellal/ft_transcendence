@@ -1,5 +1,8 @@
+import { Request, UseGuards } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { User } from '@prisma/client';
 
 @WebSocketGateway({cors: {origin: 'https://hoppscotch.io'}})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -8,11 +11,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
+  handleMessage(client: any): string {
+    console.log(client.handshake.auth);
+    /* const user: User = req.user;
+    console.log(user); */
     return "Message received";
   }
 
-  handleConnection(client: any, ...args: any[]) {
+  async handleConnection(client: Socket) {
+    this.server.emit('message', 'Hello!');
     console.log("New client connected");
   }
 

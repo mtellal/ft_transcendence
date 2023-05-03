@@ -43,6 +43,7 @@
 #### Realtime Chat with Websockets
 - [Realtime Chat App](https://www.youtube.com/playlist?list=PLVfq1luIZbSkICzoA8EuvTskPEROS68i9) - Playlist about creating a realtime chat app using NestJS.
 - [Real-time chat with WebSockets](https://wanago.io/2021/01/25/api-nestjs-chat-websockets/)
+- [Socket.io JWT](https://www.npmjs.com/package/socketio-jwt)
 
 <hr/>
 
