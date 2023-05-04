@@ -57,4 +57,17 @@ export async function updateUser(user, id)
 }
 
 
+export async function updateProfilePicture(image)
+{
+    return (
+        axios.post(`${process.env.REACT_APP_BACK}/users/upload`, image, {
+            headers: {
+                'Content-Type': image.type
+            }
+        })
+        .then(res => res)
+        .catch(err => err)
+    )
+}
+
 

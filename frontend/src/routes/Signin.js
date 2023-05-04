@@ -29,7 +29,7 @@ export default function SignIn(props) {
         if (!username || !password)
             return (setError("userame or password empty"));
         const res = await signinRequest(username, password);
-        //console.log(res);
+        console.log(res);
         if (res && res.status === 200 && res.statusText === "OK")
         {
             setCookie("access_token", res.data.access_token);

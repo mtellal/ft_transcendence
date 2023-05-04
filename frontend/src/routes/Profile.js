@@ -4,7 +4,7 @@ import '../styles/Profile.css'
 
 import jwtDecode from 'jwt-decode';
 import { redirect, useLoaderData, useNavigate } from "react-router-dom";
-import { getUser, updateUser } from "../utils/User";
+import { getUser, updateProfilePicture, updateUser } from "../utils/User";
 import { extractCookie } from "../utils/Cookie";
 
 
@@ -40,20 +40,26 @@ function InfoInput(props)
 function ProfileInfos(props)
 {
     const [username, setUsername] = React.useState(props.username || "");
-    const [password, setPassword] = React.useState(props.password || "");
-    const [email, setEmail] = React.useState(props.email || "");
-    
+    const [error, setError] = React.useState("");
     
     async function updateProfile()
     {
         const res = await updateUser({
             username: username || props.username, 
-            password: password || props.password, 
             avatar: props.avatar || "", 
             userStatus: "ONLINE"
         }, props.id)
-        console.log(res)
-        console.log("ProfileInfos: profile updated");
+
+        if (res && res.status !== 200 && res.statusText !== "OK")
+        {
+            setError("Username invalid")
+            console.log("updateProfile failed");
+        }
+        else
+        {
+            setError("")
+            console.log("updateProfile succeed")
+        }
     }
 
     return (
@@ -64,19 +70,7 @@ function ProfileInfos(props)
                 value={props.username}
                 getValue={setUsername}
             />
-            <InfoInput 
-                id={Math.floor(Math.random() * 1000000)}
-                label="Password"
-                value={props.password}
-                getValue={setPassword}
-            />  
-            <InfoInput 
-                id={Math.floor(Math.random() * 1000000)}
-                label="Email"
-                value={props.email}
-                getValue={setEmail}
-            /> 
-
+            {error && <p style={{color:'red'}}>{error}</p>}
             <button 
                 onClick={updateProfile} 
                 className="profile-infos-button" 
@@ -100,6 +94,8 @@ function ProfilePicture({image, ...props})
 
     function editProfilePicture(e)
     {
+        console.log(e.name);
+        // const rest = updateProfilePicture(e)
         console.log(e.target.files[0])
         setImg(URL.createObjectURL(e.target.files[0]));
     }
@@ -151,7 +147,8 @@ export async function loader()
 export default function Profile()
 {
     const user = useLoaderData();
-    console.log("Profile loader datas => ", user)
+    console.log(`${process.env.REACT_APP_BACK}/${user.avatar}` )
+
 
     return (
         <div className="profile">
@@ -159,10 +156,9 @@ export default function Profile()
                 id={user && user.id}
                 username={user && user.username} 
                 password={user && user.password} 
-                email={user && user.email}
             />
             <ProfilePicture 
-                image="./assets/user.png"
+                image={user && (`${process.env.REACT_APP_BACK}/${user.avatar}` || "./assets/user.png")}
             />              
         </div>
     )
