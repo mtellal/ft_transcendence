@@ -20,9 +20,11 @@ enum Status {
 }
 
 model User {
-	id					Int @id @unique
+	id					Int @id @default(autoincrement())
 	username		String @unique
-	avatar			String
+	password		String
+	email				String? @unique
+	avatar			String?
 	userStatus	Status @default(ONLINE)
 	friendList	Int[] @default([])
 	blockedList	Int[] @default([])

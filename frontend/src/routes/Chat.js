@@ -1,6 +1,6 @@
 import React from "react";
 
-import MenuElement from "../components/Chat/MenuElement";
+import MenuElement from "../Chat/MenuElement";
 import { Outlet } from "react-router-dom";
 
 import '../styles/Chat.css'

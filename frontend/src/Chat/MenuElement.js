@@ -1,11 +1,9 @@
 
 import React from "react";
-import FriendElement from "../FriendElement";
-import { examplesFriends, examplesGroup, exampleMessages } from "../../exampleDatas";
+import { Link } from "react-router-dom";
 
+import FriendElement from "../components/FriendElement";
 import './MenuElement.css'
-import { Link, json } from "react-router-dom";
-
 
 function CollectionElement(props)
 {

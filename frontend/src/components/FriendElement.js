@@ -1,6 +1,6 @@
-import './Friends.css'
+import './FriendElement.css'
 
-import img from '../images/user.png'
+import img from '../assets/user.png'
 import { Link } from 'react-router-dom'
 
 /*  

@@ -4,7 +4,7 @@ import Profile from "./Profile";
 
 import './Interface.css'
 import { useLoaderData } from "react-router-dom";
-import { currentUser } from "../../../exampleDatas";
+import { currentUser } from "../../exampleDatas";
 
 import ProfileGroup from "./ProfileChannel";
 

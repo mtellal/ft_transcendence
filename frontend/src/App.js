@@ -2,28 +2,37 @@ import React from 'react'
 import { Outlet, redirect } from 'react-router-dom';
 import './App.css';
 
-import Footer from './components/Footer';
-import Header from './components/Header'
-import Sidebar from './components/SideBar';
-import { BackendAPI } from './api/api-backend';
-
+import Footer from './App/Footer';
+import Header from './App/Header'
+import Sidebar from './App/SideBar';
+import { extractCookie } from './utils/Cookie';
 
 export async function loader()
 {
-  console.log("load app")
+  console.log("loader app")
   /*
     redirect to /login when user not logged or when cookies (auth) expired
   */
-  //return redirect("/signin");
-  return null;
+
+  if (extractCookie("access_token"))
+  {
+    return (null)
+  }
+
+  console.log("redirect signin")
+  return redirect("/signin");
 }
 
 
-BackendAPI.getUser(2);
+// BackendAPI.getUser(2);
 // BackendAPI.getUserById(2);
 
 
 function App() {
+
+  React.useEffect(() => {
+    console.log("rendu") 
+  })
 
   return (
     <div className="App" >

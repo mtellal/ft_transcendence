@@ -1,67 +1,88 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
+
+import { extractCookie } from "../utils/Cookie";
+import IconInput from "../components/IconInput";
+import imgLogin from '../assets/icon-login.png'
+
+import { setCookie } from "../utils/Cookie";
+import { loginRequest } from "../utils/User";
 
 import '../styles/Sign.css'
-import IconInput from "../components/IconInput";
-import imgLogin from '../images/icon-login.png'
 
-
-export default function SignIn(props)
+/* export async function loader()
 {
+    setCookie("access_token")
+    return (null)
+}
+ */
+
+export default function SignIn(props) {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
+    const [error, setError] = React.useState("");
 
+    const navigate = useNavigate();
 
-    function handleSubmit()
-    {
-        /* let user = fetch('http://localhost:3000/users', {
-            method: "POST",
-            headers: {'Content-type':"application/json"},
-            body: JSON.stringify({
-                id: Math.floor(Math.random() * 1000),
-                username: username,
-                avatar: JSON.stringify(imgLogin)
-            })
-        })
-        .then(res => res.json())
-        .then(datas => console.log(datas))
-        .catch(e => console.log(e)) */
+    async function handleResponse(res) {
+        //console.log(res);
+        if (!res.ok) {
+            setError(`${res.status} ${res.statusText}`);
+            return;
+        }
 
-        console.log("SignIn submit")
+        return (
+            res.json()
+            .then(d => d)
+        )
+    }
+
+    async function handleSubmit() {
+        if (!username || !password)
+            return (setError("userame or password empty"))
+        let res = await loginRequest(username, password);
+        const token = await handleResponse(res);
+        if (token)
+        {
+            setCookie("access_token", token.access_token)
+            navigate("/");
+        }
     }
 
     return (
         <>
-        <div className="sign-page">
-            <div className="sign-form">
-                <img src={imgLogin} className="sign--img" />
-                <IconInput
-                    icon="person"
-                    placeholder="Username"
-                    getValue={value => setUsername(value)}
-                />
-                <IconInput
-                    icon="lock"
-                    placeholder="Password"
-                    getValue={value => setPassword(value)}
+            <div className="sign-page">
+                <div className="sign-form">
+                    <img src={imgLogin} className="sign--img" />
+                    <IconInput
+                        icon="person"
+                        placeholder="Username"
+                        getValue={value => setUsername(value)}
+                        submit={() => handleSubmit()}
                     />
-                <Link
-                    to="/"
-                    className="sign--button"
-                    onClick={handleSubmit}
+                    <IconInput
+                        icon="lock"
+                        placeholder="Password"
+                        getValue={value => setPassword(value)}
+                        submit={() => handleSubmit()}
+                    />
+                    {error && <p>error: {error}</p>}
+                    <Link
+                        className="sign--button"
+                        onClick={handleSubmit}
                     >
-                    Sign in
-                </Link>
-                <Link
-                    to={"/signup"}
-                    className="sign--link"
-                    onClick={props.click}
+                        Sign in
+                    </Link>
+                    <Link
+                        to={"/signup"}
+                        className="sign--link"
+                        onClick={props.click}
                     >
-                    Sign up
-                </Link>
+                        Sign up
+                    </Link>
+                </div>
             </div>
-        </div>
-        <Outlet />
+            <Outlet />
         </>
     )
 }

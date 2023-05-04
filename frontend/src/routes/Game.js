@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-import './Game.css'
+import '../styles/Game.css'
 
 
 let up;

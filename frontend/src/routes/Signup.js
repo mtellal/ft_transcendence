@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 
 import '../styles/Sign.css'
 import IconInput from "../components/IconInput";
-import imgLogin from '../images/icon-login.png'
+import imgLogin from '../assets/icon-login.png'
 
 export default function SignUp(props)
 {
@@ -21,6 +21,22 @@ export default function SignUp(props)
             console.log("Error password !== confirm password")
         else
         {
+            console.log(username, password)
+
+            let user = fetch('http://localhost:3000/auth/signup', {
+                method: "POST",
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    email: "email",
+                    avatar: "avatar"
+                })
+            })
+            .then(res => res.json())
+            .then(datas => console.log(datas))
+            .catch(e => console.log(e))
+        
             console.log("User Created")
         }
     }
