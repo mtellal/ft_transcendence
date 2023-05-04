@@ -86,18 +86,21 @@ function ProfileInfos(props)
     - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
 */
 
-function ProfilePicture({image, ...props})
+function ProfilePicture({user, image, token, ...props})
 {
     const [img, setImg] = React.useState(image);
 
     const navigate = useNavigate();
 
-    function editProfilePicture(e)
+    async function editProfilePicture(e)
     {
-        console.log(e.name);
-        // const rest = updateProfilePicture(e)
-        console.log(e.target.files[0])
-        setImg(URL.createObjectURL(e.target.files[0]));
+        const userResponse = await updateUser({...user, avatar: e.target.files[0].name}, user.id)
+        if (userResponse.status !== 200 && userResponse.statusText !== "OK")
+            console.log("Error => ", userResponse);
+
+        const file = await updateProfilePicture(e.target.files[0], token);
+        if (file.status !== 201 && file.statusText !== "OK")
+            console.log("Error => ", file);
     }
 
     function disconnect()
@@ -139,16 +142,15 @@ export async function loader()
     let id = jwtDecode(token).sub;
     const user = await getUser(id);
     if (user && user.data && user.status === 200 && user.statusText === "OK")
-        return (user.data);
+        return ([user.data, token]);
     else 
         return (null)
 }
 
 export default function Profile()
 {
-    const user = useLoaderData();
-    console.log(`${process.env.REACT_APP_BACK}/${user.avatar}` )
-
+    const [user, token] = useLoaderData();
+    console.log(user)
 
     return (
         <div className="profile">
@@ -158,7 +160,9 @@ export default function Profile()
                 password={user && user.password} 
             />
             <ProfilePicture 
-                image={user && (`${process.env.REACT_APP_BACK}/${user.avatar}` || "./assets/user.png")}
+                user={user}
+                image={user && (user.avatar || "./assets/user.png")}
+                token={token}
             />              
         </div>
     )

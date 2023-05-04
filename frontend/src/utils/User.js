@@ -57,12 +57,15 @@ export async function updateUser(user, id)
 }
 
 
-export async function updateProfilePicture(image)
+export async function updateProfilePicture(image, token)
 {
+    const formData = new FormData();
+    formData.append('file', image);
     return (
-        axios.post(`${process.env.REACT_APP_BACK}/users/upload`, image, {
+        axios.post(`${process.env.REACT_APP_BACK}/users/upload`, formData, {
             headers: {
-                'Content-Type': image.type
+                'Content-Type': 'multipart/form-data', 
+                'Authorization': `Bearer ${token}`
             }
         })
         .then(res => res)
