@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -99,6 +99,8 @@ export class UsersController {
   })
   @UseInterceptors(FileInterceptor('file', storage))
   uploadfile(@UploadedFile() file, @Request() req) {
+    if (!file)
+      throw new BadRequestException('No file or empty file');
     const user: User = req.user;
     console.log(user);
     console.log(file);
