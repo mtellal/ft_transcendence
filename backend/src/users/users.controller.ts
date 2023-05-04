@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, P
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard/jwt.guard'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -85,6 +85,18 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Post('upload')
   @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file', storage))
   uploadfile(@UploadedFile() file, @Request() req) {
     const user: User = req.user;
