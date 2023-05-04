@@ -1,6 +1,4 @@
 
-import React from "react";
-
 export function setCookie(key, value)
 {
     if (document.cookie)

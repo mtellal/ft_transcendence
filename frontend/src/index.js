@@ -82,6 +82,7 @@ const router = createBrowserRouter([
     {
         path: "/signin",
         element: <SignIn />,
+        loader: signinLoader,
         children: [
             {
                 path: "",
