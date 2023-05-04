@@ -45,7 +45,8 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    updateUserDto.password = await argon.hash(updateUserDto.password);
+    if (updateUserDto.password)
+      updateUserDto.password = await argon.hash(updateUserDto.password);
     return this.prisma.user.update( {
       where : { id },
       data: updateUserDto,
