@@ -4,7 +4,7 @@ import '../styles/Profile.css'
 
 import jwtDecode from 'jwt-decode';
 import { redirect, useLoaderData, useNavigate } from "react-router-dom";
-import { getUser, updateProfilePicture, updateUser } from "../utils/User";
+import { getUser, getUserProfilePictrue, updateProfilePicture, updateUser } from "../utils/User";
 import { extractCookie } from "../utils/Cookie";
 
 
@@ -37,7 +37,7 @@ function InfoInput(props)
 }
 
 
-function ProfileInfos(props)
+function ProfileInfos({user, ...props})
 {
     const [username, setUsername] = React.useState(props.username || "");
     const [error, setError] = React.useState("");
@@ -46,7 +46,7 @@ function ProfileInfos(props)
     {
         const res = await updateUser({
             username: username || props.username, 
-            avatar: props.avatar || "", 
+            avatar: user.avatar,
             userStatus: "ONLINE"
         }, props.id)
 
@@ -94,9 +94,9 @@ function ProfilePicture({user, image, token, ...props})
 
     async function editProfilePicture(e)
     {
-        const userResponse = await updateUser({...user, avatar: e.target.files[0].name}, user.id)
+        /* const userResponse = await updateUser({...user, avatar: e.target.files[0].name}, user.id)
         if (userResponse.status !== 200 && userResponse.statusText !== "OK")
-            console.log("Error => ", userResponse);
+            console.log("Error => ", userResponse); */
 
         const file = await updateProfilePicture(e.target.files[0], token);
         if (file.status !== 201 && file.statusText !== "OK")
@@ -141,16 +141,23 @@ export async function loader()
     const token = extractCookie("access_token");
     let id = jwtDecode(token).sub;
     const user = await getUser(id);
+
+    let image = await getUserProfilePictrue(id);
+    if (image.status === 200 && image.statusText === "OK")
+        image =  window.URL.createObjectURL(new Blob([image.data]))
+    else
+        image = "";
     if (user && user.data && user.status === 200 && user.statusText === "OK")
-        return ([user.data, token]);
+        return ([user.data, token, image]);
     else 
         return (null)
 }
 
 export default function Profile()
 {
-    const [user, token] = useLoaderData();
-    console.log(user)
+    const [user, token, image] = useLoaderData();
+    console.log(user, image)
+
 
     return (
         <div className="profile">
@@ -161,7 +168,7 @@ export default function Profile()
             />
             <ProfilePicture 
                 user={user}
-                image={user && (user.avatar || "./assets/user.png")}
+                image={image  || "./assets/user.png"}
                 token={token}
             />              
         </div>

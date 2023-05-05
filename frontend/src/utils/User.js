@@ -47,6 +47,7 @@ export async function getUser(id)
 
 export async function updateUser(user, id)
 {
+    console.log("UPDATE USER => ", user)
     return (
         axios.patch(`${process.env.REACT_APP_BACK}/users/${id}`, {
             ...user
@@ -55,7 +56,6 @@ export async function updateUser(user, id)
         .catch(err => err)
     )
 }
-
 
 export async function updateProfilePicture(image, token)
 {
@@ -72,5 +72,18 @@ export async function updateProfilePicture(image, token)
         .catch(err => err)
     )
 }
+
+
+export async function getUserProfilePictrue(id)
+{
+    return (
+        axios.get(`${process.env.REACT_APP_BACK}/users/${id}/profileImage`, {
+            responseType:'arraybuffer'
+        })
+        .then(res => res)
+        .catch(err => err)
+    )
+}
+
 
 
