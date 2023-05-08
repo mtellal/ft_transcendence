@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
 
 import axios from 'axios';
 
@@ -29,11 +29,10 @@ export default function SignIn(props) {
         if (!username || !password)
             return (setError("userame or password empty"));
         const res = await signinRequest(username, password);
-        console.log(res);
         if (res && res.status === 200 && res.statusText === "OK")
         {
             setCookie("access_token", res.data.access_token);
-            navigate("/");
+            navigate("/", {user: res});
         }
         else
             setError(`${res.response.status} ${res.response.statusText}`);
@@ -72,7 +71,6 @@ export default function SignIn(props) {
                     </Link>
                 </div>
             </div>
-            <Outlet />
         </>
     )
 }

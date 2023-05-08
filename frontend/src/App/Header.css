@@ -48,11 +48,23 @@
     color: black;
 }
 
-.pp
+.pp-round
 {
-    height: 80%;
+    overflow: hidden;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.pp
+{    
+    height: 100%;
+    width: 100%;
     object-fit: cover;
-    padding: 0 10px;
 }
 
 .pp-user:hover

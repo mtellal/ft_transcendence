@@ -1,16 +1,15 @@
 import React from 'react'
-import { Outlet, redirect, useLoaderData } from 'react-router-dom';
+import jwtDecode from 'jwt-decode';
+import { Outlet, redirect, useLoaderData, useLocation } from 'react-router-dom';
 
+import Header from './App/Header';
 import Footer from './App/Footer';
-import Header from './App/Header'
 import Sidebar from './App/SideBar';
 import { extractCookie } from './utils/Cookie';
-import jwtDecode from 'jwt-decode';
 import { getUser, getUserProfilePictrue } from './utils/User';
 import './App.css';
 
 export async function loader() {
-
   const token = extractCookie("access_token");
   if (token)
   {
@@ -20,30 +19,53 @@ export async function loader() {
     if (user === 200 && user.statusText === "OK")
       return (console.log("Error: app loader => ", user))
 
-    let image = await getUserProfilePictrue(id);
-    if (image.status === 200 && image.statusText === "OK")
-        image =  window.URL.createObjectURL(new Blob([image.data]))
+    let imageURL = await getUserProfilePictrue(id);
+    if (imageURL.status === 200 && imageURL.statusText === "OK")
+      imageURL =  window.URL.createObjectURL(new Blob([imageURL.data]))
     else
-        image = null;
-    return ([user.data, token, image]);
+      imageURL = null;
+
+    return ({user: {...user.data}, token, imageURL})
   }
-  return redirect("/signin");
+  return (redirect("/signin"));
 }
 
 export const UserContext = React.createContext();
 
 function App() {
+  
+  const {user, token, imageURL} = useLoaderData();
+  const [profilePicture, setProfilePicture] = React.useState(imageURL);
+  const [username, setUsername] = React.useState(user && user.username);
 
-  const [user, token, image] = useLoaderData();
 
+  function updateHeaderProfilePicture(url)
+  {
+    setProfilePicture(url);
+  }
+
+  function updateHeaderUsername(username)
+  {
+    setUsername(username);
+    user.username = username;
+  }
+  
 
   return (
-    <UserContext.Provider value={[user, token, image]} >
+    <UserContext.Provider value={[user, token, profilePicture]} >
       <div className="App" >
-        <Header/>
+        <Header 
+          profilePicture={profilePicture} 
+          username={username}
+        />
         <Sidebar />
         <Footer />
-        <Outlet />
+        <Outlet 
+          context={{
+            updateHeaderProfilePicture, 
+            updateHeaderUsername
+          }}
+        />
       </div>
     </UserContext.Provider>
   );

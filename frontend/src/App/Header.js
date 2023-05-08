@@ -2,15 +2,10 @@ import React, { useContext } from 'react';
 
 import './Header.css'
 
-import imgLogin from '../assets/user.png'
 import { Link } from 'react-router-dom';
-import { UserContext } from '../App';
 
-
-export default function Header()
+export default function Header({profilePicture, username, ...props})
 {
-    const [user, token, image] = useContext(UserContext);
-
     return (
         <header className='header'>
             <p className='header-pong'>Pong</p>
@@ -19,11 +14,13 @@ export default function Header()
                     className='pp-link'
                     to={"/profile"}
                 >
-                    <img 
-                        className='pp'
-                        src={image}
-                    />
-                <p className='pp-user'>{user.username}</p>
+                    <div className='pp-round'>
+                        <img 
+                            className='pp'
+                            src={profilePicture || "./assets/user.png"}
+                        />
+                    </div>
+                <p className='pp-user'>{username}</p>
                 </Link>
             </div>
         </header>

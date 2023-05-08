@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import '../styles/Profile.css'
 
 import jwtDecode from 'jwt-decode';
-import { redirect, useLoaderData, useNavigate } from "react-router-dom";
+import { redirect, useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
 import { getUser, getUserProfilePictrue, updateProfilePicture, updateUser } from "../utils/User";
 import { extractCookie } from "../utils/Cookie";
+import { UserContext } from "../App";
 
 
 
 function InfoInput(props)
 {
+    const inputRef = React.useRef();
     const [value, setValue] = React.useState(props.value || "");
 
     function onChange(e)
@@ -22,15 +24,26 @@ function InfoInput(props)
         }
     }
 
+    function handleKeyDown(e)
+    {
+        if (e.key === 'Enter' && value)
+        {
+            props.submit()
+            inputRef.current.blur();
+        }
+    }
+
     return (
         <div className="input--container">
             <label htmlFor={props.id} className="input--label" >{props.label}</label>
             <input
+                ref={inputRef}
                 id={props.id}
                 className="input"
                 placeholder={props.label}
                 value={value}
                 onChange={onChange}
+                onKeyDown={handleKeyDown}
             />
         </div>
     )
@@ -41,24 +54,26 @@ function ProfileInfos({user, ...props})
 {
     const [username, setUsername] = React.useState(props.username || "");
     const [error, setError] = React.useState("");
-    
+    const {pp, updateHeaderUsername} = useOutletContext();
+
     async function updateProfile()
     {
         const res = await updateUser({
-            username: username || props.username, 
-            avatar: user.avatar,
+            username: username, 
+            avatar: props.avatar || "",
             userStatus: "ONLINE"
         }, props.id)
 
         if (res && res.status !== 200 && res.statusText !== "OK")
         {
             setError("Username invalid")
-            console.log("updateProfile failed");
+            console.log("updateProfile failed", res);
         }
         else
         {
             setError("")
             console.log("updateProfile succeed")
+            updateHeaderUsername(username);
         }
     }
 
@@ -69,6 +84,7 @@ function ProfileInfos({user, ...props})
                 label="Username"
                 value={props.username}
                 getValue={setUsername}
+                submit={updateProfile}
             />
             {error && <p style={{color:'red'}}>{error}</p>}
             <button 
@@ -89,6 +105,7 @@ function ProfileInfos({user, ...props})
 function ProfilePicture({user, image, token, ...props})
 {
     const [img, setImg] = React.useState(image);
+    const {updateHeaderProfilePicture} = useOutletContext();
 
     const navigate = useNavigate();
 
@@ -97,7 +114,9 @@ function ProfilePicture({user, image, token, ...props})
         const file = e.target.files[0];
         if (file.type.match("image.*"))
         {
-            setImg(window.URL.createObjectURL(e.target.files[0]))
+            let url = window.URL.createObjectURL(e.target.files[0])
+            setImg(url);
+            updateHeaderProfilePicture(url);
             const fileRes = await updateProfilePicture(e.target.files[0], token);
             if (fileRes.status !== 201 && fileRes.statusText !== "OK")
                 console.log("Error => ", fileRes);
@@ -141,28 +160,9 @@ function ProfilePicture({user, image, token, ...props})
     )
 }
 
-export async function loader()
-{
-    const token = extractCookie("access_token");
-    let id = jwtDecode(token).sub;
-    const user = await getUser(id);
-
-    let image = await getUserProfilePictrue(id);
-    if (image.status === 200 && image.statusText === "OK")
-        image =  window.URL.createObjectURL(new Blob([image.data]))
-    else
-        image = null;
-    if (user && user.data && user.status === 200 && user.statusText === "OK")
-        return ([user.data, token, image]);
-    else 
-        return (null)
-}
-
 export default function Profile()
 {
-    const [user, token, image] = useLoaderData();
-    console.log(user, image)
-
+    const [user, token, image] = useContext(UserContext);
 
     return (
         <div className="profile">
@@ -170,6 +170,7 @@ export default function Profile()
                 id={user && user.id}
                 username={user && user.username} 
                 password={user && user.password} 
+                avatar={user && user.avatar}
             />
             <ProfilePicture 
                 user={user}
