@@ -72,10 +72,23 @@
     max-width: 200px;
 }
 
+.picture-container
+{
+    border: 1px solid rgb(172, 172, 172);
+    overflow: hidden;
+    border-radius: 50%;
+    height: 130px;
+    width: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .profile-picture
 {
+    object-fit: cover;
     width: 100%;
-    max-width: 150px;
+    height: 100%;
 }
 
 .profile-picture-input
@@ -88,11 +101,11 @@
 
 .profil-picture-label
 {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     position: relative;
     top: -2vw;
     right: -1vw;
-    padding: 5% 5%;
+    padding: 5px 5px;
     border: 1px solid black;
     border-radius: 5px;
     cursor: pointer;

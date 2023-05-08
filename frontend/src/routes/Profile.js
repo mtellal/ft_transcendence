@@ -94,13 +94,16 @@ function ProfilePicture({user, image, token, ...props})
 
     async function editProfilePicture(e)
     {
-        /* const userResponse = await updateUser({...user, avatar: e.target.files[0].name}, user.id)
-        if (userResponse.status !== 200 && userResponse.statusText !== "OK")
-            console.log("Error => ", userResponse); */
-
-        const file = await updateProfilePicture(e.target.files[0], token);
-        if (file.status !== 201 && file.statusText !== "OK")
-            console.log("Error => ", file);
+        const file = e.target.files[0];
+        if (file.type.match("image.*"))
+        {
+            setImg(window.URL.createObjectURL(e.target.files[0]))
+            const fileRes = await updateProfilePicture(e.target.files[0], token);
+            if (fileRes.status !== 201 && fileRes.statusText !== "OK")
+                console.log("Error => ", fileRes);
+        }
+        else
+            console.log("Wrong format file")
     }
 
     function disconnect()
@@ -110,7 +113,9 @@ function ProfilePicture({user, image, token, ...props})
 
     return (
         <div className="profile-picture-container">
+            <div className="picture-container">
             <img className="profile-picture" src={img} />
+            </div>
             <form >
                 <label 
                     htmlFor="edit" 
@@ -146,7 +151,7 @@ export async function loader()
     if (image.status === 200 && image.statusText === "OK")
         image =  window.URL.createObjectURL(new Blob([image.data]))
     else
-        image = "";
+        image = null;
     if (user && user.data && user.status === 200 && user.statusText === "OK")
         return ([user.data, token, image]);
     else 

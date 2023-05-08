@@ -8,10 +8,11 @@
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border-bottom: 2px solid rgb(192, 192, 192);
 }
 
-.header--pong
+.header-pong
 {
     font-size: xx-large;
     margin: 0 5vh;
@@ -21,4 +22,40 @@
     border-radius: 5px;
     text-decoration: underline;
     color: black;
+}
+
+.pp-container
+{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    flex: 0.3;
+    display: flex;
+    align-items: center;
+}
+
+.pp-container > *
+{
+    cursor: pointer;
+}
+
+.pp-link
+{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: black;
+}
+
+.pp
+{
+    height: 80%;
+    object-fit: cover;
+    padding: 0 10px;
+}
+
+.pp-user:hover
+{
+    text-decoration: underline;
 }
