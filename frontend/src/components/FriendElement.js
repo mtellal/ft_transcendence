@@ -22,27 +22,27 @@ export default function FriendElement(props)
 {
     function selectStatusDiv()
     {
-        if (props.status === "onLine")
+        if (props.userStatus === "ONLINE")
             return ({backgroundColor:"#14CA00"} )
-        else if (props.status === "disconnected")
+        else if (props.userStatus === "OFFLINE")
             return ({backgroundColor:"#FF0000"})
-        else if (props.status === "inGame")
+        else if (props.userStatus === "INGAME")
             return ({backgroundColor: '#FFC600'})
     }
 
     function selectStatusText()
     {
-        if (props.status === "onLine")
+        if (props.userStatus === "ONLINE")
             return ("On line")
-        else if (props.status === "disconnected")
+        else if (props.userStatus === "OFFLINE")
             return ("Disconnected")
-        else if (props.status === "inGame") 
+        else if (props.userStatus === "INGAME") 
         return ("In game")
     }
 
     return (
         <Link to={`/chat/friends/${props.username}`}
-            className={`friend ${props.className ? `friend-${props.className}` : null}` }
+            className="friend"
             style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
         >
@@ -59,16 +59,7 @@ export default function FriendElement(props)
                         {selectStatusText()}
                     </p>
                 </div>
-            </div>
-
-            {
-                props.chat &&
-                <div className="friend-actions">
-                    <span className="material-symbols-outlined">
-                        mode_comment
-                    </span>
-                </div>
-            }    
+            </div>   
 
         </Link>
     )

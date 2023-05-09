@@ -1,9 +1,6 @@
 import React from "react";
 import { Link, redirect, useNavigate } from "react-router-dom";
 
-import axios from 'axios';
-
-import { extractCookie } from "../utils/Cookie";
 import IconInput from "../components/IconInput";
 import imgLogin from '../assets/icon-login.png'
 
@@ -35,7 +32,10 @@ export default function SignIn(props) {
             navigate("/", {user: res});
         }
         else
+        {
             setError(`${res.response.status} ${res.response.statusText}`);
+            console.log(res)
+        }
     }
 
     return (

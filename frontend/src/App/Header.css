@@ -67,7 +67,15 @@
     object-fit: cover;
 }
 
-.pp-user:hover
+.pp-username
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    overflow: hidden;
+}
+
+.pp-username:hover
 {
     text-decoration: underline;
 }

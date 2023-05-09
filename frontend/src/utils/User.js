@@ -86,4 +86,12 @@ export async function getUserProfilePictrue(id)
 }
 
 
+/*
+    friendIDs a array of ids of users 
+*/
+
+export async function getUserFriends(friendIDs)
+{
+    return (await Promise.all(friendIDs.map(async (id) => await getUser(id))))
+}
 

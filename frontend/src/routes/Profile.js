@@ -1,13 +1,9 @@
 import React, { useContext } from "react";
-
-import '../styles/Profile.css'
-
-import jwtDecode from 'jwt-decode';
-import { redirect, useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
-import { getUser, getUserProfilePictrue, updateProfilePicture, updateUser } from "../utils/User";
-import { extractCookie } from "../utils/Cookie";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { updateProfilePicture, updateUser } from "../utils/User";
 import { UserContext } from "../App";
 
+import '../styles/Profile.css'
 
 
 function InfoInput(props)
@@ -54,7 +50,9 @@ function ProfileInfos({user, ...props})
 {
     const [username, setUsername] = React.useState(props.username || "");
     const [error, setError] = React.useState("");
-    const {pp, updateHeaderUsername} = useOutletContext();
+    const [updated, setUpdated] = React.useState(false);
+    const {updateHeaderUsername} = useOutletContext();
+
 
     async function updateProfile()
     {
@@ -67,13 +65,15 @@ function ProfileInfos({user, ...props})
         if (res && res.status !== 200 && res.statusText !== "OK")
         {
             setError("Username invalid")
+            setUpdated("")
             console.log("updateProfile failed", res);
         }
-        else
+        else if (username !== props.username)
         {
             setError("")
             console.log("updateProfile succeed")
             updateHeaderUsername(username);
+            setUpdated(true);
         }
     }
 
@@ -86,7 +86,8 @@ function ProfileInfos({user, ...props})
                 getValue={setUsername}
                 submit={updateProfile}
             />
-            {error && <p style={{color:'red'}}>{error}</p>}
+            {error && <p className='infos-error' >{error}</p>}
+            {updated && <p className='infos-updated' >Profile updated</p>}
             <button 
                 onClick={updateProfile} 
                 className="profile-infos-button" 
@@ -125,7 +126,7 @@ function ProfilePicture({user, image, token, ...props})
             console.log("Wrong format file")
     }
 
-    function disconnect()
+    async function disconnect()
     {
         navigate("/signin");
     }

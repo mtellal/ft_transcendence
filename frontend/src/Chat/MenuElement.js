@@ -45,11 +45,22 @@ function GroupElement(props)
 
 export default function MenuElement(props)
 {
-
     const [groups, setGroups] = React.useState(props.user.channelList);
     const [friends, setFriends] = React.useState(props.user.friendList);
     const [currentFriend, setCurrentFriend] = React.useState();
     const [currentGroup, setCurrentGroup] = React.useState();
+
+    
+    React.useEffect(() => {
+
+        setFriends(props.friends.map(res => {
+            if (res.status === 200 && res.statusText === "OK")
+                return (res.data)
+            else
+                console.log("Menu element, res => ", res) 
+        }))
+
+    }, [props.friends])
 
     function handleFriendsMessage(p)
     {
@@ -76,17 +87,17 @@ export default function MenuElement(props)
         />
     )
 
-    const friendsList = friends.map(f => (
+    const friendsList = friends.map(user => (
         <FriendElement 
-            key={f.id}
-            id={f.id}
-            username={f.username}
-            status={f.status}
-            chat={false}
+            key={user.id}
+            id={user.id}
+            username={user.username}
+            avatar={user.avatar}
+            userStatus={user.userStatus}
             hover={true}
-            selected={currentFriend === f.id ? true : false}
+            selected={currentFriend === user.id ? true : false}
             className="chat"
-            click={() => handleFriendsMessage(f)}
+            click={() => handleFriendsMessage(user)}
         />
     ))
 
