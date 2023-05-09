@@ -45,6 +45,7 @@ enum ChannelType {
 model Channel {
   id             Int         @id @default(autoincrement())
   name           String?
+  password       String?
   messages       Message[]
   ownerId        Int
   administrators Int[]
