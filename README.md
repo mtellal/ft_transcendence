@@ -14,6 +14,9 @@
   - https://webuild.envato.com/blog/how-to-scale-and-maintain-legacy-css-with-sass-and-smacss/ 
   - https://www.york.ac.uk/pattern-library/about/css.html 
 
+#### AJAX
+- https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/ - Async map array of promises + explications async/sync processes
+
 #### Web sockets
 - https://javascript.info/websocket -Websocket API
 
