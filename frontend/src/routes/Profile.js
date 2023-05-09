@@ -1,214 +1,80 @@
-// import React, { useState } from "react";
-// import imgProfile from '../images/user.png'
-// import '../styles/Profile.css'
-
-// import imgProfile from '../assets/user.png'
-// import jwt_decode from 'jwt-decode';
-// import { redirect, useLoaderData } from "react-router-dom";
-
-
-
-// function InfoInput( {id, label, nameForm, formErrors, setFormErrors} )
-// {
-//     const [value, setValue] = React.useState(props.value || "");
-
-//     return (
-//         <div className="input--container">
-//             <label className="input--label" >{label}</label>
-//             <input
-//                 id={id}
-//                 className="input"
-//                 type="text"
-//                 name={nameForm}
-//                 placeholder={label}
-//                 // value={name}
-//                 // onChange={(e) => setValue(e.target.value)}
-//                 onChange={updateFormValues}
-//             />
-// 			<FieldError msg={formErrors[nameForm]} />
-//         </div>
-//     )
-// }
-
-// export default function Profile(props)
-// {
-
-// 	const [formErrors, setFormErrors] = useState({username: "", password: "", phoneNumber: ""});
-//     const [img, setImg] = React.useState(imgProfile);
-
-// 	function hasError() {
-// 		return Object.values(formErrors).some((error) => (error !== undefined && error !== ""));
-// 	}
-
-//     function updateProfile()
-//     {
-//         console.log("ProfileInfos: profile updated");
-//     }
-
-//     return (
-//         <div className="form--container">
-//             <InfoInput 
-//                 id={Math.floor(Math.random() * 1000000)}
-//                 label="Username"
-//                 value={props.username}
-//             />
-//             <InfoInput 
-//                 id={Math.floor(Math.random() * 1000000)}
-//                 label="Password"
-//                 value={props.password}
-//             />  
-//             <InfoInput 
-//                 id={Math.floor(Math.random() * 1000000)}
-//                 label="Email"
-//                 value={props.email}
-//             /> 
-
-//             <button onClick={updateProfile} className="profile-infos-button" >Update</button>         
-//         </div>
-//     )
-// }
-
-// /*
-//     - update user infos with fetch a PATCH/POST method (or any other update html method)
-//     - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
-// */
-
-// function ProfilePicture()
-// {
-//     const [img, setImg] = React.useState(imgProfile);
-
-//     function editProfilePicture(e)
-//     {
-//         setImg(URL.createObjectURL(e.target.files[0]));
-//     }
-
-//     function disconnect()
-//     {
-//         console.log("ProfilePicture: disconnection")
-//     }
-
-//     const profileInfos = (
-//         <div className="form--container">
-//             <InfoInput 
-//                 id={Math.floor(Math.random() * 1000000)}
-//                 label="Username"
-//                 nameForm="username"
-//                 formErrors={formErrors}
-//                 setFormErrors={setFormErrors}
-//             />
-//             <InfoInput 
-//                 id={Math.floor(Math.random() * 1000000)}
-//                 label="Password"
-//                 nameForm="password"
-//                 formErrors={formErrors}
-//                 setFormErrors={setFormErrors}
-//             />  
-//             <InfoInput 
-//                 id={Math.floor(Math.random() * 1000000)}
-//                 label="Phone number"
-//                 nameForm="phoneNumber"
-//                 formErrors={formErrors}
-//                 setFormErrors={setFormErrors}
-//             />
-//             <button disabled={hasError()} onClick={updateProfile} className="profile-infos-button" >Update</button>         
-//         </div>
-//     );
-
-//     const ProfilePicture = (
-//         <div className="profile-picture-container">
-//             <img className="profile-picture" src={img} alt="imgProfile"/>
-//             <form >
-//                 <label htmlFor="edit" className="profil-picture-label">Edit</label>
-//                 <input
-//                     id="edit"
-//                     type="file"
-//                     placeholder="edit"
-//                     className="profile-picture-input"
-//                     onChange={editProfilePicture}
-//                 />
-//             </form>
-//             <button className="profile-picture-button" onClick={disconnect} >
-//                 Disconnect
-//             </button>
-//         </div>
-//     );
-
-// export async function loader()
-// {
-//     const obj = jwt_decode(document.cookie);
-//     console.log("ici", process.env.REACT_APP_BACK)
-
-//     return (fetch(`${process.env.REACT_APP_BACK}/users/${obj.sub}`, {
-//             headers: {
-//                 'Authorization':`Bearer ${document.cookie.split("=")[1]}`
-//             }
-//         })
-//         .then(res => {
-//             if (!res.ok)
-//                 return (redirect("/signin"));
-//             console.log(res);
-//             return res.json();
-//         })
-//         .then(data =>  data)
-//         .catch(err => console.log(err))
-//     )
-// }
-
-
-// export default function Profile()
-// {
-//     const loader = useLoaderData();
-//     console.log("Profile loader datas => ", loader)
-
-//     return (
-//         <div className="profile">
-//             <ProfileInfos 
-//                 username={loader && loader.username} 
-//                 password={loader && loader.password} 
-//                 email={loader && loader.email}
-//             />
-//             <ProfilePicture />              
-//         </div>
-//     );
-// }
-
-
-
-import React from "react";
+import React, { useContext } from "react";
 
 import '../styles/Profile.css'
 
-import imgProfile from '../assets/user.png'
-import jwt_decode from 'jwt-decode';
-import { redirect, useLoaderData } from "react-router-dom";
+import jwtDecode from 'jwt-decode';
+import { redirect, useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
+import { getUser, getUserProfilePictrue, updateProfilePicture, updateUser } from "../utils/User";
+import { extractCookie } from "../utils/Cookie";
+import { UserContext } from "../App";
 
 
 
 function InfoInput(props)
 {
+    const inputRef = React.useRef();
     const [value, setValue] = React.useState(props.value || "");
+
+    function onChange(e)
+    {
+        setValue(e.target.value);
+        if (e.target.value)
+        {
+            props.getValue(e.target.value);
+        }
+    }
+
+    function handleKeyDown(e)
+    {
+        if (e.key === 'Enter' && value)
+        {
+            props.submit()
+            inputRef.current.blur();
+        }
+    }
 
     return (
         <div className="input--container">
             <label htmlFor={props.id} className="input--label" >{props.label}</label>
             <input
+                ref={inputRef}
                 id={props.id}
                 className="input"
                 placeholder={props.label}
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={onChange}
+                onKeyDown={handleKeyDown}
             />
         </div>
     )
 }
 
 
-function ProfileInfos(props)
+function ProfileInfos({user, ...props})
 {
-    
-    function updateProfile()
+    const [username, setUsername] = React.useState(props.username || "");
+    const [error, setError] = React.useState("");
+    const {pp, updateHeaderUsername} = useOutletContext();
+
+    async function updateProfile()
     {
-        console.log("ProfileInfos: profile updated");
+        const res = await updateUser({
+            username: username, 
+            avatar: props.avatar || "",
+            userStatus: "ONLINE"
+        }, props.id)
+
+        if (res && res.status !== 200 && res.statusText !== "OK")
+        {
+            setError("Username invalid")
+            console.log("updateProfile failed", res);
+        }
+        else
+        {
+            setError("")
+            console.log("updateProfile succeed")
+            updateHeaderUsername(username);
+        }
     }
 
     return (
@@ -217,19 +83,16 @@ function ProfileInfos(props)
                 id={Math.floor(Math.random() * 1000000)}
                 label="Username"
                 value={props.username}
+                getValue={setUsername}
+                submit={updateProfile}
             />
-            <InfoInput 
-                id={Math.floor(Math.random() * 1000000)}
-                label="Password"
-                value={props.password}
-            />  
-            <InfoInput 
-                id={Math.floor(Math.random() * 1000000)}
-                label="Email"
-                value={props.email}
-            /> 
-
-            <button onClick={updateProfile} className="profile-infos-button" >Update</button>         
+            {error && <p style={{color:'red'}}>{error}</p>}
+            <button 
+                onClick={updateProfile} 
+                className="profile-infos-button" 
+            >
+                Update
+            </button>         
         </div>
     )
 }
@@ -239,23 +102,39 @@ function ProfileInfos(props)
     - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
 */
 
-function ProfilePicture()
+function ProfilePicture({user, image, token, ...props})
 {
-    const [img, setImg] = React.useState(imgProfile);
+    const [img, setImg] = React.useState(image);
+    const {updateHeaderProfilePicture} = useOutletContext();
 
-    function editProfilePicture(e)
+    const navigate = useNavigate();
+
+    async function editProfilePicture(e)
     {
-        setImg(URL.createObjectURL(e.target.files[0]));
+        const file = e.target.files[0];
+        if (file.type.match("image.*"))
+        {
+            let url = window.URL.createObjectURL(e.target.files[0])
+            setImg(url);
+            updateHeaderProfilePicture(url);
+            const fileRes = await updateProfilePicture(e.target.files[0], token);
+            if (fileRes.status !== 201 && fileRes.statusText !== "OK")
+                console.log("Error => ", fileRes);
+        }
+        else
+            console.log("Wrong format file")
     }
 
     function disconnect()
     {
-        console.log("ProfilePicture: disconnection")
+        navigate("/signin");
     }
 
     return (
         <div className="profile-picture-container">
+            <div className="picture-container">
             <img className="profile-picture" src={img} />
+            </div>
             <form >
                 <label 
                     htmlFor="edit" 
@@ -281,41 +160,23 @@ function ProfilePicture()
     )
 }
 
-export async function loader()
-{
-    const obj = jwt_decode(document.cookie);
-    console.log("ici", process.env.REACT_APP_BACK)
-
-    return (fetch(`${process.env.REACT_APP_BACK}/users/${obj.sub}`, {
-            headers: {
-                'Authorization':`Bearer ${document.cookie.split("=")[1]}`
-            }
-        })
-        .then(res => {
-            if (!res.ok)
-                return (redirect("/signin"));
-            console.log(res);
-            return res.json();
-        })
-        .then(data =>  data)
-        .catch(err => console.log(err))
-    )
-}
-
-
 export default function Profile()
 {
-    const loader = useLoaderData();
-    console.log("Profile loader datas => ", loader)
+    const [user, token, image] = useContext(UserContext);
 
     return (
         <div className="profile">
             <ProfileInfos 
-                username={loader && loader.username} 
-                password={loader && loader.password} 
-                email={loader && loader.email}
+                id={user && user.id}
+                username={user && user.username} 
+                password={user && user.password} 
+                avatar={user && user.avatar}
             />
-            <ProfilePicture />              
+            <ProfilePicture 
+                user={user}
+                image={image  || "./assets/user.png"}
+                token={token}
+            />              
         </div>
     )
 }

@@ -5,14 +5,14 @@ import App, { loader as appLoader } from './App';
 
 import SignIn, { loader as signinLoader } from './routes/Signin';
 import SignUp from './routes/Signup';
-import Profile, { loader as profileLoader} from './routes/Profile';
+import Profile from './routes/Profile';
 import LaunchGame from './routes/Game';
 import History from './routes/History';
 
 
 
 import AddElement from "./Chat/Interface/AddElement";
-import Interface, { loader as interfaceLoader}from './Chat/Interface/Interface';
+import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
 
 
 import { currentUser as user } from './exampleDatas'
@@ -38,7 +38,6 @@ const router = createBrowserRouter([
             },
             {
                 path: "profile",
-                loader: profileLoader,
                 element: <Profile />
             },
             {
@@ -82,22 +81,11 @@ const router = createBrowserRouter([
     {
         path: "/signin",
         element: <SignIn />,
-        children: [
-            {
-                path: "",
-                element: <App />
-            }
-        ]
+        loader: signinLoader
     },
     {
         path: "/signup",
         element: <SignUp />,
-        children: [
-            {
-                path: "",
-                element: <App />
-            }
-        ]
     }
 ])
 

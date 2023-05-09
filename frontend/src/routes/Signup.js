@@ -1,44 +1,37 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 
-import '../styles/Sign.css'
 import IconInput from "../components/IconInput";
 import imgLogin from '../assets/icon-login.png'
+import { signupRequest } from "../utils/User";
+import { setCookie } from "../utils/Cookie";
 
-export default function SignUp(props)
+import '../styles/Sign.css'
+
+
+export default function SignUp()
 {
-
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
-    const [formError, setFormError] = React.useState(false);
+    const [error, setError] = React.useState(false);
 
-    function submitForm()
-    {
+    const navigate = useNavigate();
+
+    async function handleSubmit() {
         if (!username || !password || !confirmPassword)
-            console.log("Error field")
-        else if (password !== confirmPassword)
-            console.log("Error password !== confirm password")
-        else
+            return (setError("userame or password empty"));
+        if (password !== confirmPassword)
+            return (setError("password !== confirm password"))
+        const res = await signupRequest(username, password);
+        // console.log(res);
+        if (res && res.status === 201 && res.statusText === "Created")
         {
-            console.log(username, password)
-
-            let user = fetch('http://localhost:3000/auth/signup', {
-                method: "POST",
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    email: "email",
-                    avatar: "avatar"
-                })
-            })
-            .then(res => res.json())
-            .then(datas => console.log(datas))
-            .catch(e => console.log(e))
-        
-            console.log("User Created")
+            setCookie("access_token", res.data.access_token);
+            navigate("/signin");
         }
+        else
+            setError(`${res.response.status} ${res.response.statusText}`);
     }
 
     return (
@@ -50,20 +43,24 @@ export default function SignUp(props)
                     icon="person"
                     placeholder="Username"
                     getValue={value => setUsername(value)}
+                    submit={handleSubmit}
                     />
                 <IconInput
                     icon="lock"
                     placeholder="Password"
                     getValue={value => setPassword(value)}
+                    submit={handleSubmit}
                     />
                 <IconInput
                     icon="lock"
                     placeholder="Confirm password"
                     getValue={value => setConfirmPassword(value)}
+                    submit={handleSubmit}
                     />
+                {error && <p>error: {error}</p>}
                 <button 
                     className="sign--button" 
-                    onClick={submitForm} 
+                    onClick={handleSubmit} 
                     >
                     Sign up
                 </button>

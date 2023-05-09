@@ -1,46 +1,73 @@
 import React from 'react'
-import { Outlet, redirect } from 'react-router-dom';
-import './App.css';
+import jwtDecode from 'jwt-decode';
+import { Outlet, redirect, useLoaderData, useLocation } from 'react-router-dom';
 
+import Header from './App/Header';
 import Footer from './App/Footer';
-import Header from './App/Header'
 import Sidebar from './App/SideBar';
 import { extractCookie } from './utils/Cookie';
+import { getUser, getUserProfilePictrue } from './utils/User';
+import './App.css';
 
-export async function loader()
-{
-  console.log("loader app")
-  /*
-    redirect to /login when user not logged or when cookies (auth) expired
-  */
-
-  if (extractCookie("access_token"))
+export async function loader() {
+  const token = extractCookie("access_token");
+  if (token)
   {
-    return (null)
-  }
+    let id = jwtDecode(token).sub;
 
-  console.log("redirect signin")
-  return redirect("/signin");
+    const user = await getUser(id);
+    if (user === 200 && user.statusText === "OK")
+      return (console.log("Error: app loader => ", user))
+
+    let imageURL = await getUserProfilePictrue(id);
+    if (imageURL.status === 200 && imageURL.statusText === "OK")
+      imageURL =  window.URL.createObjectURL(new Blob([imageURL.data]))
+    else
+      imageURL = null;
+
+    return ({user: {...user.data}, token, imageURL})
+  }
+  return (redirect("/signin"));
 }
 
-
-// BackendAPI.getUser(2);
-// BackendAPI.getUserById(2);
-
+export const UserContext = React.createContext();
 
 function App() {
+  
+  const {user, token, imageURL} = useLoaderData();
+  const [profilePicture, setProfilePicture] = React.useState(imageURL);
+  const [username, setUsername] = React.useState(user && user.username);
 
-  React.useEffect(() => {
-    console.log("rendu") 
-  })
+
+  function updateHeaderProfilePicture(url)
+  {
+    setProfilePicture(url);
+  }
+
+  function updateHeaderUsername(username)
+  {
+    setUsername(username);
+    user.username = username;
+  }
+  
 
   return (
-    <div className="App" >
-      <Header />
-      <Sidebar />
-      <Footer />
-      <Outlet />
-    </div>
+    <UserContext.Provider value={[user, token, profilePicture]} >
+      <div className="App" >
+        <Header 
+          profilePicture={profilePicture} 
+          username={username}
+        />
+        <Sidebar />
+        <Footer />
+        <Outlet 
+          context={{
+            updateHeaderProfilePicture, 
+            updateHeaderUsername
+          }}
+        />
+      </div>
+    </UserContext.Provider>
   );
 }
 

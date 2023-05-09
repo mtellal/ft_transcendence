@@ -1,21 +1,22 @@
 import React from "react";
-import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
+
+import axios from 'axios';
 
 import { extractCookie } from "../utils/Cookie";
 import IconInput from "../components/IconInput";
 import imgLogin from '../assets/icon-login.png'
 
 import { setCookie } from "../utils/Cookie";
-import { loginRequest } from "../utils/User";
+import { signinRequest } from "../utils/User";
 
 import '../styles/Sign.css'
 
-/* export async function loader()
+export async function loader()
 {
-    setCookie("access_token")
+    setCookie("access_token", "")
     return (null)
 }
- */
 
 export default function SignIn(props) {
     const [username, setUsername] = React.useState("");
@@ -24,29 +25,17 @@ export default function SignIn(props) {
 
     const navigate = useNavigate();
 
-    async function handleResponse(res) {
-        //console.log(res);
-        if (!res.ok) {
-            setError(`${res.status} ${res.statusText}`);
-            return;
-        }
-
-        return (
-            res.json()
-            .then(d => d)
-        )
-    }
-
     async function handleSubmit() {
         if (!username || !password)
-            return (setError("userame or password empty"))
-        let res = await loginRequest(username, password);
-        const token = await handleResponse(res);
-        if (token)
+            return (setError("userame or password empty"));
+        const res = await signinRequest(username, password);
+        if (res && res.status === 200 && res.statusText === "OK")
         {
-            setCookie("access_token", token.access_token)
-            navigate("/");
+            setCookie("access_token", res.data.access_token);
+            navigate("/", {user: res});
         }
+        else
+            setError(`${res.response.status} ${res.response.statusText}`);
     }
 
     return (
@@ -82,7 +71,6 @@ export default function SignIn(props) {
                     </Link>
                 </div>
             </div>
-            <Outlet />
         </>
     )
 }

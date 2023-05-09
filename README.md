@@ -7,6 +7,12 @@
 
 ## Docs:
 
+#### CSS 
+  ##### BEM
+  - https://yandex.com/dev/bem/ - BEM naming convention 
+  - https://webuild.envato.com/blog/how-to-scale-and-maintain-legacy-css-with-sass-and-smacss/ 
+  - https://www.york.ac.uk/pattern-library/about/css.html 
+
 #### Web sockets
 - https://javascript.info/websocket -Websocket API
 
