@@ -8,6 +8,7 @@
 ## Docs:
 
 #### CSS 
+- https://github.com/suitcss/suit - suitCSS - naming convention used by twitter 
   ##### BEM
   - https://yandex.com/dev/bem/ - BEM naming convention 
   - https://webuild.envato.com/blog/how-to-scale-and-maintain-legacy-css-with-sass-and-smacss/ 
