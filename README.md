@@ -7,6 +7,12 @@
 
 ## Docs:
 
+#### CSS 
+  ##### BEM
+  - https://yandex.com/dev/bem/ - BEM naming convention 
+  - https://webuild.envato.com/blog/how-to-scale-and-maintain-legacy-css-with-sass-and-smacss/ 
+  - https://www.york.ac.uk/pattern-library/about/css.html 
+
 #### Web sockets
 - https://javascript.info/websocket -Websocket API
 
@@ -26,6 +32,13 @@
 ## BACKEND 
 `http://localhost:3000`
 
+## Docs:
+
+- [Nestjs Docs](https://docs.nestjs.com/)
+- [Build a REST API with NestJS and Prisma](https://www.youtube.com/watch?v=LMjj1_EK4y8) - Used to create a basic User module with CRUD endpoints
+- [Blog Project - NestJS](https://www.youtube.com/playlist?list=PLVfq1luIZbSnytbsm2i8Ocf_hyUHTsqbZ) - Great playlist about creating a blog using NestJS. Very useful infos about image uploading, using AuthGuard to protect endpoints
+- [Authentification using Prisma and NestJS](https://www.prisma.io/blog/nestjs-prisma-authentication-7D056s1s0k3l) - Implementing authentification in a REST API
+- [Realtime Chat App](https://www.youtube.com/playlist?list=PLVfq1luIZbSkICzoA8EuvTskPEROS68i9) - Playlist about creating a realtime chat app using NestJS.
 
 <hr/>
 
