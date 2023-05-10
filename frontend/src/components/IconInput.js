@@ -20,7 +20,7 @@ export default function IconInput(props)
     function handleChange(e)
     {
         setValue(e.target.value);
-        if (props.getValue)
+        if (props.getValue && value !== "")
             props.getValue(e.target.value);
     }
 
@@ -29,7 +29,7 @@ export default function IconInput(props)
         if (e.key === 'Enter')
         {
             console.log("Enter pressed");
-            props.submit();
+            props.submit(e);
         }
     }
 

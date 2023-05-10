@@ -20,8 +20,6 @@ export default function Chat(props)
         loadFriends();
     }, [])
 
-    console.log("CHAT => ", friends)
-
     function addFriend()
     {
         console.log("addFriend");

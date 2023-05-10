@@ -1,7 +1,11 @@
-import './FriendElement.css'
+
+import React, { useReducer } from 'react';
 
 import img from '../assets/user.png'
 import { Link } from 'react-router-dom'
+import { getUserProfilePictrue } from '../utils/User'
+
+import './FriendElement.css'
 
 /*  
 
@@ -18,8 +22,22 @@ className="chat"
 click={handleFriendsMessage}
 */
 
-export default function FriendElement(props)
+
+function AddIcon(props)
 {
+    return (
+        <div className='banner-icon'>
+            <span className="material-symbols-outlined">
+                Add
+            </span>
+        </div>
+    )
+}
+
+export default function FriendElement(props)
+{    
+    const [userIg, setUserImg] = React.useState();
+
     function selectStatusDiv()
     {
         if (props.userStatus === "ONLINE")
@@ -40,6 +58,22 @@ export default function FriendElement(props)
         return ("In game")
     }
 
+    async function loadProfilePicture()
+    {
+        const res = await getUserProfilePictrue(props.id);
+        if (res.status === 200 && res.statusText === "OK")
+        {
+            setUserImg(window.URL.createObjectURL(new Blob([res.data])))
+        }
+        else
+            console.log("Err request friend element => ", res);
+    }
+
+    React.useEffect(() => {
+        loadProfilePicture();
+    }, [])
+
+
     return (
         <Link to={`/chat/friends/${props.username}`}
             className="friend"
@@ -48,7 +82,9 @@ export default function FriendElement(props)
         >
 
             <div className="infos-div" >
-                <img className="friend-image" src={img} />
+                <div className='friend-image-container'>
+                    <img className="friend-image" src={userIg} />
+                </div>
                 <div
                     className="firend-icon-status"
                     style={selectStatusDiv()}
@@ -60,6 +96,10 @@ export default function FriendElement(props)
                     </p>
                 </div>
             </div>   
+                {
+                    props.addUser ? 
+                    <AddIcon /> : null
+                }
 
         </Link>
     )

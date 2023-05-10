@@ -1,43 +1,81 @@
 
 import React from "react";
+import { getUserByUsername } from '../../utils/User'
+import FriendElement from "../../components/FriendElement";
 
 import './AddElement.css'
+import IconInput from "../../components/IconInput";
+
 
 export default function AddElement(props)
 {
+    const [prevValue, setPrevValue] = React.useState("");
     const [value, setValue] = React.useState("");
+    const [friend, setFriend] = React.useState(null);
+    const [error, setError] = React.useState(false);
 
-    function handleChange(e)
+    async function searchUser()
     {
-        setValue(e.target.value);
+        if (prevValue === value)
+            return ;
+        const res = await getUserByUsername(value);
+        if (res.status === 200 && res.statusText === "OK")
+        {
+            setFriend(res.data);
+            setError(false)
+        }
+        else
+        {
+            setFriend(null);
+            setError(true)
+            console.log(res)
+        }
+        setPrevValue(value);
     }
 
-    function handleKeys(e)
+    function handleSubmit()
     {
-        if (e.key === "Enter")
+        if (value)
         {
-            console.log(`Search '${props.title.toLowerCase()}'`)
-            setValue("")
+            searchUser();
         }
-
     }
 
     return (
         <div className="add-container">
             <div className="add-div">
                 <h2 className="add-title">Add a {props.title}</h2>
-                <label htmlFor="input" className="search-input">
-                    <span className="material-symbols-outlined">
-                        search
-                    </span>
-                <input
-                    id="input"
-                    className="add-input"
-                    value={value}
-                    onChange={handleChange}
-                    onKeyDown={handleKeys}
+                <IconInput
+                        icon="search"
+                        placeholder="Username"
+                        getValue={v => setValue(v)}
+                        submit={() => handleSubmit()}
                     />
-                </label>
+                {
+                    friend ? 
+                    <div className="user-found">
+                        <FriendElement 
+                            key={friend.id}
+                            id={friend.id}
+                            username={friend.username}
+                            avatar={friend.avatar}
+                            userStatus={friend.userStatus}
+                            hover={true}
+                            selected={false}
+                            addUser={true}
+                            />
+                    </div>
+                        : null
+                }
+                {
+                    error ? <p>User not found</p> : null
+                }
+                <button 
+                    className="add-button"
+                    onClick={searchUser}
+                >
+                    Search
+                </button>
             </div>
         </div>
     )
