@@ -48,8 +48,8 @@ model Channel {
   password       String?
   messages       Message[]
   ownerId        Int
-  administrators Int[]
-  members        Int[]
+  administrators Int[]       @default([])
+  members        Int[]       @default([])
   banList        Int[]       @default([])
   muteList       Int[]       @default([])
   type           ChannelType
