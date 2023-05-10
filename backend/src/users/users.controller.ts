@@ -172,6 +172,28 @@ export class UsersController {
     this.usersService.addFriend(friendshipDto.friendId, friendshipDto.id);
   }
 
+  @Post('removeFriend')
+  @ApiOperation({ summary: 'Makes two users remove each other to their friendlist, might need to be one-way only. Let me know what you prefer'})
+  async removeFriend(@Body() friendshipDto: FriendshipDto)
+  {
+    const user = await this.usersService.findOne(friendshipDto.id);
+    const friend = await this.usersService.findOne(friendshipDto.friendId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id of ${friendshipDto.id} does not exist`);
+    }
+    if (!friend) {
+      throw new NotFoundException(`User with id of ${friendshipDto.friendId} does not exist`);
+    }
+
+    if (!user.friendList.includes(friendshipDto.friendId)) {
+      throw new NotAcceptableException('Not friends!')
+    }
+
+    this.usersService.removeFriend(friendshipDto.id, friendshipDto.friendId);
+    this.usersService.removeFriend(friendshipDto.friendId, friendshipDto.id);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update the user, all the fields are optional. Will be protected by JWT in the future'})
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
