@@ -5,11 +5,12 @@ import { Status } from '@prisma/client';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
-  @ApiProperty()
+  @ApiProperty({description: 'Path of the profile image', example: `uploads/profileImages/example.jpg`})
+  @IsOptional()
   @IsString()
   avatar: string;
 
-  @ApiProperty()
+  @ApiProperty({description: 'Status of the User', example: `ONLINE`})
   @IsOptional()
   @IsEnum(Status)
   userStatus?: Status;
