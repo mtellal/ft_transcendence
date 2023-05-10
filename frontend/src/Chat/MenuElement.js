@@ -13,7 +13,6 @@ function CollectionElement(props)
                 <h2 className="collection-title">{props.title}</h2>
                 <Link 
                     to={`/chat/add-${props.title.toLowerCase().slice(0, -1)}`} 
-                    onClick={props.addClick} 
                     className="collection-add"
                 >
                     <span className="material-symbols-outlined">
@@ -46,20 +45,13 @@ function GroupElement(props)
 export default function MenuElement(props)
 {
     const [groups, setGroups] = React.useState(props.user.channelList);
-    const [friends, setFriends] = React.useState([]);
+    const [friends, setFriends] = React.useState(props.friends);
     const [currentFriend, setCurrentFriend] = React.useState();
     const [currentGroup, setCurrentGroup] = React.useState();
 
     
     React.useEffect(() => {
-
-        setFriends(props.friends.map(res => {
-            if (res.status === 200 && res.statusText === "OK")
-                return (res.data)
-            else
-                console.log("Menu element, res => ", res) 
-        }))
-
+        setFriends(props.friends);
     }, [props.friends])
 
     function handleFriendsMessage(p)
@@ -111,7 +103,6 @@ export default function MenuElement(props)
             <CollectionElement
                 title="Friends"
                 collection={friendsList}
-                addClick={props.addFriend}
             />
         </div>
     )

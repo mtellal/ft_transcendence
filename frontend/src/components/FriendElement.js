@@ -23,47 +23,16 @@ click={handleFriendsMessage}
 */
 
 
-function AddIcon(props)
+export function UserInfos({id, username, userStatus, ...props})
 {
-    return (
-        <div className='banner-icon'>
-            <span className="material-symbols-outlined">
-                Add
-            </span>
-        </div>
-    )
-}
-
-export default function FriendElement(props)
-{    
-    const [userIg, setUserImg] = React.useState();
-
-    function selectStatusDiv()
-    {
-        if (props.userStatus === "ONLINE")
-            return ({backgroundColor:"#14CA00"} )
-        else if (props.userStatus === "OFFLINE")
-            return ({backgroundColor:"#FF0000"})
-        else if (props.userStatus === "INGAME")
-            return ({backgroundColor: '#FFC600'})
-    }
-
-    function selectStatusText()
-    {
-        if (props.userStatus === "ONLINE")
-            return ("On line")
-        else if (props.userStatus === "OFFLINE")
-            return ("Disconnected")
-        else if (props.userStatus === "INGAME") 
-        return ("In game")
-    }
+    const [avatar, setAvatar] = React.useState();
 
     async function loadProfilePicture()
     {
-        const res = await getUserProfilePictrue(props.id);
+        const res = await getUserProfilePictrue(id);
         if (res.status === 200 && res.statusText === "OK")
         {
-            setUserImg(window.URL.createObjectURL(new Blob([res.data])))
+            setAvatar(window.URL.createObjectURL(new Blob([res.data])))
         }
         else
             console.log("Err request friend element => ", res);
@@ -73,34 +42,87 @@ export default function FriendElement(props)
         loadProfilePicture();
     }, [])
 
+    function selectStatusDiv()
+    {
+        if (userStatus === "ONLINE")
+            return ({backgroundColor:"#14CA00"} )
+        else if (userStatus === "OFFLINE")
+            return ({backgroundColor:"#FF0000"})
+        else if (userStatus === "INGAME")
+            return ({backgroundColor: '#FFC600'})
+    }
 
+    function selectStatusText()
+    {
+        if (userStatus === "ONLINE")
+            return ("On line")
+        else if (userStatus === "OFFLINE")
+            return ("Disconnected")
+        else if (userStatus === "INGAME") 
+        return ("In game")
+    }
+
+    return (
+        <div className="infos-div" >
+            <div className='friend-image-container'>
+                <img className="friend-image" src={avatar} />
+            </div>
+            <div
+                className="firend-icon-status"
+                style={selectStatusDiv()}
+            />
+            <div className="friend-infos">
+                <p className="username" >{username}</p>
+                <p className="friend-status">
+                    {selectStatusText()}
+                </p>
+            </div>
+        </div>  
+    )
+}
+
+function AddIcon(props)
+{
+    return (
+        <div 
+            className='banner-icon'
+            onClick={props.onClick}
+        >
+            <span className="material-symbols-outlined">
+                Add
+            </span>
+        </div>
+    )
+}
+
+
+export function FriendSearch(props)
+{
+    return (
+        <div style={{
+            boxShadow:'0 1px 3px black',
+            borderRadius:'5px',
+            width: '100%', 
+            display:'flex', 
+            padding: '5px 5px',
+            justifyContent:'space-between',
+            alignItems:'center'
+        }}>
+            <UserInfos {...props} />
+            <AddIcon onClick={props.onCLick} />
+        </div>
+    )
+}
+
+export default function FriendElement(props)
+{    
     return (
         <Link to={`/chat/friends/${props.username}`}
             className="friend"
             style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
         >
-
-            <div className="infos-div" >
-                <div className='friend-image-container'>
-                    <img className="friend-image" src={userIg} />
-                </div>
-                <div
-                    className="firend-icon-status"
-                    style={selectStatusDiv()}
-                />
-                <div className="friend-infos">
-                    <p className="username" >{props.username}</p>
-                    <p className="friend-status">
-                        {selectStatusText()}
-                    </p>
-                </div>
-            </div>   
-                {
-                    props.addUser ? 
-                    <AddIcon /> : null
-                }
-
+            <UserInfos {...props}/> 
         </Link>
     )
 }

@@ -51,8 +51,6 @@ function App() {
   {
     const res = await updateUser(
       {
-        username: user.username,
-        avatar: user.avatar,
         userStatus:"OFFLINE"
       }, user.id)
       if (res.status !== 200 && res.statusText !== "OK")
@@ -63,8 +61,6 @@ function App() {
   {
     const res = await updateUser(
       {
-        username: user.username,
-        avatar: user.avatar,
         userStatus:"ONLINE"
       }, user.id)
     if (res.status !== 200 && res.statusText !== "OK")

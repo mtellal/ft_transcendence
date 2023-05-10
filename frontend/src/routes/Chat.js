@@ -6,23 +6,33 @@ import { getUserFriends } from "../utils/User";
 
 import '../styles/Chat.css'
 
+
 export default function Chat(props)
 {
     const {user} = useOutletContext();
     const [friends, setFriends] = React.useState([])
 
+
     async function loadFriends()
     {
-        setFriends(await getUserFriends(user.friendList));
+        const friendsRes = await getUserFriends(user.friendList); 
+        setFriends(friendsRes.map(res => {
+            if (res.status === 200 && res.statusText === "OK")
+                return (res.data)
+            else
+                console.log("Menu element, res => ", res) 
+        }))
     }
 
     React.useEffect(() => {
         loadFriends();
+        const loadFriendsInterval = setInterval(loadFriends, 3000)
+        return (() => clearInterval(loadFriendsInterval))
     }, [])
 
-    function addFriend()
+    function updateFriendList()
     {
-        console.log("addFriend");
+        console.log("function called from outlet")
     }
 
     function addGroup()
@@ -41,11 +51,10 @@ export default function Chat(props)
                <MenuElement
                 friends={friends}
                 user={props.user}
-                addFriend={() => addFriend()}
                 addGroup={() => addGroup()}
                 getElement={getElement}
                />
-                <Outlet />
+                <Outlet context={{user, updateFriendList}} />
             </div>
         </div>
     )
