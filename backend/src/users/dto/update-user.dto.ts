@@ -6,6 +6,7 @@ import { Status } from '@prisma/client';
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
   avatar: string;
 
