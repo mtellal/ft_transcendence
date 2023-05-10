@@ -150,7 +150,7 @@ export class UsersController {
     res.sendFile(join(process.cwd(), user.avatar));
   }
 
-  @Post('addFriend')
+  @Post('friend')
   @ApiOperation({ summary: 'Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
   async addFriend(@Body() friendshipDto: FriendshipDto)
   {
@@ -172,7 +172,7 @@ export class UsersController {
     this.usersService.addFriend(friendshipDto.friendId, friendshipDto.id);
   }
 
-  @Post('removeFriend')
+  @Delete('friend')
   @ApiOperation({ summary: 'Makes two users remove each other to their friendlist, might need to be one-way only. Let me know what you prefer'})
   async removeFriend(@Body() friendshipDto: FriendshipDto)
   {
