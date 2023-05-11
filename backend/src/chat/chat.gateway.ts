@@ -31,6 +31,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message', content);
   }
 
+  @SubscribeMessage('createChannel')
+  async createChannel(@ConnectedSocket() client: Socket, payload: any)
+  {
+    /* Need to pass in the payload: 
+    - The name of the channel (Optional? Or give it a temp name?)
+    - The type of the channel (PUBLIC, PROTECTED or PRIVATE)
+    - The password if the channel is of type PROTECTED
+    */
+    console.log(payload);
+  }
+
+  @SubscribeMessage('joinChannel')
+  async joinChannel(@ConnectedSocket() client: Socket, payload: any)
+  {
+    /* Need to pass in the payload 
+    - The id of the channel
+    - The password if the channel is PROTECTED 
+    Will need to check in this func if the conditions are respected:
+    - If the channel is public, all good if the user is valid
+    - If the channel is protected, check for a pwd. If no pwd or invalid pwd => Refuse
+    - If the channel is private, check for a pending invite? 
+    */
+   console.log(payload);
+  }
   async handleConnection(client: Socket) {
 
     try {
