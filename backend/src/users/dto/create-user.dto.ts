@@ -14,3 +14,15 @@ export class CreateUserDto {
   password: string;
 
 }
+
+export class FriendshipDto {
+  @ApiProperty({description: 'id of the first user', example: '1'})
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+
+  @ApiProperty({description: 'id of the second user', example: '2'})
+  @IsNotEmpty()
+  @IsNumber()
+  friendId: number;
+}
