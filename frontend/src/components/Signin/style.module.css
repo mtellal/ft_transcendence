@@ -1,7 +1,7 @@
-.signin {
+/* .signin {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 45%;
+    left: 55%;
     transform: translate(-50%, -50%);
     width: 50%;
     height: 50%;
@@ -12,7 +12,7 @@
     font-weight: 700;
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 56%;
     transform: translate(-50%, -50%);
     width: 50%;
     height: 50%;
@@ -64,9 +64,87 @@
 button {
     height: 40px;
     width: 250px;
-    color: white;
+    color: black;
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.1);
     border: none;
     cursor: pointer;
+}
+
+.btnSignup {
+	position: absolute;
+	top: 68%;
+	left: 25%;
+} */
+
+
+
+
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.signup {
+	width: 300px;
+	height: 350px;
+}
+
+.title {
+    font-size: 30px;
+    font-weight: 700;
+	text-align: center;
+}
+
+.form {
+    margin-top: 20px;
+	text-align: center;
+}
+
+.form_group {
+    margin-bottom: 20px;
+}
+
+.form_group input {
+    height: 35px;
+    width: 200px;
+    border: none;
+    border-radius: 22px;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding-left: 50px;
+}
+
+.logo {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    margin-top: 4px;
+    margin-left: 5px;
+}
+
+button {
+	/* margin-bottom: 11px; */
+    background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    height: 40px;
+    width: 250px;
+    border-radius: 22px;
+	cursor: pointer;
+}
+
+.btnSignup {
+	/* margin-left: 25px; */
+	margin-top: 10px;
+	background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    height: 40px;
+    width: 250px;
+    border-radius: 22px;
 }
