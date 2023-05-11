@@ -8,6 +8,7 @@ export class ChatService {
   constructor(private prisma: PrismaService) {}
 
   async create(createChannelDto: CreateChannelDto, owner: User) {
-
+    console.log(createChannelDto);
+    console.log(owner);
   }
 }
