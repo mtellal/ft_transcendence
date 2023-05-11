@@ -1,10 +1,7 @@
 import { NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
-import { ExtractJwt } from 'passport-jwt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { CreateChannelDto } from './dto/channel.dto';
@@ -64,7 +61,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return ;
     }
     console.log(dto);
-    await this.chatService.create(dto, user);
+    const newChannel = await this.chatService.create(dto, user);
+    client.join(`channel:${newChannel.id}`);
+    this.server.to(`channel:${newChannel.id}`).emit('message', "New channel joined");
   }
 
   @SubscribeMessage('joinChannel')
