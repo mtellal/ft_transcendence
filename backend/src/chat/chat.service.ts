@@ -22,7 +22,12 @@ export class ChatService {
       administrators: owner.id,
       members: owner.id,
     }});
-    console.log(newChannel);
+    await this.prisma.user.update({
+      where: { id: owner.id },
+      data: {
+        channelList: { push: newChannel.id }
+      }
+    })
     return newChannel;
   }
 }
