@@ -44,6 +44,16 @@ export class UsersService {
     })
   }
 
+  async removeFriend(id: number, friendId: number)
+  {
+    const user = this.prisma.user.findUnique({where: {id}});
+    const newFriendlist = (await user).friendList.filter(id => id !== friendId);
+    return this.prisma.user.update({
+      where: {id},
+      data: {friendList: newFriendlist},
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password)
       updateUserDto.password = await argon.hash(updateUserDto.password);
