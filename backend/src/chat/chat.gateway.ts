@@ -1,4 +1,4 @@
-import { NotFoundException, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
@@ -7,7 +7,8 @@ import { User } from '@prisma/client';
 import { ExtractJwt } from 'passport-jwt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { createChannelDto } from './dto/channel.dto';
+import { CreateChannelDto } from './dto/channel.dto';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: 'https://hoppscotch.io'}})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -15,12 +16,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private jwtService: JwtService, private userService: UsersService){}
+  constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService ){}
 
   @SubscribeMessage('message')
   async handleMessage(@MessageBody() content: string, @ConnectedSocket() client: Socket) {
     try {
-      const authToken = client.handshake.auth.token;
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = Array.isArray(client.handshake.headers.access_token) ?
+      client.handshake.headers.access_token[0] :
+      client.handshake.headers.access_token;
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
       const user = await this.userService.findOne(decodedToken.id);
       console.log(user);
@@ -33,46 +37,62 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('createChannel')
-  async createChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: createChannelDto)
+  @UsePipes(new ValidationPipe())
+  async createChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: CreateChannelDto)
   {
-    /* Need to pass in the payload: 
-    - The name of the channel (Optional? Or give it a temp name?)
-    - The type of the channel (PUBLIC, PROTECTED or PRIVATE)
-    - The password if the channel is of type PROTECTED
-    */
-    console.log(dto);
-    console.log(dto.channelName);
-    console.log(dto.channelType);
-    console.log(dto.channelPassword);
+    /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+    const authToken = Array.isArray(client.handshake.headers.access_token) ?
+      client.handshake.headers.access_token[0] :
+      client.handshake.headers.access_token;
+    if (!authToken)
+      throw new UnauthorizedException();
+    const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+    const user = await this.userService.findOne(decodedToken.id);
+    console.log(user);
+    if (!user)
+      throw new UnauthorizedException();
+    try {
+      const newChannel = await this.chatService.create(dto, user)
+    }
+    catch {
+
+    }
   }
 
   @SubscribeMessage('joinChannel')
-  async joinChannel(@ConnectedSocket() client: Socket, payload: any)
-  {
-    /* Need to pass in the payload 
-    - The id of the channel
-    - The password if the channel is PROTECTED 
-    Will need to check in this func if the conditions are respected:
-    - If the channel is public, all good if the user is valid
-    - If the channel is protected, check for a pwd. If no pwd or invalid pwd => Refuse
-    - If the channel is private, check for a pending invite?  */
-   
-   console.log(payload);
-   client.emit('joinChannel', payload);
-   //console.log(payload.userid);
-  }
-  async handleConnection(client: Socket) {
-
+  async joinChannel(@ConnectedSocket() client: Socket, payload: any) {
     try {
-/*       const authToken = client.handshake.auth.token;
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = Array.isArray(client.handshake.headers.access_token) ?
+        client.handshake.headers.access_token[0] :
+        client.handshake.headers.access_token;
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
       const user = await this.userService.findOne(decodedToken.id);
-      console.log(user); */
+      console.log(user);
     }
     catch {
       this.server.emit('Error', new UnauthorizedException());
       client.disconnect();
     }
+    console.log(payload);
+    client.emit('joinChannel', payload);
+    //console.log(payload.userid);
+  }
+
+  async handleConnection(client: Socket) {
+/*     try {
+      Temporary to test with postman, will need to be changed depending on the way the front sends the info
+      const authToken = Array.isArray(client.handshake.headers.access_token) ?
+      client.handshake.headers.access_token[0] :
+      client.handshake.headers.access_token;
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      const user = await this.userService.findOne(decodedToken.id);
+      console.log(user);
+    }
+    catch {
+      this.server.emit('Error', new UnauthorizedException());
+      client.disconnect();
+    } */
     this.server.emit('message', 'Welcome!');
     console.log("New client connected");
   }
