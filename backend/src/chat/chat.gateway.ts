@@ -63,7 +63,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.disconnect();
       return ;
     }
-    this.chatService.create(dto, user);
+    console.log(dto);
+    await this.chatService.create(dto, user);
   }
 
   @SubscribeMessage('joinChannel')

@@ -4,14 +4,14 @@ import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator"
 export class CreateChannelDto {
 
   @IsString()
-  channelName: String
+  name: string
 
   @IsEnum(ChannelType)
-  channelType: ChannelType
+  type: ChannelType
 
   @IsString()
   @IsOptional()
-  channelPassword?: String
+  password?: string
 }
 
 export class joinChannelDto {
@@ -20,5 +20,5 @@ export class joinChannelDto {
   channelId: number
 
   @IsString()
-  channelPassword: String
+  channelPassword: string
 }
