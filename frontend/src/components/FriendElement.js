@@ -1,7 +1,7 @@
 
 import React, { useReducer } from 'react';
 
-import img from '../assets/user.png'
+import imgUser from '../assets/user.png'
 import { Link } from 'react-router-dom'
 import { getUserProfilePictrue } from '../utils/User'
 
@@ -23,7 +23,7 @@ click={handleFriendsMessage}
 */
 
 
-export function UserInfos({id, username, userStatus, ...props})
+export function UserInfos({id, username, userStatus, userAvatar, ...props})
 {
     const [avatar, setAvatar] = React.useState();
 
@@ -40,7 +40,7 @@ export function UserInfos({id, username, userStatus, ...props})
 
     React.useEffect(() => {
         loadProfilePicture();
-    }, [])
+    }, [userAvatar])
 
     function selectStatusDiv()
     {
@@ -65,14 +65,14 @@ export function UserInfos({id, username, userStatus, ...props})
     return (
         <div className="infos-div" >
             <div className='friend-image-container'>
-                <img className="friend-image" src={avatar} />
+                <img className="friend-image" src={avatar || imgUser} />
             </div>
             <div
                 className="firend-icon-status"
                 style={selectStatusDiv()}
             />
-            <div className="friend-infos">
-                <p className="username" >{username}</p>
+            <div className="flex-column friend-infos">
+                <p className="friend-username" >{username}</p>
                 <p className="friend-status">
                     {selectStatusText()}
                 </p>
@@ -85,7 +85,7 @@ function AddIcon(props)
 {
     return (
         <div 
-            className='banner-icon'
+            className='hover-fill-grey banner-icon'
             onClick={props.onClick}
         >
             <span className="material-symbols-outlined">
@@ -108,8 +108,8 @@ export function FriendSearch(props)
             justifyContent:'space-between',
             alignItems:'center'
         }}>
-            <UserInfos {...props} />
-            <AddIcon onClick={props.onCLick} />
+            <UserInfos {...props} userAvatar={props.avatar}/>
+            { props.add && <AddIcon onClick={props.onCLick} /> }
         </div>
     )
 }
@@ -117,12 +117,12 @@ export function FriendSearch(props)
 export default function FriendElement(props)
 {    
     return (
-        <Link to={`/chat/friends/${props.username}`}
-            className="friend"
-            style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
+        <Link to={`/chat/friends/${props.username}/${props.id}`}
+            className="friend-element hover-fill-grey"
+            style={props.selected ? {backgroundColor:'#ECECEC'} : null}
             onClick={() => props.click(props)}
         >
-            <UserInfos {...props}/> 
+            <UserInfos {...props} userAvatar={props.avatar} /> 
         </Link>
     )
 }

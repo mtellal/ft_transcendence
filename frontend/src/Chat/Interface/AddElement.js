@@ -1,6 +1,6 @@
 
 import React from "react";
-import { getUserByUsername, addUserFriend } from '../../utils/User'
+import { getUserByUsername, addUserFriend, getUser } from '../../utils/User'
 import { FriendSearch } from "../../components/FriendElement";
 
 import IconInput from "../../components/IconInput";
@@ -16,6 +16,12 @@ export default function AddElement(props)
     const [error, setError] = React.useState(false);
 
     const {user, updateFriendList} = useOutletContext();
+
+
+    function validFriend()
+    {
+        return (user.friendList.every(id => friend.id !== id) && friend.id !== user.id)
+    }
 
     function handleResponse(res)
     {
@@ -45,7 +51,7 @@ export default function AddElement(props)
     {
         if (friend)
         {
-            const res = await getUserByUsername(friend.username);
+            const res = await getUser(friend.id);
             handleResponse(res)
         }
     }
@@ -63,9 +69,10 @@ export default function AddElement(props)
         return (() => clearInterval(reloadFriendInterval)); 
     }, [friend])
 
+
     async function addFriend()
     {
-        if (user.friendList.find(id => friend.id !== id))
+        if (validFriend())
         {
             const res = await addUserFriend(user.id, friend.id);
             updateFriendList();
@@ -75,12 +82,12 @@ export default function AddElement(props)
 
     return (
         <div className="add-container">
-            <div className="add-div">
+            <div className="flex-column-center add-div">
                 <h2 className="add-title">Add a {props.title}</h2>
                 <IconInput
                         icon="search"
                         placeholder="Username"
-                        getValue={v => setValue(v)}
+                        getValue={v => setValue(v.trim())}
                         submit={() => handleSubmit()}
                     />
                 {
@@ -90,8 +97,10 @@ export default function AddElement(props)
                             key={friend.id}
                             id={friend.id}
                             username={friend.username}
+                            avatar={friend.avatar}
                             userStatus={friend.userStatus}
                             onCLick={() => addFriend()}
+                            add={validFriend()}
                             />
                     </div>
                         : null

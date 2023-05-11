@@ -17,7 +17,7 @@ export default function ProfileGroup({user, channel, ...props})
     }
 
     return (
-        <div className="settings">
+        <div className="flex-column settings">
             <h2>Settings</h2>
             {
                 accessPassword() && 

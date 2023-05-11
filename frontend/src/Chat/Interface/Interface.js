@@ -3,10 +3,12 @@ import React, { useEffect } from "react";
 import Profile from "./Profile";
 
 import './Interface.css'
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useOutletContext } from "react-router-dom";
 import { currentUser } from "../../exampleDatas";
 
 import ProfileGroup from "./ProfileChannel";
+import { getUser, getUserByUsername } from "../../utils/User";
+import { UserInfos } from "../../components/FriendElement";
 
 
 function BlockMessage({ username }) {
@@ -88,85 +90,39 @@ function Message(props) {
 }
 
 
-
-function Banner({user, channel, ...props}) {
-
-    function selectStatusDiv() {
-
-        if (props.status)
-        {
-            if (props.status === "onLine")
-                return ({ color: "green" })
-            else if (props.status === "disconnected")
-                return ({ color: "red" })
-            else if (props.status === "inGame")
-                return ({ color: '#FFC600' })
-        }
-        else if (props.access)
-        {
-            if (props.access === "public")
-                return ({ color: "green" })
-            else if (props.access === "private")
-                return ({ color: "orange" })
-            else if (props.access === "private")
-                return ({ color: 'black' })
-        }
-
-    }
-
-    function selectStatusText() {
-        if (props.status)
-        {
-            if (props.status === "onLine")
-                return ("On line")
-            else if (props.status === "disconnected")
-                return ("Disconnected")
-            else if (props.status === "inGame")
-                return ("In game")
-        }
-        else if (props.access)
-            return (props.access)
-    }
-
-    function displayMembers()
-    {
-        let members = "";
-        props.members.map(m => members += m + ", ")
-        return (members)  
-    }
+function Banner({element, user, channel, ...props}) {
 
     return (
         <div className="banner">
-            <div className="banner-div1">
-                <img className="banner-pp" src={props.img} alt="profile" />
-                <div className="banner-infos">
+            <UserInfos 
+                id={element.id}
+                username={element.username}
+                userStatus={element.userStatus}
+                userAvatar={element.avatar}
+            />
+            <div className="banner-options">
 
-                    <p className="banner-name" >{props.name}</p>
-                    <p
-                        className="banner-status"
-                        style={selectStatusDiv()}
-                        >
-                        {selectStatusText()}
-                    </p>
-                </div>
-                { props.group && <p className="banner-members">{displayMembers()}</p>}
-            </div>
-            <div className="banner-div2">
-                <div className="banner-icon" onClick={props.profile}>
+                <div className="banner-icon hover-fill-grey" onClick={props.profile}>
                     <span className="material-symbols-outlined">
                         person
                     </span>
                 </div>
-                <div className="banner-icon" onClick={props.invitation}>
+                <div className="banner-icon hover-fill-grey" onClick={props.invitation}>
                     <span className="material-symbols-outlined">
                         sports_esports
                     </span>
                 </div>
-                <div className="banner-icon" onClick={props.block} >
+                <div className="banner-icon hover-fill-grey" onClick={props.block} >
                     <span className="material-symbols-outlined">
                         block
                     </span>
                 </div>
+                <div className="banner-icon hover-fill-grey" onClick={props.block} >
+                    <span className="material-symbols-outlined">
+                        person_remove
+                    </span>
+                </div>
+
             </div>
         </div>
     )
@@ -357,8 +313,8 @@ function getGroup(name)
 export function loader({params})
 {
     let item;
-    if (params.friendid)
-        item = getFriend(params.friendid);
+    if (params.username)
+        item = getFriend(params.username);
     else if (params.groupid)
     {
         item = getGroup(params.groupid);
@@ -373,12 +329,19 @@ export function loader({params})
 
 */
 
-export default function Interface({user, group, friend}) {
+export default function Interface({ group, friend }) {
+
+    const {user, currentElement, friends} = useOutletContext();
 
     const item = useLoaderData();
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
     const [blocked, setBlocked] = React.useState(item.blocked);
+    const [current, setCurrent] = React.useState(currentElement);
+
+    React.useEffect(() => {
+        setCurrent(currentElement);
+    }, [currentElement])
 
     function pushMessage(message) {
         let newMessage = {
@@ -413,28 +376,22 @@ export default function Interface({user, group, friend}) {
         setProfile(prev => !prev);
     }
 
-
-
     React.useEffect(() => {
         setBlocked(item.blocked);
         setProfile(false);
     }, [item])
 
     return (
-        <div className="messages-container">
+        <div className="flex-column messages-container">
             <Banner
-                name={item.username || item.name}
-                img={item.img}
-                status={item.status}
+                element={current || item}
+                name={current && current.username}
+                img={current && current.avatar}
+                status={current && current.userStatus}
                 access={item.access}
                 profile={() => toggleProfile()}
                 invitation={() => newInvitation()}
                 block={() => blockUser()}
-                group={group}
-                members={item.members}
-                firend={friend}
-                channel={item}
-                user={user}
             />
             {
                 friend ? 

@@ -4,8 +4,6 @@
 .messages-container
 {
     width: 70%;
-    display: flex;
-    flex-direction: column;
 }
 
 .messages-display
@@ -88,43 +86,14 @@
     border-bottom: 1px solid black;
     display: flex;
     padding: 10px 10px;
+    justify-content: space-between ;
 }
 
-.banner-div1
-{
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-
-.banner-pp
-{
-    height: auto;
-    width: 50px;
-}
-
-.banner-infos
+.banner-options
 {
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    padding: 0 10px;
-    height: 100%;
-}
-
-.banner-name
-{
-    margin:0;
-    font-size: x-large;
-    font-weight: 500;
-}
-
-
-.banner-status
-{
-    margin: 0;
-    color: grey;
-    font-size: small;
+    align-items: center;
 }
 
 .banner-members
@@ -162,11 +131,6 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-}
-
-.banner-icon:hover
-{
-    background-color: rgb(231, 231, 231);
 }
 
 .banner-icon:active

@@ -94,8 +94,19 @@ export async function getUserProfilePictrue(id)
 }
 
 
+
+export async function getFriendList(id)
+{
+    return (
+        axios.get(`${process.env.REACT_APP_BACK}/users/${id}/friends`)
+        .then(res => res)
+        .catch(err => err)
+    )
+} 
+
 /*
-    friendIDs a array of ids of users 
+    - friendIDs a array of id [1,2,3,4]
+    - return an array of users [{id:.., username:.., ...}] 
 */
 
 export async function getUserFriends(friendIDs)
@@ -105,21 +116,13 @@ export async function getUserFriends(friendIDs)
 
 export async function addUserFriend(id1, id2)
 {
-    let params = new URLSearchParams("");
-    params.append("id", id1);
-    params.append("id of friend", id2);
-    /* return (
-        axios.post(`${process.env.REACT_APP_BACK}/users/addFriend`, params, {
-            headers: {
-                "Content-Type":'application/x-www-form-urlencoded'
-            }
+    return (
+        axios.post(`${process.env.REACT_APP_BACK}/users/friend`, {
+            id:id1,
+            friendId:id2
         })
         .then(res => res)
         .catch(err => err)
-    ) */
-    return (
-        axios.post(`${process.env.REACT_APP_BACK}/users/addFriend?id=${id1}&id%20of%20friend=${id2}`)
-        .then(res => res)
-        .catch(err => err)
     )
+
 }

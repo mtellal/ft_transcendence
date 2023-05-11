@@ -52,7 +52,7 @@ export default function Sidebar()
 
 
     return (
-        <span className="sidebar">
+        <span className="flex-column sidebar">
             <h2 className="sidebar--title" >Menu</h2>
             {menu}
         </span>

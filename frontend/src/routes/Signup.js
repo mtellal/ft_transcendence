@@ -37,7 +37,7 @@ export default function SignUp()
     return (
         <>
         <div className="sign-page">
-            <div className="sign-form">
+            <div className="flex-column sign-form">
                 <img src={imgLogin} className="sign--img" />
                 <IconInput
                     icon="person"

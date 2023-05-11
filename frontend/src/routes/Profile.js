@@ -30,7 +30,7 @@ function InfoInput(props)
     }
 
     return (
-        <div className="input--container">
+        <div className="flex-column input--container">
             <label htmlFor={props.id} className="input--label" >{props.label}</label>
             <input
                 ref={inputRef}
@@ -58,7 +58,6 @@ function ProfileInfos({user, ...props})
     {
         const res = await updateUser({
             username: username, 
-            avatar: props.avatar || "",
             userStatus: "ONLINE"
         }, props.id)
 
@@ -66,12 +65,10 @@ function ProfileInfos({user, ...props})
         {
             setError("Username invalid")
             setUpdated("")
-            console.log("updateProfile failed", res);
         }
         else if (username !== props.username)
         {
             setError("")
-            console.log("updateProfile succeed")
             updateHeaderUsername(username);
             setUpdated(true);
         }

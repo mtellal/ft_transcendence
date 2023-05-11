@@ -17,8 +17,6 @@
     
     background-color: rgb(216, 216, 216);
     border-radius: 5px;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     padding: 2vh 2vh;
     box-shadow: 0 5px 10px black;

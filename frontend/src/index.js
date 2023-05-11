@@ -70,7 +70,7 @@ const router = createBrowserRouter([
                         element:  <Interface user={user} group={true}/>
                     },
                     {
-                        path: "friends/:friendid",
+                        path: "friends/:username/:id",
                         loader: interfaceLoader,
                         element: <Interface user={user} friend={true}/>
                     }

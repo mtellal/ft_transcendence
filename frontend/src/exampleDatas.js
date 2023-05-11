@@ -130,8 +130,8 @@ export const currentUser =
         {
             id: 1,
             username: "friend2",
-            img: imgProfile,
-            status: "disconnected",
+            avatar: imgProfile,
+            userStatus: "disconnected",
             conversation: [
                 {
                     id:0,
