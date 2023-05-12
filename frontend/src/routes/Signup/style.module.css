@@ -1,0 +1,64 @@
+.signup {
+    width: 500px;
+    height: 350px;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 3px;
+}
+
+.title {
+    font-size: 30px;
+    font-weight: 700;
+	text-align: center;
+}
+
+.form {
+    margin-top: 20px;
+	text-align: center;
+}
+
+.form_group {
+    margin-bottom: 20px;
+}
+
+.form_group input {
+    height: 35px;
+    width: 200px;
+    border: none;
+    border-radius: 22px;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding-left: 50px;
+}
+
+.logo {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    margin-top: 4px;
+    margin-left: 5px;
+}
+
+.signinButton {
+    margin-bottom: 7px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    height: 40px;
+    width: 250px;
+    border-radius: 22px;
+	cursor: pointer;
+}
+
+.btnSignin {
+	margin-left: 25px;
+	margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    height: 40px;
+    width: 250px;
+    border-radius: 22px;
+    margin-left: 125px;
+}
