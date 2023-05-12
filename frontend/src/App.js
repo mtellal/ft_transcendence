@@ -86,7 +86,8 @@ function App() {
             {
               user,
               updateHeaderProfilePicture,
-              updateHeaderUsername
+              updateHeaderUsername, 
+              token
             }
           }
         />

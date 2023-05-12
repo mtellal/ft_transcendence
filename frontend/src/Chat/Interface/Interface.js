@@ -1,248 +1,39 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useLoaderData, useOutletContext, useParams } from "react-router-dom";
 
+import Banner from "./Banner";
 import Profile from "./Profile";
+import Messenger from "./Messenger";
+import ProfileGroup from "./ProfileChannel";
 
-import './Interface.css'
-import { useLoaderData, useOutletContext } from "react-router-dom";
 import { currentUser } from "../../exampleDatas";
 
-import ProfileGroup from "./ProfileChannel";
-import { getUser, getUserByUsername } from "../../utils/User";
-import { UserInfos } from "../../components/FriendElement";
+import './Interface.css'
 
-
-function BlockMessage({ username }) {
+function RemoveFriend(props)
+{
     return (
-        <div className="block">
-            <p className="text-block">You have blocked <span className="friend-block">{username}</span></p>
-        </div>
-    )
-}
-
-function NoMessages() {
-    return (
-        <div className="no-messages-div">
-            <p key={0} className="no-messages">
-                No messages
-            </p>
-        </div>
-    )
-}
-
-/*
-    style and display an invitation
-*/
-
-function GameInvitation(props) {
-    return (
-        <>
-            {
-                props.author === "me" ?
-                    <div className="invitation">
-                        <p className="text-invitation">You have sent an invitation to<span className="friend-invitation">{props.to}</span></p>
-                    </div> :
-                    <div className="invitation">
-                        <p className="text-invitation">You have recieved an invitation from<span className="friend-invitation">{props.author}</span></p>
-                    </div>
-            }
-        </>
-    )
-}
-
-/*
-    style and display one single message
-*/
-
-function Message(props) {
-
-    function isAdmin()
-    {
-        return (props.administrators.find(username => username === props.author));
-    }
-
-    function addStyle() {
-        let obj;
-
-        if (props.author === "me")
-            obj = { backgroundColor: '#FFF5DD' };
-        return (obj);
-    }
-
-    return (
-        <div className="message-div"
-            style={props.author === "me" ? { justifyContent: 'right' } : null}
-        >
-            <div className="message-infos">
-               <p className="message"
-                    style={addStyle()}
-                >
-                {props.message}
-                </p>
-                {props.group && <p className="message-author">{props.author}</p>}
-            </div>
-            {
-                props.group && isAdmin() && <span className="material-symbols-outlined">
-                    shield_person
-                </span>
-            }
-        </div>
-    )
-}
-
-
-function Banner({element, user, channel, ...props}) {
-
-    return (
-        <div className="banner">
-            <UserInfos 
-                id={element.id}
-                username={element.username}
-                userStatus={element.userStatus}
-                userAvatar={element.avatar}
-            />
-            <div className="banner-options">
-
-                <div className="banner-icon hover-fill-grey" onClick={props.profile}>
-                    <span className="material-symbols-outlined">
-                        person
-                    </span>
+        <div className="absolute flex-column-center remove-friend">
+            <div className="flex-column-center remove-friend-div">
+                <p>Are you sure to remove <span className="remove-friend-username">{props.user}</span> ?</p>
+                <div className="remove-friend-buttons">
+                    <button 
+                        className="button red white-color remove-friend-button"
+                        onClick={props.remove}
+                    >
+                        Remove
+                    </button>
+                    <button
+                        className="button white remove-friend-button"
+                        onClick={props.cancel}
+                    >
+                        Cancel
+                    </button>
                 </div>
-                <div className="banner-icon hover-fill-grey" onClick={props.invitation}>
-                    <span className="material-symbols-outlined">
-                        sports_esports
-                    </span>
-                </div>
-                <div className="banner-icon hover-fill-grey" onClick={props.block} >
-                    <span className="material-symbols-outlined">
-                        block
-                    </span>
-                </div>
-                <div className="banner-icon hover-fill-grey" onClick={props.block} >
-                    <span className="material-symbols-outlined">
-                        person_remove
-                    </span>
-                </div>
-
             </div>
         </div>
     )
 }
-
-
-function Messenger({ item, blocked, invitation, group }) {
-
-    const lastMessageRef = React.useRef(null);
-    const [value, setValue] = React.useState("");
-    const [render, setRender] = React.useState(false);
-    const [messages, setMessages] = React.useState([]);
-
-    function pushMessage(message) {
-        let newMessage = {
-            id: messages.length + 1,
-            ...message
-        }
-        if (messages.length) {
-            setMessages(prev => ([
-                ...prev,
-                newMessage
-            ]))
-        }
-        else {
-            setMessages([newMessage])
-        }
-        item.conversation.push(newMessage);
-    }
-
-    function handleChange(e) {
-        setValue(e.target.value)
-    }
-
-    function newTextMessage() {
-        pushMessage({
-            type: "text",
-            author: "me",
-            message: value
-        })
-    }
-
-    function sendMessage(e) {
-        if (e.key === "Enter" && value !== "" && !blocked) {
-            newTextMessage();
-            setValue("")
-            setRender(prev => !prev);
-        }
-    }
-
-
-    function renderMessages() {
-        return (
-            item.conversation.map(m => {
-                if (m.type && m.type === "invitation") {
-                    return (
-                        <GameInvitation
-                            key={m.id}
-                            id={m.id}
-                            author={m.author}
-                            to={m.to}
-                            status={m.status}
-                        />
-                    )
-                }
-                else {
-                    return (
-                        <Message
-                            key={m.id}
-                            id={m.id}
-                            message={m.message}
-                            author={m.author}
-                            group={group}
-                            administrators={item.administrators}
-                        />
-                    )
-                }
-            })
-        )
-    }
-
-
-    React.useEffect(() => {
-        if (item.conversation)
-            setMessages(item.conversation);
-        else
-            setMessages([]);
-        setValue("");
-    }, [item])
-
-    React.useEffect(() => {
-        lastMessageRef.current.scrollIntoView();
-    }, [render, item, blocked, invitation])
-
-
-    return (
-        <>
-            <div className="messages-display">
-                {
-                    item.conversation.length ?
-                        renderMessages() : <NoMessages />
-                }
-                {blocked && <BlockMessage username={item.username || item.name} />}
-                <div ref={lastMessageRef}></div>
-            </div>
-            <div className="messages-input"
-            >
-                <input
-                    className="input"
-                    value={value}
-                    onChange={handleChange}
-                    placeholder={blocked ? "User blocked" : "Write your message"}
-                    onKeyDown={sendMessage}
-                    disabled={blocked}
-                />
-            </div>
-        </>
-    )
-}
-
 
 
 function InterfaceFriend(props)
@@ -286,20 +77,6 @@ function InterfaceGroup(props)
     )
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function getFriend(username)
 {
     return (currentUser.friendList.find(friend => friend.username === username));
@@ -331,17 +108,15 @@ export function loader({params})
 
 export default function Interface({ group, friend }) {
 
-    const {user, currentElement, friends} = useOutletContext();
-
+    const {id} = useParams();
     const item = useLoaderData();
+    const {user, currentElement, friends, removeFriend} = useOutletContext();
+
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
     const [blocked, setBlocked] = React.useState(item.blocked);
     const [current, setCurrent] = React.useState(currentElement);
-
-    React.useEffect(() => {
-        setCurrent(currentElement);
-    }, [currentElement])
+    const [removeFriendView, setRemoveFriendView] = React.useState(false);
 
     function pushMessage(message) {
         let newMessage = {
@@ -371,18 +146,41 @@ export default function Interface({ group, friend }) {
         }
     }
 
+    async function handleRemoveFriend()
+    {
+        removeFriend();
+    }
+
     function toggleProfile()
     {
         setProfile(prev => !prev);
     }
 
+
+    // when a friend is selected but the page is refreshed
+    // then it reload user data from URI id
+
+    React.useEffect(() => {
+        if (friends)
+            setCurrent(friends.find(u => u.id.toString() === id.toString()))
+    }, [friends])
+
+
+    // update current friend selected when he is picked from MenuElement
+
+    React.useEffect(() => {
+        setCurrent(currentElement);
+        setRemoveFriendView(false);
+    }, [currentElement])
+
+    //
     React.useEffect(() => {
         setBlocked(item.blocked);
         setProfile(false);
     }, [item])
 
     return (
-        <div className="flex-column messages-container">
+        <div className="flex-column relative interface-container">
             <Banner
                 element={current || item}
                 name={current && current.username}
@@ -392,6 +190,7 @@ export default function Interface({ group, friend }) {
                 profile={() => toggleProfile()}
                 invitation={() => newInvitation()}
                 block={() => blockUser()}
+                remove={() => setRemoveFriendView(prev => !prev)}
             />
             {
                 friend ? 
@@ -408,6 +207,14 @@ export default function Interface({ group, friend }) {
                     blocked={blocked} 
                     invitation={render} 
                     user={user}
+                />
+            }
+            {
+                removeFriendView && 
+                <RemoveFriend 
+                    user={current.username}  
+                    cancel={() => setRemoveFriendView(prev => !prev)}
+                    remove={() => handleRemoveFriend()}
                 />
             }
         </div>

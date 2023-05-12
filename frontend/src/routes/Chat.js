@@ -1,8 +1,8 @@
 import React from "react";
 
 import MenuElement from "../Chat/MenuElement";
-import { Outlet, useOutletContext } from "react-router-dom";
-import { getFriendList, getUserFriends } from "../utils/User";
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { getFriendList, getUserFriends, removeUserFriend } from "../utils/User";
 
 import '../styles/Chat.css'
 
@@ -70,9 +70,11 @@ function isEqual(value, other) {
 
 export default function Chat(props)
 {
-    const {user} = useOutletContext();
+    const {user, token} = useOutletContext();
     const [friends, setFriends] = React.useState()
     const [currentElement, setCurrentElement] = React.useState();
+
+    const navigate = useNavigate();
 
     function getData(res)
     {
@@ -85,8 +87,29 @@ export default function Chat(props)
     async function loadFriends()
     {
         const friendListRes = await getFriendList(user.id);
-        const friendList = getData(friendListRes);
+        let friendList = getData(friendListRes);
+        friendList = friendList.sort((a,b) => a.username > b.username ? 1 : -1)
         setFriends(prev => isEqual(prev, friendList) ? prev : friendList);
+    }
+
+    function addGroup()
+    {
+        console.log("add group");
+    }
+
+    function updateFriendList(friend)
+    {
+        setFriends([...friends, friend]);
+    } 
+
+    async function removeFriend()
+    {
+        const res = await removeUserFriend(user.id, currentElement.id)
+        if (res.status === 200 && res.statusText === "OK")
+        {
+            setFriends(friends.filter(u => u.id !== currentElement.id))
+            navigate("/chat");
+        }
     }
 
     React.useEffect(() => {
@@ -95,16 +118,6 @@ export default function Chat(props)
         return (() => clearInterval(loadFriendsInterval))
     }, [])
 
-    function addGroup()
-    {
-        console.log("add group");
-    }
-
-    function getElement(p)
-    {
-        setCurrentElement(p);
-    }
-
     return (
         <div className="chat">
             <div className="chat-container">
@@ -112,9 +125,19 @@ export default function Chat(props)
                 friends={friends}
                 user={props.user}
                 addGroup={() => addGroup()}
-                getElement={getElement}
+                getElement={e => setCurrentElement(e)}
                />
-                <Outlet context={{user, currentElement, friends}} />
+                <Outlet context={
+                    {
+                        user, 
+                        currentElement, 
+                        friends, 
+                        token,
+                        removeFriend,
+                        updateFriendList
+                    }
+                } 
+                />
             </div>
         </div>
     )

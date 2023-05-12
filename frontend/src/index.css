@@ -31,3 +31,54 @@ code {
   align-items: center;
   justify-content: center;
 }
+
+.flex-center
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.relative
+{
+  position: relative;
+}
+
+.absolute
+{
+  position: absolute;
+}
+
+.button
+{
+  padding: 10px 10px;
+  box-shadow: 0 1px 3px black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover
+{
+  box-shadow: 0 1px 5px black;
+}
+
+.light-red
+{
+ background-color: rgb(255, 220, 220);
+}
+
+.red
+{
+  background-color: rgb(255, 78, 78);
+}
+
+.white
+{
+  background-color: white;
+}
+
+.white-color
+{
+  color: white;
+}

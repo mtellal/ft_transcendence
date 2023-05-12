@@ -15,12 +15,12 @@ export default function AddElement(props)
     const [friend, setFriend] = React.useState(null);
     const [error, setError] = React.useState(false);
 
-    const {user, updateFriendList} = useOutletContext();
+    const {user, updateFriendList, friends} = useOutletContext();
 
 
     function validFriend()
     {
-        return (user.friendList.every(id => friend.id !== id) && friend.id !== user.id)
+        return (friends.every(user => friend.id !== user.id) && friend.id !== user.id)
     }
 
     function handleResponse(res)
@@ -55,12 +55,14 @@ export default function AddElement(props)
             handleResponse(res)
         }
     }
-
-    function handleSubmit()
+    
+    async function addFriend()
     {
-        if (value)
+
+        if (validFriend())
         {
-            searchUser();
+            const res = await addUserFriend(user.id, friend.id);
+            updateFriendList(friend);
         }
     }
     
@@ -68,17 +70,6 @@ export default function AddElement(props)
         const reloadFriendInterval = setInterval(updateFriend, 3000);
         return (() => clearInterval(reloadFriendInterval)); 
     }, [friend])
-
-
-    async function addFriend()
-    {
-        if (validFriend())
-        {
-            const res = await addUserFriend(user.id, friend.id);
-            updateFriendList();
-            console.log("add friend")
-        }
-    }
 
     return (
         <div className="add-container">
@@ -88,7 +79,7 @@ export default function AddElement(props)
                         icon="search"
                         placeholder="Username"
                         getValue={v => setValue(v.trim())}
-                        submit={() => handleSubmit()}
+                        submit={() => value && searchUser()}
                     />
                 {
                     friend ? 

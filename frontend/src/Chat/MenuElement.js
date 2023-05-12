@@ -58,7 +58,8 @@ export default function MenuElement({...props})
 
     function currentElementSelected(user)
     {
-        return (user.id.toString() === currentID.toString())
+        if (currentID)
+            return (user.id.toString() === currentID.toString())
     }
 
     function handleCurrentFriend(user)

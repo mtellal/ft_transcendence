@@ -34,8 +34,6 @@ export function UserInfos({id, username, userStatus, userAvatar, ...props})
         {
             setAvatar(window.URL.createObjectURL(new Blob([res.data])))
         }
-        else
-            console.log("Err request friend element => ", res);
     }
 
     React.useEffect(() => {
@@ -85,7 +83,7 @@ function AddIcon(props)
 {
     return (
         <div 
-            className='hover-fill-grey banner-icon'
+            className='flex-center hover-fill-grey banner-icon'
             onClick={props.onClick}
         >
             <span className="material-symbols-outlined">

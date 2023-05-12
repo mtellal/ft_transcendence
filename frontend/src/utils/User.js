@@ -114,15 +114,34 @@ export async function getUserFriends(friendIDs)
     return (await Promise.all(friendIDs.map(async (id) => await getUser(id))))
 }
 
-export async function addUserFriend(id1, id2)
+export async function addUserFriend(id, friendId)
 {
     return (
         axios.post(`${process.env.REACT_APP_BACK}/users/friend`, {
-            id:id1,
-            friendId:id2
+            id,
+            friendId
         })
         .then(res => res)
         .catch(err => err)
     )
-
 }
+
+/*
+    Not a good practice to user DELETE with a body, (need to be wrapped in data object)
+    prefer datas in URI
+*/
+
+export async function removeUserFriend(id, friendId)
+{
+    return (
+        axios.delete(`${process.env.REACT_APP_BACK}/users/friend`, 
+        {
+            data: {
+                id,
+                friendId
+            }
+        })
+        .then(res => res)
+        .catch(err => err)
+    )
+} 
