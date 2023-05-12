@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto } from './dto/channel.dto';
+import { CreateChannelDto, JoinChannelDto } from './dto/channel.dto';
 import { Channel, User } from '@prisma/client';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class ChatService {
@@ -9,6 +10,12 @@ export class ChatService {
 
   async findAll() {
     return this.prisma.channel.findMany()
+  }
+
+  async findOne(id: number) {
+    return this.prisma.channel.findUnique({
+      where: { id }
+    });
   }
 
   async create(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
@@ -29,5 +36,17 @@ export class ChatService {
       }
     })
     return newChannel;
+  }
+
+  async join(dto: JoinChannelDto ,channel: Channel, newUser: User) {
+    console.log(newUser);
+    if (newUser.channelList.includes(channel.id)) {
+      console.log('User already on the channel');
+      return ;
+    }
+    if (channel.type === 'PROTECTED' && !dto.password) {
+      console.log('No password provided');
+      return ;
+    }
   }
 }

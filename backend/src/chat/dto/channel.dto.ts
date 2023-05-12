@@ -14,11 +14,12 @@ export class CreateChannelDto {
   password?: string
 }
 
-export class joinChannelDto {
+export class JoinChannelDto {
 
   @IsNumber()
-  channelId: number
+  id: number
 
   @IsString()
-  channelPassword: string
+  @IsOptional()
+  password: string
 }

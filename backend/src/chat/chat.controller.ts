@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 
@@ -11,5 +11,16 @@ export class ChatController {
   @ApiOperation({ summary: 'Returns all channels'})
   async getChannels() {
     return this.chatService.findAll();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Returns a channel with the given ID'})
+  async getChannel(@Param('id', ParseIntPipe) id: number) {
+    const channel = await this.chatService.findOne(id);
+
+    if (!channel) {
+      throw new NotFoundException(`Channel with id of ${id} does not exist`);
+    }
+    return (channel);
   }
 }
