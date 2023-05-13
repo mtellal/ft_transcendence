@@ -50,7 +50,7 @@ export class AuthService {
 
 	async oauthLogIn(profile: Profile) {
 		const user = await this.prisma.user.findUnique({
-			where: { username: profile.username },
+			where: { id: parseInt(profile.id) },
 		})
 		if (!user)
 		{
@@ -66,8 +66,9 @@ export class AuthService {
 			try {
 			  const newuser = await this.prisma.user.create({
 				  data: {
-					  username: profile.username,
-					  password: hash,
+					id: parseInt(profile.id),
+					username: profile.username,
+					password: hash,
 				  },
 			  });
 			  return this.signToken(newuser.id, newuser.username);
