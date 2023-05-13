@@ -125,7 +125,7 @@ function ProfilePicture({user, image, token, ...props})
 
     async function disconnect()
     {
-        navigate("/signin");
+        navigate("/login");
     }
 
     return (

@@ -26,8 +26,10 @@ export async function loader() {
 
     return ({ user: { ...user.data }, token, imageURL })
   }
-  return (redirect("/signin"));
+  return (redirect("/login"));
 }
+
+
 
 export const UserContext = React.createContext();
 

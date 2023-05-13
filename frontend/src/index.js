@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App, { loader as appLoader } from './App';
 
-import SignIn, { loader as signinLoader } from './routes/Signin';
+
+import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
+import SignIn from './routes/Signin';
 import SignUp from './routes/Signup';
 import Profile from './routes/Profile';
 import LaunchGame from './routes/Game';
@@ -79,13 +81,23 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "/signin",
-        element: <SignIn />,
-        loader: signinLoader
-    },
-    {
-        path: "/signup",
-        element: <SignUp />,
+        path: "login",
+        element: <Login />,
+        loader: loginLoader,
+        children: [
+            {
+                path: "",
+                element: <ChooseLogin />
+            },
+            {
+                path: "signin",
+                element: <SignIn />
+            },
+            {
+                path: "signup",
+                element: <SignUp />,
+            }
+        ]
     }
 ])
 

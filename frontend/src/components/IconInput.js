@@ -34,7 +34,7 @@ export default function IconInput(props)
     }
 
     return (
-        <label htmlFor={id} className="iconinput">
+        <label htmlFor={id} className="iconinput" style={props.style || null}>
             <div className="iconinput--icon">
                 <span className="material-symbols-outlined">
                     {props.icon}
