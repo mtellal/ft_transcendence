@@ -1,11 +1,11 @@
 import React from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
-import IconInput from "../components/IconInput";
-import { signupRequest } from "../utils/User";
-import { setCookie } from "../utils/Cookie";
+import IconInput from "../../components/IconInput";
+import { signupRequest } from "../../utils/User";
+import { setCookie } from "../../utils/Cookie";
 
-import '../styles/Sign.css'
+import '../../styles/Sign.css'
 
 
 export default function SignUp()
