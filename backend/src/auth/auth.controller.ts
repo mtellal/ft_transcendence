@@ -1,7 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Redirect, Req, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto } from "./dto";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { FTOauthGuard, JwtGuard } from "./guard";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -19,5 +20,18 @@ export class AuthController{
 	@ApiOperation({description: 'Sign in using an existing user credentials. Returns a JWT corresponding to that user'})
 	signin(@Body() {username, password}: SigninDto) {
 		return this.authService.signin(username, password);
+	}
+
+	@Get('42')
+	@UseGuards(FTOauthGuard)
+	hello(){
+		return 'hello';
+	}
+
+	@Get('42/redirect')
+	@Redirect('http://localhost:8080')
+	@UseGuards(FTOauthGuard)
+	ftAuthCallback(@Req() req) {
+		return this.authService.oauthLogIn(req.user);
 	}
 }
