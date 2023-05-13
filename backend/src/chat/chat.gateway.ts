@@ -41,6 +41,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new NotFoundException('Channel not found');
     }
     const message = await this.chatService.createMessage(messageDto, user);
+    console.log(message);
     this.server.to(channel.id.toString()).emit('message', message);
     //this.server.emit('message', message.content);
   }
@@ -94,7 +95,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return ;
     }
     try {
-      const channel = await this.chatService.findOne(dto.id);
+      const channel = await this.chatService.findOne(dto.channelId);
       if (!channel)
         console.log("Channel does not exist");
       console.log(channel);

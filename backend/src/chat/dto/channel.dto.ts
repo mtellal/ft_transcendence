@@ -5,9 +5,6 @@ export class MessageDto {
   @IsNumber()
   channelId: number;
 
-  @IsNumber()
-  sendBy: number;
-
   @IsString()
   @IsNotEmpty()
   content: string;
@@ -29,7 +26,7 @@ export class CreateChannelDto {
 export class JoinChannelDto {
 
   @IsNumber()
-  id: number
+  channelId: number
 
   @IsString()
   @IsOptional()

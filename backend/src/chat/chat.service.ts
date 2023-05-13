@@ -33,7 +33,7 @@ export class ChatService {
         messages: { connect: {id: message.id}}
       }
     })
-    return ;
+    return message;
   }
 
   async getMessage(channelId: number) {
@@ -68,7 +68,7 @@ export class ChatService {
     try {
       if (newUser.channelList.includes(channel.id)) {
         console.log('User already on the channel');
-        throw new Error('User already on channel');
+        return ;
       }
       if (channel.type === 'PROTECTED' && !dto.password) {
         throw new Error('No password provided');
