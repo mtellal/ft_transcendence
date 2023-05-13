@@ -21,6 +21,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
 		profile: Profile,
 		cb: VerifyCallback,
 	  ) {
+		console.log(profile);
 		return cb(null, profile);
 	}
 }
