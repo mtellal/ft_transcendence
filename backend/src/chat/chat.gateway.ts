@@ -101,6 +101,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.type === 'PUBLIC')
         console.log("Channel is PUBLIC");
       this.chatService.join(dto, channel, user);
+      client.join(channel.id.toString());
+      const messages = await this.chatService.getMessage(channel.id);
+      client.emit('message', messages);
     }
     catch (error) {
       throw new WsException(error);
@@ -126,7 +129,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.disconnect();
       return ;
     }
-    this.server.emit('message', 'Welcome!');
     console.log("New client connected");
   }
 
