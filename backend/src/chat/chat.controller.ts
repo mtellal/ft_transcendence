@@ -23,4 +23,16 @@ export class ChatController {
     }
     return (channel);
   }
+
+  @Get(':id/messages')
+  @ApiOperation({ summary: 'Returns all messages from a channel with the given ID'})
+  async getChannelMessages(@Param('id', ParseIntPipe) id: number) {
+    const channel = await this.chatService.findOne(id);
+
+    if (!channel) {
+      throw new NotFoundException(`Channel with id of ${id} does not exist`);
+    }
+
+    return this.chatService.getMessage(id);
+  }
 }

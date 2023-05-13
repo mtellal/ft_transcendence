@@ -1,6 +1,6 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto, JoinChannelDto } from './dto/channel.dto';
+import { CreateChannelDto, JoinChannelDto, MessageDto } from './dto/channel.dto';
 import { Channel, User } from '@prisma/client';
 import { WsException } from '@nestjs/websockets';
 
@@ -16,6 +16,31 @@ export class ChatService {
     return this.prisma.channel.findUnique({
       where: { id }
     });
+  }
+
+  async createMessage(messageDto: MessageDto, sender: User)
+  {
+    const message = await this.prisma.message.create({
+      data: {
+        channelId: messageDto.channelId,
+        sendBy: sender.id,
+        content: messageDto.content,
+      }
+    })
+    await this.prisma.channel.update({
+      where: {id: messageDto.channelId},
+      data: {
+        messages: { connect: {id: message.id}}
+      }
+    })
+    return ;
+  }
+
+  async getMessage(channelId: number) {
+    return await this.prisma.message.findMany({
+      where: { channelId: channelId},
+      orderBy: { createdAt: 'asc'},
+    })
   }
 
   async create(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
@@ -38,15 +63,31 @@ export class ChatService {
     return newChannel;
   }
 
-  async join(dto: JoinChannelDto ,channel: Channel, newUser: User) {
+  async join(dto: JoinChannelDto, channel: Channel, newUser: User) {
     console.log(newUser);
-    if (newUser.channelList.includes(channel.id)) {
-      console.log('User already on the channel');
-      return ;
+    try {
+      if (newUser.channelList.includes(channel.id)) {
+        console.log('User already on the channel');
+        throw new Error('User already on channel');
+      }
+      if (channel.type === 'PROTECTED' && !dto.password) {
+        throw new Error('No password provided');
+      }
+      await this.prisma.user.update({
+        where: { id: newUser.id },
+        data: {
+          channelList: { push: channel.id }
+        }
+      })
+      await this.prisma.channel.update({
+        where: { id: channel.id },
+        data: {
+          members: { push: newUser.id },
+        }
+      })
     }
-    if (channel.type === 'PROTECTED' && !dto.password) {
-      console.log('No password provided');
-      return ;
+    catch (error) {
+      throw (error);
     }
   }
 }

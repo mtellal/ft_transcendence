@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io'
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { CreateChannelDto, JoinChannelDto } from './dto/channel.dto';
+import { CreateChannelDto, JoinChannelDto, MessageDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: 'https://hoppscotch.io'}})
@@ -16,7 +16,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService ){}
 
   @SubscribeMessage('message')
-  async handleMessage(@MessageBody() content: string, @ConnectedSocket() client: Socket) {
+  async handleMessage(@MessageBody() messageDto: MessageDto, @ConnectedSocket() client: Socket) {
+    let user: User;
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
       const authToken = Array.isArray(client.handshake.headers.access_token) ?
@@ -25,7 +26,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
-      const user = await this.userService.findOne(decodedToken.id);
+      user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
       console.log(user);
@@ -35,7 +36,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.disconnect();
       return ;
     }
-    this.server.emit('message', content);
+    const channel = await this.chatService.findOne(messageDto.channelId);
+    if (!channel) {
+      throw new NotFoundException('Channel not found');
+    }
+    const message = await this.chatService.createMessage(messageDto, user);
+    this.server.to(channel.id.toString()).emit('message', message);
+    //this.server.emit('message', message.content);
   }
 
   @SubscribeMessage('createChannel')
@@ -91,13 +98,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel)
         console.log("Channel does not exist");
       console.log(channel);
-      if (channel.type === 'PRIVATE')
+      if (channel.type === 'PUBLIC')
         console.log("Channel is PUBLIC");
       this.chatService.join(dto, channel, user);
     }
     catch (error) {
-      console.error(error);
-      return ;
+      throw new WsException(error);
     }
   }
 
