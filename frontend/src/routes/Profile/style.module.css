@@ -35,6 +35,7 @@
 .form button {
     width: 235px;
     margin-top: 20px;
+    cursor: pointer;
 }
 
 .form input {

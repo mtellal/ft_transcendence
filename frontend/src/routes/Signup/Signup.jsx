@@ -36,11 +36,11 @@ export function Signup() {
                 </div>
                 <div className={s.form_group}>
                     <img className={s.logo} src={logo_password} alt="logo password"></img>
-                    <input type="text" name="password" placeholder="Password" className={s.input_field}></input>
+                    <input type="password" name="password" placeholder="Password" className={s.input_field}></input>
                 </div>
 				<div className={s.form_group}>
                     <img className={s.logo} src={logo_password} alt="logo password"></img>
-                    <input type="text" name="confirm_password" placeholder="Confirm Password" className={s.input_field}></input>
+                    <input type="password" name="confirm_password" placeholder="Confirm Password" className={s.input_field}></input>
                 </div>
                 <button className={s.signinButton} type="submit">Submit</button>
             </form>
