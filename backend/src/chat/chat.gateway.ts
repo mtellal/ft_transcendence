@@ -70,7 +70,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     console.log(dto);
     const newChannel = await this.chatService.create(dto, user);
-    client.join(`channel:${newChannel.id}`);
+    client.join(newChannel.id.toString());
   }
 
   @SubscribeMessage('joinChannel')
