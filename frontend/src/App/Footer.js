@@ -5,7 +5,7 @@ import './Footer.css'
 export default function Footer()
 {
     return (
-        <footer className='footer'>
+        <footer className='flex-column-center footer'>
             <p className='footer--authors'>Project realised by {}
                 <a 
                     className='author--link' 

@@ -5,7 +5,7 @@ import './Profile.css'
 export default function Profile({item})
 {
     return (
-        <div className="profile-interface">
+        <div className="flex-column-center profile-interface">
             <p>Profile page (require stats, history, and others datas)</p>
 
         </div>

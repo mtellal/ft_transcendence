@@ -1,7 +1,11 @@
-import './FriendElement.css'
 
-import img from '../assets/user.png'
+import React, { useReducer } from 'react';
+
+import imgUser from '../assets/user.png'
 import { Link } from 'react-router-dom'
+import { getUserProfilePictrue } from '../utils/User'
+
+import './FriendElement.css'
 
 /*  
 
@@ -18,58 +22,105 @@ className="chat"
 click={handleFriendsMessage}
 */
 
-export default function FriendElement(props)
+
+export function UserInfos({id, username, userStatus, userAvatar, ...props})
 {
+    const [avatar, setAvatar] = React.useState();
+
+    async function loadProfilePicture()
+    {
+        const res = await getUserProfilePictrue(id);
+        if (res.status === 200 && res.statusText === "OK")
+        {
+            setAvatar(window.URL.createObjectURL(new Blob([res.data])))
+        }
+    }
+
+    React.useEffect(() => {
+        loadProfilePicture();
+    }, [userAvatar])
+
     function selectStatusDiv()
     {
-        if (props.status === "onLine")
+        if (userStatus === "ONLINE")
             return ({backgroundColor:"#14CA00"} )
-        else if (props.status === "disconnected")
+        else if (userStatus === "OFFLINE")
             return ({backgroundColor:"#FF0000"})
-        else if (props.status === "inGame")
+        else if (userStatus === "INGAME")
             return ({backgroundColor: '#FFC600'})
     }
 
     function selectStatusText()
     {
-        if (props.status === "onLine")
+        if (userStatus === "ONLINE")
             return ("On line")
-        else if (props.status === "disconnected")
+        else if (userStatus === "OFFLINE")
             return ("Disconnected")
-        else if (props.status === "inGame") 
+        else if (userStatus === "INGAME") 
         return ("In game")
     }
 
     return (
-        <Link to={`/chat/friends/${props.username}`}
-            className={`friend ${props.className ? `friend-${props.className}` : null}` }
-            style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
+        <div className="infos-div" >
+            <div className='friend-image-container'>
+                <img className="friend-image" src={avatar || imgUser} />
+            </div>
+            <div
+                className="firend-icon-status"
+                style={selectStatusDiv()}
+            />
+            <div className="flex-column friend-infos">
+                <p className="friend-username" >{username}</p>
+                <p className="friend-status">
+                    {selectStatusText()}
+                </p>
+            </div>
+        </div>  
+    )
+}
+
+function AddIcon(props)
+{
+    return (
+        <div 
+            className='flex-center hover-fill-grey banner-icon'
+            onClick={props.onClick}
+        >
+            <span className="material-symbols-outlined">
+                Add
+            </span>
+        </div>
+    )
+}
+
+
+export function FriendSearch(props)
+{
+    return (
+        <div style={{
+            boxShadow:'0 1px 3px black',
+            borderRadius:'5px',
+            width: '100%', 
+            display:'flex', 
+            padding: '5px 5px',
+            justifyContent:'space-between',
+            alignItems:'center'
+        }}>
+            <UserInfos {...props} userAvatar={props.avatar}/>
+            { props.add && <AddIcon onClick={props.onCLick} /> }
+        </div>
+    )
+}
+
+export default function FriendElement(props)
+{    
+    return (
+        <Link to={`/chat/friends/${props.username}/${props.id}`}
+            className="friend-element hover-fill-grey"
+            style={props.selected ? {backgroundColor:'#ECECEC'} : null}
             onClick={() => props.click(props)}
         >
-
-            <div className="infos-div" >
-                <img className="friend-image" src={img} />
-                <div
-                    className="firend-icon-status"
-                    style={selectStatusDiv()}
-                />
-                <div className="friend-infos">
-                    <p className="username" >{props.username}</p>
-                    <p className="friend-status">
-                        {selectStatusText()}
-                    </p>
-                </div>
-            </div>
-
-            {
-                props.chat &&
-                <div className="friend-actions">
-                    <span className="material-symbols-outlined">
-                        mode_comment
-                    </span>
-                </div>
-            }    
-
+            <UserInfos {...props} userAvatar={props.avatar} /> 
         </Link>
     )
 }

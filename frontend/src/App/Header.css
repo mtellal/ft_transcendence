@@ -1,6 +1,5 @@
 .header
 {
-    background-color: rgb(252, 252, 252);
     min-height: 7vh;
     width: 100%;
     margin: 0;
@@ -9,7 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid rgb(192, 192, 192);
+    border-bottom: 1px solid rgb(0, 0, 0);
 }
 
 .header-pong
@@ -67,7 +66,15 @@
     object-fit: cover;
 }
 
-.pp-user:hover
+.pp-username
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    overflow: hidden;
+}
+
+.pp-username:hover
 {
     text-decoration: underline;
 }

@@ -4,6 +4,7 @@
     width: 30%;
     height: 100%;
     overflow-y: auto;
+    border-right: 1px solid black;
 }
 
 
@@ -42,13 +43,6 @@
     background-color: rgb(235, 235, 235);
 }
 
-.collection-list
-{
-    display: flex;
-    flex-direction: column;
-}
-
-
 
 /* ///////  GROUP ELEMENT   ////// */
 
@@ -69,12 +63,6 @@
 .group > p {
     margin: 0;
 }
-
-.group:hover
-{
-    background-color: rgb(236, 236, 236);
-}
-
 
 .group-name
 {

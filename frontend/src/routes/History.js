@@ -130,7 +130,7 @@ export default function History(props)
 
 
     return (
-        <div className="history">
+        <div className="flex-column history">
             <h1>History</h1>
             {listHistory.length === 0 && <p>No match found</p>}
             {listHistory}

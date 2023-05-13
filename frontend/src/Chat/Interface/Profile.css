@@ -2,8 +2,4 @@
 {
     padding: 0;
     flex: 8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }

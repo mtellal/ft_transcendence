@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import FriendElement from "../components/FriendElement";
 import './MenuElement.css'
@@ -13,7 +13,6 @@ function CollectionElement(props)
                 <h2 className="collection-title">{props.title}</h2>
                 <Link 
                     to={`/chat/add-${props.title.toLowerCase().slice(0, -1)}`} 
-                    onClick={props.addClick} 
                     className="collection-add"
                 >
                     <span className="material-symbols-outlined">
@@ -21,7 +20,7 @@ function CollectionElement(props)
                     </span>
                 </Link>
             </div>
-            <div className="collection-list">
+            <div className="flex-column">
                 {props.collection}
             </div>
         </div>
@@ -31,7 +30,7 @@ function CollectionElement(props)
 function GroupElement(props)
 {
     return (
-        <Link to={`/chat/groups/${props.name}`} className="group"
+        <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
             style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
             onClick={() => props.click(props)}
         >
@@ -43,25 +42,35 @@ function GroupElement(props)
 }
 
 
-export default function MenuElement(props)
+export default function MenuElement({...props})
 {
-
+    const {id} = useParams();
+    
     const [groups, setGroups] = React.useState(props.user.channelList);
-    const [friends, setFriends] = React.useState(props.user.friendList);
-    const [currentFriend, setCurrentFriend] = React.useState();
+    const [friendsList, setFriendsList] = React.useState(props.friends);
     const [currentGroup, setCurrentGroup] = React.useState();
+    const [currentID, setCurrentID] = React.useState();
 
-    function handleFriendsMessage(p)
+
+    React.useEffect(() => {
+        setCurrentID(id)
+    }, [])
+
+    function currentElementSelected(user)
     {
-        setCurrentFriend(p.id);
-        setCurrentGroup(null);
-        props.getElement(p);
+        if (currentID)
+            return (user.id.toString() === currentID.toString())
+    }
+
+    function handleCurrentFriend(user)
+    {
+        setCurrentID(user.id)
+        props.getElement(user)
     }
 
     function handleCurrentGroup(p)
     {
         setCurrentGroup(p.id);
-        setCurrentFriend(null);
         props.getElement(p);
     }
 
@@ -76,19 +85,25 @@ export default function MenuElement(props)
         />
     )
 
-    const friendsList = friends.map(f => (
-        <FriendElement 
-            key={f.id}
-            id={f.id}
-            username={f.username}
-            status={f.status}
-            chat={false}
-            hover={true}
-            selected={currentFriend === f.id ? true : false}
-            className="chat"
-            click={() => handleFriendsMessage(f)}
-        />
-    ))
+    React.useEffect(() => {
+        if (props.friends)
+        {     
+            setFriendsList(
+                props.friends.map(user => (
+                    <FriendElement 
+                        key={user.id}
+                        id={user.id}
+                        username={user.username}
+                        avatar={user.avatar}
+                        userStatus={user.userStatus}
+                        selected={currentElementSelected(user)}
+                        click={() => handleCurrentFriend(user)}
+                    />
+                ))
+            )
+        }
+    }, [props.friends, currentID])
+
 
     return (
         <div className="menu-container">
@@ -100,7 +115,6 @@ export default function MenuElement(props)
             <CollectionElement
                 title="Friends"
                 collection={friendsList}
-                addClick={props.addFriend}
             />
         </div>
     )

@@ -20,7 +20,7 @@ export default function Header({profilePicture, username, ...props})
                             src={profilePicture || "./assets/user.png"}
                         />
                     </div>
-                <p className='pp-user'>{username}</p>
+                <p className='pp-username'>{username}</p>
                 </Link>
             </div>
         </header>
