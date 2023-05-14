@@ -32,3 +32,8 @@ export class JoinChannelDto {
   @IsOptional()
   password: string
 }
+
+export class LeaveChannelDto {
+  @IsNumber()
+  channelId: number
+}

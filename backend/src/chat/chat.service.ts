@@ -1,6 +1,6 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto, JoinChannelDto, MessageDto } from './dto/channel.dto';
+import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
 import { Channel, User } from '@prisma/client';
 import * as argon from 'argon2';
 import { WsException } from '@nestjs/websockets';
@@ -94,5 +94,9 @@ export class ChatService {
     catch (error) {
       throw (error);
     }
+  }
+
+  async leave(dto: LeaveChannelDto, user: User) {
+    
   }
 }

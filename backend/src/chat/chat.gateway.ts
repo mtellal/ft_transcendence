@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io'
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { CreateChannelDto, JoinChannelDto, MessageDto } from './dto/channel.dto';
+import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: 'https://hoppscotch.io'}})
@@ -13,9 +13,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  private connectedUsers = new Map<number, string>();
+
   constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService ){}
 
   @SubscribeMessage('message')
+  @UsePipes(new ValidationPipe())
   async handleMessage(@MessageBody() messageDto: MessageDto, @ConnectedSocket() client: Socket) {
     let user: User;
     try {
@@ -74,6 +77,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinChannel')
+  @UsePipes(new ValidationPipe())
   async joinChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: JoinChannelDto) {
     let user: User;
     try {
@@ -99,8 +103,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel)
         throw new WsException('Channel not found');
       console.log(channel);
-      if (channel.type === 'PUBLIC')
-        console.log("Channel is PUBLIC");
       if (client.rooms.has(channel.id.toString()))
         throw new WsException('Client already on the channel');
       this.chatService.join(dto, channel, user);
@@ -113,7 +115,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('leaveChannel')
+  @UsePipes(new ValidationPipe())
+  async leaveChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: LeaveChannelDto) {
+    let user: User;
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = Array.isArray(client.handshake.headers.access_token) ?
+        client.handshake.headers.access_token[0] :
+        client.handshake.headers.access_token;
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log(user);
+    }
+    catch (error) {
+      console.error(error);
+      client.disconnect();
+      return ;
+    }
+    try {
+
+    }
+    catch(error) {
+      throw new WsException(error);
+    }
+  }
+
   async handleConnection(client: Socket) {
+    let user: User;
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
       const authToken = Array.isArray(client.handshake.headers.access_token) ?
@@ -122,7 +155,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
-      const user = await this.userService.findOne(decodedToken.id);
+      user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
       console.log(user);
@@ -132,11 +165,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.disconnect();
       return ;
     }
+    this.connectedUsers.set(user.id, client.id);
+    console.log(this.connectedUsers);
     console.log("New client connected");
   }
 
   handleDisconnect(client: Socket) {
     client.disconnect();
     console.log("Client disconnected");
+  }
+
+  getSocketId(userId: number) {
+    return this.connectedUsers.get(userId);
   }
 }
