@@ -115,6 +115,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+/*   @SubscribeMessage('whisper')
+  @UsePipes(new ValidationPipe())
+  async createWhisperChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: ) */
+
   @SubscribeMessage('leaveChannel')
   @UsePipes(new ValidationPipe())
   async leaveChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: LeaveChannelDto) {
@@ -171,11 +175,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
+    this.removeSocketId(client.id);
+    console.log(this.connectedUsers);
     client.disconnect();
     console.log("Client disconnected");
   }
 
   getSocketId(userId: number) {
     return this.connectedUsers.get(userId);
+  }
+
+  removeSocketId(clientId: string) {
+    for (const [userId, socketId] of this.connectedUsers.entries()) {
+      if (socketId === clientId) {
+        this.connectedUsers.delete(userId);
+      }
+    }
   }
 }
