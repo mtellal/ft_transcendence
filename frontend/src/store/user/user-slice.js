@@ -13,6 +13,7 @@ export const userSlice = createSlice({
     },
     reducers: {
         saveInfoUser: (currentSlice, action) => {
+            console.log('saveInfoUser', action);
             currentSlice.user.id = action.payload.id;
             currentSlice.user.username = action.payload.username;
             currentSlice.user.status = action.payload.userStatus;
@@ -23,7 +24,9 @@ export const userSlice = createSlice({
             currentSlice.user.token = action.payload;
         },
         setAvatar: (currentSlice, action) => {
-            currentSlice.user.avatar = action.payload.avatar;
+            // console.log('SET AVATAR', action.payload);
+            currentSlice.user.avatar = action.payload;
+            // console.log('FIN setAvatar');
         },
     }
 })

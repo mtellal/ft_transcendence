@@ -5,10 +5,10 @@ import logo_password from "../../assets/logo_mdp.png"
 import s from './style.module.css'
 import { store } from "../../store";
 import { useState } from "react";
+import { setAvatar } from "../../store/user/user-slice";
 
 export function Profile() {
 
-    // const dispatch = useDispatch();
     // const selector = useSelector(store => store.USER.user);
 
     // async function updateProfile(e) {
@@ -57,32 +57,32 @@ export function Profile() {
     //     </div>
     // );
 
+    const dispatch = useDispatch();
     const selector = useSelector(store => store.USER.user);
-    const [img, setImg] = useState(null);
 
     async function setProfilePicture(e) {
-        const file = e.target.files[0];
+          const file = e.target.files[0];
           const reader = new FileReader();
           reader.readAsDataURL(file);
           reader.onload = () => {
-            setImg(reader.result);
+            console.log('A SAVE ', reader.result);
+            // Commence par : "data:image/jpeg;base64" puis long pave en violet
+            dispatch(setAvatar(reader.result));
           };
-      
+
           const response = await BackApi.updateProfilePicture(file, selector.token);
           if (response.status !== 201) {
-            console.log("Error uploading file");
+            console.log("PROFILE Error uploading file");
+          } else {
+            console.log("PROFILE File uploaded successfully!");
           }
-      
-          console.log("File uploaded successfully!");
       }
       
     
-    console.log('TOKEN ', selector.token);
-
     return (
-      <form onSubmit={(e) => e.preventDefault()}>
-        <input type="file" accept="image/*" name="image" onChange={setProfilePicture} />
-        {/* <button type="submit">Upload</button> */}
-      </form>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <input type="file" accept="image/*" name="image" onChange={setProfilePicture} />
+          {selector.avatar && <img src={selector.avatar} />}
+        </form>
     );
 }

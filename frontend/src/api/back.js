@@ -44,10 +44,22 @@ export class BackApi {
 		return response;
 	}
 
+	static async getProfilePictureById(id) {
+		// console.log('ID', id);
+		const response = await axios.get(`${BASE_URL}/users/${id}/profileImage`, {
+            responseType:'arraybuffer'
+        })
+		.then (rep => rep)
+		.catch (error => error)
+
+		return response;
+	}
+
 	static async updateProfilePicture(image, token) {
-		console.log('token api ', token);
 		const formData = new FormData();
-		formData.append('file', image);
+		formData.append('file', image, 'avatar.jpg');
+		// console.log('FORMMMMMMM', image);
+
 		return (
 			axios.post(`${process.env.REACT_APP_BACK}/users/upload`, formData, {
 				headers: {

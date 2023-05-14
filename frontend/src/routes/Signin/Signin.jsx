@@ -6,12 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { BackApi } from "../../api/back";
 import { createCookie } from "../../utils/cookie";
 import { saveInfoUser, setAvatar, setToken } from "../../store/user/user-slice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export function Signin() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const selector = useSelector(store => store.USER.user);
 
     function parseJwt (token) {
         var base64Url = token.split('.')[1];
@@ -23,23 +24,44 @@ export function Signin() {
         return JSON.parse(jsonPayload);
     }
 
+    async function setDefualtProfilePicture(token) {
+        const img = await fetch(avatar_default);
+        const blob = await img.blob();
+
+        const response = await BackApi.updateProfilePicture(blob, token);
+        if (response.status === 201) {
+            console.log("File uploaded successfully!");
+        } else {
+            console.log("Error uploading file");
+        }
+    
+    }
+
 	async function submitData(e) {
 		e.preventDefault();
 		const username = e.target.username.value;
 		const password = e.target.password.value;
 		const response = await BackApi.authSigninpUser(username, password);
 		if (response.status === 200) {
-			console.log('user connected');
 			createCookie("access_token", response.data.access_token);
             const id = parseJwt(response.data.access_token).sub;
             dispatch(setToken(response.data.access_token));
             const rep = (await BackApi.getUserInfoById(id)).data;
-            // console.log('TEST', rep);
-            // if (!rep.avatar) {
-                // BackApi.updateAvatar(id, avatar_default);
-                // dispatch(setAvatar(avatar_default));
-            // }
             dispatch(saveInfoUser(rep));
+            if (!rep.avatar) {
+                console.log('DEFAULT avatar set');
+                setDefualtProfilePicture(response.data.access_token);
+            } else {
+                let rep = await BackApi.getProfilePictureById(id);
+
+                if (rep.status === 200) {
+                    console.log("GET PP successfully!");
+                    console.log("PP.DATA", rep.data);
+                    dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
+                } else {
+                    console.log("Error GET PP");
+                }
+            }
             navigate('/profile');
 		}
 		else {
@@ -52,12 +74,10 @@ export function Signin() {
             <div className={s.title}>Signin</div>
             <form className={s.form} onSubmit={submitData}>
                 <div className={s.form_group}>
-                    {/* <label>Username</label> */}
                     <img className={s.logo} src={logo_user} alt="logo user"></img>
                     <input type="text" name="username" placeholder="Username" className={s.input_field}></input>
                 </div>
                 <div className={s.form_group}>
-                    {/* <label>Password</label> */}
                     <img className={s.logo} src={logo_password} alt="logo password"></img>
                     <input type="password" name="password" placeholder="Password" className={s.input_field}></input>
                 </div>
