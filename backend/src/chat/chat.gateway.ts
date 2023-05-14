@@ -97,10 +97,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const channel = await this.chatService.findOne(dto.channelId);
       if (!channel)
-        console.log("Channel does not exist");
+        throw new WsException('Channel not found');
       console.log(channel);
       if (channel.type === 'PUBLIC')
         console.log("Channel is PUBLIC");
+      if (client.rooms.has(channel.id.toString()))
+        throw new WsException('Client already on the channel');
       this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);

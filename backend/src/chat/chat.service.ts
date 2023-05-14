@@ -2,6 +2,7 @@ import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, JoinChannelDto, MessageDto } from './dto/channel.dto';
 import { Channel, User } from '@prisma/client';
+import * as argon from 'argon2';
 import { WsException } from '@nestjs/websockets';
 
 @Injectable()
@@ -46,6 +47,9 @@ export class ChatService {
   async create(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
     console.log(createChannelDto);
     console.log(owner);
+    if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
+      createChannelDto.password = await argon.hash(createChannelDto.password);
+    }
     const newChannel = await this.prisma.channel.create({ data: {
       name: createChannelDto.name,
       type: createChannelDto.type,
@@ -67,11 +71,12 @@ export class ChatService {
     console.log(newUser);
     try {
       if (newUser.channelList.includes(channel.id)) {
-        console.log('User already on the channel');
         return ;
       }
-      if (channel.type === 'PROTECTED' && !dto.password) {
-        throw new Error('No password provided');
+      if (channel.type === 'PROTECTED') {
+        const pwMatches = await argon.verify(channel.password, dto.password)
+        if (!pwMatches)
+          throw new WsException('Password incorrect');
       }
       await this.prisma.user.update({
         where: { id: newUser.id },
