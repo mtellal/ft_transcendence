@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Channel" ALTER COLUMN "administrators" SET DEFAULT ARRAY[]::INTEGER[],
+ALTER COLUMN "members" SET DEFAULT ARRAY[]::INTEGER[];
