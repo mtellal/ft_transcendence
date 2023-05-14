@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Navigate, Route }from 'react-router-dom'
 import './index.css';
-import App, { loader as appLoader } from './App';
+import App, { loader as appLoader, loader } from './routes/App';
 
 
 import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
@@ -27,11 +27,13 @@ import {
 import Chat from './routes/Chat';
 
 
+type user = any;
+
 const router = createBrowserRouter([
     {
         path: "/",
         loader: appLoader,
-        element: <App user={user} />,
+        element: <App />,
         errorElement: <Navigate to="/" replace/>,
         children: [
             {
@@ -74,13 +76,13 @@ const router = createBrowserRouter([
                         path: "groups/:groupid",
                         loader: interfaceLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <Interface user={user} group={true}/>
+                        element:  <Interface friend={false} group={true}/>
                     },
                     {
                         path: "friends/:username/:id",
                         loader: interfaceLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element: <Interface user={user} friend={true}/>
+                        element: <Interface friend={true} group={false}/>
                     }
                 ]
             },
@@ -90,28 +92,31 @@ const router = createBrowserRouter([
         path: "login",
         element: <Login />,
         loader: loginLoader,
-        errorElement: <Navigate to="/login" replace/>,
         children: [
             {
                 path: "",
                 element: <ChooseLogin />,
-                errorElement: <Navigate to="/login" replace/>,
             },
             {
                 path: "signin",
                 element: <SignIn />,
-                errorElement: <Navigate to="/login" replace/>,
             },
             {
                 path: "signup",
                 element: <SignUp />,
-                errorElement: <Navigate to="/login" replace/>,
             }
         ]
+    },
+    {
+        path: "login/:token",
+        element: <Login />,
+        loader: loginLoader
     }
 ])
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error('Failed to find the root element');
+const root = ReactDOM.createRoot(rootElement);
 root.render(
     <RouterProvider router={router} />
 );

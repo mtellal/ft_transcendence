@@ -2,7 +2,7 @@
 import React, { useReducer } from 'react';
 
 import imgUser from '../assets/user.png'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { getUserProfilePictrue } from '../utils/User'
 
 import './FriendElement.css'
@@ -115,12 +115,13 @@ export function FriendSearch(props)
 export default function FriendElement(props)
 {    
     return (
-        <Link to={`/chat/friends/${props.username}/${props.id}`}
-            className="friend-element hover-fill-grey"
-            style={props.selected ? {backgroundColor:'#ECECEC'} : null}
+        <NavLink to={`/chat/friends/${props.username}/${props.id}`}
+            className={({isActive}) => 
+                isActive ? "friend-element hover-fill-grey selected" : "friend-element hover-fill-grey"
+            }
             onClick={() => props.click(props)}
         >
             <UserInfos {...props} userAvatar={props.avatar} /> 
-        </Link>
+        </NavLink>
     )
 }

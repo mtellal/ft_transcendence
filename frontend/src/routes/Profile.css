@@ -14,43 +14,6 @@
     max-width: 500px;
 }
 
-.input--container
-{
-    width: 80%;
-    max-width: 400px;
-    min-height: 80px;
-}
-
-.input--label
-{
-    margin-bottom: 2%;
-}
-
-.input
-{
-    font-size: medium;
-    height: 2rem;
-    border-radius: 5px;
-    border: none;
-    width: 80%;
-    padding-left: 2%;
-    border: 1px solid black;
-}
-
-.input:focus
-{
-    outline: none;
-}
-
-.profile-infos-button
-{
-   height: 40px;
-   width: 70px;
-   border-radius: 5px;
-   border: 1px solid black;
-   cursor: pointer;
-}
-
 .profile-infos-button:hover
 {
     background-color: rgb(223, 223, 223);

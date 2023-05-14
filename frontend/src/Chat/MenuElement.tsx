@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 
-import FriendElement from "../components/FriendElement";
+import FriendElement from "../Components/FriendElement";
 import './MenuElement.css'
 
 function CollectionElement(props)
@@ -42,37 +42,16 @@ function GroupElement(props)
 }
 
 
+/*
+    2 setCurrentxxxxx in parent and child === bad approach
+    1 setXXX in parent and called in child (parent will be updated as child)
+*/
+
 export default function MenuElement({...props})
-{
-    const {id} = useParams();
-    
+{    
     const [groups, setGroups] = React.useState(props.user.channelList);
     const [friendsList, setFriendsList] = React.useState(props.friends);
     const [currentGroup, setCurrentGroup] = React.useState();
-    const [currentID, setCurrentID] = React.useState();
-
-
-    React.useEffect(() => {
-        setCurrentID(id)
-    }, [])
-
-    function currentElementSelected(user)
-    {
-        if (currentID)
-            return (user.id.toString() === currentID.toString())
-    }
-
-    function handleCurrentFriend(user)
-    {
-        setCurrentID(user.id)
-        props.getElement(user)
-    }
-
-    function handleCurrentGroup(p)
-    {
-        setCurrentGroup(p.id);
-        props.getElement(p);
-    }
 
     const groupList = groups.map(e => 
         <GroupElement
@@ -81,7 +60,7 @@ export default function MenuElement({...props})
             name={e.name}
             members={e.members.length}
             selected={currentGroup === e.id ? true : false}
-            click={handleCurrentGroup}
+            click={(user) => props.setCurrentElement(user)}
         />
     )
 
@@ -96,13 +75,12 @@ export default function MenuElement({...props})
                         username={user.username}
                         avatar={user.avatar}
                         userStatus={user.userStatus}
-                        selected={currentElementSelected(user)}
-                        click={() => handleCurrentFriend(user)}
+                        click={(user) => props.setCurrentElement(user)}
                     />
                 ))
             )
         }
-    }, [props.friends, currentID])
+    }, [props.friends])
 
 
     return (

@@ -4,7 +4,7 @@ import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import { getFriendList, getUserFriends, removeUserFriend } from "../utils/User";
 
-import '../styles/Chat.css'
+import './Chat.css'
 
 function isEqual(value, other) {
 
@@ -125,7 +125,7 @@ export default function Chat(props)
                 friends={friends}
                 user={props.user}
                 addGroup={() => addGroup()}
-                getElement={e => setCurrentElement(e)}
+                setCurrentElement={setCurrentElement}
                />
                 <Outlet context={
                     {

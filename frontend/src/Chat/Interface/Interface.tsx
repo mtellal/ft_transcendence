@@ -10,7 +10,7 @@ import { currentUser } from "../../exampleDatas";
 
 import './Interface.css'
 
-function RemoveFriend(props)
+function RemoveFriend(props : any)
 {
     return (
         <div className="absolute flex-column-center remove-friend">
@@ -36,7 +36,7 @@ function RemoveFriend(props)
 }
 
 
-function InterfaceFriend(props)
+function InterfaceFriend(props : any)
 {
     return (
         <>
@@ -53,7 +53,7 @@ function InterfaceFriend(props)
     )
 }
 
-function InterfaceGroup(props)
+function InterfaceGroup(props : any)
 {
     return (
         <>
@@ -77,17 +77,17 @@ function InterfaceGroup(props)
     )
 }
 
-function getFriend(username)
+function getFriend(username : string)
 {
     return (currentUser.friendList.find(friend => friend.username === username));
 }
 
-function getGroup(name)
+function getGroup(name : string)
 {
     return (currentUser.channelList.find(channel => channel.name === name));
 }
 
-export function loader({params})
+export function loader({params} : any)
 {
     let item;
     if (params.username)
@@ -99,6 +99,11 @@ export function loader({params})
     return (item);
 }
 
+type IInterfaceProps = {
+    friend: boolean,
+    group: boolean
+}
+
 /*
     - MessagesElement is the rigth side of Chat interface,
     - reclaim an item, which is Friend or Group object, and display messages from this item if they exist,
@@ -106,11 +111,11 @@ export function loader({params})
 
 */
 
-export default function Interface({ group, friend }) {
+export default function Interface({friend , group} : any) {
 
-    const {id} = useParams();
-    const item = useLoaderData();
-    const {user, currentElement, friends, removeFriend} = useOutletContext();
+    const {id} : any = useParams();
+    const item : any = useLoaderData();
+    const {user, currentElement, friends, removeFriend} : any = useOutletContext();
 
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
@@ -118,7 +123,7 @@ export default function Interface({ group, friend }) {
     const [current, setCurrent] = React.useState(currentElement);
     const [removeFriendView, setRemoveFriendView] = React.useState(false);
 
-    function pushMessage(message) {
+    function pushMessage(message : any) {
         let newMessage = {
             id: item.conversation.length + 1,
             ...message
@@ -141,7 +146,7 @@ export default function Interface({ group, friend }) {
     function blockUser() {
         if (!profile)
         {
-            setBlocked(prev => !prev);
+            setBlocked((prev : boolean)  => !prev);
             item.blocked = !item.blocked;
         }
     }
@@ -162,7 +167,7 @@ export default function Interface({ group, friend }) {
 
     React.useEffect(() => {
         if (friends)
-            setCurrent(friends.find(u => u.id.toString() === id.toString()))
+            setCurrent(friends.find((u : any) => u.id.toString() === id.toString()))
     }, [friends])
 
 

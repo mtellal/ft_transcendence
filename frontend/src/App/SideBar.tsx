@@ -1,17 +1,20 @@
 import React from "react";
 
 import './Sidebar.css'
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 function MenuElement(props)
 {
     return (
-        <Link to={props.route} className="menu--element">
+        <NavLink 
+            to={props.route} 
+            className={({isActive}) => isActive ? "menu--element selected" : "menu--element"}
+        >
             <span className="material-symbols-outlined">
                 {props.icon}
             </span>
             <p className="menu--element-title" >{props.title}</p>
-        </Link>
+        </NavLink>
     )
 }
 

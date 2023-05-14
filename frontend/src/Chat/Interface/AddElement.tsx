@@ -1,9 +1,9 @@
 
 import React from "react";
 import { getUserByUsername, addUserFriend, getUser } from '../../utils/User'
-import { FriendSearch } from "../../components/FriendElement";
+import { FriendSearch } from "../../Components/FriendElement";
 
-import IconInput from "../../components/IconInput";
+import IconInput from "../../Components/IconInput";
 import { useOutletContext } from "react-router-dom";
 import './AddElement.css'
 

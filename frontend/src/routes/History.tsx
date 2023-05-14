@@ -1,8 +1,6 @@
 import React from "react";
-
-import '../styles/Profile.css'
  
-import '../styles/History.css'
+import './History.css'
 
 function MatchHistory(props)
 {

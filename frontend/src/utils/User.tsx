@@ -1,8 +1,4 @@
 import axios from "axios";
-import React from "react";
-import jwtDecode from "jwt-decode";
-import {extractCookie} from './Cookie'
-import { redirect } from "react-router-dom";
 
 /*
     ask to login a user and 

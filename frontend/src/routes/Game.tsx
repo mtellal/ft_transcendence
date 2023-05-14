@@ -1,6 +1,6 @@
 import React from "react";
 
-import '../styles/Game.css'
+import './Game.css'
 
 
 let up;

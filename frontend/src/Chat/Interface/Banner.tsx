@@ -1,5 +1,5 @@
 import React from "react";
-import { UserInfos } from "../../components/FriendElement";
+import { UserInfos } from "../../Components/FriendElement";
 import './Banner.css'
 
 export default function Banner({element, user, channel, ...props}) {

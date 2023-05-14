@@ -1,7 +1,6 @@
 
 
-
-export function setCookie(key, value)
+export function setCookie(key : string, value : string)
 {
     if (document.cookie)
     {
@@ -19,7 +18,7 @@ export function setCookie(key, value)
     }
 }
 
-export function extractCookie(key)
+export function extractCookie(key : string)
 {
   let cookies = document.cookie.split("; ");
   for (let i = 0; i < cookies.length; i++)
