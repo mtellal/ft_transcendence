@@ -24,7 +24,7 @@ export function Signin() {
         return JSON.parse(jsonPayload);
     }
 
-    async function setDefualtProfilePicture(token) {
+    async function setDefualtProfilePicture(token, id) {
         const img = await fetch(avatar_default);
         const blob = await img.blob();
 
@@ -34,9 +34,12 @@ export function Signin() {
         } else {
             console.log("Error uploading file");
         }
-    
+        console.log('ID ', id)
+        let rep = await BackApi.getProfilePictureById(id);
+        dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
     }
 
+    
 	async function submitData(e) {
 		e.preventDefault();
 		const username = e.target.username.value;
@@ -50,7 +53,7 @@ export function Signin() {
             dispatch(saveInfoUser(rep));
             if (!rep.avatar) {
                 console.log('DEFAULT avatar set');
-                setDefualtProfilePicture(response.data.access_token);
+                setDefualtProfilePicture(response.data.access_token, id);
             } else {
                 let rep = await BackApi.getProfilePictureById(id);
 

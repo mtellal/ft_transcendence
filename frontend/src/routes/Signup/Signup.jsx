@@ -19,7 +19,8 @@ export function Signup() {
 			console.log('user cree');
 			// console.log(response.data);
 			createCookie("access_token", response.data.access_token);
-		}
+            navigate('/signin');
+        }
 		else {
 			console.log('user  PAS cree')
 		}
