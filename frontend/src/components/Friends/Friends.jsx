@@ -1,31 +1,20 @@
 import { useState } from "react";
 import { BackApi } from "../../api/back";
 import { FriendsList } from "../FriendsList/FriendsList";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import s from './style.module.css'
 
 export function Friends( {friends} ) {
+    console.log('FRIENDS');
 
-    // const [friends, setFriends] = useState([]);
-
-    // async function getFriends() {
-    //     const response = await BackApi.getFriendsById(id);
-
-    //     if (response.status === 200) {
-    //         console.log('Friend list OK')
-    //         setFriends(response.data);
-    //         console.log(friends);
-    //     } else {
-    //         console.log('Friend list NOT OK')
-    //     }
-    // }
-
-    // getFriends();
-    // console.log('OK');
-    console.log('FRIENDS ',  friends);
+    const navigate = useNavigate();
+    const selector = useSelector(store => store.USER.user);
 
     return (
         <div>
-            <div>My friends</div>
+            <div>Friends of {selector.username}</div>
+            <button onClick={() => navigate('/profile')}>Profile</button>
             <div className={s.list}>
                 {friends.map((friend) => {
                     return (

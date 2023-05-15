@@ -1,0 +1,12 @@
+.container {
+    width: 100px;
+    height: 125px;
+    background-color: white;
+    margin-left: 10px;
+}
+
+.image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}

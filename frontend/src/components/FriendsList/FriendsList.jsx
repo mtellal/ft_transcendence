@@ -1,21 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BackApi } from "../../api/back";
+import s from './style.module.css'
 
 export function FriendsList( {friend} ) {
+    console.log('FRIENDS LIST', friend.id);
 
     const [ProfilePicture, setProfilePicture] = useState();
 
     async function getAvatar() {
         let rep = await BackApi.getProfilePictureById(friend.id);
         setProfilePicture(URL.createObjectURL(new Blob([rep.data])));
-        // return URL.createObjectURL(new Blob([rep.data]));
     }
 
-    getAvatar();
-    // console.log(friend.avatar);
+    useEffect(() => {
+        getAvatar();
+    }, []);
+
     return (
-        <div>
-            <img src={ProfilePicture} />
+        <div className={s.container}>
+            {ProfilePicture && <img className={s.image} src={ProfilePicture} alt="ProfilePicture" />}
+            {friend.username}
             {/* <img src={() => getAvatar()} /> */}
         </div>
     );

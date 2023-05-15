@@ -6,11 +6,13 @@ import s from './style.module.css'
 // import { store } from "../../store";
 // import { useState } from "react";
 import { setAvatar } from "../../store/user/user-slice";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export function Profile() {
 
     const selector = useSelector(store => store.USER.user);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     async function updateProfile(e) {
         e.preventDefault();
@@ -75,6 +77,7 @@ export function Profile() {
                 <input type="password" className={s.element} placeholder='Password' name="password" id="input"></input>
                 <button type='submit' className={s.element}>Update</button>
             </form>
+            <button onClick={() => navigate('/chat')}>Chat</button>
         </div>
     );
 }
