@@ -72,29 +72,11 @@ export class BackApi {
 		)
 	}
 
-	// static async updateAvatar(id, avatar, token) {
-	// 	const formData = new FormData();
-	// 	formData.append('file', avatar);
+	static async getFriendsById(id) {
+		const response = await axios.get(`${BASE_URL}/users/${id}/friends`)
+			.then(rep => rep)
+			.catch(error => error)
 
-	// 	const response = await axios.patch(`${BASE_URL}/users/upload`, formData, {
-	// 		headers: {
-    //             'Content-Type': 'multipart/form-data', 
-    //             'Authorization': `Bearer ${token}`
-	// 		}
-	// 	})
-	// 	.then (rep => rep)
-	// 	.catch (error => error)
-
-	// 	return response;
-	// }
-
-	// static async updateAvatar(id, avatar) {
-	// 	const response = await axios.post(`${BASE_URL}/users/${id}`, {
-	// 		avatar: avatar,
-	// 	})
-	// 	.then (rep => rep)
-	// 	.catch (error => error)
-
-	// 	return response;
-	// }
+		return response;
+	}
 }

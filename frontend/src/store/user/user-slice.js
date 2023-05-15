@@ -13,7 +13,7 @@ export const userSlice = createSlice({
     },
     reducers: {
         saveInfoUser: (currentSlice, action) => {
-            console.log('saveInfoUser', action);
+            // console.log('saveInfoUser', action);
             currentSlice.user.id = action.payload.id;
             currentSlice.user.username = action.payload.username;
             currentSlice.user.status = action.payload.userStatus;

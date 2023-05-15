@@ -3,8 +3,8 @@ import { BackApi } from "../../api/back";
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
 import s from './style.module.css'
-import { store } from "../../store";
-import { useState } from "react";
+// import { store } from "../../store";
+// import { useState } from "react";
 import { setAvatar } from "../../store/user/user-slice";
 
 export function Profile() {
@@ -26,7 +26,7 @@ export function Profile() {
 
         console.log(updateinfos);
 
-        const response = await BackApi.updateInfoProfile(2, updateinfos)
+        const response = await BackApi.updateInfoProfile(selector.id, updateinfos)
         if (response.status === 200) {
             console.log('profile updated');
         } else {
@@ -66,7 +66,7 @@ export function Profile() {
               <label htmlFor="file" className={s.label_file}>Choisir une image</label>
               <input id="file" className={s.input_file} type="file" accept="image/*" name="image" onChange={setProfilePicture} />
               {/* <input className={s.input_img} type="file" accept="image/*" name="image" onChange={setProfilePicture} /> */}
-              {selector.avatar && <img className={s.img} src={selector.avatar} />}
+              {selector.avatar && <img className={s.img} src={selector.avatar} alt="profile_picture"/>}
             {/* </form> */}
             <form onSubmit={updateProfile} className={s.form}>
                 <img className={s.logoUser} src={logo_user} alt="logo user"></img>
@@ -77,15 +77,4 @@ export function Profile() {
             </form>
         </div>
     );
-
-
-
-      
-    
-    // return (
-        // <form onSubmit={(e) => e.preventDefault()}>
-        //   <input type="file" accept="image/*" name="image" onChange={setProfilePicture} />
-        //   {selector.avatar && <img src={selector.avatar} />}
-        // </form>
-    // );
 }

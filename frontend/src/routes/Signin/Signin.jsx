@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { BackApi } from "../../api/back";
 import { createCookie } from "../../utils/cookie";
 import { saveInfoUser, setAvatar, setToken } from "../../store/user/user-slice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export function Signin() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const selector = useSelector(store => store.USER.user);
+    // const selector = useSelector(store => store.USER.user);
 
     function parseJwt (token) {
         var base64Url = token.split('.')[1];
@@ -58,17 +58,17 @@ export function Signin() {
                 let rep = await BackApi.getProfilePictureById(id);
 
                 if (rep.status === 200) {
-                    console.log("GET PP successfully!");
-                    console.log("PP.DATA", rep.data);
+                    // console.log("GET PP successfully!");
+                    // console.log("PP.DATA", rep.data);
                     dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
                 } else {
                     console.log("Error GET PP");
                 }
             }
-            navigate('/profile');
+            navigate('/chat');
 		}
 		else {
-			console.log('user NOT connected')
+			// console.log('user NOT connected')
 		}
 	}
 
