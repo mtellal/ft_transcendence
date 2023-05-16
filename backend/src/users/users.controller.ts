@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res, BadRequestException, NotAcceptableException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res, BadRequestException, NotAcceptableException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,7 +9,7 @@ import { diskStorage } from 'multer';
 import path = require('path');
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid'
-import { User } from '@prisma/client';
+import { User, Channel } from '@prisma/client';
 
 export const storage = {
   storage: diskStorage({
@@ -51,6 +51,14 @@ export class UsersController {
       return (user);
     }
     return this.usersService.findAll();
+  }
+
+  @Get('whispers')
+  @UsePipes(new ValidationPipe())
+  @ApiOperation({ summary: 'Get direct messages channel where two given users are present'})
+  getWhispers(@Query() friendshipDto: FriendshipDto)
+  {
+    return this.usersService.getWhispers(friendshipDto);
   }
 
   @Get(':id')
@@ -149,6 +157,13 @@ export class UsersController {
 
     res.sendFile(join(process.cwd(), user.avatar));
   }
+
+  @Get(':id/channels')
+  @ApiOperation({ summary: 'Get the private/protected/public channels where the user is a member' })
+  getChannels(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.getChannels(id);
+  }
+
 
   @Post('friend')
   @ApiOperation({ summary: 'Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
