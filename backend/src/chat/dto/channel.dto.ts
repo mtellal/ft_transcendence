@@ -1,5 +1,5 @@
 import { ChannelType } from "@prisma/client"
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class MessageDto {
   @IsNumber()
@@ -21,6 +21,14 @@ export class CreateChannelDto {
   @IsString()
   @IsOptional()
   password?: string
+
+  @IsArray()
+  @IsOptional()
+  memberList?: number[]
+
+  @IsArray()
+  @IsOptional()
+  adminList?: number[]
 }
 
 export class JoinChannelDto {

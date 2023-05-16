@@ -1,0 +1,25 @@
+.footer
+{
+    grid-column: 1 / -1;
+    border-top: 1px solid rgb(0, 0, 0);
+}
+
+.footer--authors
+{
+    margin: 0;
+    padding: 0.5vh 0;
+    font-size: small;
+}
+
+.footer--copyright
+{
+    margin: 0;
+    font-size: x-small;
+}
+
+.author--link
+{
+    text-decoration: none;
+    font-weight: 600;
+    color: black;
+}

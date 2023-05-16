@@ -7,6 +7,9 @@
 
 ## Docs:
 
+#### Typescript 
+- https://mattbatman.com/typescript-and-webpack-and-images - import resolve tsc and webpack
+
 #### Web sockets
 - https://javascript.info/websocket -Websocket API
 

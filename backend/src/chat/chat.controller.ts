@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 
@@ -34,5 +34,11 @@ export class ChatController {
     }
 
     return this.chatService.getMessage(id);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Deletes a channel by its id'})
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.chatService.remove(id);
   }
 }
