@@ -12,11 +12,10 @@ export default function AddElement(props)
 {
     const [prevValue, setPrevValue] = React.useState("");
     const [value, setValue] = React.useState("");
-    const [friend, setFriend] = React.useState(null);
+    const [friend, setFriend] : [any, any] = React.useState(null);
     const [error, setError] = React.useState(false);
 
-    const {user, updateFriendList, friends} = useOutletContext();
-
+    const {user, updateFriendList, friends} : any = useOutletContext();
 
     function validFriend()
     {

@@ -31,7 +31,7 @@ function GroupElement(props)
 {
     return (
         <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
-            style={props.selected ? {backgroundColor:'#F4F4F4'} : null}
+            style={props.selected ? {backgroundColor:'#F4F4F4'} : {}}
             onClick={() => props.click(props)}
         >
             <p className="group-name">{props.name}</p>

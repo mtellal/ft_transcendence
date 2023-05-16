@@ -8,7 +8,7 @@ let down;
 
 function Game(props)
 {
-    const canvasRef = React.useRef();
+    const canvasRef : any  = React.useRef();
     const animationID = React.useRef(0);
     const player1Ref = React.useRef({x:10, y:10, width:100, height:100})
     const player2Ref = React.useRef({x:10, y:10, width:100, height:100})
@@ -70,7 +70,7 @@ function Game(props)
 
     function drawPlayground(context)
     {
-        const canvas = canvasRef.current;
+        const canvas : any = canvasRef.current;
 
         context.beginPath();
         context.arc(canvas.width / 2, canvas.height / 2, 50, 0, Math.PI * 2);
@@ -249,7 +249,7 @@ function Game(props)
                 className="game--canvas" 
                 onKeyUp={handleKeyUp}
                 onKeyDown={handleKeyDown}
-                tabIndex="0"
+                tabIndex={0}
                 >
 
             </canvas>

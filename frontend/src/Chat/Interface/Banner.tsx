@@ -2,7 +2,7 @@ import React from "react";
 import { UserInfos } from "../../Components/FriendElement";
 import './Banner.css'
 
-export default function Banner({element, user, channel, ...props}) {
+export default function Banner({element, ...props}) {
 
     return (
         <div className="banner">

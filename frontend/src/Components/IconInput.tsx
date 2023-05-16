@@ -34,14 +34,14 @@ export default function IconInput(props)
     }
 
     return (
-        <label htmlFor={id} className="iconinput" style={props.style || null}>
+        <label htmlFor={id.toString()} className="iconinput" style={props.style || null}>
             <div className="iconinput--icon">
                 <span className="material-symbols-outlined">
                     {props.icon}
                 </span>
             </div>
             <input
-                id={id} 
+                id={id.toString()} 
                 value={value} 
                 onChange={handleChange}
                 className="inconinput--input" 

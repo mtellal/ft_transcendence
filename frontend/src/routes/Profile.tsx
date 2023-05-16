@@ -19,7 +19,7 @@ function ProfileInfos({ password, updateHeader, ...props }) {
 
         if (res && res.status !== 200 && res.statusText !== "OK") {
             setError("Username invalid")
-            setUpdated("")
+            setUpdated(false)
         }
         else if (username !== props.username) {
             setError("")
@@ -114,7 +114,7 @@ export default function Profile() {
         image,
         updateHeaderUsername,
         updateHeaderProfilePicture,
-    } = useOutletContext();
+    } : any = useOutletContext();
 
     return (
         <div className="profile">

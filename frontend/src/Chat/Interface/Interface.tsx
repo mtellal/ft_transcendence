@@ -47,6 +47,7 @@ function InterfaceFriend(props : any)
                     item={props.item} 
                     blocked={props.blocked} 
                     invitation={props.invitation} 
+                    group={null}
                 />
             }
         </>

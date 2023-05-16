@@ -3,7 +3,7 @@ import React from "react";
 import './InfoInput.css'
 
 export default function InfoInput(props) {
-    const inputRef = React.useRef();
+    const inputRef : any = React.useRef();
     const [value, setValue] = React.useState(props.value || "");
 
     function onChange(e) {

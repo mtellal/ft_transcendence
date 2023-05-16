@@ -7,18 +7,19 @@ import Footer from '../App/Footer';
 import Sidebar from '../App/SideBar';
 import { extractCookie } from '../utils/Cookie';
 import { getUser, getUserProfilePictrue, updateUser } from '../utils/User';
+
 import './App.css';
 
 
 export async function loader() {
   const token = extractCookie("access_token");
   if (token) {
-    let id = jwtDecode(token).sub;
+    let id = jwtDecode<any>(token).sub;
 
     const user = await getUser(id);
-    if (user === 200 && user.statusText === "OK")
-      return (console.log("Error: app loader => ", user))
-
+    if (user.status !== 200 || user.statusText !== "OK")
+      console.log("Error: app loader => ", user)
+    
     let image = await getUserProfilePictrue(id);
     if (image.status === 200 && image.statusText === "OK")
       image = window.URL.createObjectURL(new Blob([image.data]))
@@ -32,7 +33,7 @@ export async function loader() {
 
 function App() {
 
-  const { user, token, image } = useLoaderData();
+  const { user, token, image } : any = useLoaderData();
   const [profilePicture, setProfilePicture] = React.useState(image);
   const [username, setUsername] = React.useState(user && user.username);
 
@@ -71,7 +72,7 @@ function App() {
       console.log(res)
   }
 
-  React.useEffect(() => {
+  React.useEffect(() : any => {
     login();
     return (() => logout())
   }, [])

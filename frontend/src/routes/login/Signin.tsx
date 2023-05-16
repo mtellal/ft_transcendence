@@ -23,7 +23,7 @@ export default function SignIn()
         if (res && res.status === 200 && res.statusText === "OK")
         {
             setCookie("access_token", res.data.access_token);
-            navigate("/", {user: res});
+            navigate("/");
         }
         else
         {
@@ -55,12 +55,12 @@ export default function SignIn()
                 submit={() => handleSubmit()}
             />
             {error && <p>error: {error}</p>}
-            <Link
+            <button
                 className="flex-center sign--button"
                 onClick={handleSubmit}
             >
                 Sign in
-            </Link>
+            </button>
             <Link
                 to={"/login/signup"}
                 className="sign--link"

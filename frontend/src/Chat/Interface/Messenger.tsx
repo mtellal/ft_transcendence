@@ -62,7 +62,7 @@ function Message(props) {
 
     return (
         <div className="message-div"
-            style={props.author === "me" ? { justifyContent: 'right' } : null}
+            style={props.author === "me" ? { justifyContent: 'right' } : {}}
         >
             <div className="message-infos">
                <p className="message"
@@ -84,10 +84,10 @@ function Message(props) {
 
 export default function Messenger({ item, blocked, invitation, group }) {
 
-    const lastMessageRef = React.useRef(null);
+    const lastMessageRef : any = React.useRef(null);
     const [value, setValue] = React.useState("");
     const [render, setRender] = React.useState(false);
-    const [messages, setMessages] = React.useState([]);
+    const [messages, setMessages] : [any, any]= React.useState([]);
 
     function pushMessage(message) {
         let newMessage = {

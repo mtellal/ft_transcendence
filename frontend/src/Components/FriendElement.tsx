@@ -25,7 +25,7 @@ click={handleFriendsMessage}
 
 export function UserInfos({id, username, userStatus, userAvatar, ...props})
 {
-    const [avatar, setAvatar] = React.useState();
+    const [avatar, setAvatar] : [any, any] = React.useState();
 
     async function loadProfilePicture()
     {

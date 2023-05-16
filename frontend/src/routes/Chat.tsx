@@ -70,9 +70,9 @@ function isEqual(value, other) {
 
 export default function Chat(props)
 {
-    const {user, token} = useOutletContext();
-    const [friends, setFriends] = React.useState()
-    const [currentElement, setCurrentElement] = React.useState();
+    const {user, token} : any = useOutletContext();
+    const [friends, setFriends] : [any, any] = React.useState()
+    const [currentElement, setCurrentElement] : [any, any] = React.useState();
 
     const navigate = useNavigate();
 
@@ -83,6 +83,14 @@ export default function Chat(props)
             return (res.data)
         }
     }
+
+
+
+    function elementSelected(element)
+    {
+        
+    }
+
 
     async function loadFriends()
     {
