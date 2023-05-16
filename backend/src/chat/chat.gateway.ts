@@ -39,13 +39,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.disconnect();
       return ;
     }
-    const channel = await this.chatService.findOne(messageDto.channelId);
-    if (!channel) {
-      throw new NotFoundException('Channel not found');
+    try {
+      const channel = await this.chatService.findOne(messageDto.channelId);
+      if (!channel) {
+        throw new NotFoundException('Channel not found');
+      }
+      const message = await this.chatService.createMessage(messageDto, user);
+      console.log(message);
+      this.server.to(channel.id.toString()).emit('message', message);
     }
-    const message = await this.chatService.createMessage(messageDto, user);
-    console.log(message);
-    this.server.to(channel.id.toString()).emit('message', message);
+    catch (error) {
+      throw new WsException(error)
+    }
     //this.server.emit('message', message.content);
   }
 

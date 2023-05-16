@@ -99,4 +99,11 @@ export class ChatService {
   async leave(dto: LeaveChannelDto, user: User) {
     
   }
+
+  async remove(id: number)
+  {
+    return this.prisma.channel.delete({
+      where:{id}
+    });
+  }
 }
