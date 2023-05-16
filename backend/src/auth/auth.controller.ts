@@ -24,14 +24,14 @@ export class AuthController{
 
 	@Get('42')
 	@UseGuards(FTOauthGuard)
-	hello(){
-		return 'hello';
+	ftAuth(@Req() req){
+		return this.authService.oauthLogIn(req.user);
 	}
 
 	@Get('42/redirect')
 	@Redirect('http://localhost:8080')
 	@UseGuards(FTOauthGuard)
-	ftAuthCallback(@Req() req) {
-		return this.authService.oauthLogIn(req.user);
+	ftAuthCallback() {
+		return HttpStatus.OK;
 	}
 }

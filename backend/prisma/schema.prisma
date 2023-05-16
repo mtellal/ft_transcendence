@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl"]
 }
 
@@ -14,9 +14,9 @@ datasource db {
 // User needs: a unique name, an avatar, 2FA, a friendlist, a match history, stats
 // Will add more as we progress
 enum Status {
-	ONLINE
-	OFFLINE
-	INGAME
+  ONLINE
+  OFFLINE
+  INGAME
 }
 
 model User {
@@ -36,19 +36,36 @@ model User {
 // a ban list, a mute list. Might be used for private messages too, like PRIVMSG in ft_irc?
 
 enum ChannelType {
-	PUBLIC
-	PRIVATE
-	PROTECTED
-	WHISPER
+  PUBLIC
+  PRIVATE
+  PROTECTED
+  WHISPER
 }
 
 model Channel {
-	id			Int @id @default(autoincrement())
-	ownerId	Int
-	type		ChannelType
+  id             Int         @id @default(autoincrement())
+  name           String?
+  password       String?
+  messages       Message[]
+  ownerId        Int
+  administrators Int[]       @default([])
+  members        Int[]       @default([])
+  banList        Int[]       @default([])
+  muteList       Int[]       @default([])
+  type           ChannelType
+  createdAt      DateTime    @default(now())
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  sendBy    Int
+  content   String
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId Int?
+  createdAt DateTime @default(now())
 }
 
 // For a Game, need at least the ID of the two players involved, the score, if the match is ongoing or over. Will add more.
 model Game {
-	id		Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 }
