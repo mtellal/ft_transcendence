@@ -51,11 +51,14 @@ export class ChatService {
     userArray.push(owner.id);
     adminArray.push(owner.id);
     for (let i = 0; i < createChannelDto.memberList.length; i++) {
-      if (this.userService.findOne(createChannelDto.memberList[i]))
+      const user = await this.userService.findOne(createChannelDto.memberList[i]);
+      console.log(user);
+      if (user)
         userArray.push(createChannelDto.memberList[i]);
     }
     for (let i = 0; i < createChannelDto.adminList.length; i++) {
-      if (this.userService.findOne(createChannelDto.adminList[i]))
+      const user = await this.userService.findOne(createChannelDto.adminList[i]);
+      if (user)
         adminArray.push(createChannelDto.adminList[i]);
     }
     for (const adminId of adminArray) {
