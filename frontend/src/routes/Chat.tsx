@@ -4,7 +4,11 @@ import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import { getFriendList, getUserFriends, removeUserFriend } from "../utils/User";
 
+import { io } from 'socket.io-client';
+
 import './Chat.css'
+
+
 
 function isEqual(value, other) {
 
@@ -73,6 +77,7 @@ export default function Chat(props)
     const {user, token} : any = useOutletContext();
     const [friends, setFriends] : [any, any] = React.useState()
     const [currentElement, setCurrentElement] : [any, any] = React.useState();
+    const [socket, setSocket] : [any, any] = React.useState();
 
     const navigate = useNavigate();
 
@@ -84,11 +89,15 @@ export default function Chat(props)
         }
     }
 
-
-
     function elementSelected(element)
     {
-        
+        console.log("elementSelected", user);
+        setCurrentElement(element);
+
+        socket.emit('createChannel', {name: "testMembers", type: "PUBLIC", members: [1, 2, 3]})
+
+        socket.on('createChannel', e => console.log(e))
+
     }
 
 
@@ -123,7 +132,21 @@ export default function Chat(props)
     React.useEffect(() => {
         loadFriends()
         const loadFriendsInterval = setInterval(loadFriends, 3000)
-        return (() => clearInterval(loadFriendsInterval))
+
+        setSocket(io('http://localhost:3000', {
+            transports: ['websocket'],
+            extraHeaders: {
+                'Authorization':`Bearer ${token}`
+            }
+        }));
+
+
+        return (() => {
+            clearInterval(loadFriendsInterval);
+            socket.disconnect();
+        })
+
+
     }, [])
 
     return (
@@ -133,7 +156,7 @@ export default function Chat(props)
                 friends={friends}
                 user={props.user}
                 addGroup={() => addGroup()}
-                setCurrentElement={setCurrentElement}
+                setCurrentElement={elementSelected}
                />
                 <Outlet context={
                     {
@@ -142,7 +165,8 @@ export default function Chat(props)
                         friends, 
                         token,
                         removeFriend,
-                        updateFriendList
+                        updateFriendList,
+                        socket
                     }
                 } 
                 />

@@ -141,3 +141,17 @@ export async function removeUserFriend(id, friendId)
         .catch(err => err)
     )
 } 
+
+
+/*
+    get all chats from backend 
+*/
+
+export async function getChats()
+{
+    return (
+        axios.get(`${process.env.REACT_APP_BACK}/chats`)
+        .then(res => res)
+        .catch(err => err)
+    )
+}

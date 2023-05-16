@@ -14,7 +14,7 @@ import './App.css';
 export async function loader() {
   const token = extractCookie("access_token");
   if (token) {
-    let id = jwtDecode<any>(token).sub;
+    let id = jwtDecode<any>(token).id;
 
     const user = await getUser(id);
     if (user.status !== 200 || user.statusText !== "OK")
