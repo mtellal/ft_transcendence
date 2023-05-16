@@ -4,10 +4,11 @@ import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from '.
 import { Channel, User } from '@prisma/client';
 import * as argon from 'argon2';
 import { WsException } from '@nestjs/websockets';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private userService: UsersService) {}
 
   async findAll() {
     return this.prisma.channel.findMany()
@@ -44,26 +45,42 @@ export class ChatService {
     })
   }
 
-  async create(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
-    console.log(createChannelDto);
-    console.log(owner);
+  async createChannel(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
+    let userArray: number[] = [];
+    let adminArray: number[] = [];
+    userArray.push(owner.id);
+    adminArray.push(owner.id);
+    for (let i = 0; i < createChannelDto.memberList.length; i++) {
+      if (this.userService.findOne(createChannelDto.memberList[i]))
+        userArray.push(createChannelDto.memberList[i]);
+    }
+    for (let i = 0; i < createChannelDto.adminList.length; i++) {
+      if (this.userService.findOne(createChannelDto.adminList[i]))
+        adminArray.push(createChannelDto.adminList[i]);
+    }
+    for (const adminId of adminArray) {
+      if (!userArray.includes(adminId))
+        userArray.push(adminId);
+    }
     if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
       createChannelDto.password = await argon.hash(createChannelDto.password);
     }
-    const newChannel = await this.prisma.channel.create({ data: {
-      name: createChannelDto.name,
-      type: createChannelDto.type,
-      password: createChannelDto.password,
-      ownerId: owner.id,
-      administrators: owner.id,
-      members: owner.id,
-    }});
-    await this.prisma.user.update({
-      where: { id: owner.id },
+    const newChannel = await this.prisma.channel.create({
       data: {
-        channelList: { push: newChannel.id }
+        name: createChannelDto.name,
+        type: createChannelDto.type,
+        password: createChannelDto.password,
+        ownerId: owner.id,
+        administrators: adminArray,
+        members: userArray,
       }
     })
+    for (const userId of userArray) {
+      await this.prisma.user.update({
+        where: {id: userId},
+        data: { channelList: { push: newChannel.id }}
+      })
+    }
     return newChannel;
   }
 

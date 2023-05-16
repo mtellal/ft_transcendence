@@ -93,8 +93,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return ;
     }
     console.log(dto);
-    const newChannel = await this.chatService.create(dto, user);
-    client.join(newChannel.id.toString());
+    const newChannel = await this.chatService.createChannel(dto, user);
+    for (const memberId of newChannel.members)
+    {
+      const socketId = this.connectedUsers.get(memberId);
+      if (socketId) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        socket.join(newChannel.id.toString());
+      }
+    }
     console.log("!!!!!!!!!! SUCCEED in creating channel !!!!!!!!!!")
     console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
   }
