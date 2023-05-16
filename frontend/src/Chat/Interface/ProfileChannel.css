@@ -1,0 +1,23 @@
+.settings
+{
+    padding: 10px;
+    flex: 8;
+    overflow-y: auto;
+}
+
+.password
+{
+    width: 80%;
+    padding: 10px 0;
+}
+
+.button
+{
+    padding: 10px;
+}
+
+.ban
+{
+    margin-top: 20px;
+    border-top: 1px solid black;
+}

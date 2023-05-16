@@ -7,7 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
-@WebSocketGateway({cors: {origin: 'https://hoppscotch.io'}})
+@WebSocketGateway({cors: {origin: '*'}})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
@@ -20,12 +20,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message')
   @UsePipes(new ValidationPipe())
   async handleMessage(@MessageBody() messageDto: MessageDto, @ConnectedSocket() client: Socket) {
+    console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
     let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
-      const authToken = Array.isArray(client.handshake.headers.access_token) ?
-      client.handshake.headers.access_token[0] :
-      client.handshake.headers.access_token;
+      const authToken = token;
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
@@ -37,6 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch(error) {
       console.error(error);
       client.disconnect();
+      console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
       return ;
     }
     try {
@@ -52,18 +58,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException(error)
     }
     //this.server.emit('message', message.content);
+    console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
   }
 
   @SubscribeMessage('createChannel')
   @UsePipes(new ValidationPipe())
   async createChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: CreateChannelDto)
   {
+    console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
+
     let user: User;
+
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
-      const authToken = Array.isArray(client.handshake.headers.access_token) ?
-      client.handshake.headers.access_token[0] :
-      client.handshake.headers.access_token;
+      const authToken = token;
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
@@ -74,22 +88,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch(error) {
       console.error(error);
       client.disconnect();
+      console.log("!!!!!!!!!! FAILED in creating channel !!!!!!!!!!")
+      console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
       return ;
     }
     console.log(dto);
     const newChannel = await this.chatService.create(dto, user);
     client.join(newChannel.id.toString());
+    console.log("!!!!!!!!!! SUCCEED in creating channel !!!!!!!!!!")
+    console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
   }
 
   @SubscribeMessage('joinChannel')
   @UsePipes(new ValidationPipe())
   async joinChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: JoinChannelDto) {
+    console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
+
     let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
-      const authToken = Array.isArray(client.handshake.headers.access_token) ?
-        client.handshake.headers.access_token[0] :
-        client.handshake.headers.access_token;
+      const authToken = token;
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
@@ -101,6 +125,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch (error) {
       console.error(error);
       client.disconnect();
+      console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
       return ;
     }
     try {
@@ -118,6 +143,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch (error) {
       throw new WsException(error);
     }
+    console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
   }
 
 /*   @SubscribeMessage('whisper')
@@ -127,12 +153,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leaveChannel')
   @UsePipes(new ValidationPipe())
   async leaveChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: LeaveChannelDto) {
+    console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
+
     let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
-      const authToken = Array.isArray(client.handshake.headers.access_token) ?
-        client.handshake.headers.access_token[0] :
-        client.handshake.headers.access_token;
+      const authToken = token;
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
@@ -144,6 +176,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch (error) {
       console.error(error);
       client.disconnect();
+      console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
       return ;
     }
     try {
@@ -152,31 +185,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch(error) {
       throw new WsException(error);
     }
+    console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
   }
 
   async handleConnection(client: Socket) {
+    console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
+
     let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
     try {
       /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
-      const authToken = Array.isArray(client.handshake.headers.access_token) ?
-      client.handshake.headers.access_token[0] :
-      client.handshake.headers.access_token;
+      const authToken = token
       if (!authToken)
         throw new UnauthorizedException();
       const decodedToken = await this.jwtService.decode(authToken) as { id: number };
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
+      console.log("user => ", user);
     }
     catch(error) {
-      console.error(error);
+      console.error("error => ", error);
       client.disconnect();
+      console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
       return ;
     }
     this.connectedUsers.set(user.id, client.id);
     console.log(this.connectedUsers);
     console.log("New client connected");
+    console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
   }
 
   handleDisconnect(client: Socket) {
