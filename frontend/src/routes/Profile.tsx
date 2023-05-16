@@ -6,7 +6,7 @@ import InfoInput from "../Components/InfoInput";
 
 import './Profile.css'
 
-function ProfileInfos({ password, updateHeader, ...props }) {
+function ProfileInfos({ password, updateHeader, ...props } : any) {
     const [username, setUsername] = React.useState(props.username);
     const [error, setError] = React.useState("");
     const [updated, setUpdated] = React.useState(false);
@@ -54,11 +54,11 @@ function ProfileInfos({ password, updateHeader, ...props }) {
     - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
 */
 
-function ProfilePicture({ image, token, updateHeader }) {
+function ProfilePicture({ image, token, updateHeader } : any ) {
     const navigate = useNavigate();
     const [img, setImg] = React.useState(image);
 
-    async function editProfilePicture(e) {
+    async function editProfilePicture(e : any) {
         const file = e.target.files[0];
         if (file.type.match("image.*")) {
             let url = window.URL.createObjectURL(e.target.files[0])

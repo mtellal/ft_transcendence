@@ -9,8 +9,7 @@ import { io } from 'socket.io-client';
 import './Chat.css'
 
 
-
-function isEqual(value, other) {
+function isEqual(value : any, other : any) {
 
     // Get the value type
     var type = Object.prototype.toString.call(value);
@@ -27,7 +26,7 @@ function isEqual(value, other) {
     if (valueLen !== otherLen) return false;
 
     // Compare two items
-    var compare = function (item1, item2) {
+    var compare = function (item1 : any, item2 : any) {
 
         // Get the object type
         var itemType = Object.prototype.toString.call(item1);
@@ -72,7 +71,7 @@ function isEqual(value, other) {
 
 };
 
-export default function Chat(props)
+export default function Chat(props : any)
 {
     const {user, token} : any = useOutletContext();
     const [friends, setFriends] : [any, any] = React.useState()
@@ -81,7 +80,7 @@ export default function Chat(props)
 
     const navigate = useNavigate();
 
-    function getData(res)
+    function getData(res : any)
     {
         if (res.status === 200 && res.statusText === "OK")
         {
@@ -89,15 +88,16 @@ export default function Chat(props)
         }
     }
 
-    function elementSelected(element)
+    function elementSelected(element : any)
     {
         console.log("elementSelected", user);
         setCurrentElement(element);
 
         socket.emit('createChannel', {name: "testMembers", type: "PUBLIC", members: [1, 2, 3]})
 
-        socket.on('createChannel', e => console.log(e))
+        socket.on('createChannel', (e :any)  => console.log("CHANNEL CREATED ", e))
 
+        console.log("CHANNEL CREATED")
     }
 
 
@@ -105,8 +105,8 @@ export default function Chat(props)
     {
         const friendListRes = await getFriendList(user.id);
         let friendList = getData(friendListRes);
-        friendList = friendList.sort((a,b) => a.username > b.username ? 1 : -1)
-        setFriends(prev => isEqual(prev, friendList) ? prev : friendList);
+        friendList = friendList.sort((a : any, b : any) => a.username > b.username ? 1 : -1)
+        setFriends((prev : any) => isEqual(prev, friendList) ? prev : friendList);
     }
 
     function addGroup()
@@ -114,7 +114,7 @@ export default function Chat(props)
         console.log("add group");
     }
 
-    function updateFriendList(friend)
+    function updateFriendList(friend : any)
     {
         setFriends([...friends, friend]);
     } 
@@ -124,7 +124,7 @@ export default function Chat(props)
         const res = await removeUserFriend(user.id, currentElement.id)
         if (res.status === 200 && res.statusText === "OK")
         {
-            setFriends(friends.filter(u => u.id !== currentElement.id))
+            setFriends(friends.filter((u : any) => u.id !== currentElement.id))
             navigate("/chat");
         }
     }
@@ -133,17 +133,18 @@ export default function Chat(props)
         loadFriends()
         const loadFriendsInterval = setInterval(loadFriends, 3000)
 
-        setSocket(io('http://localhost:3000', {
+        let s = io('http://localhost:3000', {
             transports: ['websocket'],
             extraHeaders: {
                 'Authorization':`Bearer ${token}`
             }
-        }));
-
+        });
+        
+        setSocket(s);
 
         return (() => {
             clearInterval(loadFriendsInterval);
-            socket.disconnect();
+            s.disconnect();
         })
 
 

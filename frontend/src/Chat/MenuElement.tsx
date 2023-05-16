@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import FriendElement from "../Components/FriendElement";
 import './MenuElement.css'
 
-function CollectionElement(props)
+function CollectionElement(props : any)
 {
     return (
         <div className="collection">
@@ -27,7 +27,7 @@ function CollectionElement(props)
     )
 }
 
-function GroupElement(props)
+function GroupElement(props : any)
 {
     return (
         <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
@@ -53,14 +53,14 @@ export default function MenuElement({...props})
     const [friendsList, setFriendsList] = React.useState(props.friends);
     const [currentGroup, setCurrentGroup] = React.useState();
 
-    const groupList = groups.map(e => 
+    const groupList = groups.map((e : any) => 
         <GroupElement
             key={e.id}
             id={e.id}
             name={e.name}
             members={e.members.length}
             selected={currentGroup === e.id ? true : false}
-            click={(user) => props.setCurrentElement(user)}
+            click={(user : any) => props.setCurrentElement(user)}
         />
     )
 
@@ -68,14 +68,14 @@ export default function MenuElement({...props})
         if (props.friends)
         {     
             setFriendsList(
-                props.friends.map(user => (
+                props.friends.map((user : any) => (
                     <FriendElement 
                         key={user.id}
                         id={user.id}
                         username={user.username}
                         avatar={user.avatar}
                         userStatus={user.userStatus}
-                        click={(user) => props.setCurrentElement(user)}
+                        click={(user : any) => props.setCurrentElement(user)}
                     />
                 ))
             )

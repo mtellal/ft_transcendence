@@ -3,10 +3,10 @@ import React from "react";
 import './Game.css'
 
 
-let up;
-let down;
+let up : boolean;
+let down : boolean;
 
-function Game(props)
+function Game(props : any)
 {
     const canvasRef : any  = React.useRef();
     const animationID = React.useRef(0);
@@ -16,7 +16,7 @@ function Game(props)
 
     const [scores, setScores] = React.useState({p1:0, p2:0})
 
-    function initPlayers(canvasHeight, canvasWidth)
+    function initPlayers(canvasHeight : any , canvasWidth : any )
     {
         const player1 = player1Ref.current;
         const player2 = player2Ref.current;
@@ -32,7 +32,7 @@ function Game(props)
         player2.y = canvasHeight / 2 - player2.height;
     }
 
-    function initBall(canvasHeight, canvasWidth)
+    function initBall(canvasHeight : any , canvasWidth : any )
     {
         const ball = ballRef.current;
         const signx = Math.floor(Math.random() * 10) % 2 === 0 ? 0 : 1;
@@ -50,7 +50,7 @@ function Game(props)
     /* //////////   DRAW FUNCTIONS     //////////*/
 
 
-    function drawPlayers(context)
+    function drawPlayers(context : any )
     {
         const p1 = player1Ref.current;
         const p2 = player2Ref.current;
@@ -60,7 +60,7 @@ function Game(props)
         context.fillRect(p2.x, p2.y, p2.width, p2.height)
     }
 
-    function drawBall(context)
+    function drawBall(context : any )
     {
         const ball = ballRef.current;
         context.beginPath();
@@ -68,7 +68,7 @@ function Game(props)
         context.fill();
     }
 
-    function drawPlayground(context)
+    function drawPlayground(context : any )
     {
         const canvas : any = canvasRef.current;
 
@@ -82,7 +82,7 @@ function Game(props)
     }
 
 
-    function draw(context)
+    function draw(context : any )
     {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
         drawPlayground(context)
@@ -92,20 +92,20 @@ function Game(props)
 
     /* //////////   MOVEMENTS FUNCTIONS     //////////*/
 
-    function handleKeyDown(e)
+    function handleKeyDown(e : any)
     {
         if (e.key === "w")
-            up = 1;
+            up = true;
         else if (e.key === "s")
-            down = 1;
+            down = true;
     }
 
-    function handleKeyUp(e)
+    function handleKeyUp(e : any)
     {
         if (e.key === "w")
-            up = 0;
+            up = false;
         else if (e.key === "s")
-            down = 0;
+            down = false;
     }
 
     function moveUp()
@@ -171,7 +171,7 @@ function Game(props)
         return (0)
     }
 
-    function resizeHandler(context)
+    function resizeHandler(context : any) 
     {
         const canvas = canvasRef.current;
         const width = canvas.parentNode.offsetWidth;
@@ -185,7 +185,7 @@ function Game(props)
         initGame(canvas, context)
     }
 
-    function initGame(canvas, context)
+    function initGame(canvas : any, context : any)
     {
         canvas.height = canvas.parentNode.offsetHeight;
         canvas.width = canvas.parentNode.offsetWidth;
@@ -257,7 +257,7 @@ function Game(props)
     )
 }
 
-function PlayPage(props)
+function PlayPage(props : any)
 {
     return (
         <div className="play-page">

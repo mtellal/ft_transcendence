@@ -5,15 +5,15 @@ import IconInput from "../../Components/IconInput";
 import './ProfileChannel.css'
 
 
-export default function ProfileGroup({user, channel, ...props})
+export default function ProfileGroup({user, channel, ...props} : any)
 {
-    const administrators = channel.administrators.map(m => <p>{m}</p>)
-    const members = channel.members.map(m => <p>{m}</p>)
-    const banned = channel.banMembers.map(m => <p>{m}</p>)
+    const administrators = channel.administrators.map((m : any) => <p>{m}</p>)
+    const members = channel.members.map((m : any) => <p>{m}</p>)
+    const banned = channel.banMembers.map((m : any) => <p>{m}</p>)
 
     function accessPassword()
     {
-        return (channel.administrators.find(m => m === user.username))
+        return (channel.administrators.find((m : any) => m === user.username))
     }
 
     return (

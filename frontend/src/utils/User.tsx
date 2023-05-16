@@ -5,7 +5,7 @@ import axios from "axios";
     return a http response 
 */
 
-export async function signinRequest(username, password)
+export async function signinRequest(username : string, password : string)
 {
     return (axios.post(`${process.env.REACT_APP_BACK}/auth/signin`, {
             username, 
@@ -21,7 +21,7 @@ export async function signinRequest(username, password)
     return a http response 
 */
 
-export async function signupRequest(username, password)
+export async function signupRequest(username : string, password : string)
 {
     return (axios.post(`${process.env.REACT_APP_BACK}/auth/signup`, {
             username, 
@@ -32,7 +32,7 @@ export async function signupRequest(username, password)
     )
 }
 
-export async function getUser(id)
+export async function getUser(id : number | string)
 {
     return (
         axios.get(`${process.env.REACT_APP_BACK}/users/${id}`)
@@ -41,7 +41,7 @@ export async function getUser(id)
     )
 }
 
-export async function getUserByUsername(username)
+export async function getUserByUsername(username : any )
 {
     return (
         axios.get(`${process.env.REACT_APP_BACK}/users?username=${username}`)
@@ -50,7 +50,7 @@ export async function getUserByUsername(username)
     )
 }
 
-export async function updateUser(user, id)
+export async function updateUser(user : any, id : number | string)
 {
     return (
         axios.patch(`${process.env.REACT_APP_BACK}/users/${id}`, {
@@ -61,7 +61,7 @@ export async function updateUser(user, id)
     )
 }
 
-export async function updateProfilePicture(image, token)
+export async function updateProfilePicture(image : any , token : string)
 {
     const formData = new FormData();
     formData.append('file', image);
@@ -78,7 +78,7 @@ export async function updateProfilePicture(image, token)
 }
 
 
-export async function getUserProfilePictrue(id)
+export async function getUserProfilePictrue(id : number | string)
 {
     return (
         axios.get(`${process.env.REACT_APP_BACK}/users/${id}/profileImage`, {
@@ -91,7 +91,7 @@ export async function getUserProfilePictrue(id)
 
 
 
-export async function getFriendList(id)
+export async function getFriendList(id :  number | string)
 {
     return (
         axios.get(`${process.env.REACT_APP_BACK}/users/${id}/friends`)
@@ -105,12 +105,12 @@ export async function getFriendList(id)
     - return an array of users [{id:.., username:.., ...}] 
 */
 
-export async function getUserFriends(friendIDs)
+export async function getUserFriends(friendIDs :  any)
 {
-    return (await Promise.all(friendIDs.map(async (id) => await getUser(id))))
+    return (await Promise.all(friendIDs.map(async (id : any) => await getUser(id))))
 }
 
-export async function addUserFriend(id, friendId)
+export async function addUserFriend(id : number | string, friendId : number | string)
 {
     return (
         axios.post(`${process.env.REACT_APP_BACK}/users/friend`, {
@@ -127,7 +127,7 @@ export async function addUserFriend(id, friendId)
     prefer datas in URI
 */
 
-export async function removeUserFriend(id, friendId)
+export async function removeUserFriend(id : number | string, friendId : number | string)
 {
     return (
         axios.delete(`${process.env.REACT_APP_BACK}/users/friend`, 

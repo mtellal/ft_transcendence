@@ -44,14 +44,14 @@ export default function SignIn()
                 style={iconInputStyle}
                 icon="person"
                 placeholder="Username"
-                getValue={value => setUsername(value)}
+                getValue={(value : string) => setUsername(value)}
                 submit={() => handleSubmit()}
             />
             <IconInput
                 style={iconInputStyle}
                 icon="lock"
                 placeholder="Password"
-                getValue={value => setPassword(value)}
+                getValue={(value : string) => setPassword(value)}
                 submit={() => handleSubmit()}
             />
             {error && <p>error: {error}</p>}

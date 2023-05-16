@@ -23,7 +23,7 @@ click={handleFriendsMessage}
 */
 
 
-export function UserInfos({id, username, userStatus, userAvatar, ...props})
+export function UserInfos({id, username, userStatus, userAvatar, ...props} : any)
 {
     const [avatar, setAvatar] : [any, any] = React.useState();
 
@@ -79,7 +79,7 @@ export function UserInfos({id, username, userStatus, userAvatar, ...props})
     )
 }
 
-function AddIcon(props)
+function AddIcon(props : any)
 {
     return (
         <div 
@@ -94,7 +94,7 @@ function AddIcon(props)
 }
 
 
-export function FriendSearch(props)
+export function FriendSearch(props : any)
 {
     return (
         <div style={{
@@ -112,7 +112,7 @@ export function FriendSearch(props)
     )
 }
 
-export default function FriendElement(props)
+export default function FriendElement(props : any)
 {    
     return (
         <NavLink to={`/chat/friends/${props.username}/${props.id}`}

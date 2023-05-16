@@ -3,7 +3,7 @@ import React from "react";
 import './Sidebar.css'
 import { Link, NavLink } from "react-router-dom";
 
-function MenuElement(props)
+function MenuElement(props : any)
 {
     return (
         <NavLink 

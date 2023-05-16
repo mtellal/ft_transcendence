@@ -50,7 +50,7 @@ export async function loader({params} : any)
 {
     console.log("param => ", params)
     setCookie("access_token", "")
-    return (null)
+    return ({})
 }
 
 export default function Login() {

@@ -2,7 +2,7 @@ import React from "react";
  
 import './History.css'
 
-function MatchHistory(props)
+function MatchHistory(props : any )
 {
 
     const winStyle = {
@@ -39,12 +39,12 @@ function MatchHistory(props)
     )
 }
 
-function generateScore(max)
+function generateScore(max : any )
 {
     return (Math.floor(Math.random() * max))
 }
 
-export default function History(props)
+export default function History()
 {
 
     const exampleScores = [

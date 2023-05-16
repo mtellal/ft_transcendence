@@ -8,7 +8,7 @@ import { useOutletContext } from "react-router-dom";
 import './AddElement.css'
 
 
-export default function AddElement(props)
+export default function AddElement(props : any)
 {
     const [prevValue, setPrevValue] = React.useState("");
     const [value, setValue] = React.useState("");
@@ -19,10 +19,10 @@ export default function AddElement(props)
 
     function validFriend()
     {
-        return (friends.every(user => friend.id !== user.id) && friend.id !== user.id)
+        return (friends.every((user : any) => friend.id !== user.id) && friend.id !== user.id)
     }
 
-    function handleResponse(res)
+    function handleResponse(res : any)
     {
         if (res.status === 200 && res.statusText === "OK")
         {
@@ -77,7 +77,7 @@ export default function AddElement(props)
                 <IconInput
                         icon="search"
                         placeholder="Username"
-                        getValue={v => setValue(v.trim())}
+                        getValue={(v : string) => setValue(v.trim())}
                         submit={() => value && searchUser()}
                     />
                 {

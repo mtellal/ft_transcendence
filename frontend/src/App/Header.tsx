@@ -4,7 +4,7 @@ import './Header.css'
 
 import { Link } from 'react-router-dom';
 
-export default function Header({profilePicture, username, ...props})
+export default function Header({profilePicture, username, ...props} : any)
 {
     return (
         <header className='header'>

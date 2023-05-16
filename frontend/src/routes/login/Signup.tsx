@@ -44,21 +44,21 @@ export default function SignUp()
                     style={iconInputStyle}
                     icon="person"
                     placeholder="Username"
-                    getValue={value => setUsername(value)}
+                    getValue={(value : string) => setUsername(value)}
                     submit={handleSubmit}
                     />
                 <IconInput
                     style={iconInputStyle}
                     icon="lock"
                     placeholder="Password"
-                    getValue={value => setPassword(value)}
+                    getValue={(value : string) => setPassword(value)}
                     submit={handleSubmit}
                     />
                 <IconInput
                     style={iconInputStyle}
                     icon="lock"
                     placeholder="Confirm password"
-                    getValue={value => setConfirmPassword(value)}
+                    getValue={(value : string) => setConfirmPassword(value)}
                     submit={handleSubmit}
                     />
                 {error && <p>error: {error}</p>}

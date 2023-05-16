@@ -11,20 +11,20 @@ import './IconInput.css'
     - submit() exex function props.submit when enter is pressed
 */
 
-export default function IconInput(props)
+export default function IconInput(props : any)
 {
     const [value, setValue] = React.useState("");
 
     const id = Math.floor(Math.random() * 10000);
 
-    function handleChange(e)
+    function handleChange(e : any)
     {
         setValue(e.target.value);
         if (props.getValue && value !== "")
             props.getValue(e.target.value);
     }
 
-    function onKeyDown(e)
+    function onKeyDown(e : any)
     {
         if (e.key === 'Enter')
         {

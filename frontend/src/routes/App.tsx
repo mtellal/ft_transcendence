@@ -38,18 +38,18 @@ function App() {
   const [username, setUsername] = React.useState(user && user.username);
 
 
-  function updateHeader(obj)
+  function updateHeader(obj : any)
   {
     setProfilePicture(obj.profilePicture);
     setUsername(obj.username);
     user.username = obj.username
   }
 
-  function updateHeaderProfilePicture(url) {
+  function updateHeaderProfilePicture(url : any) {
     setProfilePicture(url);
   }
 
-  function updateHeaderUsername(username) {
+  function updateHeaderUsername(username : any) {
     setUsername(username);
     user.username = username;
   }

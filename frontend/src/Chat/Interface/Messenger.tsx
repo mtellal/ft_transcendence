@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 
 import './Messenger.css'
 
-function BlockMessage({ username }) {
+function BlockMessage({ username } : any) {
     return (
         <div className="block">
             <p className="text-block">You have blocked <span className="friend-block">{username}</span></p>
@@ -25,7 +25,7 @@ function NoMessages() {
     style and display an invitation
 */
 
-function GameInvitation(props) {
+function GameInvitation(props : any) {
     return (
         <>
             {
@@ -45,11 +45,11 @@ function GameInvitation(props) {
     style and display one single message
 */
 
-function Message(props) {
+function Message(props : any) {
 
     function isAdmin()
     {
-        return (props.administrators.find(username => username === props.author));
+        return (props.administrators.find((username : any) => username === props.author));
     }
 
     function addStyle() {
@@ -82,20 +82,20 @@ function Message(props) {
 }
 
 
-export default function Messenger({ item, blocked, invitation, group }) {
+export default function Messenger({ item, blocked, invitation, group } : any) {
 
     const lastMessageRef : any = React.useRef(null);
     const [value, setValue] = React.useState("");
     const [render, setRender] = React.useState(false);
     const [messages, setMessages] : [any, any]= React.useState([]);
 
-    function pushMessage(message) {
+    function pushMessage(message : any) {
         let newMessage = {
             id: messages.length + 1,
             ...message
         }
         if (messages.length) {
-            setMessages(prev => ([
+            setMessages((prev: any) => ([
                 ...prev,
                 newMessage
             ]))
@@ -106,7 +106,7 @@ export default function Messenger({ item, blocked, invitation, group }) {
         item.conversation.push(newMessage);
     }
 
-    function handleChange(e) {
+    function handleChange(e : any) {
         setValue(e.target.value)
     }
 
@@ -118,7 +118,7 @@ export default function Messenger({ item, blocked, invitation, group }) {
         })
     }
 
-    function sendMessage(e) {
+    function sendMessage(e : any) {
         if (e.key === "Enter" && value !== "" && !blocked) {
             newTextMessage();
             setValue("")
@@ -129,7 +129,7 @@ export default function Messenger({ item, blocked, invitation, group }) {
 
     function renderMessages() {
         return (
-            item.conversation.map(m => {
+            item.conversation.map((m: any) => {
                 if (m.type && m.type === "invitation") {
                     return (
                         <GameInvitation
