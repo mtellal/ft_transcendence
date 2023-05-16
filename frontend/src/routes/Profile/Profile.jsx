@@ -52,6 +52,8 @@ export function Profile() {
       } else {
         console.log("PROFILE File uploaded successfully!");
       }
+      // let rep = await BackApi.getProfilePictureById(selector.id);
+      // dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
   }
 
     // function handleChange(e) {

@@ -1,10 +1,9 @@
 import s from "./style.module.css"
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
-import avatar_default from "../../assets/alpaga.jpg"
 import { useNavigate } from "react-router-dom";
 import { BackApi } from "../../api/back";
-import { createCookie } from "../../utils/cookie";
+import { createCookie, parseJwt } from "../../utils/auth";
 import { saveInfoUser, setAvatar, setToken } from "../../store/user/user-slice";
 import { useDispatch } from "react-redux";
 
@@ -14,30 +13,30 @@ export function Signin() {
     const dispatch = useDispatch();
     // const selector = useSelector(store => store.USER.user);
 
-    function parseJwt (token) {
-        var base64Url = token.split('.')[1];
-        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+    // function parseJwt (token) {
+    //     var base64Url = token.split('.')[1];
+    //     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    //     var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+    //         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    //     }).join(''));
 
-        return JSON.parse(jsonPayload);
-    }
+    //     return JSON.parse(jsonPayload);
+    // }
 
-    async function setDefualtProfilePicture(token, id) {
-        const img = await fetch(avatar_default);
-        const blob = await img.blob();
+    // async function setDefualtProfilePicture(token, id) {
+    //     const img = await fetch(avatar_default);
+    //     const blob = await img.blob();
 
-        const response = await BackApi.updateProfilePicture(blob, token);
-        if (response.status === 201) {
-            console.log("File uploaded successfully!");
-        } else {
-            console.log("Error uploading file");
-        }
-        console.log('ID ', id)
-        let rep = await BackApi.getProfilePictureById(id);
-        dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
-    }
+    //     const response = await BackApi.updateProfilePicture(blob, token);
+    //     if (response.status === 201) {
+    //         console.log("File uploaded successfully!");
+    //     } else {
+    //         console.log("Error uploading file");
+    //     }
+    //     console.log('ID ', id)
+    //     let rep = await BackApi.getProfilePictureById(id);
+    //     dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
+    // }
 
     
 	async function submitData(e) {
@@ -51,20 +50,20 @@ export function Signin() {
             dispatch(setToken(response.data.access_token));
             const rep = (await BackApi.getUserInfoById(id)).data;
             dispatch(saveInfoUser(rep));
-            if (!rep.avatar) {
-                console.log('DEFAULT avatar set');
-                setDefualtProfilePicture(response.data.access_token, id);
-            } else {
-                let rep = await BackApi.getProfilePictureById(id);
+            // if (!rep.avatar) {
+            //     console.log('DEFAULT avatar set');
+            //     setDefualtProfilePicture(response.data.access_token, id);
+            // } else {
+                let resp = await BackApi.getProfilePictureById(id);
 
-                if (rep.status === 200) {
+                if (resp.status === 200) {
                     // console.log("GET PP successfully!");
                     // console.log("PP.DATA", rep.data);
-                    dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
+                    dispatch(setAvatar(URL.createObjectURL(new Blob([resp.data]))));
                 } else {
                     console.log("Error GET PP");
                 }
-            }
+            // }
             navigate('/chat');
 		}
 		else {

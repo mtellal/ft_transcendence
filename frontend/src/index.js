@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// import { App } from './App.jsx';
+import { App } from './App.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Signup } from './routes/Signup/Signup.jsx';
 import { Signin } from './routes/Signin/Signin.jsx';
@@ -16,10 +16,12 @@ root.render(
 	<Provider store={store}>
 		<BrowserRouter>
 			<Routes>
+				<Route path='/' element={<App />} >
+					<Route path='/profile' element={<Profile />} />
+					<Route path='/chat' element={<Chat />} />
+				</Route>
 				<Route path='/signup' element={<Signup />} />
 				<Route path='/signin' element={<Signin />} />
-				<Route path='/profile' element={<Profile />} />
-				<Route path='/chat' element={<Chat />} />
 			</Routes>
 		</BrowserRouter>
 	</Provider>

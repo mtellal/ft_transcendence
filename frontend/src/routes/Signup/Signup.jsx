@@ -1,13 +1,32 @@
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
+import avatar_default from "../../assets/alpaga.jpg"
 import { BackApi } from "../../api/back";
-import { createCookie } from "../../utils/cookie";
+import { createCookie, parseJwt } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import s from "./style.module.css"
+import { setAvatar } from "../../store/user/user-slice";
 
 export function Signup() {
 
 	const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    async function setDefualtProfilePicture(token, id) {
+        const img = await fetch(avatar_default);
+        const blob = await img.blob();
+
+        const response = await BackApi.updateProfilePicture(blob, token);
+        if (response.status === 201) {
+            console.log("File uploaded successfully!");
+        } else {
+            console.log("Error uploading file");
+        }
+        console.log('ID ', id)
+        let rep = await BackApi.getProfilePictureById(id);
+        dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
+    }
 
 	async function submitData(e) {
 		e.preventDefault();
@@ -15,10 +34,13 @@ export function Signup() {
 		const password = e.target.password.value;
 		// console.log(username, password);
 		const response = await BackApi.authSignupUser(username, password);
+        const id = parseJwt(response.data.access_token).sub;
+        // console.log('Auth signup', response.data);
 		if (response.status === 201) {
 			console.log('user cree');
 			// console.log(response.data);
 			createCookie("access_token", response.data.access_token);
+            setDefualtProfilePicture(response.data.access_token, id);
             navigate('/signin');
         }
 		else {

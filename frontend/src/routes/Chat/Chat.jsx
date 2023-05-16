@@ -3,42 +3,38 @@ import { Friends } from '../../components/Friends/Friends';
 import s from './style.module.css'
 import { useEffect, useState } from 'react';
 import { BackApi } from '../../api/back';
+import { useNavigate } from 'react-router-dom';
 
 export function Chat() {
 
     const [friends, setFriends] = useState([]);
     const selector = useSelector(store => store.USER.user);
+    const navigate = useNavigate();
 
     async function getFriends() {
         const response = await BackApi.getFriendsById(selector.id);
 
-        // console.log('response.data', response.data);
-        // console.log('response.data.len', response.data.length);
-
-        if (response.data.length > 0) {
-            if (response.status === 200) {
-                // console.log('Friend list OK')
+        if (response.status === 200) {
+            if (response.data.length > 0) {
                 setFriends(response.data);
-                // console.log('friends', friends);
-            } else {
-                // console.log('Friend list NOT OK')
             }
         }
     }
 
     useEffect(() => {
-        console.log('useEffect');
-        getFriends();
-    }, [])
-
-    // console.log('friends', friends);
-    // console.log('friends.len', friends.length);
+        if (selector.id) {
+            console.log('getFriends()');
+            getFriends();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selector.id])
 
     return (
         <div className={s.container}>
             <div className={s.item}>
-                {friends.length > 0 && <Friends friends={friends} />}
+                {friends.length > 0 ? <Friends friends={friends} /> : `pas d'amis :( User: ${selector.username}`}
             </div>
+            <button onClick={() => navigate('/profile')}>Profile</button>
         </div>
     );
 }
