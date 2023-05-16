@@ -14,7 +14,6 @@ export function FriendsList( {friend} ) {
     }
 
     function actionFriend() {
-        console.log('CLICK Friend ID', friend.id);
         setShowActionFriend(!showActionFriend);
     }
 
@@ -24,9 +23,15 @@ export function FriendsList( {friend} ) {
     }, []);
 
     return (
-        // <div className={s.container} onMouseEnter={actionFriend} onMouseLeave={actionFriend}>
-        <div className={s.container} >
-            {ProfilePicture && <img className={s.image} src={ProfilePicture} alt="ProfilePicture" />}
+        // <div className={s.container} >
+            <div className={s.container} onMouseEnter={actionFriend} onMouseLeave={actionFriend}>
+                {ProfilePicture &&
+                    <img
+                        className={s.image}
+                        src={ProfilePicture}
+                        alt="ProfilePicture"
+                        style={{opacity: showActionFriend ? '0.3' : '1'}}
+                    />}
             {friend.username}
             {showActionFriend && (
                     <ul className={s.menu}>
