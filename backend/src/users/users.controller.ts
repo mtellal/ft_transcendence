@@ -248,6 +248,10 @@ export class UsersController {
     const blockedUser = await this.usersService.findOne(id);
     if (!blockedUser)
       throw new NotFoundException(`User with id of ${id} does not exist`);
+    if (user.blockedList.includes(id))
+      throw new NotAcceptableException(`User is already blocked`);
+    if (id === user.id)
+      throw new NotAcceptableException(`Can't block yourself`);
     return this.usersService.blockUser(user, id);
   }
 
@@ -261,6 +265,10 @@ export class UsersController {
     const unblockedUser = await this.usersService.findOne(id);
     if (!unblockedUser)
       throw new NotFoundException(`User with id of ${id} does not exist`);
+    if (!user.blockedList.includes(id))
+      throw new NotAcceptableException(`User is not blocked`);
+    if (id === user.id)
+      throw new NotAcceptableException(`Can't unblock yourself`);
     return this.usersService.unblockUser(user, id);
   }
 
