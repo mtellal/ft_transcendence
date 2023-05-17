@@ -208,17 +208,24 @@ export class UsersController {
     const friend = await this.usersService.findOne(friendRequestDto.friendId);
     if (!friend)
       throw new NotFoundException(`User with id of ${friendRequestDto.friendId} doesn't exist`);
+    if (friend.id === user.id)
+      throw new ForbiddenException(`Can't add yourself as friend`);
     if (friend.blockedList.includes(user.id))
       throw new ForbiddenException(`Blocked`);
-    if (this.usersService.checkFriendRequest(user.id, friend.id))
+    if (await this.usersService.checkFriendRequest(user.id, friend.id))
       throw new NotAcceptableException(`Already exists a pending friend request between these two users`);
-    await this.usersService.sendFriendRequest(friend, user);
+    if (friend.friendList.includes(user.id))
+       throw new NotAcceptableException(`Already friends!`);
+    return await this.usersService.sendFriendRequest(friend, user);
   }
 
   @Post(':id/friendRequest/:requestid')
   @ApiOperation({ summary: 'Accept a pending friend request with a given id'})
   async acceptFriendRequest(@Param('id', ParseIntPipe) id: number, @Param('requestid', ParseIntPipe) requestId: number) {
-    console.log('Accepted a request');
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return await this.usersService.acceptFriendRequest(id, requestId);
   }
 
   @Delete('friend')
