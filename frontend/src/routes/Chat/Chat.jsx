@@ -4,6 +4,7 @@ import s from './style.module.css'
 import { useEffect, useState } from 'react';
 import { BackApi } from '../../api/back';
 import { useNavigate } from 'react-router-dom';
+import { AddFriend } from '../../components/AddFriend/AddFriend';
 
 export function Chat() {
 
@@ -32,7 +33,8 @@ export function Chat() {
     return (
         <div className={s.container}>
             <div className={s.item}>
-                {friends.length > 0 ? <Friends friends={friends} /> : `pas d'amis :( User: ${selector.username}`}
+                <AddFriend id={selector.id} />
+                {friends.length > 0 ? <Friends friends={friends} /> : `Aucun ami a afficher :(`}
             </div>
             <button onClick={() => navigate('/profile')}>Profile</button>
         </div>

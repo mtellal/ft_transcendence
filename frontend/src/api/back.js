@@ -4,6 +4,14 @@ const BASE_URL = 'http://localhost:3000';
 
 export class BackApi {
 
+	static async getAllUsers() {
+		const response = await axios.get(`${BASE_URL}/users`)
+		.then (rep => rep)
+		.catch (error => error)
+
+		return response;
+	}
+
 	static async getUserInfoById(id) {
 		const response = await axios.get(`${BASE_URL}/users/${id}`)
 		.then (rep => rep)
@@ -45,7 +53,6 @@ export class BackApi {
 	}
 
 	static async getProfilePictureById(id) {
-		// console.log('ID', id);
 		const response = await axios.get(`${BASE_URL}/users/${id}/profileImage`, {
             responseType:'arraybuffer'
         })
@@ -58,13 +65,26 @@ export class BackApi {
 	static async updateProfilePicture(image, token) {
 		const formData = new FormData();
 		formData.append('file', image, 'avatar.jpg');
-		// console.log('FORMMMMMMM', image);
 
 		return (
-			axios.post(`${process.env.REACT_APP_BACK}/users/upload`, formData, {
+			axios.post(`${BASE_URL}/users/upload`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data', 
 					'Authorization': `Bearer ${token}`
+				}
+			})
+			.then(res => res)
+			.catch(err => err)
+		)
+	}
+
+	static async addFriend(id, idFriend) {
+		console.log('BackApi addFriend', id, idFriend);
+		return (
+			axios.post(`${BASE_URL}/users/addFriend`, null, {
+				params: {
+					id: id,
+					'id of friend': idFriend
 				}
 			})
 			.then(res => res)
