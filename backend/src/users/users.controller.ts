@@ -56,9 +56,12 @@ export class UsersController {
   @Get('whispers')
   @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Get direct messages channel where two given users are present'})
-  getWhispers(@Query() friendshipDto: FriendshipDto)
+  async getWhispers(@Query() friendshipDto: FriendshipDto)
   {
-    return this.usersService.getWhispers(friendshipDto);
+    const channel = await this.usersService.getWhispers(friendshipDto);
+    if (!channel)
+      throw new NotFoundException('No direct messages channel between these two users');
+    return channel;
   }
 
   @Get(':id')
@@ -166,8 +169,11 @@ export class UsersController {
 
   @Get(':id/friendRequest')
   @ApiOperation({ summary: 'Get all friend requests for a given user'})
-  getFriendRequest(@Param('id', ParseIntPipe) id: number) {
-    console.log("Return friend requests");
+  async getFriendRequest(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return this.usersService.getFriendRequest(user);
   }
 
   @Post('friend')
@@ -194,6 +200,7 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @Post('friendRequest')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Send a pending friend request to another user, if it is accepted, both users will add each other to their friend list'})
   async sendFriendRequest(@Body() friendRequestDto: FriendRequestDto, @Request() req)
   {
@@ -204,7 +211,8 @@ export class UsersController {
     if (friend.blockedList.includes(user.id)) {
       throw new ForbiddenException(`Blocked`)
     }
-    await this.usersService.sendFriendRequest(friend);
+    console.log(await this.usersService.getFriendRequest(friend));
+    await this.usersService.sendFriendRequest(friend, user);
   }
 
   @Delete('friend')

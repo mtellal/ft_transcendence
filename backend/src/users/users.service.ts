@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   async getFriends(friendIds: number[]) {
-    return this.prisma.user.findMany({
+    return await this.prisma.user.findMany({
       where: {id: {in: friendIds}},
       select: {
         id: true,
@@ -37,8 +37,25 @@ export class UsersService {
     })
   }
 
-  async sendFriendRequest(friend: User) {
-    
+  async getFriendRequest(user: User) {
+    return await this.prisma.friendRequest.findMany({
+      where: {userId: user.id}
+    })
+  }
+
+  async sendFriendRequest(friend: User, user: User) {
+    const newRequest = await this.prisma.friendRequest.create({
+      data: {
+        sendBy: user.id,
+        userId: friend.id,
+      }
+    })
+    return await this.prisma.user.update({
+      where: { id: friend.id },
+      data: {
+        friendRequest: { connect: { id: newRequest.id } }
+      }
+    })
   }
 
   async addFriend(id: number, friendId: number)
@@ -73,7 +90,7 @@ export class UsersService {
   }
 
   async getWhispers(friendshipDto: FriendshipDto) {
-    return await this.prisma.channel.findMany({
+    return await this.prisma.channel.findFirst({
       where : {
         type: {
           equals: ChannelType.WHISPER

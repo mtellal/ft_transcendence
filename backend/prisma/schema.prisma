@@ -34,10 +34,12 @@ model User {
 }
 
 model FriendRequest {
-  id     Int     @id @default(autoincrement())
-  sendBy User    @relation(fields: [userId], references: [id])
-  status Boolean @default(false)
-  userId Int
+  id        Int      @id @default(autoincrement())
+  sendBy    Int
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  status    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 // For a Channel, we need an enum type representing the privacy of the channel (public, private, protected), a channel owner, one or more channel administrator, 
