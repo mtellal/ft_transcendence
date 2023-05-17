@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, FriendshipDto } from './dto/create-user.dto';
+import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { ChannelType } from '@prisma/client';
+import { ChannelType, User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -26,13 +26,34 @@ export class UsersService {
   }
 
   async getFriends(friendIds: number[]) {
-    return this.prisma.user.findMany({
+    return await this.prisma.user.findMany({
       where: {id: {in: friendIds}},
       select: {
         id: true,
         username: true,
         avatar: true,
         userStatus: true,
+      }
+    })
+  }
+
+  async getFriendRequest(user: User) {
+    return await this.prisma.friendRequest.findMany({
+      where: {userId: user.id}
+    })
+  }
+
+  async sendFriendRequest(friend: User, user: User) {
+    const newRequest = await this.prisma.friendRequest.create({
+      data: {
+        sendBy: user.id,
+        userId: friend.id,
+      }
+    })
+    return await this.prisma.user.update({
+      where: { id: friend.id },
+      data: {
+        friendRequest: { connect: { id: newRequest.id } }
       }
     })
   }
@@ -69,7 +90,7 @@ export class UsersService {
   }
 
   async getWhispers(friendshipDto: FriendshipDto) {
-    return await this.prisma.channel.findMany({
+    return await this.prisma.channel.findFirst({
       where : {
         type: {
           equals: ChannelType.WHISPER

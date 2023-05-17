@@ -1,4 +1,4 @@
-import { NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, NotAcceptableException, NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
 import { User } from '@prisma/client';
@@ -142,10 +142,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const channel = await this.chatService.findOne(dto.channelId);
       if (!channel)
-        throw new WsException('Channel not found');
+        throw new NotFoundException('Channel not found');
       console.log(channel);
       if (client.rooms.has(channel.id.toString()))
-        throw new WsException('Client already on the channel');
+        throw new NotAcceptableException('Client already on the channel');
       this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);
@@ -191,7 +191,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return ;
     }
     try {
-
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException('Channel not found');
+      if (!user.channelList.includes(channel.id))
+        throw new BadRequestException('User is not on the channel');
+      client.leave(channel.id.toString());
+      await this.chatService.leave(channel, user);
     }
     catch(error) {
       throw new WsException(error);

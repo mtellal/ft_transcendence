@@ -29,3 +29,10 @@ export class FriendshipDto {
   @Type(() => Number)
   friendId: number;
 }
+
+export class FriendRequestDto {
+  @ApiProperty({description: 'id of the user receiving the friend request', example: '2'})
+  @IsNotEmpty()
+  @IsNumber()
+  friendId: number
+}
