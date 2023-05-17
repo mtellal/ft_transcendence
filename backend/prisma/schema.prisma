@@ -20,16 +20,24 @@ enum Status {
 }
 
 model User {
-	id					Int @id @default(autoincrement())
-	username		String @unique
-	password		String
-	email				String? @unique
-	avatar			String?
-	userStatus	Status @default(OFFLINE)
-	friendList	Int[] @default([])
-	blockedList	Int[] @default([])
-	channelList	Int[] @default([])
-	createdAt		DateTime @default(now())
+  id            Int             @id @default(autoincrement())
+  username      String          @unique
+  password      String
+  email         String?         @unique
+  avatar        String?
+  userStatus    Status          @default(OFFLINE)
+  friendRequest FriendRequest[]
+  friendList    Int[]           @default([])
+  blockedList   Int[]           @default([])
+  channelList   Int[]           @default([])
+  createdAt     DateTime        @default(now())
+}
+
+model FriendRequest {
+  id     Int     @id @default(autoincrement())
+  sendBy User    @relation(fields: [userId], references: [id])
+  status Boolean @default(false)
+  userId Int
 }
 
 // For a Channel, we need an enum type representing the privacy of the channel (public, private, protected), a channel owner, one or more channel administrator, 
@@ -60,7 +68,7 @@ model Message {
   id        Int      @id @default(autoincrement())
   sendBy    Int
   content   String
-  Channel   Channel? @relation(fields: [channelId], references: [id])
+  Channel   Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int?
   createdAt DateTime @default(now())
 }

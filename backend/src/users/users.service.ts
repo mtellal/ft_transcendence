@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, FriendshipDto } from './dto/create-user.dto';
+import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { ChannelType } from '@prisma/client';
+import { ChannelType, User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +35,10 @@ export class UsersService {
         userStatus: true,
       }
     })
+  }
+
+  async sendFriendRequest(friend: User) {
+    
   }
 
   async addFriend(id: number, friendId: number)

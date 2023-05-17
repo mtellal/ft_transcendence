@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res, BadRequestException, NotAcceptableException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res, BadRequestException, NotAcceptableException, UsePipes, ValidationPipe, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, FriendshipDto } from './dto/create-user.dto';
+import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags, ApiOkResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard/jwt.guard'
@@ -164,6 +164,11 @@ export class UsersController {
     return this.usersService.getChannels(id);
   }
 
+  @Get(':id/friendRequest')
+  @ApiOperation({ summary: 'Get all friend requests for a given user'})
+  getFriendRequest(@Param('id', ParseIntPipe) id: number) {
+    console.log("Return friend requests");
+  }
 
   @Post('friend')
   @ApiOperation({ summary: 'Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
@@ -185,6 +190,21 @@ export class UsersController {
 
     this.usersService.addFriend(friendshipDto.id, friendshipDto.friendId);
     this.usersService.addFriend(friendshipDto.friendId, friendshipDto.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('friendRequest')
+  @ApiOperation({ summary: 'Send a pending friend request to another user, if it is accepted, both users will add each other to their friend list'})
+  async sendFriendRequest(@Body() friendRequestDto: FriendRequestDto, @Request() req)
+  {
+    const user: User = req.user;
+    const friend = await this.usersService.findOne(friendRequestDto.friendId);
+    if (!friend)
+      throw new NotFoundException(`User with id of ${friendRequestDto.friendId} doesn't exist`);
+    if (friend.blockedList.includes(user.id)) {
+      throw new ForbiddenException(`Blocked`)
+    }
+    await this.usersService.sendFriendRequest(friend);
   }
 
   @Delete('friend')
