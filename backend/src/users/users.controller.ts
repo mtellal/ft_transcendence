@@ -237,7 +237,6 @@ export class UsersController {
     return await this.usersService.deleteFriendRequest(user.id, requestId);
   }
 
-
   @UseGuards(JwtGuard)
   @Post('block')
   @ApiOperation({ summary: 'Block a user with a given id'})
