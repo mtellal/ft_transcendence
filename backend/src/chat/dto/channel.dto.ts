@@ -13,7 +13,8 @@ export class MessageDto {
 export class CreateChannelDto {
 
   @IsString()
-  name: string
+  @IsOptional()
+  name?: string
 
   @IsEnum(ChannelType)
   type: ChannelType

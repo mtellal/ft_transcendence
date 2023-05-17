@@ -50,16 +50,20 @@ export class ChatService {
     let adminArray: number[] = [];
     userArray.push(owner.id);
     adminArray.push(owner.id);
-    for (let i = 0; i < createChannelDto.memberList.length && createChannelDto.memberList.length; i++) {
-      const user = await this.userService.findOne(createChannelDto.memberList[i]);
-      console.log(user);
-      if (user)
-        userArray.push(createChannelDto.memberList[i]);
+    if (createChannelDto.memberList) {
+      for (let i = 0; i < createChannelDto.memberList.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.memberList[i]);
+        console.log(user);
+        if (user)
+          userArray.push(createChannelDto.memberList[i]);
+      }
     }
-    for (let i = 0; i < createChannelDto.adminList.length && createChannelDto.adminList.length; i++) {
-      const user = await this.userService.findOne(createChannelDto.adminList[i]);
-      if (user)
-        adminArray.push(createChannelDto.adminList[i]);
+    if (createChannelDto.adminList) {
+      for (let i = 0; i < createChannelDto.adminList.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.adminList[i]);
+        if (user)
+          adminArray.push(createChannelDto.adminList[i]);
+      }
     }
     for (const adminId of adminArray) {
       if (!userArray.includes(adminId))
