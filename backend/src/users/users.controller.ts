@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, Query, UseGuards, UseInterceptors, UploadedFile, Request, Res, BadRequestException, NotAcceptableException, UsePipes, ValidationPipe, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
+import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags, ApiOkResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard/jwt.guard'
@@ -202,12 +202,12 @@ export class UsersController {
   @Post('friendRequest')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Send a pending friend request to another user, if it is accepted, both users will add each other to their friend list'})
-  async sendFriendRequest(@Body() friendRequestDto: FriendRequestDto, @Request() req)
+  async sendFriendRequest(@Body() friendRequestDto: UserRequestDto, @Request() req)
   {
     const user: User = req.user;
-    const friend = await this.usersService.findOne(friendRequestDto.friendId);
+    const friend = await this.usersService.findOne(friendRequestDto.id);
     if (!friend)
-      throw new NotFoundException(`User with id of ${friendRequestDto.friendId} doesn't exist`);
+      throw new NotFoundException(`User with id of ${friendRequestDto.id} doesn't exist`);
     if (friend.id === user.id)
       throw new ForbiddenException(`Can't add yourself as friend`);
     if (friend.blockedList.includes(user.id))
@@ -237,6 +237,32 @@ export class UsersController {
     return await this.usersService.deleteFriendRequest(id, requestId);
   }
 
+
+  @UseGuards(JwtGuard)
+  @Post('block')
+  @ApiOperation({ summary: 'Block a user with a given id'})
+  @ApiBearerAuth()
+  @ApiBody({type: UserRequestDto})
+  async blockUser(@Body('id', ParseIntPipe) id: number, @Request() req) {
+    const user: User = req.user;
+    const blockedUser = await this.usersService.findOne(id);
+    if (!blockedUser)
+      throw new NotFoundException(`User with id of ${id} does not exist`);
+    return this.usersService.blockUser(user, id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('block')
+  @ApiOperation({ summary: 'Remove a user with a given id from a blocked user list'})
+  @ApiBearerAuth()
+  @ApiBody({type: UserRequestDto})
+  async unblockUser(@Body('id', ParseIntPipe) id: number, @Request() req) {
+    const user: User = req.user;
+    const unblockedUser = await this.usersService.findOne(id);
+    if (!unblockedUser)
+      throw new NotFoundException(`User with id of ${id} does not exist`);
+    return this.usersService.unblockUser(user, id);
+  }
 
   @Delete('friend')
   @ApiOperation({ summary: 'Makes two users remove each other to their friendlist, might need to be one-way only. Let me know what you prefer'})

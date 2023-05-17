@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
+import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
 import { ChannelType, FriendRequest, User } from '@prisma/client';
@@ -123,6 +123,24 @@ export class UsersService {
       }
     })
     return newRequest;
+  }
+
+  async blockUser(user: User, blockedUser: number) {
+    return await this.prisma.user.update({
+      where: {id: user.id},
+      data: {
+        blockedList: {push: blockedUser}
+      }
+    })
+  }
+
+  async unblockUser(user: User, unblockedUser: number) {
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        blockedList: user.blockedList.filter((id) => id != unblockedUser)
+      }
+    })
   }
 
   async addFriend(id: number, friendId: number)
