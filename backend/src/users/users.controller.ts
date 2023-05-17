@@ -219,22 +219,22 @@ export class UsersController {
     return await this.usersService.sendFriendRequest(friend, user);
   }
 
-  @Post(':id/friendRequest/:requestid')
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @Post('friendRequest/:requestid')
   @ApiOperation({ summary: 'Accept a pending friend request with a given id, both users will add each other to their friend lists'})
-  async acceptFriendRequest(@Param('id', ParseIntPipe) id: number, @Param('requestid', ParseIntPipe) requestId: number) {
-    const user = await this.usersService.findOne(id);
-    if (!user)
-      throw new NotFoundException(`User with id of ${id} not found`);
-    return await this.usersService.acceptFriendRequest(id, requestId);
+  async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
+    const user: User = req.user;
+    return await this.usersService.acceptFriendRequest(user.id, requestId);
   }
 
-  @Delete(':id/friendRequest/:requestid')
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @Delete('friendRequest/:requestid')
   @ApiOperation({ summary: 'Remove a pending friend request with a given id'})
-  async deleteFriendRequest(@Param('id', ParseIntPipe) id: number, @Param('requestid', ParseIntPipe) requestId: number) {
-    const user = await this.usersService.findOne(id);
-    if (!user)
-      throw new NotFoundException(`User with id of ${id} not found`);
-    return await this.usersService.deleteFriendRequest(id, requestId);
+  async deleteFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
+    const user: User = req.user;
+    return await this.usersService.deleteFriendRequest(user.id, requestId);
   }
 
 
