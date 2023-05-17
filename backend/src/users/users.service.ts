@@ -55,7 +55,7 @@ export class UsersService {
 
   async acceptFriendRequest(userId: number, requestId: number) {
     const user = await this.prisma.user.findUnique({
-      where: {id: userId},
+      where: { id: userId },
       include: {
         friendRequest: true
       }
@@ -67,7 +67,7 @@ export class UsersService {
     }
 
     await this.prisma.user.update({
-      where: {id: friendRequest.sendBy},
+      where: { id: friendRequest.sendBy },
       data: {
         friendList: {
           push: userId,
@@ -75,13 +75,13 @@ export class UsersService {
       }
     })
     return await this.prisma.user.update({
-      where: {id: userId},
+      where: { id: userId },
       data: {
         friendList: {
           push: friendRequest.sendBy
         },
         friendRequest: {
-          delete: [{id: friendRequest.id}]
+          delete: [{ id: friendRequest.id }]
         }
       },
     })
