@@ -1,7 +1,7 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
-import { Channel, User } from '@prisma/client';
+import { Channel, User, Message } from '@prisma/client';
 import * as argon from 'argon2';
 import { WsException } from '@nestjs/websockets';
 import { UsersService } from 'src/users/users.service';
@@ -38,11 +38,14 @@ export class ChatService {
     return message;
   }
 
-  async getMessage(channelId: number) {
-    return await this.prisma.message.findMany({
+  async getMessage(channelId: number): Promise<Message[]> {
+    const messages = await this.prisma.message.findMany({
       where: { channelId: channelId},
       orderBy: { createdAt: 'asc'},
     })
+    if (messages.length === 0)
+      throw new NotFoundException(`No messages on this channel`);
+    return (messages);
   }
 
   async createChannel(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {

@@ -220,13 +220,23 @@ export class UsersController {
   }
 
   @Post(':id/friendRequest/:requestid')
-  @ApiOperation({ summary: 'Accept a pending friend request with a given id'})
+  @ApiOperation({ summary: 'Accept a pending friend request with a given id, both users will add each other to their friend lists'})
   async acceptFriendRequest(@Param('id', ParseIntPipe) id: number, @Param('requestid', ParseIntPipe) requestId: number) {
     const user = await this.usersService.findOne(id);
     if (!user)
       throw new NotFoundException(`User with id of ${id} not found`);
     return await this.usersService.acceptFriendRequest(id, requestId);
   }
+
+  @Delete(':id/friendRequest/:requestid')
+  @ApiOperation({ summary: 'Remove a pending friend request with a given id'})
+  async deleteFriendRequest(@Param('id', ParseIntPipe) id: number, @Param('requestid', ParseIntPipe) requestId: number) {
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return await this.usersService.deleteFriendRequest(id, requestId);
+  }
+
 
   @Delete('friend')
   @ApiOperation({ summary: 'Makes two users remove each other to their friendlist, might need to be one-way only. Let me know what you prefer'})

@@ -87,6 +87,28 @@ export class UsersService {
     })
   }
 
+  async deleteFriendRequest(userId: number, requestId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        friendRequest: true
+      }
+    })
+    console.log(user);
+    const friendRequest = user.friendRequest.find((request) => request.id === requestId)
+    if (!friendRequest) {
+      throw new NotFoundException('Friend request not found');
+    }
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        friendRequest: {
+          delete: [{ id: friendRequest.id }]
+        }
+      },
+    })
+  }
+
   async sendFriendRequest(friend: User, user: User) {
     const newRequest = await this.prisma.friendRequest.create({
       data: {
