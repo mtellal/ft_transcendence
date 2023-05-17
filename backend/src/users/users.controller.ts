@@ -13,14 +13,28 @@ import { User, Channel } from '@prisma/client';
 
 export const storage = {
   storage: diskStorage({
-    destination: './uploads/profileImages',
+    destination: './uploads/',
     filename: (req, file, cb) => {
-        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-        const extension: string = path.parse(file.originalname).ext;
+      const userJSON = JSON.stringify(req.user);
+      const userObj = JSON.parse(userJSON);
 
-        cb(null, `${filename}${extension}`)
+      const filename: string = userObj.id;
+      const extension: string = path.parse(file.originalname).ext;
+      cb(null, `${filename}${extension}`)
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    const allowedExtensions = ['.jpg', '.png', '.jpeg'];
+    const extension = path.extname(file.originalname);
+    if (allowedExtensions.includes(extension.toLocaleLowerCase())) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file extension'));
     }
-  })
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
 }
 
 @Controller('users')
@@ -136,8 +150,8 @@ export class UsersController {
     if (!file)
       throw new BadRequestException('No file or empty file');
     const user: User = req.user;
-    console.log(user);
-    console.log(file);
+    if (path.extname(file.filename) != path.extname(user.avatar))
+      this.usersService.deleteImg(req.user.avatar);
     return this.usersService.update(user.id, {
       avatar: file.path
     })

@@ -4,6 +4,7 @@ import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
 import { ChannelType, FriendRequest, User } from '@prisma/client';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -198,6 +199,16 @@ export class UsersService {
   remove(id: number) {
     return this.prisma.user.delete( {
       where : { id },
+    });
+  }
+
+  async deleteImg(filePath: string): Promise<void> {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err);
+        return;
+      }
+      console.log('File deleted successfully');
     });
   }
 }

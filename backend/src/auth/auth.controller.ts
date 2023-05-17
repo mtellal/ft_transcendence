@@ -1,9 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Redirect, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Redirect, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto } from "./dto";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FTOauthGuard, JwtGuard } from "./guard";
-
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController{
@@ -25,13 +24,20 @@ export class AuthController{
 	@Get('42')
 	@UseGuards(FTOauthGuard)
 	ftAuth(@Req() req){
-		return this.authService.oauthLogIn(req.user);
+		return;
 	}
 
 	@Get('42/redirect')
-	@Redirect('http://localhost:8080')
 	@UseGuards(FTOauthGuard)
-	ftAuthCallback() {
-		return HttpStatus.OK;
+	async ftAuthCallback(@Req() req, @Res() res) {
+		const token = await this.authService.oauthLogIn(req.user);
+		const redirectUrl = 'http://localhost:8080/login?token=' + JSON.stringify(token);
+		res.redirect(redirectUrl);
+	}
+
+	@Get('isLogined')
+	@UseGuards(JwtGuard)
+	async test(@Res() res) {
+		res.json('success');
 	}
 }
