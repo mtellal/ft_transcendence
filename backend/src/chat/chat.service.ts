@@ -72,6 +72,8 @@ export class ChatService {
     if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
       createChannelDto.password = await argon.hash(createChannelDto.password);
     }
+    if (createChannelDto.type == 'WHISPER' && userArray.length !== 2)
+      throw new NotAcceptableException(`The other user doesn't exist`);
     const newChannel = await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,
@@ -120,8 +122,42 @@ export class ChatService {
     }
   }
 
-  async leave(dto: LeaveChannelDto, user: User) {
-    
+  async leave(channel: Channel, user: User) {
+    //Check to see if the user is the owner of the channel
+    let newOwner: number;
+    if (channel.ownerId === user.id) {
+      if (channel.members.length > 1) {
+        if (channel.administrators.length > 1) {
+          newOwner = channel.administrators.find((num) => num != channel.ownerId);
+        }
+        else {
+          newOwner = channel.members.find((num) => num != channel.ownerId);
+        }
+      }
+    }
+    const updatedAdmin = channel.administrators.filter((num) => num != channel.ownerId);
+    const updatedMember = channel.members.filter((num) => num != channel.ownerId);
+    if (updatedMember.length === 0) {
+      await this.prisma.channel.delete({
+        where: {id: channel.id},
+      });
+    }
+    else {
+      await this.prisma.channel.update({
+        where: {id: channel.id},
+        data: {
+          ownerId: newOwner,
+          administrators: updatedAdmin,
+          members: updatedMember,
+        }
+      })
+    }
+    await this.prisma.user.update({
+      where: {id: user.id},
+      data: {
+        channelList: user.channelList.filter((num) => num !== channel.id)
+      }
+    })
   }
 
   async remove(id: number)
