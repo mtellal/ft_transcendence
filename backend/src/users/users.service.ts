@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { ChannelType, User } from '@prisma/client';
+import { ChannelType, FriendRequest, User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -41,6 +41,20 @@ export class UsersService {
     return await this.prisma.friendRequest.findMany({
       where: {userId: user.id}
     })
+  }
+
+  async checkFriendRequest(senderId: number, receiverId: number): Promise<FriendRequest> {
+    return await this.prisma.friendRequest.findFirst({
+      where: {
+        sendBy: senderId,
+        userId: receiverId,
+        status: false,
+      }
+    })
+  }
+
+  async acceptFriendRequest() {
+    
   }
 
   async sendFriendRequest(friend: User, user: User) {
