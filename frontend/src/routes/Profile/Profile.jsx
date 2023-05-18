@@ -2,17 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { BackApi } from "../../api/back";
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
-import s from './style.module.css'
-// import { store } from "../../store";
-// import { useState } from "react";
 import { setAvatar } from "../../store/user/user-slice";
-import { Navigate, useNavigate } from "react-router-dom";
+import s from './style.module.css'
 
 export function Profile() {
 
     const selector = useSelector(store => store.USER.user);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     async function updateProfile(e) {
         e.preventDefault();
@@ -25,16 +21,7 @@ export function Profile() {
         } if (passwd) {
             updateinfos.password = passwd;
         }
-
-        console.log(updateinfos);
-
-        const response = await BackApi.updateInfoProfile(selector.id, updateinfos)
-        if (response.status === 200) {
-            console.log('profile updated');
-        } else {
-            console.log('profile NOT updated');
-            console.log(response.data.message);
-        }
+        await BackApi.updateInfoProfile(selector.id, updateinfos)
     }
 
     async function setProfilePicture(e) {
@@ -42,36 +29,18 @@ export function Profile() {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        console.log('A SAVE ', reader.result);
         dispatch(setAvatar(reader.result));
       };
 
-      const response = await BackApi.updateProfilePicture(file, selector.token);
-      if (response.status !== 201) {
-        console.log("PROFILE Error uploading file");
-      } else {
-        console.log("PROFILE File uploaded successfully!");
-      }
-      // let rep = await BackApi.getProfilePictureById(selector.id);
-      // dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
+      await BackApi.updateProfilePicture(file, selector.token);
   }
-
-    // function handleChange(e) {
-    //     // setState
-    //     console.log('ok');
-    // }
 
     return (
         <div className={s.profile}>
             <div className={s.title}>Update profile</div>
-            {/* <form onSubmit={(e) => e.preventDefault()}> */}
-              {/* <input className={s.input_img} type="file" accept="image/*" name="image" onChange={setProfilePicture} /> */}
-              {/* {selector.avatar && <img className={s.img} src={selector.avatar} />} */}
-              <label htmlFor="file" className={s.label_file}>Choisir une image</label>
+              <label htmlFor="file" className={s.label_file}>Choose a picture</label>
               <input id="file" className={s.input_file} type="file" accept="image/*" name="image" onChange={setProfilePicture} />
-              {/* <input className={s.input_img} type="file" accept="image/*" name="image" onChange={setProfilePicture} /> */}
               {selector.avatar && <img className={s.img} src={selector.avatar} alt="profile_picture"/>}
-            {/* </form> */}
             <form onSubmit={updateProfile} className={s.form}>
                 <img className={s.logoUser} src={logo_user} alt="logo user"></img>
                 <input type="text" className={s.element} placeholder='Username' name="username" ></input>
@@ -79,7 +48,6 @@ export function Profile() {
                 <input type="password" className={s.element} placeholder='Password' name="password" id="input"></input>
                 <button type='submit' className={s.element}>Update</button>
             </form>
-            <button onClick={() => navigate('/chat')}>Chat</button>
         </div>
     );
 }

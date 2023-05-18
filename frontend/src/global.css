@@ -3,4 +3,5 @@ html {
     width: 100%;
     background-color: #969696;
     background-image: linear-gradient(132deg, #969696 0%, #000000 100%);
+	overflow: hidden;
 }

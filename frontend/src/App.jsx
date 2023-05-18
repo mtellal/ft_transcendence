@@ -1,11 +1,11 @@
-// import { Signin } from "./components/Signin/Signin";
-import "./global.css"
+import { Header } from "./components/Header/Header";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getCookieByName, parseJwt } from "./utils/auth";
 import { saveInfoUser, setAvatar, setToken } from "./store/user/user-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { BackApi } from "./api/back";
+import "./global.css"
 
 export function App() {
 
@@ -36,7 +36,7 @@ export function App() {
 
 	return (
 		<div>
-			Hello !!
+			<Header />
 			<div>
 				<Outlet />
 			</div>

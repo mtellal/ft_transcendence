@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { BackApi } from "../../api/back";
 import s from './style.module.css'
+import { useSelector } from "react-redux";
 
-export function FriendsList( {friend} ) {
-    // console.log('FRIENDS LIST', friend.id);
+export function FriendsList( { friend, delFriend } ) {
 
     const [ProfilePicture, setProfilePicture] = useState();
     const [showActionFriend, setShowActionFriend] = useState(false);
+    const selector = useSelector(store => store.USER.user);
 
     async function getAvatar() {
         let rep = await BackApi.getProfilePictureById(friend.id);
@@ -17,13 +18,29 @@ export function FriendsList( {friend} ) {
         setShowActionFriend(!showActionFriend);
     }
 
+	async function removeFriend() {
+
+        const users = (await BackApi.getAllUsers()).data;
+
+        for (let user of users) {
+            if (user.username === friend.username) {
+                const response = await BackApi.removeFriend(selector.id, user.id);
+				delFriend(user.id);
+                if (response.status === 201) {
+                    break ;
+                }
+            }
+        }
+	}
+
     useEffect(() => {
-        console.log('Friend ID', friend.id);
-        getAvatar();
+		if (friend.id) {
+			getAvatar();
+		}
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
-        // <div className={s.container} >
             <div className={s.container} onMouseEnter={actionFriend} onMouseLeave={actionFriend}>
                 {ProfilePicture &&
                     <img
@@ -35,7 +52,7 @@ export function FriendsList( {friend} ) {
             {friend.username}
             {showActionFriend && (
                     <ul className={s.menu}>
-                        <li>Remove friend</li>
+                        <li onClick={removeFriend}>Remove friend</li>
                         <li>Play game</li>
                     </ul>
             )}

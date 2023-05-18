@@ -1,14 +1,13 @@
 .container {
-    /* background-color: white; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+	margin-top: 100px;
 }
 
 .item {
-    width: 750px;
-    height: 600px;
+    width: 850px;
+    height: 670px;
     background-color: rgba(0,0,0,0.1);
     border-radius: 50px;
     text-align: center;

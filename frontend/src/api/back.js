@@ -79,24 +79,44 @@ export class BackApi {
 	}
 
 	static async addFriend(id, idFriend) {
-		console.log('BackApi addFriend', id, idFriend);
 		return (
-			axios.post(`${BASE_URL}/users/addFriend`, null, {
-				params: {
-					id: id,
-					'id of friend': idFriend
-				}
-			})
-			.then(res => res)
-			.catch(err => err)
-		)
-	}
+		  axios.post('http://localhost:3000/users/friend', {
+			id: id,
+			friendId: idFriend
+		  }, {
+			headers: {
+			  'Accept': '*/*',
+			  'Content-Type': 'application/json'
+			}
+		  })
+		  .then(res => res)
+		  .catch(err => err)
+		);
+	  }
+	  
 
 	static async getFriendsById(id) {
 		const response = await axios.get(`${BASE_URL}/users/${id}/friends`)
 			.then(rep => rep)
 			.catch(error => error)
 
+		return response;
+	}
+
+	static async removeFriend(id, idFriend) {
+		const response = await axios.delete(`${BASE_URL}/users/friend`, {
+			data: {
+				id: id,
+				friendId: idFriend
+			}
+		  }, {
+			headers: {
+			  'Accept': '*/*',
+			  'Content-Type': 'application/json'
+			}
+		})
+			.then(res => res)
+			.catch(err => err)
 		return response;
 	}
 }

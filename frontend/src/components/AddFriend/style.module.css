@@ -12,3 +12,12 @@
     border: none;
     border-radius: 20px;
 }
+
+.button {
+	height: 30px;
+	width: 85px;
+	border: none;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 20px;
+	cursor: pointer;
+}

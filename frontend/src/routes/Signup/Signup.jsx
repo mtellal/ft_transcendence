@@ -17,13 +17,7 @@ export function Signup() {
         const img = await fetch(avatar_default);
         const blob = await img.blob();
 
-        const response = await BackApi.updateProfilePicture(blob, token);
-        if (response.status === 201) {
-            console.log("File uploaded successfully!");
-        } else {
-            console.log("Error uploading file");
-        }
-        console.log('ID ', id)
+        await BackApi.updateProfilePicture(blob, token);
         let rep = await BackApi.getProfilePictureById(id);
         dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
     }
@@ -32,21 +26,13 @@ export function Signup() {
 		e.preventDefault();
 		const username = e.target.username.value;
 		const password = e.target.password.value;
-		// console.log(username, password);
 		const response = await BackApi.authSignupUser(username, password);
         const id = parseJwt(response.data.access_token).sub;
-        // console.log('Auth signup', response.data);
 		if (response.status === 201) {
-			console.log('user cree');
-			// console.log(response.data);
 			createCookie("access_token", response.data.access_token);
             setDefualtProfilePicture(response.data.access_token, id);
             navigate('/signin');
         }
-		else {
-			console.log('user  PAS cree')
-		}
-		// const e.target.confirm_password.value;
 	}
 
     return (
