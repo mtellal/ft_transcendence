@@ -7,6 +7,9 @@ import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../prisma/prisma.service";
 import { Profile } from 'passport-42';
 import * as generator from 'generate-password';
+import axios from 'axios';
+import { join } from 'path';
+import { createWriteStream } from 'fs';
 
 
 @Injectable()
@@ -62,13 +65,15 @@ export class AuthService {
 				excludeSimilarCharacters: true // exclude similar characters
 			  });
 			const hash = await argon.hash(password);
-			console.log(hash);
+			console.log(profile);
+			this.download42Pic(profile._json.image.link, profile.id + '.png');
 			try {
 			  const newuser = await this.prisma.user.create({
 				  data: {
 					id: parseInt(profile.id),
 					username: profile.username,
 					password: hash,
+					avatar: './uploads/' + profile.id + '.png',
 				  },
 			  });
 			  return this.signToken(newuser.id, newuser.username);
@@ -81,9 +86,10 @@ export class AuthService {
 			  throw error;
 			}
 		}
-		return this.signToken(user.id, user.username);
+		else
+			return this.signToken(user.id, user.username);
 	}
-
+	
 	async signToken(userId: number, username: string): Promise< {access_token: string} > {
 		const payload = {
 			id: userId,
@@ -102,5 +108,18 @@ export class AuthService {
 		return {
 			access_token: token,
 		};
+	}
+
+	async download42Pic(url: string, filename: string): Promise<void> {
+		const response = await axios.get(url, { responseType: 'stream'});
+		const path = join('./uploads', filename);
+		const writer = createWriteStream(path);
+
+		response.data.pipe(writer);
+
+		return new Promise((resolve, reject) => {
+			writer.on('finish', resolve);
+			writer.on('error', reject);
+		})
 	}
 }
