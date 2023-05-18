@@ -17,8 +17,6 @@ import AddElement from "./Chat/Interface/AddElement";
 import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
 
 
-import { currentUser as user } from './exampleDatas'
-
 import {
     createBrowserRouter,
     RouterProvider,
@@ -26,8 +24,6 @@ import {
 
 import Chat from './routes/Chat';
 
-
-type user = any;
 
 const router = createBrowserRouter([
     {
@@ -57,20 +53,20 @@ const router = createBrowserRouter([
             },
             {
                 path: "chat",
-                element: <Chat user={user} />,
+                element: <Chat />,
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
                     {
                         path: "add-friend",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement user={user} title="friend" />
+                        element:  <AddElement title="friend" />
                     },
                     {
                         path: "add-group",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement user={user} title="group" />
+                        element:  <AddElement title="group" />
                     },
                     {
                         path: "groups/:groupid",
@@ -114,8 +110,11 @@ const router = createBrowserRouter([
     }
 ])
 
+
 const rootElement = document.getElementById("root");
+
 if (!rootElement) throw new Error('Failed to find the root element');
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
     <RouterProvider router={router} />

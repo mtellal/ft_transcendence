@@ -184,7 +184,7 @@ export default function Messenger({ item, blocked, invitation, group } : any) {
             <div className="messages-input"
             >
                 <input
-                    className="input"
+                    className="messenger-input"
                     value={value}
                     onChange={handleChange}
                     placeholder={blocked ? "User blocked" : "Write your message"}

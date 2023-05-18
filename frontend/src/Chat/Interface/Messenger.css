@@ -21,15 +21,24 @@
     align-items: center;
     position: sticky;
     bottom: 0;
+    margin-top: 10px;
 }
 
-.input
+.messenger-input
 {
-    padding: 5px 5px;
+    padding: 10px 10px;
     align-items: center;
     font-family: 'inter', sans-serif;
     font-size: 15px;
-    box-shadow: 1px 1px 3px black;
+    box-shadow: 1px 2px 5px black;
+    border-radius: 5px;
+    border: 1px solid grey;
+    width: 70%;
+}
+
+.messenger-input:focus
+{
+    outline: none;
 }
 
 .message-div

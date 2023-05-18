@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const back = process.env.REACT_APP_BACK;
+
 /*
     ask to login a user and 
     return a http response 
@@ -7,7 +9,7 @@ import axios from "axios";
 
 export async function signinRequest(username : string, password : string)
 {
-    return (axios.post(`${process.env.REACT_APP_BACK}/auth/signin`, {
+    return (axios.post(`${back}/auth/signin`, {
             username, 
             password
         })
@@ -23,7 +25,7 @@ export async function signinRequest(username : string, password : string)
 
 export async function signupRequest(username : string, password : string)
 {
-    return (axios.post(`${process.env.REACT_APP_BACK}/auth/signup`, {
+    return (axios.post(`${back}/auth/signup`, {
             username, 
             password
         })
@@ -35,7 +37,7 @@ export async function signupRequest(username : string, password : string)
 export async function getUser(id : number | string)
 {
     return (
-        axios.get(`${process.env.REACT_APP_BACK}/users/${id}`)
+        axios.get(`${back}/users/${id}`)
         .then(res => res)
         .catch(err => err)
     )
@@ -44,7 +46,7 @@ export async function getUser(id : number | string)
 export async function getUserByUsername(username : any )
 {
     return (
-        axios.get(`${process.env.REACT_APP_BACK}/users?username=${username}`)
+        axios.get(`${back}/users?username=${username}`)
         .then(res => res)
         .catch(err => err)
     )
@@ -53,7 +55,7 @@ export async function getUserByUsername(username : any )
 export async function updateUser(user : any, id : number | string)
 {
     return (
-        axios.patch(`${process.env.REACT_APP_BACK}/users/${id}`, {
+        axios.patch(`${back}/users/${id}`, {
             ...user
         })
         .then(res => res)
@@ -66,7 +68,7 @@ export async function updateProfilePicture(image : any , token : string)
     const formData = new FormData();
     formData.append('file', image);
     return (
-        axios.post(`${process.env.REACT_APP_BACK}/users/upload`, formData, {
+        axios.post(`${back}/users/upload`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data', 
                 'Authorization': `Bearer ${token}`
@@ -81,7 +83,7 @@ export async function updateProfilePicture(image : any , token : string)
 export async function getUserProfilePictrue(id : number | string)
 {
     return (
-        axios.get(`${process.env.REACT_APP_BACK}/users/${id}/profileImage`, {
+        axios.get(`${back}/users/${id}/profileImage`, {
             responseType:'arraybuffer'
         })
         .then(res => res)
@@ -94,7 +96,7 @@ export async function getUserProfilePictrue(id : number | string)
 export async function getFriendList(id :  number | string)
 {
     return (
-        axios.get(`${process.env.REACT_APP_BACK}/users/${id}/friends`)
+        axios.get(`${back}/users/${id}/friends`)
         .then(res => res)
         .catch(err => err)
     )
@@ -113,7 +115,7 @@ export async function getUserFriends(friendIDs :  any)
 export async function addUserFriend(id : number | string, friendId : number | string)
 {
     return (
-        axios.post(`${process.env.REACT_APP_BACK}/users/friend`, {
+        axios.post(`${back}/users/friend`, {
             id,
             friendId
         })
@@ -130,7 +132,7 @@ export async function addUserFriend(id : number | string, friendId : number | st
 export async function removeUserFriend(id : number | string, friendId : number | string)
 {
     return (
-        axios.delete(`${process.env.REACT_APP_BACK}/users/friend`, 
+        axios.delete(`${back}/users/friend`, 
         {
             data: {
                 id,
@@ -150,7 +152,28 @@ export async function removeUserFriend(id : number | string, friendId : number |
 export async function getChats()
 {
     return (
-        axios.get(`${process.env.REACT_APP_BACK}/chats`)
+        axios.get(`${back}/chats`)
+        .then(res => res)
+        .catch(err => err)
+    )
+}
+
+
+
+export async function getChannelByIDs(id : string | number, friendId : string | number)
+{
+    return (
+        axios.get(`${back}/users/whispers?id=${id}&friendId=${friendId}`)
+        .then(res => res)
+        .catch(err => err)
+    )
+}
+
+
+export async function getMessages(channelId : string | number)
+{
+    return (
+        axios.get(`${back}/chat/${channelId}/messages`)
         .then(res => res)
         .catch(err => err)
     )
