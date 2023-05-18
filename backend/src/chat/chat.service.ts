@@ -125,6 +125,21 @@ export class ChatService {
     }
   }
 
+  async addUsertoChannel(channel: Channel, newUser: User) {
+    await this.prisma.user.update({
+      where: {id: newUser.id},
+      data: {
+        channelList: {push: channel.id}
+      }
+    })
+    return await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        members: {push: newUser.id}
+      }
+    })
+  }
+
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
     let newOwner: number;

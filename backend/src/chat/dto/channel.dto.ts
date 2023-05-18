@@ -42,6 +42,14 @@ export class JoinChannelDto {
   password: string
 }
 
+export class AddUserDto {
+  @IsNumber()
+  channelId: number
+
+  @IsNumber()
+  userId: number
+}
+
 export class LeaveChannelDto {
   @IsNumber()
   channelId: number

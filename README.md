@@ -48,5 +48,15 @@
 - [Real-time chat with WebSockets](https://wanago.io/2021/01/25/api-nestjs-chat-websockets/)
 - [Socket.io JWT](https://www.npmjs.com/package/socketio-jwt)
 
+## Sockets:
+
+### Events
+
+#### Backend
+
+- The backend listens to these events: 'message', 'createChannel', 'joinChannel', 'leaveChannel'
+I added an 'addedtoChannel' event that will be emited to a user that has been newly added to a channel. Let me know if it is useful or not to allow the list of channels of a user to be updated.
+Check the dtos in backend/src/chat/dto to see what the server is expecting to receive
+
 <hr/>
 
