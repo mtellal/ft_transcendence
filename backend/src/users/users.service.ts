@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, FriendRequestDto, FriendshipDto } from './dto/create-user.dto';
+import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { ChannelType, User } from '@prisma/client';
+import { ChannelType, FriendRequest, User } from '@prisma/client';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +44,72 @@ export class UsersService {
     })
   }
 
+  async checkFriendRequest(senderId: number, receiverId: number): Promise<FriendRequest> {
+    return await this.prisma.friendRequest.findFirst({
+      where: {
+        sendBy: senderId,
+        userId: receiverId,
+        status: false,
+      }
+    })
+  }
+
+  async acceptFriendRequest(userId: number, requestId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        friendRequest: true
+      }
+    })
+    console.log(user);
+    const friendRequest = user.friendRequest.find((request) => request.id === requestId)
+    if (!friendRequest) {
+      throw new NotFoundException('Friend request not found');
+    }
+
+    await this.prisma.user.update({
+      where: { id: friendRequest.sendBy },
+      data: {
+        friendList: {
+          push: userId,
+        }
+      }
+    })
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        friendList: {
+          push: friendRequest.sendBy
+        },
+        friendRequest: {
+          delete: [{ id: friendRequest.id }]
+        }
+      },
+    })
+  }
+
+  async deleteFriendRequest(userId: number, requestId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        friendRequest: true
+      }
+    })
+    console.log(user);
+    const friendRequest = user.friendRequest.find((request) => request.id === requestId)
+    if (!friendRequest) {
+      throw new NotFoundException('Friend request not found');
+    }
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        friendRequest: {
+          delete: [{ id: friendRequest.id }]
+        }
+      },
+    })
+  }
+
   async sendFriendRequest(friend: User, user: User) {
     const newRequest = await this.prisma.friendRequest.create({
       data: {
@@ -50,10 +117,29 @@ export class UsersService {
         userId: friend.id,
       }
     })
-    return await this.prisma.user.update({
+    await this.prisma.user.update({
       where: { id: friend.id },
       data: {
         friendRequest: { connect: { id: newRequest.id } }
+      }
+    })
+    return newRequest;
+  }
+
+  async blockUser(user: User, blockedUser: number) {
+    return await this.prisma.user.update({
+      where: {id: user.id},
+      data: {
+        blockedList: {push: blockedUser}
+      }
+    })
+  }
+
+  async unblockUser(user: User, unblockedUser: number) {
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        blockedList: user.blockedList.filter((id) => id != unblockedUser)
       }
     })
   }
@@ -113,6 +199,16 @@ export class UsersService {
   remove(id: number) {
     return this.prisma.user.delete( {
       where : { id },
+    });
+  }
+
+  async deleteImg(filePath: string): Promise<void> {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err);
+        return;
+      }
+      console.log('File deleted successfully');
     });
   }
 }

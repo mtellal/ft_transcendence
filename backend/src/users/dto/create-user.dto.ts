@@ -30,9 +30,9 @@ export class FriendshipDto {
   friendId: number;
 }
 
-export class FriendRequestDto {
+export class UserRequestDto {
   @ApiProperty({description: 'id of the user receiving the friend request', example: '2'})
   @IsNotEmpty()
   @IsNumber()
-  friendId: number
+  id: number
 }
