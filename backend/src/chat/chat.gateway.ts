@@ -144,7 +144,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel)
         throw new NotFoundException('Channel not found');
       console.log(channel);
-      if (client.rooms.has(channel.id.toString()))
+      if (user.channelList.includes(channel.id))
         throw new NotAcceptableException('Client already on the channel');
       this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());
@@ -207,6 +207,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
       socket.join(channel.id.toString());
       this.server.to(socketId).emit('addedtoChannel', {channelId: channel.id});
+      const messages = await this.chatService.getMessage(channel.id);
+      this.server.to(socketId).emit('message', messages);
     }
     catch(error) {
       throw new WsException(error);
