@@ -203,12 +203,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       this.chatService.addUsertoChannel(channel, usertoAdd);
       const socketId = this.connectedUsers.get(usertoAdd.id);
-      const socket = this.server.sockets.sockets.get(socketId);
-      //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
-      socket.join(channel.id.toString());
-      this.server.to(socketId).emit('addedtoChannel', {channelId: channel.id});
-      const messages = await this.chatService.getMessage(channel.id);
-      this.server.to(socketId).emit('message', messages);
+      if (socketId) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
+        socket.join(channel.id.toString());
+        this.server.to(socketId).emit('addedtoChannel', {channelId: channel.id});
+        const messages = await this.chatService.getMessage(channel.id);
+        this.server.to(socketId).emit('message', messages);
+      }
     }
     catch(error) {
       throw new WsException(error);
