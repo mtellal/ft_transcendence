@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -196,10 +196,16 @@ export class UsersService {
     });
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete( {
-      where : { id },
+  async remove(id: number) {
+    let user = await this.prisma.user.findUnique({
+      where: { id: id },
     });
+    if (user)
+      return this.prisma.user.delete( {
+        where : { id },
+      });
+    else
+      throw new ForbiddenException('User doesn\'t exists or has already been deleted');
   }
 
   async deleteImg(filePath: string): Promise<void> {

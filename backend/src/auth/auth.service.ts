@@ -52,11 +52,26 @@ export class AuthService {
 	}
 
 	async oauthLogIn(profile: Profile) {
+		let index = 0;
+		let username = profile.username;
+
 		const user = await this.prisma.user.findUnique({
 			where: { id: parseInt(profile.id) },
 		})
 		if (!user)
 		{
+			let userCheck = await this.prisma.user.findUnique({
+				where: { username: username },
+			})
+			while (userCheck)
+			{
+				index++;
+				username = `${profile.username}${index}`;
+
+				userCheck = await this.prisma.user.findUnique({
+					where: { username: username },
+				})
+			}
 			const password = generator.generate({
 				length: 12, // length of password
 				numbers: true, // include numbers
@@ -71,7 +86,7 @@ export class AuthService {
 			  const newuser = await this.prisma.user.create({
 				  data: {
 					id: parseInt(profile.id),
-					username: profile.username,
+					username: username,
 					password: hash,
 					avatar: './uploads/' + profile.id + '.png',
 				  },
