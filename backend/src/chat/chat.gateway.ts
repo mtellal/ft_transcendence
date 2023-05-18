@@ -252,8 +252,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException('Channel not found');
       if (!user.channelList.includes(channel.id))
         throw new BadRequestException('User is not on the channel');
-      client.leave(channel.id.toString());
       await this.chatService.leave(channel, user);
+      client.leave(channel.id.toString());
     }
     catch(error) {
       throw new WsException(error);
