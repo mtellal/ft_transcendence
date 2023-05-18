@@ -4,6 +4,7 @@
     grid-column: 1 / span 4;
     border-right: 1px solid rgb(0, 0, 0);
     overflow-x: hidden;
+    max-width: 250px;
 }
 
 .sidebar--title

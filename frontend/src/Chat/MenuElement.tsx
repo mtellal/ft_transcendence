@@ -49,20 +49,7 @@ function GroupElement(props : any)
 
 export default function MenuElement({...props})
 {    
-    const [groups, setGroups] = React.useState(props.user.channelList);
-    const [friendsList, setFriendsList] = React.useState(props.friends);
-    const [currentGroup, setCurrentGroup] = React.useState();
-
-    const groupList = groups.map((e : any) => 
-        <GroupElement
-            key={e.id}
-            id={e.id}
-            name={e.name}
-            members={e.members.length}
-            selected={currentGroup === e.id ? true : false}
-            click={(user : any) => props.setCurrentElement(user)}
-        />
-    )
+    const [friendsList, setFriendsList] = React.useState();
 
     React.useEffect(() => {
         if (props.friends)
@@ -87,7 +74,7 @@ export default function MenuElement({...props})
         <div className="menu-container">
             <CollectionElement
                 title="Groups"
-                collection={groupList}
+                collection={null}
                 addClick={props.addGroup}
             />
             <CollectionElement
