@@ -144,7 +144,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel)
         throw new NotFoundException('Channel not found');
       console.log(channel);
-      if (client.rooms.has(channel.id.toString()))
+      if (user.channelList.includes(channel.id))
         throw new NotAcceptableException('Client already on the channel');
       this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());
@@ -203,10 +203,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       this.chatService.addUsertoChannel(channel, usertoAdd);
       const socketId = this.connectedUsers.get(usertoAdd.id);
-      const socket = this.server.sockets.sockets.get(socketId);
-      //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
-      socket.join(channel.id.toString());
-      this.server.to(socketId).emit('addedtoChannel', {channelId: channel.id});
+      if (socketId) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
+        socket.join(channel.id.toString());
+        this.server.to(socketId).emit('addedtoChannel', {channelId: channel.id});
+        const messages = await this.chatService.getMessage(channel.id);
+        this.server.to(socketId).emit('message', messages);
+      }
     }
     catch(error) {
       throw new WsException(error);
@@ -248,8 +252,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException('Channel not found');
       if (!user.channelList.includes(channel.id))
         throw new BadRequestException('User is not on the channel');
-      client.leave(channel.id.toString());
       await this.chatService.leave(channel, user);
+      client.leave(channel.id.toString());
     }
     catch(error) {
       throw new WsException(error);
