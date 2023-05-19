@@ -1,0 +1,16 @@
+.container {
+    width: 100px;
+    height: 125px;
+    margin-left: 10px;
+    position: relative;
+    display: inline-block;
+	font-weight: 900;
+}
+
+.image {
+    height: 100px;
+    border-radius: 50%;
+    display: block;
+    width: 100%;
+    /* opacity: 0.5; */
+}

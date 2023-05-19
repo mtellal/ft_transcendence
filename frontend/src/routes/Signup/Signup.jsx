@@ -16,8 +16,10 @@ export function Signup() {
     async function setDefualtProfilePicture(token, id) {
         const img = await fetch(avatar_default);
         const blob = await img.blob();
-
-        await BackApi.updateProfilePicture(blob, token);
+		// console.log('img', img);
+		// console.log('blob', blob);
+        // await BackApi.updateProfilePicture(img, token, 'file');
+        await BackApi.updateProfilePicture(blob, token, true);
         let rep = await BackApi.getProfilePictureById(id);
         dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
     }

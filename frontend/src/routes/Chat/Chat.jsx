@@ -1,14 +1,17 @@
 import { useSelector } from 'react-redux';
 import { Friends } from '../../components/Friends/Friends';
-import s from './style.module.css'
 import { useEffect, useState } from 'react';
 import { BackApi } from '../../api/back';
 import { AddFriend } from '../../components/AddFriend/AddFriend';
 import { Chatbox } from '../../components/Chatbot/Chatbot';
+import s from './style.module.css'
+import { FriendRequest } from '../../components/FriendRequest/FriendRequest';
 
 export function Chat() {
 
     const [friends, setFriends] = useState([]);
+    const [btnFriendsRequest, setBtnFriendsRequest] = useState(true);
+	const [friendRequest, setFriendRequest] = useState([]);
     const selector = useSelector(store => store.USER.user);
 
     async function getFriends() {
@@ -31,9 +34,15 @@ export function Chat() {
 		setFriends(updatedFriends);
 	}
 
+	async function getFriendRequest() {
+		const response = await BackApi.getFriendRequest(selector.id);
+		setFriendRequest(response.data);
+	}
+
     useEffect(() => {
 		if (selector.id) {
             getFriends();
+			getFriendRequest();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id])
@@ -41,8 +50,10 @@ export function Chat() {
     return (
         <div className={s.container}>
             <div className={s.item}>
+				<button className={s.button} onClick={() => setBtnFriendsRequest(!btnFriendsRequest)}>{btnFriendsRequest ? 'Add Friend' : 'Friend Request'}</button>
                 <AddFriend id={selector.id} addFriend={addFriend} />
-                {friends.length > 0 ? <Friends friends={friends} delFriend={delFriend} /> : `Aucun ami a afficher :(`}
+				{btnFriendsRequest && <FriendRequest listFriendRequest={friendRequest} />}
+                {!btnFriendsRequest && <Friends friends={friends} delFriend={delFriend} />}
 				<Chatbox />
             </div>
         </div>

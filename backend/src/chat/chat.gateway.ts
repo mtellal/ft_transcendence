@@ -144,9 +144,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel)
         throw new NotFoundException('Channel not found');
       console.log(channel);
-      if (user.channelList.includes(channel.id))
-        throw new NotAcceptableException('Client already on the channel');
-      this.chatService.join(dto, channel, user);
+      if (client.rooms.has(channel.id.toString()))
+        throw new NotAcceptableException('Client is already in the room');
+      if (!user.channelList.includes(channel.id))
+        await this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);
       client.emit('message', messages);

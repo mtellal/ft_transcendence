@@ -63,10 +63,8 @@ export class BackApi {
 	}
 
 	static async updateProfilePicture(image, token) {
-
 		const formData = new FormData();
-		formData.append('file', image);
-
+		formData.append('file', image, 'alpaga.jpg');
 		return (
 			axios.post(`${BASE_URL}/users/upload`, formData, {
 				headers: {
@@ -79,7 +77,8 @@ export class BackApi {
 		)
 	}
 
-	static async addFriend(id, idFriend) {
+	// Uniquement pour les tests
+	static async addFriendTest(id, idFriend) {
 		return (
 		  axios.post('http://localhost:3000/users/friend', {
 			id: id,
@@ -93,8 +92,33 @@ export class BackApi {
 		  .then(res => res)
 		  .catch(err => err)
 		);
-	  }
-	  
+	}
+
+	static async sendFriendRequest(idFriend, token) {
+		console.log('idFriend', idFriend);
+		console.log('token', token);
+		return (
+		  axios.post('http://localhost:3000/users/friendRequest', {
+			id: idFriend,
+		  }, {
+			headers: {
+				'Accept': '*/*',
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			}
+		  })
+		  .then(res => res)
+		  .catch(err => err)
+		);
+	}
+
+	static async getFriendRequest(id) {
+		const response = await axios.get(`${BASE_URL}/users/${id}/friendRequest`)
+			.then(rep => rep)
+			.catch(error => error)
+
+		return response;
+	}
 
 	static async getFriendsById(id) {
 		const response = await axios.get(`${BASE_URL}/users/${id}/friends`)

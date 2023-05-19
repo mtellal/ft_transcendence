@@ -6,9 +6,30 @@
 }
 
 .item {
-    width: 850px;
-    height: 670px;
-    background-color: rgba(0,0,0,0.1);
-    border-radius: 50px;
-    text-align: center;
+	display: flex;
+	flex-direction: column;
+	/* flex-wrap: wrap; */
+	width: 850px;
+	height: 670px;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 50px;
+	text-align: center;
+}
+
+.button {
+	/* display: flex; */
+	width: 120px;
+	height: 30px;
+	position: absolute;
+	margin-top: 10px;
+	margin-left: 30px;
+	background-color: rgba(0,0,0,0.1);
+	border: none;
+	border-radius: 50px;
+	cursor: pointer;
+	/* display: flex; */
+
+
+
+	/* background-color: black; */
 }
