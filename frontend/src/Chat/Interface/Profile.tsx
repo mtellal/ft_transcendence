@@ -2,7 +2,7 @@ import React from "react"
 
 import './Profile.css'
 
-export default function Profile({item} : any)
+export default function Profile({element} : any)
 {
     return (
         <div className="flex-column-center profile-interface">

@@ -2,6 +2,8 @@
 import React, { useEffect } from "react";
 
 import './Messenger.css'
+import { getMessages } from "../../utils/User";
+import userEvent from "@testing-library/user-event";
 
 function BlockMessage({ username } : any) {
     return (
@@ -55,14 +57,14 @@ function Message(props : any) {
     function addStyle() {
         let obj;
 
-        if (props.author === "me")
+        if (props.author === props.userId)
             obj = { backgroundColor: '#FFF5DD' };
         return (obj);
     }
 
     return (
         <div className="message-div"
-            style={props.author === "me" ? { justifyContent: 'right' } : {}}
+            style={props.author === props.userId ? { justifyContent: 'right' } : {}}
         >
             <div className="message-infos">
                <p className="message"
@@ -82,12 +84,36 @@ function Message(props : any) {
 }
 
 
-export default function Messenger({ item, blocked, invitation, group } : any) {
+export default function Messenger({ user, element, channel, socket, blocked, invitation, group } : any) {
 
     const lastMessageRef : any = React.useRef(null);
     const [value, setValue] = React.useState("");
     const [render, setRender] = React.useState(false);
     const [messages, setMessages] : [any, any]= React.useState([]);
+
+    async function loadMessages()
+    {
+        console.log(channel)
+        const messagesRes = await getMessages(channel.id);
+        if (messagesRes.status === 200 && messagesRes.statusText === "OK")
+        {
+            console.log("MESSAGES EXISTS => ", messagesRes.data);
+            setMessages(messagesRes.data);
+        }
+        else
+        {
+            console.log("NO MESSAGES");
+        }
+
+        socket.on('message', (e:any) => console.log(e));
+    }
+
+    React.useEffect(() => {
+        if (channel)
+            loadMessages();
+    }, [channel])
+
+
 
     function pushMessage(message : any) {
         let newMessage = {
@@ -103,7 +129,6 @@ export default function Messenger({ item, blocked, invitation, group } : any) {
         else {
             setMessages([newMessage])
         }
-        item.conversation.push(newMessage);
     }
 
     function handleChange(e : any) {
@@ -120,65 +145,56 @@ export default function Messenger({ item, blocked, invitation, group } : any) {
 
     function sendMessage(e : any) {
         if (e.key === "Enter" && value !== "" && !blocked) {
-            newTextMessage();
+            socket.emit('message', {
+                channelId: channel.id, 
+                content: value
+            })
+            //newTextMessage();
             setValue("")
             setRender(prev => !prev);
         }
     }
 
+    console.log(user)
 
     function renderMessages() {
         return (
-            item.conversation.map((m: any) => {
-                if (m.type && m.type === "invitation") {
-                    return (
-                        <GameInvitation
-                            key={m.id}
-                            id={m.id}
-                            author={m.author}
-                            to={m.to}
-                            status={m.status}
-                        />
-                    )
-                }
-                else {
-                    return (
-                        <Message
-                            key={m.id}
-                            id={m.id}
-                            message={m.message}
-                            author={m.author}
-                            group={group}
-                            administrators={item.administrators}
-                        />
-                    )
-                }
-            })
-        )
+            messages.map((m : any) => 
+                <Message
+                    key={m.id}
+                    id={m.id}
+                    message={m.content}
+                    author={m.sendBy}
+                    userId={user.id}
+                    group={null}
+                    administrators={null}
+                />
+            )
+        );
     }
 
 
-    React.useEffect(() => {
+    /* React.useEffect(() => {
         if (item.conversation)
             setMessages(item.conversation);
         else
             setMessages([]);
         setValue("");
-    }, [item])
+    }, [element]) */
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
-    }, [render, item, blocked, invitation])
+    }, [render, element, blocked, invitation])
 
 
     return (
         <>
             <div className="messages-display">
                 {
-                    item.conversation.length ?
+                    messages.length ?
                         renderMessages() : <NoMessages />
                 }
-                {blocked && <BlockMessage username={item.username || item.name} />}
+                {blocked && <BlockMessage username={element.username || element.name} />}
                 <div ref={lastMessageRef}></div>
             </div>
             <div className="messages-input"

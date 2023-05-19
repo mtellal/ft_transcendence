@@ -2,7 +2,12 @@ import React from "react";
 
 import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
-import { getChannelByIDs, getFriendList, getMessages, getUserFriends, removeUserFriend } from "../utils/User";
+import { 
+    getChannelByIDs, 
+    getFriendList, 
+    getMessages, 
+    removeUserFriend 
+} from "../utils/User";
 
 import { io } from 'socket.io-client';
 
@@ -91,36 +96,6 @@ export default function Chat()
     async function elementSelected(element : any)
     {
         setCurrentElement(element);
-
-        const channelRes = await getChannelByIDs(user.id, element.id);
-
-        if (channelRes.status === 200 && channelRes.statusText === "OK")
-        {
-            console.log("CHANNEL EXISTS ", channelRes.data);
-
-            const messagesRes = await getMessages(channelRes.data.id);
-
-            if (messagesRes.status === 200 && messagesRes.statusText === "OK")
-            {
-                console.log("MESSAGES EXISTS")
-                console.log(messagesRes.data);
-            }
-            else
-            {
-                console.log("NO MESSAGES")
-            }
-        }
-        else
-        {    
-            socket.emit('createChannel', {
-                name: "privateMessage", 
-                type: "WHISPER", 
-                memberList: [element.id]
-            })
-            socket.on('createChannel', (e :any)  => console.log("CHANNEL CREATED ", e))
-            console.log("CHANNEL CREATED")
-        }
-
     }
 
 
