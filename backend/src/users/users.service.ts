@@ -14,16 +14,16 @@ export class UsersService {
     return this.prisma.user.create({ data: createUserDto });
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  async findAll() {
+    return await this.prisma.user.findMany();
   }
 
   async findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return await this.prisma.user.findUnique({ where: { id } });
   }
 
   async findbyUsername(username: string) {
-    return this.prisma.user.findUnique({where: {username}})
+    return await this.prisma.user.findUnique({where: {username}})
   }
 
   async getFriends(friendIds: number[]) {
@@ -146,7 +146,7 @@ export class UsersService {
 
   async addFriend(id: number, friendId: number)
   {
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data: { friendList: {push: friendId}}
     })
@@ -154,9 +154,9 @@ export class UsersService {
 
   async removeFriend(id: number, friendId: number)
   {
-    const user = this.prisma.user.findUnique({where: {id}});
-    const newFriendlist = (await user).friendList.filter(id => id !== friendId);
-    return this.prisma.user.update({
+    const user = await this.prisma.user.findUnique({where: {id}});
+    const newFriendlist = user.friendList.filter(id => id !== friendId);
+    return await this.prisma.user.update({
       where: {id},
       data: {friendList: newFriendlist},
     });
