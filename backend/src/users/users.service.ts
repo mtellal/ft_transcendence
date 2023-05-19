@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { ChannelType, FriendRequest, User } from '@prisma/client';
+import { Prisma, ChannelType, FriendRequest, User } from '@prisma/client';
 import * as fs from 'fs';
 
 @Injectable()
@@ -190,16 +190,30 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password)
       updateUserDto.password = await argon.hash(updateUserDto.password);
-    return this.prisma.user.update( {
-      where : { id },
-      data: updateUserDto,
-    });
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    }
+    catch (PrismaClientKnownRequestError) {
+      if (PrismaClientKnownRequestError.code === 'P2002') {
+        throw new ForbiddenException('Username is already taken');
+      }
+      throw new ForbiddenException(PrismaClientKnownRequestError);
+    }
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete( {
-      where : { id },
+  async remove(id: number) {
+    let user = await this.prisma.user.findUnique({
+      where: { id: id },
     });
+    if (user)
+      return this.prisma.user.delete( {
+        where : { id },
+      });
+    else
+      throw new ForbiddenException('User doesn\'t exists or has already been deleted');
   }
 
   async deleteImg(filePath: string): Promise<void> {
