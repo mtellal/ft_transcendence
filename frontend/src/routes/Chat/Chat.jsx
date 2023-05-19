@@ -19,7 +19,7 @@ export function Chat() {
 
         if (response.status === 200) {
             if (response.data.length > 0) {
-                setFriends(response.data);
+				setFriends(response.data);
             }
         }
     }
@@ -37,6 +37,7 @@ export function Chat() {
 	async function getFriendRequest() {
 		const response = await BackApi.getFriendRequest(selector.id);
 		setFriendRequest(response.data);
+		console.log('API call Friend request')
 	}
 
     useEffect(() => {
@@ -50,9 +51,9 @@ export function Chat() {
     return (
         <div className={s.container}>
             <div className={s.item}>
-				<button className={s.button} onClick={() => setBtnFriendsRequest(!btnFriendsRequest)}>{btnFriendsRequest ? 'Add Friend' : 'Friend Request'}</button>
+				<button className={s.button} onClick={() => setBtnFriendsRequest(!btnFriendsRequest)}>{btnFriendsRequest ? 'List Friends' : 'Friend Request'}</button>
                 <AddFriend id={selector.id} addFriend={addFriend} />
-				{btnFriendsRequest && <FriendRequest listFriendRequest={friendRequest} />}
+				{btnFriendsRequest && friendRequest.length > 0 && <FriendRequest listFriendRequest={friendRequest} />}
                 {!btnFriendsRequest && <Friends friends={friends} delFriend={delFriend} />}
 				<Chatbox />
             </div>

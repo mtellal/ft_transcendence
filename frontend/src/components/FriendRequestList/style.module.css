@@ -14,3 +14,21 @@
     width: 100%;
     /* opacity: 0.5; */
 }
+
+.cross {
+	height: 15px;
+	width: 15px;
+	position: absolute;
+	top: 80px;
+	left: 58px;
+	cursor: pointer;
+}
+
+.check {
+	height: 25px;
+	width: 20px;
+	position: absolute;
+	top: 75px;
+	left: 22px;
+	cursor: pointer;
+}

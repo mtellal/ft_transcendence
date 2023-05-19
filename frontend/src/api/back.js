@@ -54,8 +54,8 @@ export class BackApi {
 
 	static async getProfilePictureById(id) {
 		const response = await axios.get(`${BASE_URL}/users/${id}/profileImage`, {
-            responseType:'arraybuffer'
-        })
+			responseType:'arraybuffer'
+		})
 		.then (rep => rep)
 		.catch (error => error)
 
@@ -80,7 +80,7 @@ export class BackApi {
 	// Uniquement pour les tests
 	static async addFriendTest(id, idFriend) {
 		return (
-		  axios.post('http://localhost:3000/users/friend', {
+		  axios.post(`${BASE_URL}/users/friend`, {
 			id: id,
 			friendId: idFriend
 		  }, {
@@ -95,15 +95,39 @@ export class BackApi {
 	}
 
 	static async sendFriendRequest(idFriend, token) {
-		console.log('idFriend', idFriend);
-		console.log('token', token);
 		return (
-		  axios.post('http://localhost:3000/users/friendRequest', {
+		  axios.post(`${BASE_URL}/users/friendRequest`, {
 			id: idFriend,
 		  }, {
 			headers: {
 				'Accept': '*/*',
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			}
+		  })
+		  .then(res => res)
+		  .catch(err => err)
+		);
+	}
+
+	static async acceptFriendRequest(requestId, token) {
+		return (
+		  axios.post(`${BASE_URL}/users/friendRequest/${requestId}`, '', {
+			headers: {
+				'Accept': '*/*',
+				'Authorization': `Bearer ${token}`
+			}
+		  })
+		  .then(res => res)
+		  .catch(err => err)
+		);
+	}
+
+	static async removeFriendRequest(requestId, token) {
+		return (
+		  axios.delete(`${BASE_URL}/users/friendRequest/${requestId}`, {
+			headers: {
+				'Accept': '*/*',
 				'Authorization': `Bearer ${token}`
 			}
 		  })
