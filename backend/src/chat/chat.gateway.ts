@@ -314,12 +314,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (socket.rooms.has(channel.id.toString()))
           socket.leave(channel.id.toString());
       }
-      let kickMessage = `${usertoKick.username} was kicked by ${user.username}`;
+      let kickMessage = `${usertoKick.username} was kicked by ${user.username}.`;
       if (dto.reason)
         kickMessage += ` Reason: ${dto.reason}`;
       const message: MessageDto = {
         channelId: channel.id,
-        type: 'NOTIF',
+        type: MessageType.NOTIF,
         content: kickMessage
       }
       await this.chatService.createNotif(message);
