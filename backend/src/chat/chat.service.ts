@@ -38,6 +38,22 @@ export class ChatService {
     return message;
   }
 
+  async createNotif(messageDto: MessageDto) {
+    const message = await this.prisma.message.create({
+      data: {
+        channelId: messageDto.channelId,
+        type: messageDto.type,
+        content: messageDto.content
+      }
+    })
+    await this.prisma.channel.update({
+      where: {id: messageDto.channelId},
+      data: {
+        messages: { connect: {id: message.id}}
+      }
+    })
+  }
+
   async getMessage(channelId: number): Promise<Message[]> {
     const messages = await this.prisma.message.findMany({
       where: { channelId: channelId},
@@ -136,6 +152,26 @@ export class ChatService {
     })
   }
 
+  async kickUserfromChannel(channel: Channel, usertoKick: User) {
+    await this.prisma.user.update({
+      where: {id: usertoKick.id},
+      data: {
+        channelList: usertoKick.channelList.filter((num) => num !== channel.id)
+      }
+    })
+    const updatedMember = channel.members.filter((id) => id !== usertoKick.id);
+    let updatedAdmin = channel.administrators;
+    if (channel.administrators.includes(usertoKick.id))
+      updatedAdmin = channel.administrators.filter((id) => id !== usertoKick.id);
+    await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        administrators: updatedAdmin,
+        members: updatedMember
+      }
+    })
+  }
+
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
     let newOwner: number;
@@ -150,6 +186,8 @@ export class ChatService {
       }
     }
     const updatedAdmin = channel.administrators.filter((num) => num != channel.ownerId);
+    if (!updatedAdmin.includes(newOwner))
+      updatedAdmin.push(newOwner);
     const updatedMember = channel.members.filter((num) => num != channel.ownerId);
     if (updatedMember.length === 0) {
       await this.prisma.channel.delete({
