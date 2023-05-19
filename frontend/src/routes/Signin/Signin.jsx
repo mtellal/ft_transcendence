@@ -19,7 +19,7 @@ export function Signin() {
 		const response = await BackApi.authSigninpUser(username, password);
 		if (response.status === 200) {
 			createCookie("access_token", response.data.access_token);
-            const id = parseJwt(response.data.access_token).sub;
+            const id = parseJwt(response.data.access_token).id;
             dispatch(setToken(response.data.access_token));
             const rep = (await BackApi.getUserInfoById(id)).data;
             dispatch(saveInfoUser(rep));

@@ -63,8 +63,9 @@ export class BackApi {
 	}
 
 	static async updateProfilePicture(image, token) {
+
 		const formData = new FormData();
-		formData.append('file', image, 'avatar.jpg');
+		formData.append('file', image);
 
 		return (
 			axios.post(`${BASE_URL}/users/upload`, formData, {

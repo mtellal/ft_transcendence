@@ -32,7 +32,7 @@ export function Profile() {
         dispatch(setAvatar(reader.result));
       };
 
-      await BackApi.updateProfilePicture(file, selector.token);
+      await BackApi.updateProfilePicture(e.target.files[0], selector.token);
   }
 
     return (

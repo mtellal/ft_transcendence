@@ -14,7 +14,7 @@ export function App() {
     const navigate = useNavigate();
 
     async function saveInfosUser(token) {
-        const id = parseJwt(token).sub;
+        const id = parseJwt(token).id;
         dispatch(setToken(token));
         const rep = (await BackApi.getUserInfoById(id)).data;
         dispatch(saveInfoUser(rep));

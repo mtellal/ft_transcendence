@@ -5,6 +5,11 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../prisma/prisma.service";
+import { Profile } from 'passport-42';
+import * as generator from 'generate-password';
+import axios from 'axios';
+import { join } from 'path';
+import { createWriteStream } from 'fs';
 
 
 @Injectable()
@@ -23,7 +28,7 @@ export class AuthService {
 					password: hash,
 				},
 			});
-			return this.signToken(user.id, user.email);
+			return this.signToken(user.id, user.username);
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -46,9 +51,63 @@ export class AuthService {
 		return this.signToken(user.id, user.username);
 	}
 
+	async oauthLogIn(profile: Profile) {
+		let index = 0;
+		let username = profile.username;
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: parseInt(profile.id) },
+		})
+		if (!user)
+		{
+			let userCheck = await this.prisma.user.findUnique({
+				where: { username: username },
+			})
+			while (userCheck)
+			{
+				index++;
+				username = `${profile.username}${index}`;
+
+				userCheck = await this.prisma.user.findUnique({
+					where: { username: username },
+				})
+			}
+			const password = generator.generate({
+				length: 12, // length of password
+				numbers: true, // include numbers
+				symbols: true, // include symbols
+				uppercase: true, // include uppercase letters
+				excludeSimilarCharacters: true // exclude similar characters
+			  });
+			const hash = await argon.hash(password);
+			console.log(profile);
+			this.download42Pic(profile._json.image.link, profile.id + '.png');
+			try {
+			  const newuser = await this.prisma.user.create({
+				  data: {
+					id: parseInt(profile.id),
+					username: username,
+					password: hash,
+					avatar: './uploads/' + profile.id + '.png',
+				  },
+			  });
+			  return this.signToken(newuser.id, newuser.username);
+			}
+			catch (error) {
+			  if (error instanceof PrismaClientKnownRequestError) {
+				  if (error.code === 'P2002')
+					  throw new ForbiddenException('Credentials taken');
+			  }
+			  throw error;
+			}
+		}
+		else
+			return this.signToken(user.id, user.username);
+	}
+	
 	async signToken(userId: number, username: string): Promise< {access_token: string} > {
 		const payload = {
-			sub: userId,
+			id: userId,
 			username,
 		}
 		const secret = this.config.get('JWT_SECRET');
@@ -64,5 +123,18 @@ export class AuthService {
 		return {
 			access_token: token,
 		};
+	}
+
+	async download42Pic(url: string, filename: string): Promise<void> {
+		const response = await axios.get(url, { responseType: 'stream'});
+		const path = join('./uploads', filename);
+		const writer = createWriteStream(path);
+
+		response.data.pipe(writer);
+
+		return new Promise((resolve, reject) => {
+			writer.on('finish', resolve);
+			writer.on('error', reject);
+		})
 	}
 }

@@ -27,7 +27,7 @@ export function Signup() {
 		const username = e.target.username.value;
 		const password = e.target.password.value;
 		const response = await BackApi.authSignupUser(username, password);
-        const id = parseJwt(response.data.access_token).sub;
+        const id = parseJwt(response.data.access_token).id;
 		if (response.status === 201) {
 			createCookie("access_token", response.data.access_token);
             setDefualtProfilePicture(response.data.access_token, id);
