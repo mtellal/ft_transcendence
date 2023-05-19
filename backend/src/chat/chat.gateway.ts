@@ -146,6 +146,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(channel);
       if (client.rooms.has(channel.id.toString()))
         throw new NotAcceptableException('Client is already in the room');
+      /* If it's the User first time joining the channel */
       if (!user.channelList.includes(channel.id))
         await this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());

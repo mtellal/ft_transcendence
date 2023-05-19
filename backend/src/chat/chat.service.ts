@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
 import { Channel, User, Message } from '@prisma/client';
@@ -97,32 +97,28 @@ export class ChatService {
   }
 
   async join(dto: JoinChannelDto, channel: Channel, newUser: User) {
-    console.log(newUser);
-    try {
-      if (newUser.channelList.includes(channel.id)) {
-        return ;
-      }
-      if (channel.type === 'PROTECTED') {
-        const pwMatches = await argon.verify(channel.password, dto.password)
-        if (!pwMatches)
-          throw new WsException('Password incorrect');
-      }
-      await this.prisma.user.update({
-        where: { id: newUser.id },
-        data: {
-          channelList: { push: channel.id }
-        }
-      })
-      await this.prisma.channel.update({
-        where: { id: channel.id },
-        data: {
-          members: { push: newUser.id },
-        }
-      })
+    if (newUser.channelList.includes(channel.id)) {
+      return;
     }
-    catch (error) {
-      throw (error);
+    if (channel.type === 'PRIVATE')
+      throw new ForbiddenException('Can only join a private channel if invited');
+    if (channel.type === 'PROTECTED') {
+      const pwMatches = await argon.verify(channel.password, dto.password)
+      if (!pwMatches)
+        throw new ForbiddenException('Password incorrect');
     }
+    await this.prisma.user.update({
+      where: { id: newUser.id },
+      data: {
+        channelList: { push: channel.id }
+      }
+    })
+    await this.prisma.channel.update({
+      where: { id: channel.id },
+      data: {
+        members: { push: newUser.id },
+      }
+    })
   }
 
   async addUsertoChannel(channel: Channel, newUser: User) {
