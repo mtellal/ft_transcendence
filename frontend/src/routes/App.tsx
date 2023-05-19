@@ -19,7 +19,7 @@ export async function loader() {
     const user = await getUser(id);
     if (user.status !== 200 || user.statusText !== "OK")
       console.log("Error: app loader => ", user)
-    
+
     let image = await getUserProfilePictrue(id);
     if (image.status === 200 && image.statusText === "OK")
       image = window.URL.createObjectURL(new Blob([image.data]))
@@ -33,23 +33,22 @@ export async function loader() {
 
 function App() {
 
-  const { user, token, image } : any = useLoaderData();
+  const { user, token, image }: any = useLoaderData();
   const [profilePicture, setProfilePicture] = React.useState(image);
   const [username, setUsername] = React.useState(user && user.username);
 
 
-  function updateHeader(obj : any)
-  {
+  function updateHeader(obj: any) {
     setProfilePicture(obj.profilePicture);
     setUsername(obj.username);
     user.username = obj.username
   }
 
-  function updateHeaderProfilePicture(url : any) {
+  function updateHeaderProfilePicture(url: any) {
     setProfilePicture(url);
   }
 
-  function updateHeaderUsername(username : any) {
+  function updateHeaderUsername(username: any) {
     setUsername(username);
     user.username = username;
   }
@@ -72,7 +71,7 @@ function App() {
       console.log(res)
   }
 
-  React.useEffect(() : any => {
+  React.useEffect((): any => {
     login();
     return (() => logout())
   }, [])

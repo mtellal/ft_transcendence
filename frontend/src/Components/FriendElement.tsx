@@ -114,6 +114,7 @@ export function FriendSearch(props : any)
 
 export default function FriendElement(props : any)
 {    
+    console.log("FRIEND ELEMENT => ", props)
     return (
         <NavLink to={`/chat/friends/${props.username}/${props.id}`}
             className={({isActive}) => 

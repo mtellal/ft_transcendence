@@ -1,8 +1,5 @@
 import React from "react";
 import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
-
-import axios from 'axios';
-
 import { setCookie } from "../../utils/Cookie";
 
 import userImg from '../../assets/icon-login.png'
@@ -10,46 +7,40 @@ import userImg from '../../assets/icon-login.png'
 import './Sign.css'
 
 
-export function ChooseLogin()
-{
+export function ChooseLogin() {
     const navigate = useNavigate();
-
-    async function load()
-    {
-        const res = await fetch("http://localhost:3000/auth/42", {redirect:'follow', mode:'cors'})
-            .then(res => {
-                if (res.redirected)
-                    window.location.href = res.url;
-            })
-            .catch(err => err)
-        console.log(res);
-    }
-
 
     return (
         <div className="flex-column-center chooselogin-button-container">
-            <button 
+            <a
                 className="flex-center button chooselogin-button"
                 onClick={() => navigate("/login/signin")}
             >
                 Signin
-            </button>
+            </a>
 
-            <button
+            <a
                 className="flex-center button chooselogin-button"
-                onClick={() => load()}
+                href={`${process.env.REACT_APP_BACK}/auth/42`}
             >
-                Signin as <img className="chooselogin-img" src="./assets/42_Logo.svg"/>
-            </button>
+                Signin as <img className="chooselogin-img" src="./assets/42_Logo.svg" />
+            </a>
         </div>
     )
 }
 
 
-export async function loader({params} : any)
-{
-    console.log("param => ", params)
-    setCookie("access_token", "")
+export async function loader({ params, request }: any) {
+    let url = request.url.split('token=');
+    if (url.length > 1) {
+        let data = JSON.parse(decodeURI(url[1]));
+        if (data.access_token) {
+            setCookie("access_token", data.access_token);
+            return (redirect("/"));
+        }
+    }
+    else
+        setCookie("access_token", "")
     return ({})
 }
 

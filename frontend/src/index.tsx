@@ -104,7 +104,7 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "login/:token",
+        path: "login:token",
         element: <Login />,
         loader: loginLoader
     }

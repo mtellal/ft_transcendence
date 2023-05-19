@@ -6,9 +6,8 @@ import Profile from "./Profile";
 import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";
 
-import { currentUser } from "../../exampleDatas";
-
 import './Interface.css'
+import { getChannelByIDs, getMessages } from "../../utils/User";
 
 function RemoveFriend(props : any)
 {
@@ -42,9 +41,12 @@ function InterfaceFriend(props : any)
         <>
             {
                 props.profile ? 
-                <Profile item={props.item} /> :
+                <Profile element={props.element} /> :
                 <Messenger 
-                    item={props.item} 
+                    user={props.user}
+                    element={props.element} 
+                    channel={props.channel}
+                    socket={props.socket}
                     blocked={props.blocked} 
                     invitation={props.invitation} 
                     group={null}
@@ -78,31 +80,9 @@ function InterfaceGroup(props : any)
     )
 }
 
-function getFriend(username : string)
-{
-    return (currentUser.friendList.find(friend => friend.username === username));
-}
-
-function getGroup(name : string)
-{
-    return (currentUser.channelList.find(channel => channel.name === name));
-}
-
 export function loader({params} : any)
 {
-    let item;
-    if (params.username)
-        item = getFriend(params.username);
-    else if (params.groupid)
-    {
-        item = getGroup(params.groupid);
-    }
-    return (item);
-}
-
-type IInterfaceProps = {
-    friend: boolean,
-    group: boolean
+    return ({})
 }
 
 /*
@@ -115,42 +95,50 @@ type IInterfaceProps = {
 export default function Interface({friend , group} : any) {
 
     const {id} : any = useParams();
-    const item : any = useLoaderData();
-    const {user, currentElement, friends, removeFriend} : any = useOutletContext();
+    const {
+        user, 
+        currentElement, 
+        friends, 
+        removeFriend, 
+        socket
+    } : any = useOutletContext();
 
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
-    const [blocked, setBlocked] = React.useState(item.blocked);
+    const [blocked, setBlocked] = React.useState(false);
     const [current, setCurrent] = React.useState(currentElement);
     const [removeFriendView, setRemoveFriendView] = React.useState(false);
 
-    function pushMessage(message : any) {
-        let newMessage = {
-            id: item.conversation.length + 1,
-            ...message
+    const [channel, setChannel] = React.useState();
+   
+
+    async function loadCHannel()
+    {
+        const channelRes = await getChannelByIDs(user.id, current.id);
+
+        if (channelRes.status === 200 && channelRes.statusText === "OK")
+        {
+            console.log("CHANNEL EXISTS ", channelRes.data);
+            setChannel(channelRes.data);
         }
-        item.conversation.push(newMessage);
+        else
+        {    
+            socket.emit('createChannel', {
+                name: "privateMessage", 
+                type: "WHISPER", 
+                memberList: [current.id]
+            })
+            socket.on('createChannel', (e :any)  => console.log("CHANNEL CREATED ", e))
+            console.log("CHANNEL CREATED")
+        }
     }
 
-    function newInvitation() {
-        if (!blocked && !profile) {
-            pushMessage({
-                author: "me",
-                type: "invitation",
-                to: item.username || item.name,
-                status: "valid"
-            })
-        }
-        setRender(prev => !prev)
-    }
-    
-    function blockUser() {
-        if (!profile)
-        {
-            setBlocked((prev : boolean)  => !prev);
-            item.blocked = !item.blocked;
-        }
-    }
+
+    React.useEffect(() => {
+       loadCHannel();
+    }, [])
+
+
 
     async function handleRemoveFriend()
     {
@@ -175,41 +163,41 @@ export default function Interface({friend , group} : any) {
     // update current friend selected when he is picked from MenuElement
 
     React.useEffect(() => {
-        setCurrent(currentElement);
+        setBlocked(false);
+        setProfile(false);
         setRemoveFriendView(false);
+        setCurrent(currentElement);
     }, [currentElement])
 
-    //
-    React.useEffect(() => {
-        setBlocked(item.blocked);
-        setProfile(false);
-    }, [item])
 
     return (
         <div className="flex-column relative interface-container">
             <Banner
-                element={current || item}
+                element={current}
                 name={current && current.username}
                 img={current && current.avatar}
                 status={current && current.userStatus}
-                access={item.access}
+                access={current.access}
                 profile={() => toggleProfile()}
-                invitation={() => newInvitation()}
-                block={() => blockUser()}
+                invitation={() => {}}
+                block={() => {}}
                 remove={() => setRemoveFriendView(prev => !prev)}
             />
             {
                 friend ? 
                 <InterfaceFriend 
                     profile={profile} 
-                    item={item} 
+                    element={current} 
                     blocked={blocked} 
                     invitation={render} 
+                    user={user}
+                    channel={channel}
+                    socket={socket}
                 /> :
                 <InterfaceGroup 
                     group={group} 
                     profile={profile} 
-                    item={item} 
+                    item={current} 
                     blocked={blocked} 
                     invitation={render} 
                     user={user}
