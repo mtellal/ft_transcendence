@@ -147,13 +147,13 @@ export class UsersController {
     description: 'Profile image of the User has been succesfully uploaded and its path in the user record updated',
   })
   @UseInterceptors(FileInterceptor('file', storage))
-  uploadfile(@UploadedFile() file, @Request() req) {
+  async uploadfile(@UploadedFile() file, @Request() req) {
     if (!file)
       throw new BadRequestException('No file or empty file');
     const user: User = req.user;
     if (req.user.avatar && path.extname(file.filename) != path.extname(user.avatar))
       this.usersService.deleteImg(req.user.avatar);
-    return this.usersService.update(user.id, {
+    return await this.usersService.update(user.id, {
       avatar: file.path
     })
   }
