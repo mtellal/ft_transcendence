@@ -5,12 +5,17 @@ import check from '../../assets/check.png'
 import s from './style.module.css'
 import { useSelector } from "react-redux";
 
-export function FriendRequestList({ friendId, requestId }) {
+export function FriendRequestList({ friendId, requestId, listFriendRequest, setFriendRequest }) {
 
 	const [infoUser, setInfoUser] = useState();
 	const [avatar, setAvatar] = useState();
 	const [isLoading, setIsLoading] = useState(true);
+	const [onAvatar, setOnAvatar] = useState(false);
 	const selector = useSelector(store => store.USER.user);
+
+	function showActionsFriendRequest() {
+		setOnAvatar(!onAvatar)
+	}
 
 	async function getInfosUser() {
 		const response = await BackApi.getUserInfoById(friendId);
@@ -23,11 +28,19 @@ export function FriendRequestList({ friendId, requestId }) {
 	}
 
 	async function acceptFriendRequest() {
-		const response = await BackApi.acceptFriendRequest(requestId, selector.token)
+		await BackApi.acceptFriendRequest(requestId, selector.token);
+		removeListFriendRequestById(requestId);
 	}
 
 	async function removeFriendRequest() {
-		const response = await BackApi.removeFriendRequest(requestId, selector.token)
+		await BackApi.removeFriendRequest(requestId, selector.token);
+		removeListFriendRequestById(requestId);
+	}
+
+	function removeListFriendRequestById(requestId) {
+		let ret = listFriendRequest.filter(objet => objet['id'] !== requestId);
+		setFriendRequest(ret);
+		console.log('ret', ret);
 	}
 
 	useEffect(() => {
@@ -36,6 +49,7 @@ export function FriendRequestList({ friendId, requestId }) {
 			setIsLoading(false);
 		}
 		fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	console.log('Component FriendRequest LIST');
@@ -47,24 +61,29 @@ export function FriendRequestList({ friendId, requestId }) {
 	}
 
 	return (
-		<div className={s.container}>
+		<div className={s.container} onMouseEnter={showActionsFriendRequest} onMouseLeave={showActionsFriendRequest}>
 			<img
 				className={s.image}
 				src={avatar}
 				alt="profilePicture"
+				style={{opacity: onAvatar ? '0.3' : '1'}}
 			/>
-				<img
+			{ onAvatar && (
+				<div>
+					<img
 					src={check}
 					alt="cross"
 					className={s.check}
 					onClick={acceptFriendRequest}
-				/>
-			<img
-				src={cross}
-				alt="cross"
-				className={s.cross}
-				onClick={removeFriendRequest}
-			/>
+					/>
+					<img
+					src={cross}
+					alt="cross"
+					className={s.cross}
+					onClick={removeFriendRequest}
+					/>
+				</div>
+			)}
 			{infoUser && infoUser.username}
 		</div>
 	);

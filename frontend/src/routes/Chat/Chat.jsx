@@ -10,15 +10,15 @@ import { FriendRequest } from '../../components/FriendRequest/FriendRequest';
 export function Chat() {
 
     const [friends, setFriends] = useState([]);
-    const [btnFriendsRequest, setBtnFriendsRequest] = useState(true);
 	const [friendRequest, setFriendRequest] = useState([]);
+    const [btnFriendsRequest, setBtnFriendsRequest] = useState(true);
     const selector = useSelector(store => store.USER.user);
 
     async function getFriends() {
         const response = await BackApi.getFriendsById(selector.id);
 
         if (response.status === 200) {
-            if (response.data.length > 0) {
+            if (response.data.length > 0 && friends !== response.data) {
 				setFriends(response.data);
             }
         }
@@ -36,25 +36,42 @@ export function Chat() {
 
 	async function getFriendRequest() {
 		const response = await BackApi.getFriendRequest(selector.id);
-		setFriendRequest(response.data);
-		console.log('API call Friend request')
+        if (response.data !== friendRequest) {
+            setFriendRequest(response.data);
+        }
+        console.log('API call Friend request', response.data);
 	}
 
     useEffect(() => {
-		if (selector.id) {
-            getFriends();
-			getFriendRequest();
+        console.log('1');
+        if (selector.id) {
+            const interval = setInterval(() => {
+                console.log('INTERVAL');
+                getFriendRequest();
+            }, 10000)
+            getFriendRequest();
+            return () => {
+                clearInterval(interval);
+            };
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id])
+
+    useEffect(() => {
+        console.log('2');
+        if (selector.id) {
+            getFriends();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selector.id, friendRequest])
 
     return (
         <div className={s.container}>
             <div className={s.item}>
 				<button className={s.button} onClick={() => setBtnFriendsRequest(!btnFriendsRequest)}>{btnFriendsRequest ? 'List Friends' : 'Friend Request'}</button>
                 <AddFriend id={selector.id} addFriend={addFriend} />
-				{btnFriendsRequest && friendRequest.length > 0 && <FriendRequest listFriendRequest={friendRequest} />}
-                {!btnFriendsRequest && <Friends friends={friends} delFriend={delFriend} />}
+				{btnFriendsRequest && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest}/>}
+                {!btnFriendsRequest && friends && <Friends friends={friends} delFriend={delFriend} />}
 				<Chatbox />
             </div>
         </div>
