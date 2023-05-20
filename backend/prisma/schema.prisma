@@ -66,10 +66,17 @@ model Channel {
   createdAt      DateTime    @default(now())
 }
 
+enum MessageType {
+  MESSAGE
+  INVITE
+  NOTIF
+}
+
 model Message {
   id        Int      @id @default(autoincrement())
-  sendBy    Int
+  sendBy    Int?
   content   String
+  type      MessageType @default(MESSAGE)
   Channel   Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int?
   createdAt DateTime @default(now())
