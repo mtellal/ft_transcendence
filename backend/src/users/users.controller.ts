@@ -64,7 +64,7 @@ export class UsersController {
       }
       return (user);
     }
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @Get('whispers')
@@ -147,13 +147,13 @@ export class UsersController {
     description: 'Profile image of the User has been succesfully uploaded and its path in the user record updated',
   })
   @UseInterceptors(FileInterceptor('file', storage))
-  uploadfile(@UploadedFile() file, @Request() req) {
+  async uploadfile(@UploadedFile() file, @Request() req) {
     if (!file)
       throw new BadRequestException('No file or empty file');
     const user: User = req.user;
-    if (path.extname(file.filename) != path.extname(user.avatar))
+    if (req.user.avatar && path.extname(file.filename) != path.extname(user.avatar))
       this.usersService.deleteImg(req.user.avatar);
-    return this.usersService.update(user.id, {
+    return await this.usersService.update(user.id, {
       avatar: file.path
     })
   }
@@ -192,7 +192,7 @@ export class UsersController {
   }
 
   @Post('friend')
-  @ApiOperation({ summary: 'Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
+  @ApiOperation({ summary: 'THIS METHOD IS DEPRECATED: USE FRIENDREQUEST INSTEAD!!! Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
   async addFriend(@Body() friendshipDto: FriendshipDto)
   {
     const user = await this.usersService.findOne(friendshipDto.id);
@@ -304,19 +304,19 @@ export class UsersController {
       throw new NotAcceptableException('Not friends!')
     }
 
-    this.usersService.removeFriend(friendshipDto.id, friendshipDto.friendId);
-    this.usersService.removeFriend(friendshipDto.friendId, friendshipDto.id);
+    await this.usersService.removeFriend(friendshipDto.id, friendshipDto.friendId);
+    await this.usersService.removeFriend(friendshipDto.friendId, friendshipDto.id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update the user, all the fields are optional. Will be protected by JWT in the future'})
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+    return await this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Deletes a user by its id'})
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.usersService.remove(id);
   }
 }

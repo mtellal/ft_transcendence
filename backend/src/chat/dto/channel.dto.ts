@@ -1,9 +1,13 @@
-import { ChannelType } from "@prisma/client"
+import { ChannelType, MessageType } from "@prisma/client"
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class MessageDto {
   @IsNumber()
   channelId: number;
+
+  @IsOptional()
+  @IsEnum(MessageType)
+  type: MessageType;
 
   @IsString()
   @IsNotEmpty()
@@ -48,6 +52,18 @@ export class AddUserDto {
 
   @IsNumber()
   userId: number
+}
+
+export class KickUserDto {
+  @IsNumber()
+  channelId: number
+
+  @IsNumber()
+  userId: number
+
+  @IsString()
+  @IsOptional()
+  reason: string
 }
 
 export class LeaveChannelDto {

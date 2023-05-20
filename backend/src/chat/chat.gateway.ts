@@ -1,10 +1,10 @@
 import { BadRequestException, ForbiddenException, NotAcceptableException, NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
-import { User } from '@prisma/client';
+import { User, MessageType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { AddUserDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
+import { AddUserDto, KickUserDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: '*'}})
@@ -144,9 +144,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel)
         throw new NotFoundException('Channel not found');
       console.log(channel);
-      if (user.channelList.includes(channel.id))
-        throw new NotAcceptableException('Client already on the channel');
-      this.chatService.join(dto, channel, user);
+      if (client.rooms.has(channel.id.toString()))
+        throw new NotAcceptableException('Client is already in the room');
+      /* If it's the User first time joining the channel */
+      if (!user.channelList.includes(channel.id))
+        await this.chatService.join(dto, channel, user);
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);
       client.emit('message', messages);
@@ -259,6 +261,73 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException(error);
     }
     console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
+  }
+
+  @SubscribeMessage('kickUser')
+  async kickfromChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: KickUserDto) {
+    console.log("/////////////////////////////// EVENT KICKFROMCHANNEL ///////////////////////////////")
+
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
+      return ;
+    }
+    try {
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      if (!channel.administrators.includes(user.id))
+        throw new ForbiddenException(`You do not have the permissions on that channel to kick another user`);
+      if (dto.userId === user.id)
+        throw new ForbiddenException(`You can't kick yourself`);
+      const usertoKick = await this.userService.findOne(dto.userId);
+      if (!usertoKick)
+        throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+      if (!usertoKick.channelList.includes(channel.id)) 
+        throw new NotFoundException(`${usertoKick.username} is not on this channel`);
+      if (channel.administrators.includes(usertoKick.id) && channel.ownerId !== user.id)
+        throw new ForbiddenException(`You can't kick another administrator`)
+      await this.chatService.kickUserfromChannel(channel, usertoKick);
+      const socketId = this.connectedUsers.get(usertoKick.id);
+      if (socketId) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        if (socket.rooms.has(channel.id.toString()))
+          socket.leave(channel.id.toString());
+      }
+      let kickMessage = `${usertoKick.username} was kicked by ${user.username}.`;
+      if (dto.reason)
+        kickMessage += ` Reason: ${dto.reason}`;
+      const message: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: kickMessage
+      }
+      await this.chatService.createNotif(message);
+      this.server.to(channel.id.toString()).emit('message', message);
+    }
+    catch(error) {
+      throw new WsException(error)
+    }
   }
 
   async handleConnection(client: Socket) {
