@@ -2,8 +2,11 @@
 import React, { useEffect } from "react";
 
 import './Messenger.css'
-import { getMessages } from "../../utils/User";
+import { getChannelByIDs, getMessages } from "../../utils/User";
 import userEvent from "@testing-library/user-event";
+import { measureMemory } from "vm";
+import { ElementFlags } from "typescript";
+import { currentUser } from "../../exampleDatas";
 
 function BlockMessage({ username } : any) {
     return (
@@ -88,59 +91,46 @@ export default function Messenger({ user, element, channel, socket, blocked, inv
 
     const lastMessageRef : any = React.useRef(null);
     const [value, setValue] = React.useState("");
-    const [render, setRender] = React.useState(false);
-    const [messages, setMessages] : [any, any]= React.useState([]);
+    const [messages, setMessages] : [any, any] = React.useState([]);
 
-    async function loadMessages()
-    {
-        console.log(channel)
-        const messagesRes = await getMessages(channel.id);
-        if (messagesRes.status === 200 && messagesRes.statusText === "OK")
-        {
-            console.log("MESSAGES EXISTS => ", messagesRes.data);
-            setMessages(messagesRes.data);
-        }
-        else
-        {
-            console.log("NO MESSAGES");
-        }
+    React.useEffect(() => {
 
-        socket.on('message', (e:any) => console.log(e));
-    }
+        socket.on('message',(e : any) => {
+            if (e.length)
+            {
+                console.log("array msg");        
+                setMessages([...e])
+            }
+            else if (e.content)
+            {
+                console.log("unique obj mesg")    
+                if (e.channelId === channel.id)
+                setMessages((prev:any) => [...prev, e])
+            }
+        });
+
+        return () => {
+                console.log("messages = []")
+                setMessages([]);
+        }
+    }, [])
+
 
     React.useEffect(() => {
         if (channel)
-            loadMessages();
+        {
+            console.log("join channel ", channel.id)
+            socket.emit('joinChannel', {
+                channelId: channel.id,
+            })
+        }
+        return () => {
+            setMessages([]);
+        }
     }, [channel])
-
-
-
-    function pushMessage(message : any) {
-        let newMessage = {
-            id: messages.length + 1,
-            ...message
-        }
-        if (messages.length) {
-            setMessages((prev: any) => ([
-                ...prev,
-                newMessage
-            ]))
-        }
-        else {
-            setMessages([newMessage])
-        }
-    }
 
     function handleChange(e : any) {
         setValue(e.target.value)
-    }
-
-    function newTextMessage() {
-        pushMessage({
-            type: "text",
-            author: "me",
-            message: value
-        })
     }
 
     function sendMessage(e : any) {
@@ -149,13 +139,9 @@ export default function Messenger({ user, element, channel, socket, blocked, inv
                 channelId: channel.id, 
                 content: value
             })
-            //newTextMessage();
             setValue("")
-            setRender(prev => !prev);
         }
     }
-
-    console.log(user)
 
     function renderMessages() {
         return (
@@ -173,7 +159,6 @@ export default function Messenger({ user, element, channel, socket, blocked, inv
         );
     }
 
-
     /* React.useEffect(() => {
         if (item.conversation)
             setMessages(item.conversation);
@@ -184,7 +169,7 @@ export default function Messenger({ user, element, channel, socket, blocked, inv
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
-    }, [render, element, blocked, invitation])
+    }, [element, blocked, invitation, messages])
 
 
     return (

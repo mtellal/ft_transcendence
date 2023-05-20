@@ -116,6 +116,8 @@ export default function Interface({friend , group} : any) {
     {
         const channelRes = await getChannelByIDs(user.id, current.id);
 
+        console.log(channelRes)
+
         if (channelRes.status === 200 && channelRes.statusText === "OK")
         {
             console.log("CHANNEL EXISTS ", channelRes.data);
@@ -129,14 +131,14 @@ export default function Interface({friend , group} : any) {
                 memberList: [current.id]
             })
             socket.on('createChannel', (e :any)  => console.log("CHANNEL CREATED ", e))
-            console.log("CHANNEL CREATED")
+            console.log("CHANNEL CREATED", channelRes)
         }
     }
 
 
     React.useEffect(() => {
        loadCHannel();
-    }, [])
+    }, [current])
 
 
 
