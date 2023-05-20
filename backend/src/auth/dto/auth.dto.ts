@@ -25,4 +25,8 @@ export class SigninDto {
 	@IsString()
 	@IsNotEmpty()
 	password: string;
+
+	@ApiProperty({description: 'code of the user. Is optional', example: 'test'})
+	@IsString()
+	code?: string;
 }

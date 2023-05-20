@@ -20,17 +20,20 @@ enum Status {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  username      String          @unique
-  password      String
-  email         String?         @unique
-  avatar        String?
-  userStatus    Status          @default(OFFLINE)
-  friendRequest FriendRequest[]
-  friendList    Int[]           @default([])
-  blockedList   Int[]           @default([])
-  channelList   Int[]           @default([])
-  createdAt     DateTime        @default(now())
+  id              Int             @id @default(autoincrement())
+  username        String          @unique
+  password        String
+  email           String?         @unique
+  avatar          String?
+  twoFactorSecret String?
+  twoFactorStatus Boolean         @default(false)
+  twoFactorOtpUrl String?
+  userStatus      Status          @default(OFFLINE)
+  friendRequest   FriendRequest[]
+  friendList      Int[]           @default([])
+  blockedList     Int[]           @default([])
+  channelList     Int[]           @default([])
+  createdAt       DateTime        @default(now())
 }
 
 model FriendRequest {
