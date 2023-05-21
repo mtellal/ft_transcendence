@@ -204,6 +204,10 @@ export class ChatService {
     })
   }
 
+  async makeAdmin(channel: Channel, user: User) {
+
+  }
+
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
     let newOwner: number;

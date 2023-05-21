@@ -482,6 +482,64 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('makeAdmin')
+  async makeAdmin(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+    console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
+      return ;
+    }
+    try {
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      if (channel.ownerId !== user.id)
+        throw new ForbiddenException(`Only the owner can promote another user to admin`);
+      if (dto.userId === user.id)
+        throw new ForbiddenException(`You're already the owner/administrator`);
+      const newAdmin = await this.userService.findOne(dto.userId);
+      if (!newAdmin)
+        throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+      if (!newAdmin.channelList.includes(channel.id)) 
+        throw new NotFoundException(`${newAdmin.username} is not on this channel`);
+      if (channel.administrators.includes(newAdmin.id))
+        throw new ForbiddenException(`${newAdmin.username} is already an administrator`)
+      await this.chatService.makeAdmin(channel, newAdmin);
+      let promoteNotif = `${newAdmin.username} was promoted to administrator by ${user.username}.`;
+      const notif: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: promoteNotif
+      }
+      await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', notif);
+    }
+    catch(error) {
+      throw new WsException(error)
+    }
+  }
+
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
 
