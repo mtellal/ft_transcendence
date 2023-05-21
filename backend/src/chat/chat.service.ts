@@ -174,6 +174,15 @@ export class ChatService {
     })
   }
 
+  async muteUser(channel: Channel, usertoMute: User) {
+    await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        muteList: {push: usertoMute.id}
+      }
+    })
+  }
+
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
     let newOwner: number;

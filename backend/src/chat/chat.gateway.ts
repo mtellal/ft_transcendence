@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io'
 import { User, MessageType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { AddUserDto, KickUserDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
+import { AddUserDto, AdminActionDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: '*'}})
@@ -143,6 +143,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const channel = await this.chatService.findOne(dto.channelId);
       if (!channel)
         throw new NotFoundException('Channel not found');
+      if (channel.banList.includes(user.id)) {
+        throw new ForbiddenException('User was banned from this channel');
+      }
       console.log(channel);
       if (client.rooms.has(channel.id.toString()))
         throw new NotAcceptableException('Client is already in the room');
@@ -216,6 +219,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (usertoAdd.blockedList.includes(user.id)) {
         throw new ForbiddenException(`User has blocked you`);
       }
+      if (channel.banList.includes(usertoAdd.id)) {
+        throw new ForbiddenException(`User was banned from this channel`);
+      }
       this.chatService.addUsertoChannel(channel, usertoAdd);
       const notif: MessageDto = {
         channelId: channel.id,
@@ -284,7 +290,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('kickUser')
-  async kickfromChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: KickUserDto) {
+  async kickfromChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
     console.log("/////////////////////////////// EVENT KICKFROMCHANNEL ///////////////////////////////")
 
     let user: User;
@@ -309,7 +315,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
+      console.log("/////////////////////////////// EVENT KICKUSER ///////////////////////////////")
       return ;
     }
     try {
@@ -344,6 +350,132 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.chatService.createNotif(message);
       this.server.to(channel.id.toString()).emit('message', message);
+    }
+    catch(error) {
+      throw new WsException(error)
+    }
+  }
+
+  @SubscribeMessage('muteUser')
+  async muteUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+    console.log("/////////////////////////////// EVENT MUTEUSER ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT MUTEUSER ///////////////////////////////")
+      return ;
+    }
+    try {
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      if (!channel.administrators.includes(user.id))
+        throw new ForbiddenException(`You do not have the permissions on that channel to mute another user`);
+      if (dto.userId === user.id)
+        throw new ForbiddenException(`You can't mute yourself`);
+      const usertoMute = await this.userService.findOne(dto.userId);
+      if (!usertoMute)
+        throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+      if (!usertoMute.channelList.includes(channel.id)) 
+        throw new NotFoundException(`${usertoMute.username} is not on this channel`);
+      if (channel.administrators.includes(usertoMute.id) && channel.ownerId !== user.id)
+        throw new ForbiddenException(`You can't mute another administrator`)
+      await this.chatService.muteUser(channel, usertoMute);
+      let muteNotif = `${usertoMute.username} was muted by ${user.username}.`;
+      if (dto.reason)
+        muteNotif += ` Reason: ${dto.reason}`;
+      const notif: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: muteNotif
+      }
+      await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', notif);
+    }
+    catch(error) {
+      throw new WsException(error)
+    }
+  }
+
+  @SubscribeMessage('banUser')
+  async banUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+    console.log("/////////////////////////////// EVENT BANUSER ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT BANUSER ///////////////////////////////")
+      return ;
+    }
+    try {
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      if (!channel.administrators.includes(user.id))
+        throw new ForbiddenException(`You do not have the permissions on that channel to ban another user`);
+      if (dto.userId === user.id)
+        throw new ForbiddenException(`You can't ban yourself`);
+      const usertoBan = await this.userService.findOne(dto.userId);
+      if (!usertoBan)
+        throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+      if (!usertoBan.channelList.includes(channel.id)) 
+        throw new NotFoundException(`${usertoBan.username} is not on this channel`);
+      if (channel.administrators.includes(usertoBan.id) && channel.ownerId !== user.id)
+        throw new ForbiddenException(`You can't ban another administrator`)
+      await this.chatService.muteUser(channel, usertoBan);
+      const socketId = this.connectedUsers.get(usertoBan.id);
+      if (socketId) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        if (socket.rooms.has(channel.id.toString()))
+          socket.leave(channel.id.toString());
+      }
+      let banNotif = `${usertoBan.username} was banned by ${user.username}.`;
+      if (dto.reason)
+        banNotif += ` Reason: ${dto.reason}`;
+      const notif: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: banNotif
+      }
+      await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', notif);
     }
     catch(error) {
       throw new WsException(error)

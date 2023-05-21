@@ -54,7 +54,7 @@ export class AddUserDto {
   userId: number
 }
 
-export class KickUserDto {
+export class AdminActionDto {
   @IsNumber()
   channelId: number
 
