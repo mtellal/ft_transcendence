@@ -213,7 +213,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (usertoAdd.channelList.includes(channel.id)) {
         throw new NotAcceptableException(`User already on the channel`);
       }
+      if (usertoAdd.blockedList.includes(user.id)) {
+        throw new ForbiddenException(`User has blocked you`);
+      }
       this.chatService.addUsertoChannel(channel, usertoAdd);
+      const notif: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: `${usertoAdd.username} was added to the channel by ${user.username}`
+      }
+      await this.chatService.createNotif(notif);
       const socketId = this.connectedUsers.get(usertoAdd.id);
       if (socketId) {
         const socket = this.server.sockets.sockets.get(socketId);
