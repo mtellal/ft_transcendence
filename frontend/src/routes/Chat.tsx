@@ -2,19 +2,20 @@ import React from "react";
 
 import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
-import { 
-    getChannelByIDs, 
-    getFriendList, 
-    getMessages, 
-    removeUserFriend 
+import {
+    getChannelByIDs,
+    getFriendList,
+    getMessages,
+    removeUserFriend
 } from "../utils/User";
 
 import { io } from 'socket.io-client';
 
 import './Chat.css'
+import { measureMemory } from "vm";
 
 
-function isEqual(value : any, other : any) {
+function isEqual(value: any, other: any) {
 
     // Get the value type
     var type = Object.prototype.toString.call(value);
@@ -31,7 +32,7 @@ function isEqual(value : any, other : any) {
     if (valueLen !== otherLen) return false;
 
     // Compare two items
-    var compare = function (item1 : any, item2 : any) {
+    var compare = function (item1: any, item2: any) {
 
         // Get the object type
         var itemType = Object.prototype.toString.call(item1);
@@ -76,98 +77,223 @@ function isEqual(value : any, other : any) {
 
 };
 
-export default function Chat()
-{
-    const {user, token} : any = useOutletContext();
-    const [friends, setFriends] : [any, any] = React.useState()
-    const [currentElement, setCurrentElement] : [any, any] = React.useState();
-    const [socket, setSocket] : [any, any] = React.useState();
+export default function Chat() {
 
     const navigate = useNavigate();
+    
+    const { user, token }: any = useOutletContext();
+    const [friends, setFriends]: [any, any] = React.useState()
+    const [currentElement, setCurrentElement]: [any, any] = React.useState();
+    const [socket, setSocket]: [any, any] = React.useState();
 
-    function getData(res : any)
-    {
-        if (res.status === 200 && res.statusText === "OK")
-        {
-            return (res.data)
+    const [conversations, setConversations]: [any, any] = React.useState([]);
+    const [channel, setChannel]: [any, any] = React.useState();
+
+    const [notifications, setNotifications] : [any, any] = React.useState([]);
+
+    console.log("/////////////////////chat rendered/////////////////////")
+
+
+    function newConversation(channel: any) {
+        return (
+            {
+                ...channel,
+                messages: []
+            }
+        )
+    }
+
+    async function loadCHannel() {
+        const channelRes = await getChannelByIDs(user.id, currentElement.id);
+
+        if (channelRes.status === 200 && channelRes.statusText === "OK") {
+            console.log("CHANNEL EXISTS ");
+            setChannel(channelRes.data);
+        }
+        else {
+            socket.emit('createChannel', {
+                name: "privateMessage",
+                type: "WHISPER",
+                memberList: [currentElement.id]
+            })
+            socket.on('createChannel', (e: any) => console.log("CHANNEL CREATED ", e))
+            console.log("CHANNEL CREATED")
         }
     }
 
-    async function elementSelected(element : any)
+
+    React.useEffect(() => {
+        if (currentElement)
+            loadCHannel();
+    }, [currentElement])
+
+
+    React.useEffect(() => {
+        if (channel) {
+            if (!conversations.find((e: any) => e.id === channel.id)) {
+                setConversations((p : any) => [...p, newConversation(channel)])
+            }
+
+            socket.emit('joinChannel', {
+                channelId: channel.id,
+            })
+
+        }
+    }, [socket, channel])
+
+
+    function initMessages(arrayMessages : any)
     {
-        setCurrentElement(element);
+        setConversations((p : any) => 
+            p.map((c : any, i : number) => {
+                if (c.id === arrayMessages[0].channelId)
+                {
+                    c.messages = arrayMessages;
+                }
+                return (c);
+            })
+        )
     }
 
 
-    async function loadFriends()
+    function addMessage(message :any)
     {
-        const friendListRes = await getFriendList(user.id);
-        let friendList = getData(friendListRes);
-        friendList = friendList.sort((a : any, b : any) => a.username > b.username ? 1 : -1)
-        setFriends((prev : any) => isEqual(prev, friendList) ? prev : friendList);
-    }
-
-    function addGroup()
-    {
-        console.log("add group");
-    }
-
-    function updateFriendList(friend : any)
-    {
-        setFriends([...friends, friend]);
-    } 
-
-    async function removeFriend()
-    {
-        const res = await removeUserFriend(user.id, currentElement.id)
-        if (res.status === 200 && res.statusText === "OK")
+        if (message.sendBy !== user.id && message.sendBy !== currentElement.id)
         {
-            setFriends(friends.filter((u : any) => u.id !== currentElement.id))
+            setFriends((p : any) => p.map((f : any) => {
+                if (f.id === message.sendBy)
+                {
+                    if (!f.notifs)
+                        f.notifs = 1;
+                    else
+                        f.notifs += 1;
+                }
+                return (f)
+            }))
+        }
+
+        setConversations((p : any) => 
+        p.map((c : any, i : number) => {
+            if (c.id === message.channelId)
+                c.messages = [...c.messages, message];
+            return (c);
+        })
+    )
+    }
+
+    React.useEffect(() => {
+        if (conversations && socket)
+        {
+            socket.on('message', (m: any) => {
+                if (m.length) {
+                    console.log("[] messages recieved")
+                    initMessages(m)
+                }
+                if (m.content) {
+                    console.log("message recieved, ")
+                    addMessage(m)
+                }
+            });
+        }
+
+        return () => {
+            if (socket)
+                socket.off('message');
+        }
+    }, [conversations, socket, channel])
+
+
+    function sendMessage(channelId : any, content : any)
+    {
+        socket.emit('message', {
+            channelId,
+            content
+        })
+    }
+
+
+
+
+    async function loadFriends() {
+        const friendListRes = await getFriendList(user.id);
+        if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
+            let friendList = friendListRes.data;
+            friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
+            setFriends((prev: any) => isEqual(prev, friendList) ? prev : friendList);
+        }
+    }
+
+    function updateFriendList(friend: any) {
+        setFriends([...friends, friend]);
+    }
+
+    async function removeFriend() {
+        const res = await removeUserFriend(user.id, currentElement.id)
+        if (res.status === 200 && res.statusText === "OK") {
+            setFriends(friends.filter((u: any) => u.id !== currentElement.id))
             navigate("/chat");
         }
     }
 
     React.useEffect(() => {
         loadFriends()
-        const loadFriendsInterval = setInterval(loadFriends, 3000)
+        //const loadFriendsInterval = setInterval(loadFriends, 3000)
 
         let s = io('http://localhost:3000', {
             transports: ['websocket'],
             extraHeaders: {
-                'Authorization':`Bearer ${token}`
+                'Authorization': `Bearer ${token}`
             }
         });
-        
+
         setSocket(s);
 
         return (() => {
-            clearInterval(loadFriendsInterval);
+            //clearInterval(loadFriendsInterval);
             s.disconnect();
         })
 
 
     }, [])
 
+
+    React.useEffect(() => {
+        console.log("conversations updated from CHAT")
+    }, [conversations])
+
+
+    function selectCurrentElement(e : any)
+    {
+        setFriends((p : any) => p.map((f : any) => {
+            if (e.id === f.id && f.notifs)
+                f.notifs = 0;
+            return (f);
+        }));
+        setCurrentElement({...e, notifs: 0});
+    }
+
     return (
         <div className="chat">
             <div className="chat-container">
-               <MenuElement
-                friends={friends}
-                user={user}
-                addGroup={() => addGroup()}
-                setCurrentElement={elementSelected}
-               />
+                <MenuElement
+                    friends={friends}
+                    user={user}
+                    addGroup={() => { }}
+                    setCurrentElement={selectCurrentElement}
+                />
                 <Outlet context={
                     {
-                        user, 
-                        currentElement, 
-                        friends, 
+                        user,
+                        currentElement,
+                        friends,
                         token,
                         removeFriend,
                         updateFriendList,
-                        socket
+                        channel, 
+                        conversations: conversations,
+                        sendMessage
                     }
-                } 
+                }
                 />
             </div>
         </div>
