@@ -73,14 +73,14 @@ export class ChatService {
       for (let i = 0; i < createChannelDto.memberList.length; i++) {
         const user = await this.userService.findOne(createChannelDto.memberList[i]);
         console.log(user);
-        if (user)
+        if (user && !user.blockedList.includes(owner.id))
           userArray.push(createChannelDto.memberList[i]);
       }
     }
     if (createChannelDto.adminList) {
       for (let i = 0; i < createChannelDto.adminList.length; i++) {
         const user = await this.userService.findOne(createChannelDto.adminList[i]);
-        if (user)
+        if (user && !user.blockedList.includes(owner.id))
           adminArray.push(createChannelDto.adminList[i]);
       }
     }
