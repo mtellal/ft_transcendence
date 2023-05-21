@@ -114,7 +114,7 @@ export function FriendSearch(props : any)
 
 export default function FriendElement(props : any)
 {    
-    console.log("FRIEND ELEMENT => ", props)
+    console.log(props)
     return (
         <NavLink to={`/chat/friends/${props.username}/${props.id}`}
             className={({isActive}) => 
@@ -123,6 +123,13 @@ export default function FriendElement(props : any)
             onClick={() => props.click(props)}
         >
             <UserInfos {...props} userAvatar={props.avatar} /> 
+            {
+                props.notifs !== 0 ?
+                <div className='friendelement-notifs'>
+                    <p>{props.notifs > 10 ? "10+" : props.notifs}</p>
+                </div>
+                : null
+            }
         </NavLink>
     )
 }

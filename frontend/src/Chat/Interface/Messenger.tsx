@@ -6,9 +6,9 @@ import { getChannelByIDs, getMessages } from "../../utils/User";
 import userEvent from "@testing-library/user-event";
 import { measureMemory } from "vm";
 import { ElementFlags } from "typescript";
-import { currentUser } from "../../exampleDatas";
+import { useOutlet, useOutletContext } from "react-router-dom";
 
-function BlockMessage({ username } : any) {
+function BlockMessage({ username }: any) {
     return (
         <div className="block">
             <p className="text-block">You have blocked <span className="friend-block">{username}</span></p>
@@ -30,7 +30,7 @@ function NoMessages() {
     style and display an invitation
 */
 
-function GameInvitation(props : any) {
+function GameInvitation(props: any) {
     return (
         <>
             {
@@ -50,11 +50,10 @@ function GameInvitation(props : any) {
     style and display one single message
 */
 
-function Message(props : any) {
+function Message(props: any) {
 
-    function isAdmin()
-    {
-        return (props.administrators.find((username : any) => username === props.author));
+    function isAdmin() {
+        return (props.administrators.find((username: any) => username === props.author));
     }
 
     function addStyle() {
@@ -70,10 +69,10 @@ function Message(props : any) {
             style={props.author === props.userId ? { justifyContent: 'right' } : {}}
         >
             <div className="message-infos">
-               <p className="message"
+                <p className="message"
                     style={addStyle()}
                 >
-                {props.message}
+                    {props.message}
                 </p>
                 {props.group && <p className="message-author">{props.author}</p>}
             </div>
@@ -87,97 +86,58 @@ function Message(props : any) {
 }
 
 
-export default function Messenger({ user, element, channel, socket, blocked, invitation, group } : any) {
+export default function Messenger({
+     user, 
+     conversation,
+     sendMessage,
+     element, 
+     channel, 
+     blocked, 
+     invitation, 
+}: any) {
 
-    const lastMessageRef : any = React.useRef(null);
+    const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");
-    const [messages, setMessages] : [any, any] = React.useState([]);
-
-    React.useEffect(() => {
-
-        socket.on('message',(e : any) => {
-            if (e.length)
-            {
-                console.log("array msg");        
-                setMessages([...e])
-            }
-            else if (e.content)
-            {
-                console.log("unique obj mesg")    
-                if (e.channelId === channel.id)
-                setMessages((prev:any) => [...prev, e])
-            }
-        });
-
-        return () => {
-                console.log("messages = []")
-                setMessages([]);
-        }
-    }, [])
 
 
-    React.useEffect(() => {
-        if (channel)
-        {
-            console.log("join channel ", channel.id)
-            socket.emit('joinChannel', {
-                channelId: channel.id,
-            })
-        }
-        return () => {
-            setMessages([]);
-        }
-    }, [channel])
+    console.log("messenger rendered")
 
-    function handleChange(e : any) {
+    function handleChange(e: any) {
         setValue(e.target.value)
     }
 
-    function sendMessage(e : any) {
+    function submit(e: any) {
         if (e.key === "Enter" && value !== "" && !blocked) {
-            socket.emit('message', {
-                channelId: channel.id, 
-                content: value
-            })
+           sendMessage(conversation.id, value)
             setValue("")
         }
     }
 
-    function renderMessages() {
-        return (
-            messages.map((m : any) => 
-                <Message
-                    key={m.id}
-                    id={m.id}
-                    message={m.content}
-                    author={m.sendBy}
-                    userId={user.id}
-                    group={null}
-                    administrators={null}
-                />
-            )
-        );
-    }
-
-    /* React.useEffect(() => {
-        if (item.conversation)
-            setMessages(item.conversation);
-        else
-            setMessages([]);
-        setValue("");
-    }, [element]) */
+    const renderMessages = conversation ? 
+        conversation.messages.map((m: any) =>
+            <Message
+                key={m.id}
+                id={m.id}
+                message={m.content}
+                author={m.sendBy}
+                userId={user.id}
+                group={null}
+                administrators={null}
+            />
+        ) : null
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
-    }, [element, blocked, invitation, messages])
+    }, [element, blocked, invitation, renderMessages])
+
 
 
     return (
         <>
             <div className="messages-display">
                 {
-                    messages.length ?
-                        renderMessages() : <NoMessages />
+                    renderMessages ?
+                        renderMessages : <NoMessages />
                 }
                 {blocked && <BlockMessage username={element.username || element.name} />}
                 <div ref={lastMessageRef}></div>
@@ -189,7 +149,7 @@ export default function Messenger({ user, element, channel, socket, blocked, inv
                     value={value}
                     onChange={handleChange}
                     placeholder={blocked ? "User blocked" : "Write your message"}
-                    onKeyDown={sendMessage}
+                    onKeyDown={submit}
                     disabled={blocked}
                 />
             </div>

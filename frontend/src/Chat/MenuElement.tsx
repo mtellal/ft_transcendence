@@ -50,10 +50,10 @@ function GroupElement(props : any)
 export default function MenuElement({...props})
 {    
     const [friendsList, setFriendsList] = React.useState();
-
+    
     React.useEffect(() => {
         if (props.friends)
-        {     
+        {   
             setFriendsList(
                 props.friends.map((user : any) => (
                     <FriendElement 
@@ -63,6 +63,7 @@ export default function MenuElement({...props})
                         avatar={user.avatar}
                         userStatus={user.userStatus}
                         click={(user : any) => props.setCurrentElement(user)}
+                        notifs={user.notifs}
                     />
                 ))
             )

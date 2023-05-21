@@ -46,7 +46,6 @@ function InterfaceFriend(props : any)
                     user={props.user}
                     element={props.element} 
                     channel={props.channel}
-                    socket={props.socket}
                     blocked={props.blocked} 
                     invitation={props.invitation} 
                     group={null}
@@ -100,7 +99,9 @@ export default function Interface({friend , group} : any) {
         currentElement, 
         friends, 
         removeFriend, 
-        socket
+        channel,
+        conversations,
+        sendMessage
     } : any = useOutletContext();
 
     const [render, setRender] = React.useState(false);
@@ -108,39 +109,6 @@ export default function Interface({friend , group} : any) {
     const [blocked, setBlocked] = React.useState(false);
     const [current, setCurrent] = React.useState(currentElement);
     const [removeFriendView, setRemoveFriendView] = React.useState(false);
-
-    const [channel, setChannel] = React.useState();
-   
-
-    async function loadCHannel()
-    {
-        const channelRes = await getChannelByIDs(user.id, current.id);
-
-        console.log(channelRes)
-
-        if (channelRes.status === 200 && channelRes.statusText === "OK")
-        {
-            console.log("CHANNEL EXISTS ", channelRes.data);
-            setChannel(channelRes.data);
-        }
-        else
-        {    
-            socket.emit('createChannel', {
-                name: "privateMessage", 
-                type: "WHISPER", 
-                memberList: [current.id]
-            })
-            socket.on('createChannel', (e :any)  => console.log("CHANNEL CREATED ", e))
-            console.log("CHANNEL CREATED", channelRes)
-        }
-    }
-
-
-    React.useEffect(() => {
-       loadCHannel();
-    }, [current])
-
-
 
     async function handleRemoveFriend()
     {
@@ -187,15 +155,22 @@ export default function Interface({friend , group} : any) {
             />
             {
                 friend ? 
-                <InterfaceFriend 
-                    profile={profile} 
-                    element={current} 
-                    blocked={blocked} 
-                    invitation={render} 
-                    user={user}
-                    channel={channel}
-                    socket={socket}
-                /> :
+                    <>
+                        {
+                            profile ? 
+                            <Profile element={current} /> :
+                            <Messenger 
+                                user={user}
+                                element={current} 
+                                conversation={conversations.find((c : any) => c.id === channel.id)}
+                                sendMessage={sendMessage}
+                                blocked={blocked} 
+                                invitation={render} 
+                                group={null}
+                            />
+                        }
+                    </> 
+                    :
                 <InterfaceGroup 
                     group={group} 
                     profile={profile} 
