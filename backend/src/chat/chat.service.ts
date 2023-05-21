@@ -204,8 +204,13 @@ export class ChatService {
     })
   }
 
-  async makeAdmin(channel: Channel, user: User) {
-
+  async makeAdmin(channel: Channel, newAdmin: User) {
+    await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        administrators: {push: newAdmin.id }
+      }
+    })
   }
 
   async leave(channel: Channel, user: User) {
