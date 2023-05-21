@@ -119,6 +119,8 @@ export class ChatService {
     if (channel.type === 'PRIVATE')
       throw new ForbiddenException('Can only join a private channel if invited');
     if (channel.type === 'PROTECTED') {
+      if (!dto.password)
+        throw new ForbiddenException('No password provided');
       const pwMatches = await argon.verify(channel.password, dto.password)
       if (!pwMatches)
         throw new ForbiddenException('Password incorrect');
@@ -185,10 +187,10 @@ export class ChatService {
         }
       }
     }
-    const updatedAdmin = channel.administrators.filter((num) => num != channel.ownerId);
+    const updatedAdmin = channel.administrators.filter((num) => num != user.id);
     if (!updatedAdmin.includes(newOwner))
       updatedAdmin.push(newOwner);
-    const updatedMember = channel.members.filter((num) => num != channel.ownerId);
+    const updatedMember = channel.members.filter((num) => num != user.id);
     if (updatedMember.length === 0) {
       await this.prisma.channel.delete({
         where: {id: channel.id},

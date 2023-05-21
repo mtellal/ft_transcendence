@@ -147,13 +147,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (client.rooms.has(channel.id.toString()))
         throw new NotAcceptableException('Client is already in the room');
       /* If it's the User first time joining the channel */
-      if (!user.channelList.includes(channel.id))
+      if (!user.channelList.includes(channel.id)) {
         await this.chatService.join(dto, channel, user);
+        //First time someone joins a channel
+        const notif: MessageDto = {
+          channelId: channel.id,
+          type: MessageType.NOTIF,
+          content: `${user.username} joined the channel`
+        }
+        await this.chatService.createNotif(notif);
+        this.server.to(channel.id.toString()).emit('message', notif);
+      }
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);
       client.emit('message', messages);
     }
     catch (error) {
+      console.log(error);
       throw new WsException(error);
     }
     console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
@@ -258,6 +268,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.leave(channel.id.toString());
     }
     catch(error) {
+      console.log(error);
       throw new WsException(error);
     }
     console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
