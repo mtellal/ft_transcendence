@@ -183,6 +183,27 @@ export class ChatService {
     })
   }
 
+  async banUser(channel: Channel, usertoBan: User) {
+    await this.prisma.user.update({
+      where: {id: usertoBan.id},
+      data: {
+        channelList: usertoBan.channelList.filter((num) => num !== channel.id)
+      }
+    })
+    const updatedMember = channel.members.filter((id) => id !== usertoBan.id);
+    let updatedAdmin = channel.administrators;
+    if (channel.administrators.includes(usertoBan.id))
+      updatedAdmin = channel.administrators.filter((id) => id !== usertoBan.id);
+    await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        administrators: updatedAdmin,
+        members: updatedMember,
+        banList: {push: usertoBan.id}
+      }
+    })
+  }
+
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
     let newOwner: number;
