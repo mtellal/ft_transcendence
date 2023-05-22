@@ -221,12 +221,28 @@ export default function Chat() {
         }
     }
 
+    /*
+        if a friend exists inside friendList[] then it updates, 
+        else he is added in the array 
+    */
+
     function updateFriendList(friend: any) {
-        setFriends([...friends, friend]);
+        if (friends && friends.find((p : any) => p.length && p.find((u : any) => u.id === friend.id)))
+        {
+            setFriends((p : any) => p.map((u : any) => {
+                if (u.id === friend.id)
+                {
+                    return (friend)
+                }
+                return (u);
+            }))
+        }
+        else
+            setFriends([...friends, friend]);
     }
 
     async function removeFriend() {
-        const res = await removeUserFriend(user.id, currentElement.id)
+        const res = await removeUserFriend(currentElement.id, token)
         if (res.status === 200 && res.statusText === "OK") {
             setFriends(friends.filter((u: any) => u.id !== currentElement.id))
             navigate("/chat");

@@ -129,14 +129,12 @@ export async function addUserFriend(id : number | string, friendId : number | st
     prefer datas in URI
 */
 
-export async function removeUserFriend(id : number | string, friendId : number | string)
+export async function removeUserFriend(friendId : number | string, token : number | string)
 {
     return (
-        axios.delete(`${back}/users/friend`, 
-        {
-            data: {
-                id,
-                friendId
+        axios.delete(`${back}/users/friend/${friendId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
         })
         .then(res => res)
