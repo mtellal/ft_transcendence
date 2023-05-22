@@ -180,7 +180,10 @@ export async function getMessages(channelId : string | number)
 }
 
 
-/*  ///////////     F R I E N D    R E Q U E S T S    ///////////   */
+/////////////////////////////////////////////////////////////////////////
+//                     F R I E N D    R E Q U E S T S                  //
+/////////////////////////////////////////////////////////////////////////
+
 
 export async function getUserInvitations(id : number | string)
 {
@@ -231,3 +234,36 @@ export async function refuseFriendRequest(requestId : number | string, token : n
         .catch(err => err)
     )
 }
+
+/////////////////////////////////////////////////////////////////////////
+//                     B L O C K     R E Q U E S T S                   //
+/////////////////////////////////////////////////////////////////////////
+
+export async function blockUser(id : number | string, token: number | string)
+{
+    return (
+        axios.post(`${back}/users/block`, {
+            id
+        }, {
+            headers: {
+                'Authorization':`Bearer ${token}`
+            }
+        })
+        .then(res =>res)
+        .catch(err => err)
+    )
+}
+
+export async function unblockUser(id : number | string, token: number | string)
+{
+    return (
+        axios.delete(`${back}/users/block/${id}`, {
+            headers: {
+                'Authorization':`Bearer ${token}`
+            }
+        })
+        .then(res =>res)
+        .catch(err => err)
+    )
+}
+

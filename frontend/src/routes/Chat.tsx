@@ -233,8 +233,6 @@ export default function Chat() {
         }
     }
 
-    
-    
     async function loadInvitations()
     {
         const invitationsRes = await getUserInvitations(user.id);
