@@ -203,6 +203,7 @@ export class ChatService {
     })
     if (!mutedUser)
       return ;
+    console.log(mutedUser);
     const currentTime = new Date
     if (mutedUser.duration > currentTime)
       throw new BadRequestException('You have been muted');

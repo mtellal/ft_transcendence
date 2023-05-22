@@ -50,6 +50,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel) {
         throw new NotFoundException('Channel not found');
       }
+      if (!client.rooms.has(channel.id.toString())) {
+        throw new ForbiddenException('User not on that channel');
+      }
       await this.chatService.checkMute(channel, user);
       const message = await this.chatService.createMessage(messageDto, user);
       console.log(message);
