@@ -1,0 +1,104 @@
+.login-page
+{
+    z-index: 2;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.login-form
+{
+    min-height: 300px;
+    width: 200px;
+    background-color: rgb(216, 216, 216);
+    border-radius: 5px;
+    align-items: center;
+    padding: 2vh 2vh;
+    box-shadow: 0 5px 10px black;
+}
+
+
+.chooselogin-button-container
+{
+    margin-top: 10%;
+    height: 200px;
+    width: 100%;
+}
+
+.chooselogin-button
+{
+    margin-top: 10%;
+    height: 40px;
+    min-width: 80%;
+    font-size: medium;
+    font-weight: 500;
+    text-decoration: none;
+    color: black;
+    background-color: white;
+    padding: 0px 0px;
+}
+
+.chooselogin-img
+{
+    height: 80%;
+    padding: 0 5px;
+}
+
+
+.sign--img
+{
+    width: 30%;
+    align-self: center;
+}
+
+
+.sign--button
+{
+    width: 50%;
+    padding: 5%;
+    margin-top: 20px;
+    align-self: center ;
+    background-color: rgb(87, 87, 87);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: medium;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.sign--button:hover
+{
+    box-shadow: 0 2px 4px rgb(0, 0, 0);
+}
+
+.sign--button:active
+{
+    background-color: rgb(163, 163, 163);
+    border: 1px solid black;
+}
+
+.sign--link
+{
+    text-decoration: underline;
+    color: black;
+    padding-top: 1vh;
+}
+
+.login--link:hover
+{
+    cursor: pointer;
+}
+
+.login-iconinput
+{
+    margin-top: 10%;
+    height: 200px;
+    width: 90%;
+}
+
+.login-form-container
+{
+    margin-top: 15%;
+}

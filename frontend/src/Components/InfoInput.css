@@ -1,0 +1,28 @@
+.infoinput-container
+{
+    width: 80%;
+    max-width: 400px;
+    min-height: 80px;
+}
+
+.infoinput-label
+{
+    margin-bottom: 2%;
+}
+
+.infoinput-input
+{
+    height: 2rem;
+    width: 80%;
+    padding: 5px 5px;
+    align-items: center;
+    font-size: medium;
+    font-family: 'inter', sans-serif;
+    border-radius: 5px;
+    border: 1px solid black;
+    box-shadow: 1px 1px 3px black;
+}
+
+.infoinput-input:focus{
+    outline: none;
+}

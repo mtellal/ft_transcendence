@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, IsNumber, IsOptional } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 
 export class CreateUserDto {
 
@@ -19,10 +20,19 @@ export class FriendshipDto {
   @ApiProperty({description: 'id of the first user', example: '1'})
   @IsNotEmpty()
   @IsNumber()
+  @Type(() => Number)
   id: number;
 
   @ApiProperty({description: 'id of the second user', example: '2'})
   @IsNotEmpty()
   @IsNumber()
+  @Type(() => Number)
   friendId: number;
+}
+
+export class UserRequestDto {
+  @ApiProperty({description: 'id of the user receiving the friend request', example: '2'})
+  @IsNotEmpty()
+  @IsNumber()
+  id: number
 }

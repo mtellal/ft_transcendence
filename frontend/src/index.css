@@ -78,6 +78,11 @@ code {
   background-color: white;
 }
 
+.selected
+{
+  background-color: #ECECEC
+}
+
 .white-color
 {
   color: white;

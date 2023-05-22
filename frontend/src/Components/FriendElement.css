@@ -1,0 +1,84 @@
+
+.friend-element
+{
+    height: 60px;
+    padding: 0 2%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgb(112, 112, 112);
+    text-decoration: none;
+    color: black;
+    align-items: center;
+}
+
+.infos-div
+{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.friend-image-container
+{
+    border-radius: 50%;
+    min-width: 40px;
+    height: 40px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.friend-image
+{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    max-width: 40px;
+    max-height: 50px;
+}
+
+.firend-icon-status
+{
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 50%;
+    background-color: rgb(255, 0, 0);
+    align-self: end;
+    position: relative;
+    top: -5px;
+    left: -15px;
+    border: 2px solid rgb(255, 255, 255);
+}
+
+.friend-infos > p
+{
+    margin: 0;
+}
+
+.friend-infos
+{
+    padding-bottom: 5px;
+    justify-content: space-around;
+}
+
+.friend-username
+{
+    font-size: large;
+}
+
+.friend-status
+{
+    display: flex;
+    font-size: small;
+    color: grey;
+}
+
+.friendelement-notifs
+{
+    color: rgb(206, 0, 0);
+    font-size: medium;
+}
