@@ -31,6 +31,8 @@
     "@nestjs/swagger": "^6.3.0",
     "@nestjs/websockets": "^9.4.0",
     "@prisma/client": "^4.13.0",
+    "@types/qrcode": "^1.5.0",
+    "@types/speakeasy": "^2.0.7",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
@@ -38,9 +40,11 @@
     "generate-password": "^1.7.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
+    "qrcode": "^1.5.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.6.1",
+    "speakeasy": "^2.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.4.1",

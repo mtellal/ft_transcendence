@@ -54,12 +54,27 @@ export class AddUserDto {
   userId: number
 }
 
-export class KickUserDto {
+export class AdminActionDto {
   @IsNumber()
   channelId: number
 
   @IsNumber()
   userId: number
+
+  @IsString()
+  @IsOptional()
+  reason: string
+}
+
+export class MuteDto {
+  @IsNumber()
+  channelId: number
+
+  @IsNumber()
+  userId: number
+
+  @IsNumber()
+  duration: number
 
   @IsString()
   @IsOptional()
