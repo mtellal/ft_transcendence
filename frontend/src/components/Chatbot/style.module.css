@@ -20,8 +20,8 @@
 
 .inputBox {
 	height: 10%;
+	display: flex;
 	border-radius: 0 0 20px 20px;
-
 	/* border-top: solid 1px grey; */
 	background-color: rgba(0, 0, 0, 0.1);
 }

@@ -2,7 +2,7 @@ import { FriendRequestList } from "../FriendRequestList/FriendRequestList";
 
 export function FriendRequest({ listFriendRequest, setFriendRequest }) {
 
-	console.log('Component FriendRequest len', listFriendRequest.length);
+	// console.log('Component FriendRequest len', listFriendRequest.length);
 
 	if (listFriendRequest.length === 0) {
 		return (
