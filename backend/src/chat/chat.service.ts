@@ -1,9 +1,8 @@
-import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
+import { AdminActionDto, CreateChannelDto, JoinChannelDto, MessageDto, MuteDto } from './dto/channel.dto';
 import { Channel, User, Message } from '@prisma/client';
 import * as argon from 'argon2';
-import { WsException } from '@nestjs/websockets';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -174,13 +173,44 @@ export class ChatService {
     })
   }
 
-  async muteUser(channel: Channel, usertoMute: User) {
-    await this.prisma.channel.update({
-      where: {id: channel.id},
+  async muteUser(dto: MuteDto, usertoMute: User) {
+    const mutedDuration = new Date();
+    mutedDuration.setSeconds(mutedDuration.getSeconds() + dto.duration);
+    const newMute = await this.prisma.mutedUser.create({
       data: {
-        muteList: {push: usertoMute.id}
+        channelId: dto.channelId,
+        userId: dto.userId,
+        duration: mutedDuration,
       }
     })
+    await this.prisma.channel.update({
+      where: {id: dto.channelId},
+      data: {
+        muteList: {connect: {id: newMute.id}}
+      }
+    })
+  }
+
+  async checkMute (channel: Channel, user: User) {
+    const mutedUser = await this.prisma.mutedUser.findFirst({
+      where: {
+        channelId: channel.id,
+        userId: user.id
+      },
+      orderBy: {
+        duration: 'desc',
+      }
+    })
+    if (!mutedUser)
+      return ;
+    const currentTime = new Date
+    if (mutedUser.duration > currentTime)
+      throw new BadRequestException('You have been muted');
+    if (mutedUser.duration <= currentTime) {
+      await this.prisma.mutedUser.delete({
+        where: {id: mutedUser.id}
+      })
+    }
   }
 
   async banUser(channel: Channel, usertoBan: User) {

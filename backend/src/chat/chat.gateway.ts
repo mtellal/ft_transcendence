@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io'
 import { User, MessageType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { AddUserDto, AdminActionDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto } from './dto/channel.dto';
+import { AddUserDto, AdminActionDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto, MuteDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: '*'}})
@@ -50,6 +50,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel) {
         throw new NotFoundException('Channel not found');
       }
+      await this.chatService.checkMute(channel, user);
       const message = await this.chatService.createMessage(messageDto, user);
       console.log(message);
       this.server.to(channel.id.toString()).emit('message', message);
@@ -357,7 +358,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('muteUser')
-  async muteUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+  async muteUser(@ConnectedSocket() client: Socket, @MessageBody() dto: MuteDto) {
     console.log("/////////////////////////////// EVENT MUTEUSER ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
@@ -399,8 +400,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException(`${usertoMute.username} is not on this channel`);
       if (channel.administrators.includes(usertoMute.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't mute another administrator`)
-      await this.chatService.muteUser(channel, usertoMute);
-      let muteNotif = `${usertoMute.username} was muted by ${user.username}.`;
+      await this.chatService.muteUser(dto, usertoMute);
+      let muteNotif = `${usertoMute.username} was muted by ${user.username} for ${dto.duration}".`;
       if (dto.reason)
         muteNotif += ` Reason: ${dto.reason}`;
       const notif: MessageDto = {

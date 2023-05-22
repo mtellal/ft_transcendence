@@ -66,6 +66,21 @@ export class AdminActionDto {
   reason: string
 }
 
+export class MuteDto {
+  @IsNumber()
+  channelId: number
+
+  @IsNumber()
+  userId: number
+
+  @IsNumber()
+  duration: number
+
+  @IsString()
+  @IsOptional()
+  reason: string
+}
+
 export class LeaveChannelDto {
   @IsNumber()
   channelId: number
