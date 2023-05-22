@@ -36,6 +36,8 @@
     cursor: pointer;
     text-decoration: none;
     color: black;
+    border-radius: 5px;
+    position: relative;
 }
 
 .collection-add:hover
@@ -43,6 +45,17 @@
     background-color: rgb(235, 235, 235);
 }
 
+.collection-element-notif
+{
+    height: 10px;
+    width: 10px;
+    background-color: red;
+    border: 2px solid white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    border-radius: 50%;
+}
 
 /* ///////  GROUP ELEMENT   ////// */
 

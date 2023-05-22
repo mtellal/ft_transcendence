@@ -5,20 +5,33 @@ import { Link, useParams } from "react-router-dom";
 import FriendElement from "../Components/FriendElement";
 import './MenuElement.css'
 
-function CollectionElement(props : any)
+export function CollectionElement(props : any)
 {
     return (
         <div className="collection">
             <div className="collection-label">
                 <h2 className="collection-title">{props.title}</h2>
-                <Link 
-                    to={`/chat/add-${props.title.toLowerCase().slice(0, -1)}`} 
-                    className="collection-add"
-                >
-                    <span className="material-symbols-outlined">
-                        add
-                    </span>
-                </Link>
+                {
+                    props.add ?
+                    <Link 
+                        to={`/chat/add-${props.title.toLowerCase().slice(0, -1)}`} 
+                        className="collection-add"
+                        onClick={props.removeNotif}
+                    >
+                        {
+                            props.notification ?
+                            <div 
+                                className="collection-element-notif" 
+                            >
+
+                            </div> : null
+                        }
+                        <span className="material-symbols-outlined">
+                            groups
+                        </span>
+                    </Link>
+                    : null
+                }
             </div>
             <div className="flex-column">
                 {props.collection}
@@ -77,10 +90,14 @@ export default function MenuElement({...props})
                 title="Groups"
                 collection={null}
                 addClick={props.addGroup}
+                add={true}
             />
             <CollectionElement
                 title="Friends"
                 collection={friendsList}
+                add={true}
+                notification={props.notification}
+                removeNotif={props.removeNotif}
             />
         </div>
     )

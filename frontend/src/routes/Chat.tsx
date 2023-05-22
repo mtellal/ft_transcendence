@@ -6,13 +6,13 @@ import {
     getChannelByIDs,
     getFriendList,
     getMessages,
+    getUserInvitations,
     removeUserFriend
 } from "../utils/User";
 
 import { io } from 'socket.io-client';
 
 import './Chat.css'
-import { measureMemory } from "vm";
 
 
 function isEqual(value: any, other: any) {
@@ -89,10 +89,8 @@ export default function Chat() {
     const [conversations, setConversations]: [any, any] = React.useState([]);
     const [channel, setChannel]: [any, any] = React.useState();
 
-    const [notifications, setNotifications] : [any, any] = React.useState([]);
-
-    console.log("/////////////////////chat rendered/////////////////////")
-
+    const [friendInvitations, setFriendInvitations] : [any, any] = React.useState([]);
+    const [notifInvitation, setNotifInvitation] : [any, any] = React.useState(false);
 
     function newConversation(channel: any) {
         return (
@@ -107,7 +105,6 @@ export default function Chat() {
         const channelRes = await getChannelByIDs(user.id, currentElement.id);
 
         if (channelRes.status === 200 && channelRes.statusText === "OK") {
-            console.log("CHANNEL EXISTS ");
             setChannel(channelRes.data);
         }
         else {
@@ -116,8 +113,6 @@ export default function Chat() {
                 type: "WHISPER",
                 memberList: [currentElement.id]
             })
-            socket.on('createChannel', (e: any) => console.log("CHANNEL CREATED ", e))
-            console.log("CHANNEL CREATED")
         }
     }
 
@@ -186,11 +181,9 @@ export default function Chat() {
         {
             socket.on('message', (m: any) => {
                 if (m.length) {
-                    console.log("[] messages recieved")
                     initMessages(m)
                 }
                 if (m.content) {
-                    console.log("message recieved, ")
                     addMessage(m)
                 }
             });
@@ -212,6 +205,11 @@ export default function Chat() {
     }
 
 
+    function removeFriendRequest(inviteId : any)
+    {
+        setNotifInvitation(false);
+        setFriendInvitations((p : any) => p.filter((i : any) => i.id !== inviteId))
+    }
 
 
     async function loadFriends() {
@@ -235,9 +233,36 @@ export default function Chat() {
         }
     }
 
+    
+    
+    async function loadInvitations()
+    {
+        const invitationsRes = await getUserInvitations(user.id);
+        if (invitationsRes.status === 200 && invitationsRes.statusText === "OK")
+        {
+            if (invitationsRes.data.length)
+            {
+                setFriendInvitations((p : any) => {
+                    if (!isEqual(p, invitationsRes.data))
+                    {
+                        setNotifInvitation(true);
+                        return (invitationsRes.data);
+                    }
+                    return (p);
+                });
+            }
+        }
+    }
+     
+    async function updateDatas()
+    {
+        loadInvitations();
+        loadFriends();
+    }
+
     React.useEffect(() => {
-        loadFriends()
-        //const loadFriendsInterval = setInterval(loadFriends, 3000)
+        updateDatas();
+        const loadFriendsInterval = setInterval(updateDatas, 3000)
 
         let s = io('http://localhost:3000', {
             transports: ['websocket'],
@@ -249,17 +274,12 @@ export default function Chat() {
         setSocket(s);
 
         return (() => {
-            //clearInterval(loadFriendsInterval);
+            clearInterval(loadFriendsInterval);
             s.disconnect();
         })
 
 
     }, [])
-
-
-    React.useEffect(() => {
-        console.log("conversations updated from CHAT")
-    }, [conversations])
 
 
     function selectCurrentElement(e : any)
@@ -280,6 +300,8 @@ export default function Chat() {
                     user={user}
                     addGroup={() => { }}
                     setCurrentElement={selectCurrentElement}
+                    notification={notifInvitation}
+                    removeNotif={() => setNotifInvitation(false)}
                 />
                 <Outlet context={
                     {
@@ -291,7 +313,9 @@ export default function Chat() {
                         updateFriendList,
                         channel, 
                         conversations: conversations,
-                        sendMessage
+                        sendMessage,
+                        friendInvitations,
+                        removeFriendRequest
                     }
                 }
                 />

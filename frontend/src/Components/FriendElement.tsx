@@ -79,7 +79,7 @@ export function UserInfos({id, username, userStatus, userAvatar, ...props} : any
     )
 }
 
-function AddIcon(props : any)
+function Icon(props : any)
 {
     return (
         <div 
@@ -87,7 +87,7 @@ function AddIcon(props : any)
             onClick={props.onClick}
         >
             <span className="material-symbols-outlined">
-                Add
+                {props.icon}
             </span>
         </div>
     )
@@ -96,25 +96,38 @@ function AddIcon(props : any)
 
 export function FriendSearch(props : any)
 {
+    const [invitation, setInvitation] : [any, any] = React.useState(false);
+
     return (
         <div style={{
             boxShadow:'0 1px 3px black',
             borderRadius:'5px',
-            width: '100%', 
+            width: '96%', 
             display:'flex', 
-            padding: '5px 5px',
+            padding: '2% 2%',
             justifyContent:'space-between',
             alignItems:'center'
         }}>
             <UserInfos {...props} userAvatar={props.avatar}/>
-            { props.add && <AddIcon onClick={props.onCLick} /> }
+            { props.add && 
+                !invitation && 
+                    <Icon 
+                        icon="add" 
+                        onClick={() => {props.onCLick(); setInvitation(true)}} 
+                    /> 
+            }
+            { props.invitation && 
+                <>
+                    <Icon icon="done" onClick={props.accept} />
+                    <Icon icon="close" onClick={props.refuse} />
+                </>
+            }
         </div>
     )
 }
 
 export default function FriendElement(props : any)
 {    
-    console.log(props)
     return (
         <NavLink to={`/chat/friends/${props.username}/${props.id}`}
             className={({isActive}) => 

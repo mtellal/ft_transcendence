@@ -1,11 +1,12 @@
 
 import React from "react";
-import { getUserByUsername, addUserFriend, getUser } from '../../utils/User'
+import { getUserByUsername, addUserFriend, getUser, sendFriendRequest, validFriendRequest, refuseFriendRequest } from '../../utils/User'
 import { FriendSearch } from "../../Components/FriendElement";
 
 import IconInput from "../../Components/IconInput";
 import { useOutletContext } from "react-router-dom";
 import './AddElement.css'
+import { CollectionElement } from "../MenuElement";
 
 
 export default function AddElement(props : any)
@@ -15,7 +16,17 @@ export default function AddElement(props : any)
     const [friend, setFriend] : [any, any] = React.useState(null);
     const [error, setError] = React.useState(false);
 
-    const {user, updateFriendList, friends} : any = useOutletContext();
+    const [userInvitations, setUserInvitations] : [any, any] = React.useState([]);
+    const [invitations, setInvitations] : [any, any] = React.useState([]);
+
+    const {
+        user, 
+        updateFriendList, 
+        friends, 
+        token,
+        friendInvitations,
+        removeFriendRequest
+    } : any = useOutletContext();
 
     function validFriend()
     {
@@ -33,7 +44,6 @@ export default function AddElement(props : any)
         {
             setFriend(null);
             setError(true)
-            console.log(res)
         }
     }
 
@@ -57,11 +67,9 @@ export default function AddElement(props : any)
     
     async function addFriend()
     {
-
         if (validFriend())
         {
-            const res = await addUserFriend(user.id, friend.id);
-            updateFriendList(friend);
+            const sendRes = await sendFriendRequest(friend.id, token);
         }
     }
     
@@ -69,6 +77,90 @@ export default function AddElement(props : any)
         const reloadFriendInterval = setInterval(updateFriend, 3000);
         return (() => clearInterval(reloadFriendInterval)); 
     }, [friend])
+
+
+    async function loadUser(id : number | string)
+    {
+        const userRes = await getUser(id);
+        if (userRes.status === 200 && userRes.statusText === "OK")
+        {
+            return (userRes.data);
+        }
+        return (null)
+    }
+
+    async function acceptFriendRequest(u : any)
+    {
+        const invitation = friendInvitations.find((i : any) => i.sendBy === u.id);
+        if (invitation)
+        {
+            const validRes = await validFriendRequest(invitation.id, token);
+            if (validRes.status === 201 && validRes.statusText === "Created")
+            {
+                updateFriendList(u);
+                removeFriendRequest(invitation.id);
+                setUserInvitations((p : any) => p.filter((user : any) => user.id !== u.id))
+            }
+        }
+    }
+
+    async function refuseRequest(u : any)
+    {
+        const invitation = friendInvitations.find((i : any) => i.sendBy === u.id);
+        if (invitation)
+        {
+            const refuseRes = await refuseFriendRequest(invitation.id, token);
+            if (refuseRes.status === 200 && refuseRes.statusText === "OK")
+            {
+                removeFriendRequest(invitation.id);
+                setUserInvitations((p : any) => p.filter((user : any) => user.id !== u.id))
+            }
+        }
+    }
+
+
+    async function loadFriends()
+    {
+        const users = await Promise.all(friendInvitations.map(async (u : any) =>
+            await loadUser(u.sendBy)
+        ))
+        setUserInvitations(users);
+    } 
+
+    React.useEffect(() => {
+
+        if (friendInvitations && friendInvitations.length)
+        {
+            loadFriends();
+        }
+        else
+        {
+            setInvitations([]);
+            setUserInvitations([]);
+        }
+    }, [friendInvitations])
+
+
+    React.useEffect(() => {
+        if (userInvitations && userInvitations.length)
+        {
+            setInvitations(userInvitations.map((u : any) => 
+                <FriendSearch
+                    key={u.id}
+                    id={u.id}
+                    username={u.username}
+                    avatar={u.avatar}
+                    userStatus={u.userStatus}
+                    invitation={true}
+                    accept={() => acceptFriendRequest(u)}
+                    refuse={() => refuseRequest(u)}
+                />
+            ))
+        }
+        else
+            setInvitations([]);
+    }, [userInvitations])
+
 
     return (
         <div className="add-container">
@@ -91,7 +183,7 @@ export default function AddElement(props : any)
                             userStatus={friend.userStatus}
                             onCLick={() => addFriend()}
                             add={validFriend()}
-                            />
+                        />
                     </div>
                         : null
                 }
@@ -104,6 +196,18 @@ export default function AddElement(props : any)
                 >
                     Search
                 </button>
+                {
+                    userInvitations.length ?
+                        <div className="add-element-invitations">
+                            <CollectionElement
+                                title="Invitations"
+                                collection={invitations}
+                                addClick={props.addGroup}
+                            />
+                        </div> 
+                    : 
+                        null
+                }
             </div>
         </div>
     )
