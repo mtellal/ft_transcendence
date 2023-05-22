@@ -7,7 +7,6 @@ import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
-import { getChannelByIDs, getMessages } from "../../utils/User";
 
 function RemoveFriend(props : any)
 {
@@ -109,6 +108,9 @@ export default function Interface({friend , group} : any) {
     const [blocked, setBlocked] = React.useState(false);
     const [current, setCurrent] = React.useState(currentElement);
     const [removeFriendView, setRemoveFriendView] = React.useState(false);
+    const [blockedList, setBlockedList] : [any, any] = React.useState([]);
+
+    console.log(blockedList, currentElement.id, blocked)
 
     async function handleRemoveFriend()
     {
@@ -120,6 +122,32 @@ export default function Interface({friend , group} : any) {
         setProfile(prev => !prev);
     }
 
+    function blockFriend()
+    {
+        if (!blocked)
+            setBlockedList((p : any[]) => [...p, currentElement.id])
+        else
+            setBlockedList((p : any) => p.filter((id : any) => id !== currentElement.id))
+        setBlocked(p => !p)
+    }
+
+    React.useEffect(() => {
+        if (user)
+        {
+            setBlockedList(user.blockedList);
+            if (user.blockedList.find((id : any) => id === currentElement.id))
+                setBlocked(true);
+        }
+    }, [user])
+
+
+
+    React.useEffect(() => {
+        console.log("INTERFACE MOUNT")
+        return () => {
+            console.log("INTERFACE UNMOUNT")
+        }
+    }, [])
 
     // when a friend is selected but the page is refreshed
     // then it reload user data from URI id
@@ -133,10 +161,19 @@ export default function Interface({friend , group} : any) {
     // update current friend selected when he is picked from MenuElement
 
     React.useEffect(() => {
-        setBlocked(false);
         setProfile(false);
         setRemoveFriendView(false);
-        setCurrent(currentElement);
+        if (currentElement)
+        {
+            if (blockedList.length && 
+                    blockedList.find((id : any) => id === currentElement.id))
+            {
+                setBlocked(true);
+            }
+            else
+                setBlocked(false);
+            setCurrent(currentElement);
+        }
     }, [currentElement])
 
 
@@ -150,7 +187,7 @@ export default function Interface({friend , group} : any) {
                 access={current.access}
                 profile={() => toggleProfile()}
                 invitation={() => {}}
-                block={() => {}}
+                block={() => blockFriend()}
                 remove={() => setRemoveFriendView(prev => !prev)}
             />
             {
