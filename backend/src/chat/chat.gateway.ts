@@ -459,7 +459,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException(`${usertoBan.username} is not on this channel`);
       if (channel.administrators.includes(usertoBan.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't ban another administrator`)
-      await this.chatService.muteUser(channel, usertoBan);
+      await this.chatService.banUser(channel, usertoBan);
       const socketId = this.connectedUsers.get(usertoBan.id);
       if (socketId) {
         const socket = this.server.sockets.sockets.get(socketId);
