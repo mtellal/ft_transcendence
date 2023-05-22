@@ -5,9 +5,9 @@ import { FriendSearch } from "../../Components/FriendElement";
 
 import IconInput from "../../Components/IconInput";
 import { useOutletContext } from "react-router-dom";
-import './AddElement.css'
 import { CollectionElement } from "../MenuElement";
 
+import './AddElement.css'
 
 export default function AddElement(props : any)
 {
