@@ -10,13 +10,13 @@
 	/* background-color: white; */
 }
 
-.messages {
-	height: 90%;
-	border-radius: 20px 20px 0 0;
+/* .messages { */
+	/* height: 50%; */
+	/* border-radius: 20px 20px 0 0; */
 	/* border-radius: 20px; */
 
-	background-color: rgba(0, 0, 0, 0.1);
-}
+	/* background-color: rgba(0, 0, 0, 0.1); */
+/* } */
 
 .inputBox {
 	height: 10%;

@@ -168,4 +168,20 @@ export class BackApi {
 			.catch(err => err)
 		return response;
 	}
+
+	static async getWhispers(id, idFriend) {
+		const response = await axios.get(`${BASE_URL}/users/whispers`, {
+			params: {
+				id: id,
+				friendId: idFriend
+			},
+			headers: {
+				'accept': '*/*'
+			}
+		})
+			.then(rep => rep)
+			.catch(error => error)
+
+		return response;
+	}
 }

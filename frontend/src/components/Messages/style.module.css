@@ -1,0 +1,16 @@
+.container {
+	height: 50%;
+	border-radius: 20px 20px 0 0;
+	/* border-radius: 20px; */
+	padding-top: 1px;
+
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.message {
+	margin: 10px 10px 10px 10px;
+	/* width: 50px; */
+	justify-content: right;
+	align-items: center;
+	text-align: center;
+}

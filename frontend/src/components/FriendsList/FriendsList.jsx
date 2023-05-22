@@ -3,7 +3,7 @@ import { BackApi } from "../../api/back";
 import s from './style.module.css'
 import { useSelector } from "react-redux";
 
-export function FriendsList( { friend, delFriend } ) {
+export function FriendsList( { friend, delFriend, setIdFriendSelected } ) {
 
     const [ProfilePicture, setProfilePicture] = useState();
     const [showActionFriend, setShowActionFriend] = useState(false);
@@ -54,6 +54,7 @@ export function FriendsList( { friend, delFriend } ) {
                     <ul className={s.menu}>
                         <li onClick={removeFriend}>Remove friend</li>
                         <li>Play game</li>
+                        <li onClick={() => setIdFriendSelected(friend.id)}>Chat</li>
                     </ul>
             )}
         </div>
