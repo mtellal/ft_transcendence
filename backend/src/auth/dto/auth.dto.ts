@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 
@@ -28,5 +28,6 @@ export class SigninDto {
 
 	@ApiProperty({description: 'code of the user. Is optional', example: 'test'})
 	@IsString()
+	@IsOptional()
 	code?: string;
 }
