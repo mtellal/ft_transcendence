@@ -20,17 +20,20 @@ enum Status {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  username      String          @unique
-  password      String
-  email         String?         @unique
-  avatar        String?
-  userStatus    Status          @default(OFFLINE)
-  friendRequest FriendRequest[]
-  friendList    Int[]           @default([])
-  blockedList   Int[]           @default([])
-  channelList   Int[]           @default([])
-  createdAt     DateTime        @default(now())
+  id              Int             @id @default(autoincrement())
+  username        String          @unique
+  password        String
+  email           String?         @unique
+  avatar          String?
+  twoFactorSecret String?
+  twoFactorStatus Boolean         @default(false)
+  twoFactorOtpUrl String?
+  userStatus      Status          @default(OFFLINE)
+  friendRequest   FriendRequest[]
+  friendList      Int[]           @default([])
+  blockedList     Int[]           @default([])
+  channelList     Int[]           @default([])
+  createdAt       DateTime        @default(now())
 }
 
 model FriendRequest {
@@ -61,9 +64,17 @@ model Channel {
   administrators Int[]       @default([])
   members        Int[]       @default([])
   banList        Int[]       @default([])
-  muteList       Int[]       @default([])
+  muteList       MutedUser[]
   type           ChannelType
   createdAt      DateTime    @default(now())
+}
+
+model MutedUser {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  duration  DateTime
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId Int?
 }
 
 enum MessageType {
@@ -73,13 +84,13 @@ enum MessageType {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   sendBy    Int?
   content   String
   type      MessageType @default(MESSAGE)
-  Channel   Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  Channel   Channel?    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int?
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
 }
 
 // For a Game, need at least the ID of the two players involved, the score, if the match is ongoing or over. Will add more.
