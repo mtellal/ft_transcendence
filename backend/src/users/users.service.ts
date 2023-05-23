@@ -47,8 +47,10 @@ export class UsersService {
   async checkFriendRequest(senderId: number, receiverId: number): Promise<FriendRequest> {
     return await this.prisma.friendRequest.findFirst({
       where: {
-        sendBy: senderId,
-        userId: receiverId,
+        OR: [
+          { sendBy: senderId, userId: receiverId },
+          { sendBy: receiverId, userId: senderId },
+        ],
         status: false,
       }
     })
