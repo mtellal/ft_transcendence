@@ -128,7 +128,7 @@ export function FriendSearch(props : any)
 
 export default function FriendElement(props : any)
 {    
-    return (
+        return (
         <NavLink to={`/chat/friends/${props.username}/${props.id}`}
             className={({isActive}) => 
                 isActive ? "friend-element hover-fill-grey selected" : "friend-element hover-fill-grey"

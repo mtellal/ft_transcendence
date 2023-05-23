@@ -80,17 +80,23 @@ function isEqual(value: any, other: any) {
 export default function Chat() {
 
     const navigate = useNavigate();
-    
-    const { user, token }: any = useOutletContext();
-    const [friends, setFriends]: [any, any] = React.useState()
-    const [currentElement, setCurrentElement]: [any, any] = React.useState();
+
+    const { user, token, currentUser, ...context }: any = useOutletContext();
+
     const [socket, setSocket]: [any, any] = React.useState();
+    const [friends, setFriends]: [any, any] = React.useState();
+    const [currentElement, setCurrentElement]: [any, any] = React.useState();
 
     const [conversations, setConversations]: [any, any] = React.useState([]);
     const [channel, setChannel]: [any, any] = React.useState();
 
-    const [friendInvitations, setFriendInvitations] : [any, any] = React.useState([]);
-    const [notifInvitation, setNotifInvitation] : [any, any] = React.useState(false);
+    const [friendInvitations, setFriendInvitations]: [any, any] = React.useState([]);
+    const [notifInvitation, setNotifInvitation]: [any, any] = React.useState(false);
+
+
+
+
+    //console.log(currentUser)
 
     function newConversation(channel: any) {
         return (
@@ -118,15 +124,16 @@ export default function Chat() {
 
 
     React.useEffect(() => {
-        if (currentElement)
+        if (currentElement) {
             loadCHannel();
+        }
     }, [currentElement])
 
 
     React.useEffect(() => {
         if (channel) {
             if (!conversations.find((e: any) => e.id === channel.id)) {
-                setConversations((p : any) => [...p, newConversation(channel)])
+                setConversations((p: any) => [...p, newConversation(channel)])
             }
 
             socket.emit('joinChannel', {
@@ -137,27 +144,26 @@ export default function Chat() {
     }, [socket, channel])
 
 
-    function initMessages(arrayMessages : any)
-    {
-        setConversations((p : any) => 
-            p.map((c : any, i : number) => {
+    function initMessages(arrayMessages: any) {
+        console.log(currentUser.blockedList, arrayMessages)
+        setConversations((p: any) =>
+            p.map((c: any, i: number) => {
                 if (c.id === arrayMessages[0].channelId)
                 {
-                    c.messages = arrayMessages;
+                    if (currentUser && currentUser.blockedList.length && 
+                            currentUser.blockedList.find((id :any) => id === arrayMessages[0].channeId))
+                            return (c);
+                    c.messages = arrayMessages;                    
                 }
                 return (c);
             })
         )
     }
 
-
-    function addMessage(message :any)
-    {
-        if (message.sendBy !== user.id && message.sendBy !== currentElement.id)
-        {
-            setFriends((p : any) => p.map((f : any) => {
-                if (f.id === message.sendBy)
-                {
+    function addMessage(message: any) {
+        if (message.sendBy !== user.id && message.sendBy !== currentElement.id) {
+            setFriends((p: any) => p.map((f: any) => {
+                if (f.id === message.sendBy) {
                     if (!f.notifs)
                         f.notifs = 1;
                     else
@@ -167,18 +173,17 @@ export default function Chat() {
             }))
         }
 
-        setConversations((p : any) => 
-        p.map((c : any, i : number) => {
-            if (c.id === message.channelId)
-                c.messages = [...c.messages, message];
-            return (c);
-        })
-    )
+        setConversations((p: any) =>
+            p.map((c: any, i: number) => {
+                if (c.id === message.channelId)
+                    c.messages = [...c.messages, message];
+                return (c);
+            })
+        )
     }
 
     React.useEffect(() => {
-        if (conversations && socket)
-        {
+        if (conversations && socket) {
             socket.on('message', (m: any) => {
                 if (m.length) {
                     initMessages(m)
@@ -196,8 +201,7 @@ export default function Chat() {
     }, [conversations, socket, channel])
 
 
-    function sendMessage(channelId : any, content : any)
-    {
+    function sendMessage(channelId: any, content: any) {
         socket.emit('message', {
             channelId,
             content
@@ -205,10 +209,9 @@ export default function Chat() {
     }
 
 
-    function removeFriendRequest(inviteId : any)
-    {
+    function removeFriendRequest(inviteId: any) {
         setNotifInvitation(false);
-        setFriendInvitations((p : any) => p.filter((i : any) => i.id !== inviteId))
+        setFriendInvitations((p: any) => p.filter((i: any) => i.id !== inviteId))
     }
 
 
@@ -227,11 +230,9 @@ export default function Chat() {
     */
 
     function updateFriendList(friend: any) {
-        if (friends && friends.find((p : any) => p.length && p.find((u : any) => u.id === friend.id)))
-        {
-            setFriends((p : any) => p.map((u : any) => {
-                if (u.id === friend.id)
-                {
+        if (friends && friends.find((p: any) => p.length && p.find((u: any) => u.id === friend.id))) {
+            setFriends((p: any) => p.map((u: any) => {
+                if (u.id === friend.id) {
                     return (friend)
                 }
                 return (u);
@@ -249,16 +250,12 @@ export default function Chat() {
         }
     }
 
-    async function loadInvitations()
-    {
+    async function loadInvitations() {
         const invitationsRes = await getUserInvitations(user.id);
-        if (invitationsRes.status === 200 && invitationsRes.statusText === "OK")
-        {
-            if (invitationsRes.data.length)
-            {
-                setFriendInvitations((p : any) => {
-                    if (!isEqual(p, invitationsRes.data))
-                    {
+        if (invitationsRes.status === 200 && invitationsRes.statusText === "OK") {
+            if (invitationsRes.data.length) {
+                setFriendInvitations((p: any) => {
+                    if (!isEqual(p, invitationsRes.data)) {
                         setNotifInvitation(true);
                         return (invitationsRes.data);
                     }
@@ -267,16 +264,14 @@ export default function Chat() {
             }
         }
     }
-     
-    async function updateDatas()
-    {
-        loadInvitations();
-        loadFriends();
-    }
 
     React.useEffect(() => {
-        updateDatas();
-        const loadFriendsInterval = setInterval(updateDatas, 3000)
+        loadInvitations();
+        loadFriends();
+        const loadFriendsInterval = setInterval(async () => {
+            loadInvitations();
+            loadFriends();
+        }, 3000)
 
         let s = io('http://localhost:3000', {
             transports: ['websocket'],
@@ -296,14 +291,13 @@ export default function Chat() {
     }, [])
 
 
-    function selectCurrentElement(e : any)
-    {
-        setFriends((p : any) => p.map((f : any) => {
+    function selectCurrentElement(e: any) {
+        setFriends((p: any) => p.map((f: any) => {
             if (e.id === f.id && f.notifs)
                 f.notifs = 0;
             return (f);
         }));
-        setCurrentElement({...e, notifs: 0});
+        setCurrentElement({ ...e, notifs: 0 });
     }
 
     return (
@@ -319,17 +313,19 @@ export default function Chat() {
                 />
                 <Outlet context={
                     {
+                        ...context,
+                        currentUser,
                         user,
                         currentElement,
                         friends,
                         token,
                         removeFriend,
                         updateFriendList,
-                        channel, 
+                        channel,
                         conversations: conversations,
                         sendMessage,
                         friendInvitations,
-                        removeFriendRequest
+                        removeFriendRequest,
                     }
                 }
                 />

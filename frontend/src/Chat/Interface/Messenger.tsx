@@ -10,8 +10,8 @@ import { useOutlet, useOutletContext } from "react-router-dom";
 
 function BlockMessage({ username }: any) {
     return (
-        <div className="block">
-            <p className="text-block">You have blocked <span className="friend-block">{username}</span></p>
+        <div className="flex-center sticky-bot">
+            <p className="flex-center reset-m">You have blocked <span className="friend-block">{username}</span></p>
         </div>
     )
 }
@@ -98,9 +98,6 @@ export default function Messenger({
 
     const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");
-
-
-    console.log("messenger rendered")
 
     function handleChange(e: any) {
         setValue(e.target.value)
