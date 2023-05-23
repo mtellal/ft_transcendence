@@ -581,7 +581,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let updateNotif = `${user.id} updated the channel:`;
     if (dto.password)
       updateNotif += ` ${channel.name} is now protected by a password.`
-    if (dto.type)
+    if (dto.type && !dto.password)
       updateNotif += ` ${channel.name} is now ${dto.type.toLowerCase()}.`
     const notif: MessageDto = {
       channelId: channel.id,
