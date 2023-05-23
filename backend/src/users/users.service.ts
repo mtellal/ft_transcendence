@@ -139,11 +139,10 @@ export class UsersService {
   async checkifUserblocked(userId: number, blockedId: number) {
     const isBlocked = await this.prisma.blockedUser.findFirst({
       where: {
-        id: userId,
+        userId: userId,
         blockedId: blockedId
     }})
     if (!isBlocked) {
-      console.log('User is not blocked');
       return false
     }
     return true;
