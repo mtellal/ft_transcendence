@@ -63,7 +63,7 @@ The backend listens to these events:
 - 'kickUser', 'banUser': Takes a channelId, userId and a reason (optional). Administrators can use admin actions on members and owner can use admin action on anyone. Emits a notification to the serv when an admin action was taken.
 - 'muteUser': Takes a channelId, userId, a duration and a reason (optional). A muted user can't send messages to the given channel.
 - 'makeAdmin': Takes a channelId and a userId. Only the owner can make someone else admin.
-- 'updateChannel': Takes a type (optional) or a password (optional)
+- 'updateChannel': Takes a type (optional) and/or a password (optional). If you're trying to make a channel protected by a password, a PROTECTED type is required else we'll throw an error
 
 I added an 'addedtoChannel' event that will be emited to a user that has been newly added to a channel. Let me know if it is useful or not to allow the list of channels of a user to be updated.
 Check the dtos in backend/src/chat/dto to see what the server is expecting to receive
