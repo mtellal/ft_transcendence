@@ -31,9 +31,17 @@ model User {
   userStatus      Status          @default(OFFLINE)
   friendRequest   FriendRequest[]
   friendList      Int[]           @default([])
-  blockedList     Int[]           @default([])
+  blockedList     BlockedUser[]
   channelList     Int[]           @default([])
   createdAt       DateTime        @default(now())
+}
+
+model BlockedUser {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
+  blockedId Int      @unique
+  createdAt DateTime @default(now())
 }
 
 model FriendRequest {

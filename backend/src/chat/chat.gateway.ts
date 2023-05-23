@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io'
 import { User, MessageType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { AddUserDto, AdminActionDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto, MuteDto } from './dto/channel.dto';
+import { AddUserDto, AdminActionDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({cors: {origin: '*'}})
@@ -220,7 +220,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (usertoAdd.channelList.includes(channel.id)) {
         throw new NotAcceptableException(`User already on the channel`);
       }
-      if (usertoAdd.blockedList.includes(user.id)) {
+      if (await this.userService.checkifUserblocked(usertoAdd.id, user.id)) {
         throw new ForbiddenException(`User has blocked you`);
       }
       if (channel.banList.includes(usertoAdd.id)) {
@@ -542,6 +542,54 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch(error) {
       throw new WsException(error)
     }
+  }
+
+  @SubscribeMessage('updateChannel')
+  async updateChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: UpdateChannelDto) {
+    console.log("/////////////////////////////// EVENT UPDATECHANNEL ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT UPDATECHANNEL ///////////////////////////////")
+      return ;
+    }
+    const channel = await this.chatService.findOne(dto.channelId);
+    if (!channel)
+      throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+    if (channel.ownerId !== user.id)
+      throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
+    await this.chatService.updateChannel(dto, channel);
+    let updateNotif = `${user.id} updated the channel:`;
+    if (dto.password)
+      updateNotif += ` ${channel.name} is now protected by a password.`
+    if (dto.type && !dto.password)
+      updateNotif += ` ${channel.name} is now ${dto.type.toLowerCase()}.`
+    const notif: MessageDto = {
+      channelId: channel.id,
+      type: MessageType.NOTIF,
+      content: updateNotif
+    }
+    await this.chatService.createNotif(notif);
+    this.server.to(channel.id.toString()).emit('message', notif);
   }
 
   async handleConnection(client: Socket) {

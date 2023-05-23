@@ -126,11 +126,40 @@ export class UsersService {
     return newRequest;
   }
 
+  async getBlocklist(userId: number) {
+    return await this.prisma.blockedUser.findMany({
+      where: {userId},
+      select: {
+        blockedId: true,
+        createdAt: true
+      }
+    })
+  }
+
+  async checkifUserblocked(userId: number, blockedId: number) {
+    const isBlocked = await this.prisma.blockedUser.findFirst({
+      where: {
+        id: userId,
+        blockedId: blockedId
+    }})
+    if (!isBlocked) {
+      console.log('User is not blocked');
+      return false
+    }
+    return true;
+  }
+
   async blockUser(user: User, blockedUser: number) {
+    const newBlock = await this.prisma.blockedUser.create({
+      data: {
+        userId: user.id,
+        blockedId: blockedUser
+      }
+    })
     return await this.prisma.user.update({
       where: {id: user.id},
       data: {
-        blockedList: {push: blockedUser}
+        blockedList: {connect: {id: newBlock.id}}
       }
     })
   }
@@ -139,7 +168,9 @@ export class UsersService {
     return await this.prisma.user.update({
       where: { id: user.id },
       data: {
-        blockedList: user.blockedList.filter((id) => id != unblockedUser)
+        blockedList: {
+          delete: [{ blockedId: unblockedUser}]
+        }
       }
     })
   }
