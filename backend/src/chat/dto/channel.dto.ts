@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { ChannelType, MessageType } from "@prisma/client"
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
@@ -43,7 +44,7 @@ export class JoinChannelDto {
 
   @IsString()
   @IsOptional()
-  password: string
+  password?: string
 }
 
 export class AddUserDto {
@@ -78,10 +79,26 @@ export class MuteDto {
 
   @IsString()
   @IsOptional()
-  reason: string
+  reason?: string
 }
 
 export class LeaveChannelDto {
   @IsNumber()
   channelId: number
+}
+
+export class UpdateChannelDto {
+  @ApiProperty()
+  @IsNumber()
+  channelId: number
+
+  @ApiProperty()
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string
 }
