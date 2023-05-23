@@ -43,7 +43,7 @@ export class JoinChannelDto {
 
   @IsString()
   @IsOptional()
-  password: string
+  password?: string
 }
 
 export class AddUserDto {
@@ -78,10 +78,23 @@ export class MuteDto {
 
   @IsString()
   @IsOptional()
-  reason: string
+  reason?: string
 }
 
 export class LeaveChannelDto {
   @IsNumber()
   channelId: number
+}
+
+export class UpdateChannelDto {
+  @IsNumber()
+  channelId: number
+
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @IsString()
+  @IsOptional()
+  password?: string
 }

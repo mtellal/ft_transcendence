@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AdminActionDto, CreateChannelDto, JoinChannelDto, MessageDto, MuteDto } from './dto/channel.dto';
+import { AdminActionDto, CreateChannelDto, JoinChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
 import { Channel, User, Message } from '@prisma/client';
 import * as argon from 'argon2';
 import { UsersService } from 'src/users/users.service';
@@ -109,6 +109,34 @@ export class ChatService {
       })
     }
     return newChannel;
+  }
+
+  async updateChannel(dto: UpdateChannelDto, channel: Channel) {
+    if (dto.password) {
+      if (dto.type !== 'PROTECTED')
+        throw new ForbiddenException('Only a protected channel can have a password');
+      dto.password = await argon.hash(dto.password);
+      await this.prisma.channel.update({
+        where: {id: channel.id},
+        data: {
+          type: dto.type,
+          password: dto.password
+        }
+      })
+      return ;
+    }
+    if (dto.type !== channel.type) {
+      if (dto.type === 'PROTECTED' && !dto.password)
+        throw new ForbiddenException(`A protected channel must have a password`);
+      await this.prisma.channel.update({
+        where: {id: channel.id},
+        data: {
+          type: dto.type,
+          password: null
+        }
+      })
+      return ;
+    }
   }
 
   async join(dto: JoinChannelDto, channel: Channel, newUser: User) {
