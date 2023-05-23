@@ -93,3 +93,25 @@ code {
   height: 100%;
   width: 100%;
 }
+
+.reset
+{
+  margin: 0;
+  padding: 0;
+}
+
+.reset-m
+{
+  margin: 0;
+}
+
+.reset-p
+{
+  padding: 0;
+}
+
+.sticky-bot
+{
+  position: sticky;
+  bottom: 0;
+}

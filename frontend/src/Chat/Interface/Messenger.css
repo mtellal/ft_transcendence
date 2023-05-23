@@ -14,18 +14,19 @@
 
 .messages-input
 {
-    flex: 1;
+    padding: 10px 0;
     word-wrap: break-word;
     display: flex;
     justify-content: center;
     align-items: center;
     position: sticky;
     bottom: 0;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .messenger-input
 {
+    margin: 0;
     padding: 10px 10px;
     align-items: center;
     font-family: 'inter', sans-serif;
@@ -59,7 +60,7 @@
     margin: 0;
     margin-top: 20px;
     width: auto;
-    background-color: rgb(235, 255, 255);
+    background-color: rgb(255, 255, 255);
     border: 1px solid black;
     padding: 5px 5px;
     border-radius: 5px;
@@ -89,23 +90,6 @@
 }
 
 /*  /////   BLOCK MESSAGE   ////    */
- 
-.block
-{
-    background-color: white;
-    border-top: 1px solid black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
-    bottom: 0;
-}
-
-.text-block
-{
-    display: flex;
-    align-items: center;
-}
 
 .friend-block
 {

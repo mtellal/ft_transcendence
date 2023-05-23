@@ -237,12 +237,10 @@ export async function refuseFriendRequest(requestId : number | string, token : n
 //                     B L O C K     R E Q U E S T S                   //
 /////////////////////////////////////////////////////////////////////////
 
-export async function blockUser(id : number | string, token: number | string)
+export async function blockUserRequest(id : number | string, token: number | string)
 {
     return (
-        axios.post(`${back}/users/block`, {
-            id
-        }, {
+        axios.post(`${back}/users/block/${id}`, {}, {
             headers: {
                 'Authorization':`Bearer ${token}`
             }
@@ -252,7 +250,7 @@ export async function blockUser(id : number | string, token: number | string)
     )
 }
 
-export async function unblockUser(id : number | string, token: number | string)
+export async function unblockUserRequest(id : number | string, token: number | string)
 {
     return (
         axios.delete(`${back}/users/block/${id}`, {
