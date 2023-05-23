@@ -12,13 +12,19 @@ export function Messages({ messages, id }) {
 				// return (<div key>{messages.content}</div>);
 				return (
 					<div
-						className={s.message}
+						className={s.boxMessage}
 						key={message.id}
 						style={{
-							// textAlign: message.sendBy === id ? 'right' : 'left',
-							backgroundColor: message.sendBy === id ? 'blue' : 'white'
+							textAlign: message.sendBy === id ? 'right' : 'left',
 						}}>
-						{message.content}
+						{/* {message.content} */}
+						<span className={s.message}
+							style={{
+								backgroundColor: message.sendBy === id ? 'grey' : 'white'
+							}}
+						>
+							{message.content}
+						</span>
 					</div>
 				);
 			})}

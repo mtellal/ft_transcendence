@@ -23,17 +23,15 @@ export function Chatbox({ idFriendSelected }) {
 	async function creteOrJoinChannel() {
 		const response = await BackApi.getWhispers(selector.id, idFriendSelected);
 		if (response.status === 200) {
+			console.log('Chennel exist');
 			setIdChannel(response.data.id);
 		} else {
+			console.log('Create chennel');
 			socket.emit('createChannel', {
 				name: "mp",
 				type: "WHISPER",
 				memberList: [idFriendSelected]
 			})
-			const rep = await BackApi.getWhispers(selector.id, idFriendSelected);
-			if (rep.status === 200) {
-				setIdChannel(rep.data.id);
-			}
 		}
 	}
 
@@ -59,12 +57,14 @@ export function Chatbox({ idFriendSelected }) {
 		if (selector.id && socket) {
 			creteOrJoinChannel();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, selector.id])
 
 	useEffect(() => {
 		if (socket && idChannel) {
 			joinChannel()
 		}
+        // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [socket, idChannel])
 
 	const messageListener = (message) => {
@@ -82,9 +82,10 @@ export function Chatbox({ idFriendSelected }) {
 				socket.off('message', messageListener)
 			}
 		}
+        // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [messageListener])
 
-	console.log('messages', messages);
+	// console.log('messages', messages);
 
 	return (
 		<div className={s.container} >
