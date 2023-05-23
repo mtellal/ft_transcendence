@@ -220,7 +220,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (usertoAdd.channelList.includes(channel.id)) {
         throw new NotAcceptableException(`User already on the channel`);
       }
-      if (usertoAdd.blockedList.includes(user.id)) {
+      if (await this.userService.checkifUserblocked(usertoAdd.id, user.id)) {
         throw new ForbiddenException(`User has blocked you`);
       }
       if (channel.banList.includes(usertoAdd.id)) {
