@@ -7,6 +7,10 @@
 
 ## Docs:
 
+### REACT
+- https://react.dev/ - React official doc 
+- https://stackoverflow.com/questions/54576865/when-to-use-native-react-usereducer-hook-and-how-it-differentiate-from-redux - When to use `useReducer` or `Redux`
+
 ### CSS 
 - https://github.com/suitcss/suit - suitCSS - naming convention used by twitter 
   ##### BEM
