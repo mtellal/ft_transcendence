@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Redirect, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Redirect, Req, Request, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto } from "./dto";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
@@ -17,8 +17,8 @@ export class AuthController{
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')
 	@ApiOperation({description: 'Sign in using an existing user credentials. Returns a JWT corresponding to that user'})
-	signin(@Body() {username, password}: SigninDto) {
-		return this.authService.signin(username, password);
+	signin(@Body() {username, password, code}: SigninDto) {
+		return this.authService.signin(username, password, code);
 	}
 
 	@Get('42')
@@ -35,9 +35,22 @@ export class AuthController{
 		res.redirect(redirectUrl);
 	}
 
-	@Get('isLogined')
+	@Put('twofactor')
+	@HttpCode(HttpStatus.OK)
 	@UseGuards(JwtGuard)
-	async test(@Res() res) {
-		res.json('success');
+	async updateTwoFA(@Query() query: { enable: string }, @Req() req) {
+		let bool: boolean;
+		if (query.enable == 'true')
+			bool = true;
+		else
+			bool = false;
+		await this.authService.updateTwoFactorStatus(req.user.id, bool);
+	}
+
+	@Get('qrcode')
+	@UseGuards(JwtGuard)
+	async generateQR(@Req() req) {
+		const qrCode = await this.authService.generateQRcode(req.user.id);
+		return { qrCode };
 	}
 }

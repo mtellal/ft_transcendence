@@ -191,6 +191,15 @@ export class UsersController {
     return this.usersService.getFriendRequest(user);
   }
 
+  @Get(':id/blockList')
+  @ApiOperation({ summary: 'Get a user blocked list'})
+  async getBlocklist(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return await this.usersService.getBlocklist(id);
+  }
+
   @Post('friend')
   @ApiOperation({ summary: 'THIS METHOD IS DEPRECATED: USE FRIENDREQUEST INSTEAD!!! Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
   async addFriend(@Body() friendshipDto: FriendshipDto)
@@ -225,7 +234,7 @@ export class UsersController {
       throw new NotFoundException(`User with id of ${friendRequestDto.id} doesn't exist`);
     if (friend.id === user.id)
       throw new ForbiddenException(`Can't add yourself as friend`);
-    if (friend.blockedList.includes(user.id))
+    if (await this.usersService.checkifUserblocked(friend.id, user.id))
       throw new ForbiddenException(`Blocked`);
     if (await this.usersService.checkFriendRequest(user.id, friend.id))
       throw new NotAcceptableException(`Already exists a pending friend request between these two users`);
@@ -253,59 +262,59 @@ export class UsersController {
   }
 
   @UseGuards(JwtGuard)
-  @Post('block')
+  @Post('block/:id')
   @ApiOperation({ summary: 'Block a user with a given id'})
   @ApiBearerAuth()
-  @ApiBody({type: UserRequestDto})
-  async blockUser(@Body('id', ParseIntPipe) id: number, @Request() req) {
+  async blockUser(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user: User = req.user;
     const blockedUser = await this.usersService.findOne(id);
     if (!blockedUser)
       throw new NotFoundException(`User with id of ${id} does not exist`);
-    if (user.blockedList.includes(id))
-      throw new NotAcceptableException(`User is already blocked`);
     if (id === user.id)
       throw new NotAcceptableException(`Can't block yourself`);
-    return this.usersService.blockUser(user, id);
+    if (await this.usersService.checkifUserblocked(user.id, id))
+      throw new NotAcceptableException(`User is already blocked`);
+    return await this.usersService.blockUser(user, id);
   }
 
   @UseGuards(JwtGuard)
-  @Delete('block')
+  @Delete('block/:id')
   @ApiOperation({ summary: 'Remove a user with a given id from a blocked user list'})
   @ApiBearerAuth()
-  @ApiBody({type: UserRequestDto})
-  async unblockUser(@Body('id', ParseIntPipe) id: number, @Request() req) {
+  async unblockUser(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user: User = req.user;
     const unblockedUser = await this.usersService.findOne(id);
     if (!unblockedUser)
       throw new NotFoundException(`User with id of ${id} does not exist`);
-    if (!user.blockedList.includes(id))
+    if (!await this.usersService.checkifUserblocked(user.id, id))
       throw new NotAcceptableException(`User is not blocked`);
     if (id === user.id)
       throw new NotAcceptableException(`Can't unblock yourself`);
-    return this.usersService.unblockUser(user, id);
+    return await this.usersService.unblockUser(user, id);
   }
 
-  @Delete('friend')
+  @UseGuards(JwtGuard)
+  @Delete('friend/:id')
   @ApiOperation({ summary: 'Makes two users remove each other to their friendlist, might need to be one-way only. Let me know what you prefer'})
-  async removeFriend(@Body() friendshipDto: FriendshipDto)
+  @ApiBearerAuth()
+  async removeFriend(@Param('id', ParseIntPipe) id: number, @Request() req)
   {
-    const user = await this.usersService.findOne(friendshipDto.id);
-    const friend = await this.usersService.findOne(friendshipDto.friendId);
+    const user: User = req.user;
+    const friend = await this.usersService.findOne(id);
 
     if (!user) {
-      throw new NotFoundException(`User with id of ${friendshipDto.id} does not exist`);
+      throw new NotFoundException(`User with id of ${user.id} does not exist`);
     }
     if (!friend) {
-      throw new NotFoundException(`User with id of ${friendshipDto.friendId} does not exist`);
+      throw new NotFoundException(`User with id of ${id} does not exist`);
     }
 
-    if (!user.friendList.includes(friendshipDto.friendId)) {
+    if (!user.friendList.includes(id)) {
       throw new NotAcceptableException('Not friends!')
     }
 
-    await this.usersService.removeFriend(friendshipDto.id, friendshipDto.friendId);
-    await this.usersService.removeFriend(friendshipDto.friendId, friendshipDto.id);
+    await this.usersService.removeFriend(user.id, id);
+    await this.usersService.removeFriend(id, user.id);
   }
 
   @Patch(':id')
