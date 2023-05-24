@@ -4,28 +4,36 @@ import { updateProfilePicture, updateUser } from "../utils/User";
 
 import InfoInput from "../Components/InfoInput";
 
+import { useUser } from "../hooks/Userhooks";
+
 import './Profile.css'
 
-function ProfileInfos({ password, updateHeader, ...props } : any) {
+function ProfileInfos({id, setUser, ...props } : any) {
     const [username, setUsername] = React.useState(props.username);
     const [error, setError] = React.useState("");
     const [updated, setUpdated] = React.useState(false);
 
     async function updateProfile() {
-        const res = await updateUser({
+        updateUser({
             username: username,
             userStatus: "ONLINE"
-        }, props.id)
-
-        if (res && res.status !== 200 && res.statusText !== "OK") {
-            setError("Username invalid")
-            setUpdated(false)
-        }
-        else if (username !== props.username) {
-            setError("")
-            updateHeader(username);
+        }, id)
+        .then(d => {
+            if (d.status !== 200 || d.statusText !== "OK")
+                throw "";
+            if  (username === props.username)
+                    throw "Already yours";
+            setError("");
             setUpdated(true);
-        }
+            setUser(d.data);
+        })
+        .catch(e => {
+            if (e === "Already yours")
+                setError("Already yours")
+            else
+                setError("Username invalid");
+            setUpdated(false);
+        })
     }
 
     return (
@@ -54,16 +62,14 @@ function ProfileInfos({ password, updateHeader, ...props } : any) {
     - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
 */
 
-function ProfilePicture({ image, token, updateHeader } : any ) {
+function ProfilePicture({token, image, setImage} : any) {
     const navigate = useNavigate();
-    const [img, setImg] = React.useState(image);
 
     async function editProfilePicture(e : any) {
         const file = e.target.files[0];
         if (file.type.match("image.*")) {
             let url = window.URL.createObjectURL(e.target.files[0])
-            setImg(url);
-            updateHeader(url);
+            setImage(url);
             const fileRes = await updateProfilePicture(e.target.files[0], token);
             if (fileRes.status !== 201 && fileRes.statusText !== "OK")
                 console.log("Error => ", fileRes);
@@ -79,7 +85,7 @@ function ProfilePicture({ image, token, updateHeader } : any ) {
     return (
         <div className="profile-picture-container">
             <div className="picture-container">
-                <img className="profile-picture" src={img} />
+                <img className="profile-picture" src={image} />
             </div>
             <form >
                 <label
@@ -106,28 +112,27 @@ function ProfilePicture({ image, token, updateHeader } : any ) {
     )
 }
 
-
 export default function Profile() {
+
     const {
-        user,
         token,
-        image,
-        updateHeaderUsername,
-        updateHeaderProfilePicture,
-    } : any = useOutletContext();
+        user, 
+        setUser, 
+        image, 
+        setImage
+    } : any = useUser();
 
     return (
         <div className="profile">
             <ProfileInfos
-                id={user && user.id}
-                username={user && user.username}
-                password={user && user.password}
-                updateHeader={updateHeaderUsername}
+                id={user.id}
+                username={user.username}
+                setUser={setUser}
             />
             <ProfilePicture
-                image={image || "./assets/user.png"}
                 token={token}
-                updateHeader={updateHeaderProfilePicture}
+                image={image}
+                setImage={setImage}
             />
         </div>
     )

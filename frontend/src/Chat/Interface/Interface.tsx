@@ -143,12 +143,12 @@ export default function Interface({ friend, group }: any) {
         setRemoveFriendView(false);
         if (currentElement) {
             setCurrent(currentElement);
-            if (currentUser && currentUser.blockedList.length) {
+            /* if (currentUser && currentUser.blockedList.length) {
                 if (currentUser.blockedList.find((id: any) => currentElement.id === id))
                     setBlocked(true);
                 else 
                     setBlocked(false)
-            }
+            } */
         }
     }, [currentElement, currentUser])
 

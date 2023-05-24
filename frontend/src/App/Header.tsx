@@ -3,9 +3,12 @@ import React, { useContext } from 'react';
 import './Header.css'
 
 import { Link } from 'react-router-dom';
+import { useUser } from '../hooks/Userhooks';
 
-export default function Header({profilePicture, username, ...props} : any)
+export default function Header({profilePicture} : any)
 {
+    const {user, image} = useUser();
+
     return (
         <header className='header'>
             <p className='header-pong'>Pong</p>
@@ -17,10 +20,10 @@ export default function Header({profilePicture, username, ...props} : any)
                     <div className='pp-round'>
                         <img 
                             className='pp'
-                            src={profilePicture || "./assets/user.png"}
+                            src={image}
                         />
                     </div>
-                <p className='pp-username'>{username}</p>
+                <p className='pp-username'>{user.username}</p>
                 </Link>
             </div>
         </header>

@@ -150,9 +150,9 @@ export default function Chat() {
             p.map((c: any, i: number) => {
                 if (c.id === arrayMessages[0].channelId)
                 {
-                    if (currentUser && currentUser.blockedList.length && 
+                    /* if (currentUser && currentUser.blockedList.length && 
                             currentUser.blockedList.find((id :any) => id === arrayMessages[0].channeId))
-                            return (c);
+                            return (c); */
                     c.messages = arrayMessages;                    
                 }
                 return (c);
