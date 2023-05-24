@@ -25,6 +25,8 @@ model User {
   password        String
   email           String?         @unique
   avatar          String?
+  oauth_code      String?         @unique
+  oauth_exp       DateTime?
   twoFactorSecret String?
   twoFactorStatus Boolean         @default(false)
   twoFactorOtpUrl String?
