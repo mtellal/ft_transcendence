@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import './Header.css'
 
 import { Link } from 'react-router-dom';
-import { useUser } from '../hooks/Userhooks';
+import { useUser } from '../Hooks';
 
 export default function Header({profilePicture} : any)
 {

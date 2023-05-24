@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer } from "react";
 
 import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
@@ -12,100 +12,33 @@ import {
 
 import { io } from 'socket.io-client';
 
+
+import { useConversations, useFriends, useUser } from "../Hooks";
+import { isEqual } from "../utils";
+
 import './Chat.css'
+import { FriendsProvider } from "../contexts/Chat/FriendsContext";
 
 
-function isEqual(value: any, other: any) {
-
-    // Get the value type
-    var type = Object.prototype.toString.call(value);
-
-    // If the two objects are not the same type, return false
-    if (type !== Object.prototype.toString.call(other)) return false;
-
-    // If items are not an object or array, return false
-    if (['[object Array]', '[object Object]'].indexOf(type) < 0) return false;
-
-    // Compare the length of the length of the two items
-    var valueLen = type === '[object Array]' ? value.length : Object.keys(value).length;
-    var otherLen = type === '[object Array]' ? other.length : Object.keys(other).length;
-    if (valueLen !== otherLen) return false;
-
-    // Compare two items
-    var compare = function (item1: any, item2: any) {
-
-        // Get the object type
-        var itemType = Object.prototype.toString.call(item1);
-
-        // If an object or array, compare recursively
-        if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
-            if (!isEqual(item1, item2)) return false;
-        }
-
-        // Otherwise, do a simple comparison
-        else {
-
-            // If the two items are not the same type, return false
-            if (itemType !== Object.prototype.toString.call(item2)) return false;
-
-            // Else if it's a function, convert to a string and compare
-            // Otherwise, just compare
-            if (itemType === '[object Function]') {
-                if (item1.toString() !== item2.toString()) return false;
-            } else {
-                if (item1 !== item2) return false;
-            }
-
-        }
-    };
-
-    // Compare properties
-    if (type === '[object Array]') {
-        for (var i = 0; i < valueLen; i++) {
-            if (compare(value[i], other[i]) === false) return false;
-        }
-    } else {
-        for (var key in value) {
-            if (value.hasOwnProperty(key)) {
-                if (compare(value[key], other[key]) === false) return false;
-            }
-        }
-    }
-
-    // If nothing failed, return true
-    return true;
-
-};
-
-export default function Chat() {
+function ChatInterface() {
 
     const navigate = useNavigate();
 
-    const { user, token, currentUser, ...context }: any = useOutletContext();
+    const { 
+        user, 
+        token 
+    } : any = useUser();
 
     const [socket, setSocket]: [any, any] = React.useState();
-    const [friends, setFriends]: [any, any] = React.useState();
     const [currentElement, setCurrentElement]: [any, any] = React.useState();
 
-    const [conversations, setConversations]: [any, any] = React.useState([]);
+    const [friends, friendsDispatch] : any = useFriends();
+    const [conversations, conversationsDispatch] : any = useConversations();
+
     const [channel, setChannel]: [any, any] = React.useState();
 
     const [friendInvitations, setFriendInvitations]: [any, any] = React.useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = React.useState(false);
-
-
-
-
-    //console.log(currentUser)
-
-    function newConversation(channel: any) {
-        return (
-            {
-                ...channel,
-                messages: []
-            }
-        )
-    }
 
     async function loadCHannel() {
         const channelRes = await getChannelByIDs(user.id, currentElement.id);
@@ -132,8 +65,9 @@ export default function Chat() {
 
     React.useEffect(() => {
         if (channel) {
-            if (!conversations.find((e: any) => e.id === channel.id)) {
-                setConversations((p: any) => [...p, newConversation(channel)])
+            if (conversations && 
+                    !conversations.find((e: any) => e.id === channel.id)) {
+                conversationsDispatch({type: 'addConv', conversation: channel})
             }
 
             socket.emit('joinChannel', {
@@ -145,41 +79,16 @@ export default function Chat() {
 
 
     function initMessages(arrayMessages: any) {
-        console.log(currentUser.blockedList, arrayMessages)
-        setConversations((p: any) =>
-            p.map((c: any, i: number) => {
-                if (c.id === arrayMessages[0].channelId)
-                {
-                    /* if (currentUser && currentUser.blockedList.length && 
-                            currentUser.blockedList.find((id :any) => id === arrayMessages[0].channeId))
-                            return (c); */
-                    c.messages = arrayMessages;                    
-                }
-                return (c);
-            })
-        )
+        console.log(user.blockedList, arrayMessages)
+        conversationsDispatch({type: 'initMessages', messages: arrayMessages});
     }
 
     function addMessage(message: any) {
         if (message.sendBy !== user.id && message.sendBy !== currentElement.id) {
-            setFriends((p: any) => p.map((f: any) => {
-                if (f.id === message.sendBy) {
-                    if (!f.notifs)
-                        f.notifs = 1;
-                    else
-                        f.notifs += 1;
-                }
-                return (f)
-            }))
+            friendsDispatch({type: 'addNotif', friendId: message.sendBy})
         }
 
-        setConversations((p: any) =>
-            p.map((c: any, i: number) => {
-                if (c.id === message.channelId)
-                    c.messages = [...c.messages, message];
-                return (c);
-            })
-        )
+        conversationsDispatch({type: 'addMessage', message});
     }
 
     React.useEffect(() => {
@@ -220,7 +129,7 @@ export default function Chat() {
         if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
             let friendList = friendListRes.data;
             friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
-            setFriends((prev: any) => isEqual(prev, friendList) ? prev : friendList);
+            friendsDispatch({type: 'set', newFriends: friendList})
         }
     }
 
@@ -230,22 +139,13 @@ export default function Chat() {
     */
 
     function updateFriendList(friend: any) {
-        if (friends && friends.find((p: any) => p.length && p.find((u: any) => u.id === friend.id))) {
-            setFriends((p: any) => p.map((u: any) => {
-                if (u.id === friend.id) {
-                    return (friend)
-                }
-                return (u);
-            }))
-        }
-        else
-            setFriends([...friends, friend]);
+        friendsDispatch({type: 'updateFriend', friend});
     }
 
     async function removeFriend() {
         const res = await removeUserFriend(currentElement.id, token)
         if (res.status === 200 && res.statusText === "OK") {
-            setFriends(friends.filter((u: any) => u.id !== currentElement.id))
+            friendsDispatch({type: 'removeFriend', friend: currentElement})
             navigate("/chat");
         }
     }
@@ -292,44 +192,51 @@ export default function Chat() {
 
 
     function selectCurrentElement(e: any) {
-        setFriends((p: any) => p.map((f: any) => {
-            if (e.id === f.id && f.notifs)
-                f.notifs = 0;
-            return (f);
-        }));
+        friendsDispatch({type: 'removeNotif', friend: e});
         setCurrentElement({ ...e, notifs: 0 });
     }
 
+    console.log(currentElement)
+
     return (
-        <div className="chat">
-            <div className="chat-container">
-                <MenuElement
-                    friends={friends}
-                    user={user}
-                    addGroup={() => { }}
-                    setCurrentElement={selectCurrentElement}
-                    notification={notifInvitation}
-                    removeNotif={() => setNotifInvitation(false)}
-                />
-                <Outlet context={
-                    {
-                        ...context,
-                        currentUser,
-                        user,
-                        currentElement,
-                        friends,
-                        token,
-                        removeFriend,
-                        updateFriendList,
-                        channel,
-                        conversations: conversations,
-                        sendMessage,
-                        friendInvitations,
-                        removeFriendRequest,
+        <FriendsProvider>
+            <div className="chat">
+                <div className="chat-container">
+                    <MenuElement
+                        friends={friends}
+                        user={user}
+                        addGroup={() => { }}
+                        setCurrentElement={selectCurrentElement}
+                        notification={notifInvitation}
+                        removeNotif={() => setNotifInvitation(false)}
+                        />
+                    <Outlet context={
+                        {
+                            user,
+                            currentElement,
+                            friends,
+                            token,
+                            removeFriend,
+                            channel,
+                            conversations,
+                            sendMessage,
+                            friendInvitations,
+                            removeFriendRequest,
+                        }
                     }
-                }
-                />
+                    />
+                </div>
             </div>
-        </div>
+        </FriendsProvider>
+    )
+}
+
+
+export default function Chat()
+{
+    return (
+        <FriendsProvider>
+            <ChatInterface />
+        </FriendsProvider>
     )
 }

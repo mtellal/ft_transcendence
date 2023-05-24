@@ -132,7 +132,11 @@ export default function Interface({ friend, group }: any) {
 
     React.useEffect(() => {
         if (friends)
+        {
+            console.log("INTERFACE => ", friends)
             setCurrent(friends.find((u: any) => u.id.toString() === id.toString()))
+            
+        }
     }, [friends])
 
 
@@ -174,7 +178,8 @@ export default function Interface({ friend, group }: any) {
                                 <Messenger
                                     user={user}
                                     element={current}
-                                    conversation={conversations.find((c: any) => c.id === channel.id)}
+                                    conversation={conversations && 
+                                            conversations.find((c: any) => c.id === channel.id)}
                                     sendMessage={sendMessage}
                                     blocked={blocked}
                                     invitation={render}

@@ -4,7 +4,7 @@ import { updateProfilePicture, updateUser } from "../utils/User";
 
 import InfoInput from "../Components/InfoInput";
 
-import { useUser } from "../hooks/Userhooks";
+import { useUser } from "../Hooks";
 
 import './Profile.css'
 
