@@ -16,7 +16,7 @@ import {
 
 import './App.css';
 import { UserProvider } from '../contexts/UserContext';
-import { useUser } from '../hooks/Userhooks';
+import { useUser } from '../Hooks';
 
 
 export async function loader() {
