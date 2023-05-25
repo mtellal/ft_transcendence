@@ -25,6 +25,7 @@ export function Chatbox({ idFriendSelected }) {
 		if (response.status === 200) {
 			console.log('Chennel exist');
 			setIdChannel(response.data.id);
+			joinChannel(response.data.id);
 		} else {
 			console.log('Create chennel');
 			socket.emit('createChannel', {
@@ -32,10 +33,20 @@ export function Chatbox({ idFriendSelected }) {
 				type: "WHISPER",
 				memberList: [idFriendSelected]
 			})
+			setTimeout(async function() {
+				// Le code à exécuter après la pause de 1 seconde
+				console.log("Après la pause");
+				const response = await BackApi.getWhispers(selector.id, idFriendSelected);
+				if (response.status === 200) {
+					console.log('Chennel exist');
+					setIdChannel(response.data.id);
+				  joinChannel(response.data.id);
+				}
+			  }, 1000); // 1000 millisecondes = 1 seconde
 		}
 	}
 
-	function joinChannel() {
+	function joinChannel(idChan) {
 		socket.emit('joinChannel', {
 			channelId: idChannel
 		})
@@ -60,12 +71,12 @@ export function Chatbox({ idFriendSelected }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, selector.id])
 
-	useEffect(() => {
-		if (socket && idChannel) {
-			joinChannel()
-		}
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [socket, idChannel])
+	// useEffect(() => {
+	// 	if (socket && idChannel) {
+	// 		joinChannel()
+	// 	}
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [socket, idChannel])
 
 	const messageListener = (message) => {
 		if (message.length) {

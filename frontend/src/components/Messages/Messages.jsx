@@ -3,7 +3,7 @@ import s from './style.module.css'
 export function Messages({ messages, id }) {
 
 	// console.log('Component Messages');
-	console.log('Component Messages', messages);
+	// console.log('Component Messages', messages);
 	// console.log('Component Messages 2', messages[0]);
 	return (
 		<div className={s.container}>

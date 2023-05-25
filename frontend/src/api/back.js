@@ -152,16 +152,12 @@ export class BackApi {
 		return response;
 	}
 
-	static async removeFriend(id, idFriend) {
-		const response = await axios.delete(`${BASE_URL}/users/friend`, {
-			data: {
-				id: id,
-				friendId: idFriend
-			}
-		  }, {
+	static async removeFriend(idFriend, token) {
+		const response = await axios.delete(`${BASE_URL}/users/friend/${idFriend}`, {
 			headers: {
 			  'Accept': '*/*',
-			  'Content-Type': 'application/json'
+			//   'Content-Type': 'application/json',
+			'Authorization': `Bearer ${token}`
 			}
 		})
 			.then(res => res)

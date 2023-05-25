@@ -24,7 +24,7 @@ export function FriendsList( { friend, delFriend, setIdFriendSelected } ) {
 
         for (let user of users) {
             if (user.username === friend.username) {
-                const response = await BackApi.removeFriend(selector.id, user.id);
+                const response = await BackApi.removeFriend(user.id, selector.token);
 				delFriend(user.id);
                 if (response.status === 201) {
                     break ;
