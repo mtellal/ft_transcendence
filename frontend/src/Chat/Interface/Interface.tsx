@@ -8,6 +8,7 @@ import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
 import { useConversations, useFriends, useUser } from "../../Hooks";
+import { blockUserRequest, unblockUserRequest } from "../../utils/User";
 
 function RemoveFriend(props: any) {
     return (
@@ -92,10 +93,10 @@ export default function Interface({ friend, group }: any) {
     const { id }: any = useParams();
     const {
         token,
-        user, 
+        user,
         userDispatch,
         setUser
-    } : any = useUser();
+    }: any = useUser();
 
     const {
         currentElement,
@@ -104,8 +105,8 @@ export default function Interface({ friend, group }: any) {
         sendMessage,
     }: any = useOutletContext();
 
-    const [friends, friendsDispatch] : any = useFriends();
-    const [conversations, conversationsDispatch] : any = useConversations();
+    const [friends, friendsDispatch]: any = useFriends();
+    const [conversations, conversationsDispatch]: any = useConversations();
 
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
@@ -114,11 +115,15 @@ export default function Interface({ friend, group }: any) {
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
     function block() {
-        if (!blocked)
-            userDispatch({type: 'blockUser', friendId: current.id})
-        else
-            userDispatch({type: 'unblockUser', friendId: current.id})
-        setBlocked((p : any) => !p)
+        if (!blocked) {
+            userDispatch({ type: 'blockUser', friendId: current.id })
+            blockUserRequest(current.id, token)
+        }
+        else {
+            unblockUserRequest(current.id, token)
+            userDispatch({ type: 'unblockUser', friendId: current.id })
+        }
+        setBlocked((p: any) => !p)
     }
 
 
@@ -133,11 +138,9 @@ export default function Interface({ friend, group }: any) {
     // then it reload user data from URI id
 
     React.useEffect(() => {
-        if (friends)
-        {
-            console.log("INTERFACE => ", friends)
+        if (friends) {
             setCurrent(friends.find((u: any) => u.id.toString() === id.toString()))
-            
+
         }
     }, [friends])
 
@@ -149,65 +152,71 @@ export default function Interface({ friend, group }: any) {
         setRemoveFriendView(false);
         if (currentElement) {
             setCurrent(currentElement);
-            console.log("current element => ", currentElement)
             if (user.blockedList.length) {
                 if (user.blockedList.find((id: any) => currentElement.id === id))
                     setBlocked(true);
-                else 
+                else
                     setBlocked(false)
             }
         }
     }, [currentElement])
 
+
     return (
-        <div className="flex-column relative interface-container">
-            <Banner
-                element={current}
-                name={current && current.username}
-                img={current && current.avatar}
-                status={current && current.userStatus}
-                access={null}
-                profile={() => setProfile(prev => !prev)}
-                invitation={() => { }}
-                block={() => block()}
-                remove={() => setRemoveFriendView(prev => !prev)}
-            />
+        <>
             {
-                friend ?
-                    <>
+                current ?
+                    <div className="flex-column relative interface-container">
+                        <Banner
+                            element={current}
+                            name={current && current.username}
+                            img={current && current.avatar}
+                            status={current && current.userStatus}
+                            access={null}
+                            profile={() => setProfile(prev => !prev)}
+                            invitation={() => { }}
+                            block={() => block()}
+                            remove={() => setRemoveFriendView(prev => !prev)}
+                        />
                         {
-                            profile ?
-                                <Profile element={current} /> :
-                                <Messenger
-                                    user={user}
-                                    element={current}
-                                    conversation={conversations && 
-                                            conversations.find((c: any) => c.id === channel.id)}
-                                    sendMessage={sendMessage}
+                            friend ?
+                                <>
+                                    {
+                                        profile ?
+                                            <Profile element={current} /> :
+                                            <Messenger
+                                                user={user}
+                                                element={current}
+                                                conversation={conversations &&
+                                                    conversations.find((c: any) => c.id === channel.id)}
+                                                sendMessage={sendMessage}
+                                                blocked={blocked}
+                                                invitation={render}
+                                                group={null}
+                                            />
+                                    }
+                                </>
+                                :
+                                <InterfaceGroup
+                                    group={group}
+                                    profile={profile}
+                                    item={current}
                                     blocked={blocked}
                                     invitation={render}
-                                    group={null}
+                                    user={user}
                                 />
                         }
-                    </>
-                    :
-                    <InterfaceGroup
-                        group={group}
-                        profile={profile}
-                        item={current}
-                        blocked={blocked}
-                        invitation={render}
-                        user={user}
-                    />
+                        {
+                            removeFriendView &&
+                            <RemoveFriend
+                                user={current.username}
+                                cancel={() => setRemoveFriendView(prev => !prev)}
+                                remove={() => removeFriend(current)}
+                            />
+                        }
+                    </div>
+                    : null
             }
-            {
-                removeFriendView &&
-                <RemoveFriend
-                    user={current.username}
-                    cancel={() => setRemoveFriendView(prev => !prev)}
-                    remove={() => removeFriend(current)}
-                />
-            }
-        </div>
+        </>
     )
 }
