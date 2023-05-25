@@ -1,11 +1,9 @@
 import React, { createContext, useReducer } from "react";
 import { isEqual } from "../../utils";
 
-
 export const FriendsContext: React.Context<any> = createContext([]);
 
 function reducer(friends: any, action: any) {
-    console.log("FRIENDS REDUCER CALLED ", action.type)
     switch (action.type) {
         case ('set'): {
             return (isEqual(friends, action.newFriends) ? friends : action.newFriends)
@@ -26,7 +24,7 @@ function reducer(friends: any, action: any) {
             else
                 return ([...friends, friend]);
         }
-        case ('remomeFriend'): {
+        case ('removeFriend'): {
             return (friends.filter((u: any) => u.id !== action.friend.id))
         }
         case('addNotif'): {

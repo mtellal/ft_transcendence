@@ -8,6 +8,7 @@ import { useOutletContext } from "react-router-dom";
 import { CollectionElement } from "../MenuElement";
 
 import './AddElement.css'
+import { useUser } from "../../Hooks";
 
 export default function AddElement(props : any)
 {
@@ -20,13 +21,19 @@ export default function AddElement(props : any)
     const [invitations, setInvitations] : [any, any] = React.useState([]);
 
     const {
+        token, 
         user, 
-        updateFriendList, 
+        setUser
+    } : any = useUser();
+
+    const {
         friends, 
-        token,
+        updateFriendList, 
         friendInvitations,
         removeFriendRequest
     } : any = useOutletContext();
+
+    console.log(user)
 
     function validFriend()
     {
