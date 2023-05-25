@@ -331,7 +331,9 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update the user, all the fields are optional. Will be protected by JWT in the future'})
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(id, updateUserDto);
+    const updatedUser = await this.usersService.update(id, updateUserDto);
+    const updatedFriendList = await this.usersService.getUpdatedFriendList(id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(id)).emit('updatedFriend', updatedFriendList);
   }
 
   @Delete(':id')
