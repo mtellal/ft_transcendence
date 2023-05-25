@@ -43,13 +43,6 @@ function App() {
 
   const {user, token, image}: any = useLoaderData();
 
-  const [currentUser, setCurrentUser]: [any, any] = React.useState();
-
-  React.useEffect(() => {
-    if (user)
-      setCurrentUser(user);
-  }, [user])
-
   return (
     <div className="App" >
       <UserProvider 

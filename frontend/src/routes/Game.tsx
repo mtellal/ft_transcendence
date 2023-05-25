@@ -7,6 +7,11 @@ import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 let up : boolean;
 let down : boolean;
 
+
+<canvas width="100" height="800">
+    ....
+</canvas>
+
 function Game(props : any)
 {
     const canvasRef : any  = React.useRef();

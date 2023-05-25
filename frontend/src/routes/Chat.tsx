@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 
 import MenuElement from "../Chat/MenuElement";
-import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import {
     getChannelByIDs,
     getFriendList,
@@ -23,25 +23,27 @@ import './Chat.css'
 
 function ChatInterface() {
 
-    const navigate = useNavigate();
+    const params: any = useParams();
 
+    console.log(params)
+    const navigate = useNavigate();
+    
     const {
         user,
         token
     }: any = useUser();
-
+    
     const [socket, setSocket]: [any, any] = useState();
     const [currentElement, setCurrentElement]: [any, any] = useState();
-
+    
     const [friends, friendsDispatch]: any = useFriends();
     const [conversations, conversationsDispatch]: any = useConversations();
-
+    
     const [channel, setChannel]: [any, any] = useState();
-
+    
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
-
-
+    
     /////////////////////////////////////////////////////////////////////////
     //                          F R I E N D S                              //
     /////////////////////////////////////////////////////////////////////////
@@ -68,6 +70,9 @@ function ChatInterface() {
                 })
         }
     }
+
+
+    // socket.on('updateFriend', friend => updateFriendList(friendList))
 
     /*
         if a friend exists inside friendList[] then it updates, 
@@ -150,13 +155,13 @@ function ChatInterface() {
 
     }
 
-
     /////////////////////////////////////////////////////////////////////////
     //                            C H A N N E L                            //
     /////////////////////////////////////////////////////////////////////////
 
     async function selectCurrentElement(e: any) {
         friendsDispatch({ type: 'removeNotif', friend: e });
+        console.log(e)
         setCurrentElement({ ...e, notifs: 0 });
 
         getChannelByIDs(user.id, e.id)

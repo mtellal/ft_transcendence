@@ -7,7 +7,7 @@ import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
-import { useConversations, useFriends } from "../../Hooks";
+import { useConversations, useFriends, useUser } from "../../Hooks";
 
 function RemoveFriend(props: any) {
     return (
@@ -91,23 +91,21 @@ export default function Interface({ friend, group }: any) {
 
     const { id }: any = useParams();
     const {
-        currentUser,
-        user,
+        token,
+        user, 
+        userDispatch,
+        setUser
+    } : any = useUser();
+
+    const {
         currentElement,
         removeFriend,
         channel,
         sendMessage,
-        blockUser,
-        unblockUser
     }: any = useOutletContext();
 
     const [friends, friendsDispatch] : any = useFriends();
     const [conversations, conversationsDispatch] : any = useConversations();
-
-    
-    React.useEffect(() => {
-        console.log("conversations => ", conversations)
-    }, [conversations])
 
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
@@ -116,14 +114,11 @@ export default function Interface({ friend, group }: any) {
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
     function block() {
-        console.log("block function called")
-        setBlocked((p: any) => {
-            if (!p)
-                blockUser(current.id)
-            else
-                unblockUser(current.id);
-            return (!p);
-        });
+        if (!blocked)
+            userDispatch({type: 'blockUser', friendId: current.id})
+        else
+            userDispatch({type: 'unblockUser', friendId: current.id})
+        setBlocked((p : any) => !p)
     }
 
 
@@ -154,14 +149,15 @@ export default function Interface({ friend, group }: any) {
         setRemoveFriendView(false);
         if (currentElement) {
             setCurrent(currentElement);
-            /* if (currentUser && currentUser.blockedList.length) {
-                if (currentUser.blockedList.find((id: any) => currentElement.id === id))
+            console.log("current element => ", currentElement)
+            if (user.blockedList.length) {
+                if (user.blockedList.find((id: any) => currentElement.id === id))
                     setBlocked(true);
                 else 
                     setBlocked(false)
-            } */
+            }
         }
-    }, [currentElement, currentUser])
+    }, [currentElement])
 
     return (
         <div className="flex-column relative interface-container">
@@ -170,7 +166,7 @@ export default function Interface({ friend, group }: any) {
                 name={current && current.username}
                 img={current && current.avatar}
                 status={current && current.userStatus}
-                access={current.access}
+                access={null}
                 profile={() => setProfile(prev => !prev)}
                 invitation={() => { }}
                 block={() => block()}
