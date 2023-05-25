@@ -1,5 +1,5 @@
 import React, { useReducer, createContext, useState } from "react";
-import { getUser } from "../utils/User";
+import { getBlockedList, getUser } from "../utils/User";
 import { updateUser } from "../utils/User";
 
 async function login(user: any) {
@@ -20,19 +20,46 @@ async function logout(user: any) {
     )
 }
 
+function reducer(user: any, action: any) {
+    switch (action.type) {
+        case ('login'): {
+            return ({ ...user, userStatus: "ONLINE" })
+        }
+        case ('logout'): {
+            return ({ ...user, userStatus: "OFFLINE" })
+        }
+        case('setblockedList'): {
+            return ({...user, blockedList: action.blockedList});
+        }
+        case ('blockUser'): {
+            return ({ ...user, blockedList: [...user.blockedList, action.friendId] })
+        }
+        case ('unblockUser'): {
+            return ({ ...user, blockedList: user.blockedList.filter((id : any) => id !== action.friendId)})
+        }
+        default: return (user);
+    }
+}
 
 export const UserContext: React.Context<any> = createContext(0);
 
 export function UserProvider({ children, ...props }: any) {
-    const [user, setUser]: any = useState(props.user);
-    const [image, setImage] : any = useState(props.image)
+    const [user, userDispatch]: any = useReducer(reducer, props.user);
+    const [image, setImage]: any = useState(props.image)
 
     React.useEffect(() => {
-        login(user)
-            .then(d => setUser(d.data))
+        userDispatch({ type: 'login' })
+        login(user);
+
+        getBlockedList(user.id, props.token)
+            .then(res => {
+                userDispatch({type: 'setblockedList', blockedList: res.data})
+            })
+            .catch(err => console.log(err))
+        
         return () => {
-            logout(user)
-            .then(d => setUser(d.data))
+            logout(user);
+            userDispatch({ type: 'logout' })
         }
     }, [])
 
@@ -46,7 +73,7 @@ export function UserProvider({ children, ...props }: any) {
             value={{
                 token: props.token,
                 user,
-                setUser,
+                userDispatch,
                 image,
                 setImage
             }}>

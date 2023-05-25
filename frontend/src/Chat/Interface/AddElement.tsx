@@ -33,8 +33,6 @@ export default function AddElement(props : any)
         removeFriendRequest
     } : any = useOutletContext();
 
-    console.log(user)
-
     function validFriend()
     {
         return (friends.every((user : any) => friend.id !== user.id) && friend.id !== user.id)
