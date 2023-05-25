@@ -42,7 +42,6 @@ export async function loader() {
 function App() {
 
   const {user, token, image}: any = useLoaderData();
-  console.log(user.image)
 
   const [currentUser, setCurrentUser]: [any, any] = React.useState();
 
@@ -50,26 +49,6 @@ function App() {
     if (user)
       setCurrentUser(user);
   }, [user])
-
-  async function blockUser(id: number | string) {
-    const blockRes = await blockUserRequest(id, user.token);
-    if (blockRes.status === 201 && blockRes.statusText === "Created") {
-      console.log(id, " user blocked");
-    }
-    else
-      console.log("error in blockUser ", blockRes);
-    setCurrentUser((u: any) => ({ ...u, blockedList: [...u.blockedList, id] }))
-  }
-
-  async function unblockUser(id: number | string) {
-    const unblockRes = await unblockUserRequest(id, user.token);
-    if (unblockRes.status === 200 && unblockRes.statusText === "OK") {
-      console.log(id, " user blocked");
-    }
-    else
-      console.log("error in blockUser ", unblockRes);
-    setCurrentUser((u: any) => ({ ...u, blockedList: u.blockedList.filter((i: any) => i !== id) }))
-  }
 
   return (
     <div className="App" >

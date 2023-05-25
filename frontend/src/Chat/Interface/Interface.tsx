@@ -209,7 +209,7 @@ export default function Interface({ friend, group }: any) {
                 <RemoveFriend
                     user={current.username}
                     cancel={() => setRemoveFriendView(prev => !prev)}
-                    remove={() => removeFriend()}
+                    remove={() => removeFriend(current)}
                 />
             }
         </div>
