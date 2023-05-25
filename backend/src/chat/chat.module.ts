@@ -5,6 +5,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { ChatController } from './chat.controller';
+import { UsersGateway } from 'src/users/users.gateway';
 
 @Module({
   imports: [PrismaModule],

@@ -3,8 +3,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { Prisma, ChannelType, FriendRequest, User } from '@prisma/client';
+import { Prisma, ChannelType, FriendRequest, User, Status } from '@prisma/client';
 import * as fs from 'fs';
+import { UsersGateway } from './users.gateway';
 
 @Injectable()
 export class UsersService {
@@ -229,10 +230,20 @@ export class UsersService {
     if (updateUserDto.password)
       updateUserDto.password = await argon.hash(updateUserDto.password);
     try {
-      return await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { id },
         data: updateUserDto,
       });
+      const updatedFriendList = await this.prisma.user.findMany({
+        where: {
+          id: {
+            in: updatedUser.friendList
+          },
+          userStatus: Status.ONLINE
+        }
+      })
+      console.log(updatedFriendList);
+      return updatedUser;
     }
     catch (PrismaClientKnownRequestError) {
       if (PrismaClientKnownRequestError.code === 'P2002') {
@@ -240,6 +251,21 @@ export class UsersService {
       }
       throw new ForbiddenException(PrismaClientKnownRequestError);
     }
+  }
+
+  async getUpdatedFriendList(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {id}
+    })
+    const friendList = user.friendList;
+    return await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: friendList
+        },
+        userStatus: Status.ONLINE
+      }
+    })
   }
 
   async remove(id: number) {
