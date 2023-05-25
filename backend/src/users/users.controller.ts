@@ -10,6 +10,7 @@ import path = require('path');
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid'
 import { User, Channel } from '@prisma/client';
+import { UsersGateway } from './users.gateway';
 
 export const storage = {
   storage: diskStorage({
@@ -40,7 +41,7 @@ export const storage = {
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly usersGateway: UsersGateway) {}
 
   @Get()
   @ApiQuery({
@@ -153,9 +154,11 @@ export class UsersController {
     const user: User = req.user;
     if (req.user.avatar && path.extname(file.filename) != path.extname(user.avatar))
       this.usersService.deleteImg(req.user.avatar);
-    return await this.usersService.update(user.id, {
+    await this.usersService.update(user.id, {
       avatar: file.path
     })
+    const updatedFriendList = await this.usersService.getUpdatedFriendList(user.id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendList);
   }
 
   @Get(':id/profileImage')
@@ -240,7 +243,7 @@ export class UsersController {
       throw new NotAcceptableException(`Already exists a pending friend request between these two users`);
     if (friend.friendList.includes(user.id))
        throw new NotAcceptableException(`Already friends!`);
-    return await this.usersService.sendFriendRequest(friend, user);
+    await this.usersService.sendFriendRequest(friend, user);
   }
 
   @UseGuards(JwtGuard)
@@ -249,7 +252,9 @@ export class UsersController {
   @ApiOperation({ summary: 'Accept a pending friend request with a given id, both users will add each other to their friend lists'})
   async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
-    return await this.usersService.acceptFriendRequest(user.id, requestId);
+    await this.usersService.acceptFriendRequest(user.id, requestId);
+    const updatedFriendList = await this.usersService.getUpdatedFriendList(user.id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendList);
   }
 
   @UseGuards(JwtGuard)
@@ -258,7 +263,9 @@ export class UsersController {
   @ApiOperation({ summary: 'Remove a pending friend request with a given id'})
   async deleteFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
-    return await this.usersService.deleteFriendRequest(user.id, requestId);
+    await this.usersService.deleteFriendRequest(user.id, requestId);
+    const updatedFriendList = await this.usersService.getUpdatedFriendList(user.id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendList);
   }
 
   @UseGuards(JwtGuard)
