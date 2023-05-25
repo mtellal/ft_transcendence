@@ -166,11 +166,17 @@ export class UsersService {
   }
 
   async unblockUser(user: User, unblockedUser: number) {
+    const blockedRequest = await this.prisma.blockedUser.findFirst({
+      where: {
+        userId: user.id,
+        blockedId: unblockedUser
+      }
+    })
     return await this.prisma.user.update({
       where: { id: user.id },
       data: {
         blockedList: {
-          delete: [{ blockedId: unblockedUser}]
+          delete: [{id:blockedRequest.id}]
         }
       }
     })
