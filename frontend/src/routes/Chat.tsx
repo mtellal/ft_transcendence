@@ -6,6 +6,7 @@ import {
     getChannelByIDs,
     getFriendList,
     getMessages,
+    getUser,
     getUserInvitations,
     removeUserFriend
 } from "../utils/User";
@@ -25,25 +26,24 @@ function ChatInterface() {
 
     const params: any = useParams();
 
-    console.log(params)
     const navigate = useNavigate();
-    
+
     const {
         user,
         token
     }: any = useUser();
-    
+
     const [socket, setSocket]: [any, any] = useState();
     const [currentElement, setCurrentElement]: [any, any] = useState();
-    
+
     const [friends, friendsDispatch]: any = useFriends();
     const [conversations, conversationsDispatch]: any = useConversations();
-    
+
     const [channel, setChannel]: [any, any] = useState();
-    
+
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
-    
+
     /////////////////////////////////////////////////////////////////////////
     //                          F R I E N D S                              //
     /////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,6 @@ function ChatInterface() {
 
     async function selectCurrentElement(e: any) {
         friendsDispatch({ type: 'removeNotif', friend: e });
-        console.log(e)
         setCurrentElement({ ...e, notifs: 0 });
 
         getChannelByIDs(user.id, e.id)
@@ -177,6 +176,22 @@ function ChatInterface() {
             })
     }
 
+    /*
+        when messenger (chat/friends/username/id) is refreshed then 
+            we need to set manually the current friend  
+    */
+    useEffect(() => {
+        if (friends && friends.length &&
+            params && params.id) {
+            getUser(params.id)
+                .then(res => selectCurrentElement(res.data))
+        }
+    }, [friends])
+
+
+    /*
+        when a channel is picked we add it in conversations state and join it 
+    */
     useEffect(() => {
         if (socket && channel) {
             if (conversations &&
