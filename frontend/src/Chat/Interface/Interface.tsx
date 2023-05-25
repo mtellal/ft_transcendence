@@ -7,6 +7,7 @@ import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
+import { useConversations, useFriends } from "../../Hooks";
 
 function RemoveFriend(props: any) {
     return (
@@ -93,14 +94,20 @@ export default function Interface({ friend, group }: any) {
         currentUser,
         user,
         currentElement,
-        friends,
         removeFriend,
         channel,
-        conversations,
         sendMessage,
         blockUser,
         unblockUser
     }: any = useOutletContext();
+
+    const [friends, friendsDispatch] : any = useFriends();
+    const [conversations, conversationsDispatch] : any = useConversations();
+
+    
+    React.useEffect(() => {
+        console.log("conversations => ", conversations)
+    }, [conversations])
 
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);

@@ -16,9 +16,10 @@ import { io } from 'socket.io-client';
 import { useConversations, useFriends, useUser } from "../Hooks";
 import { isEqual } from "../utils";
 
-import './Chat.css'
 import { FriendsProvider } from "../contexts/Chat/FriendsContext";
+import { ConversationsProvider } from "../contexts/Chat/ConversationsContexts";
 
+import './Chat.css'
 
 function ChatInterface() {
 
@@ -40,29 +41,6 @@ function ChatInterface() {
     const [friendInvitations, setFriendInvitations]: [any, any] = React.useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = React.useState(false);
 
-    async function loadCHannel() {
-        const channelRes = await getChannelByIDs(user.id, currentElement.id);
-
-        if (channelRes.status === 200 && channelRes.statusText === "OK") {
-            setChannel(channelRes.data);
-        }
-        else {
-            socket.emit('createChannel', {
-                name: "privateMessage",
-                type: "WHISPER",
-                memberList: [currentElement.id]
-            })
-        }
-    }
-
-
-    React.useEffect(() => {
-        if (currentElement) {
-            loadCHannel();
-        }
-    }, [currentElement])
-
-
     React.useEffect(() => {
         if (channel) {
             if (conversations && 
@@ -79,7 +57,6 @@ function ChatInterface() {
 
 
     function initMessages(arrayMessages: any) {
-        console.log(user.blockedList, arrayMessages)
         conversationsDispatch({type: 'initMessages', messages: arrayMessages});
     }
 
@@ -92,7 +69,7 @@ function ChatInterface() {
     }
 
     React.useEffect(() => {
-        if (conversations && socket) {
+        if (socket && socket.connected) {
             socket.on('message', (m: any) => {
                 if (m.length) {
                     initMessages(m)
@@ -191,15 +168,24 @@ function ChatInterface() {
     }, [])
 
 
-    function selectCurrentElement(e: any) {
+    async function selectCurrentElement(e: any) {
         friendsDispatch({type: 'removeNotif', friend: e});
         setCurrentElement({ ...e, notifs: 0 });
+
+        getChannelByIDs(user.id, e.id)
+            .then(d => {
+                setChannel(d.data)
+            })
+            .catch(e => {
+                socket.emit('createChannel', {
+                    name: "privateMessage",
+                    type: "WHISPER",
+                    memberList: [e.id]
+                })
+            })
     }
 
-    console.log(currentElement)
-
     return (
-        <FriendsProvider>
             <div className="chat">
                 <div className="chat-container">
                     <MenuElement
@@ -227,7 +213,6 @@ function ChatInterface() {
                     />
                 </div>
             </div>
-        </FriendsProvider>
     )
 }
 
@@ -236,7 +221,9 @@ export default function Chat()
 {
     return (
         <FriendsProvider>
-            <ChatInterface />
+            <ConversationsProvider>
+                <ChatInterface />
+            </ConversationsProvider>
         </FriendsProvider>
     )
 }
