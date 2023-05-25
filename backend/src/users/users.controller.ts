@@ -227,6 +227,7 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @Post('friendRequest')
+  @ApiBody({type: UserRequestDto})
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Send a pending friend request to another user, if it is accepted, both users will add each other to their friend list'})
   async sendFriendRequest(@Body() friendRequestDto: UserRequestDto, @Request() req)
@@ -243,7 +244,8 @@ export class UsersController {
       throw new NotAcceptableException(`Already exists a pending friend request between these two users`);
     if (friend.friendList.includes(user.id))
        throw new NotAcceptableException(`Already friends!`);
-    await this.usersService.sendFriendRequest(friend, user);
+    const newRequest = await this.usersService.sendFriendRequest(friend, user);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(friend.id)).emit('receivedRequest', newRequest);
   }
 
   @UseGuards(JwtGuard)
@@ -252,9 +254,11 @@ export class UsersController {
   @ApiOperation({ summary: 'Accept a pending friend request with a given id, both users will add each other to their friend lists'})
   async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
-    await this.usersService.acceptFriendRequest(user.id, requestId);
-    const updatedFriendList = await this.usersService.getUpdatedFriendList(user.id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendList);
+    const newFriend = await this.usersService.acceptFriendRequest(user.id, requestId);
+    const updatedFriendListForUser = await this.usersService.getUpdatedFriendList(user.id);
+    const updatedFriendListForFriend = await this.usersService.getUpdatedFriendList(newFriend.id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendListForUser);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('updatedFriend', updatedFriendListForFriend);
   }
 
   @UseGuards(JwtGuard)

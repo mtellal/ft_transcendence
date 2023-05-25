@@ -70,7 +70,7 @@ export class UsersService {
       throw new NotFoundException('Friend request not found');
     }
 
-    await this.prisma.user.update({
+    const newFriend = await this.prisma.user.update({
       where: { id: friendRequest.sendBy },
       data: {
         friendList: {
@@ -78,7 +78,7 @@ export class UsersService {
         }
       }
     })
-    return await this.prisma.user.update({
+    await this.prisma.user.update({
       where: { id: userId },
       data: {
         friendList: {
@@ -89,6 +89,7 @@ export class UsersService {
         }
       },
     })
+    return newFriend;
   }
 
   async deleteFriendRequest(userId: number, requestId: number) {
