@@ -83,7 +83,7 @@ model MutedUser {
   id        Int      @id @default(autoincrement())
   userId    Int
   duration  DateTime
-  Channel   Channel? @relation(fields: [channelId], references: [id])
+  Channel   Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int?
 }
 
