@@ -12,7 +12,7 @@ export function Chat() {
     const [friends, setFriends] = useState([]);
     const [friendRequest, setFriendRequest] = useState([]);
     const [idFriendSelected, setIdFriendSelected] = useState();
-    const [btnFriendsRequest, setBtnFriendsRequest] = useState('REQUEST');
+    const [btnFriendsRequest, setBtnFriendsRequest] = useState('FRIEND');
     const selector = useSelector(store => store.USER.user);
 
     async function getFriends() {
@@ -85,6 +85,13 @@ export function Chat() {
                     >
                         Friend List
                     </button>
+					<button
+						className={s.button}
+						onClick={() => setBtnFriendsRequest('GROUP')}
+						style={{backgroundColor: btnFriendsRequest === 'GROUP' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)'}}
+					>
+						Groups
+					</button>
                     <AddFriend id={selector.id} addFriend={addFriend} />
                 </div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest}/>}

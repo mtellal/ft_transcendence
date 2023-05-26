@@ -21,6 +21,7 @@ export function Chatbox({ idFriendSelected }) {
     }
 
 	async function creteOrJoinChannel() {
+		// console.log('idFriendSelected', idFriendSelected)
 		const response = await BackApi.getWhispers(selector.id, idFriendSelected);
 		if (response.status === 200) {
 			console.log('Chennel exist');
@@ -34,21 +35,20 @@ export function Chatbox({ idFriendSelected }) {
 				memberList: [idFriendSelected]
 			})
 			setTimeout(async function() {
-				// Le code à exécuter après la pause de 1 seconde
-				console.log("Après la pause");
 				const response = await BackApi.getWhispers(selector.id, idFriendSelected);
 				if (response.status === 200) {
 					console.log('Chennel exist');
 					setIdChannel(response.data.id);
-				  joinChannel(response.data.id);
+					joinChannel(response.data.id);
 				}
-			  }, 1000); // 1000 millisecondes = 1 seconde
+			  }, 1000);
 		}
 	}
 
 	function joinChannel(idChan) {
+		console.log('idChan', idChan);
 		socket.emit('joinChannel', {
-			channelId: idChannel
+			channelId: idChan
 		})
 	}
 
@@ -62,23 +62,17 @@ export function Chatbox({ idFriendSelected }) {
             })
             setSocket(newSocket);
         }
-    }, [setSocket, selector.token])
+    }, [setSocket, selector.token, idFriendSelected])
 
     useEffect(() => {
 		if (selector.id && socket) {
 			creteOrJoinChannel();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socket, selector.id])
-
-	// useEffect(() => {
-	// 	if (socket && idChannel) {
-	// 		joinChannel()
-	// 	}
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [socket, idChannel])
+    }, [socket, selector.id, idFriendSelected])
 
 	const messageListener = (message) => {
+		console.log('Msg', message);
 		if (message.length) {
 			setMessages(message);
 		} else {
@@ -94,7 +88,7 @@ export function Chatbox({ idFriendSelected }) {
 			}
 		}
         // eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [messageListener])
+	}, [messageListener, idFriendSelected])
 
 	// console.log('messages', messages);
 
