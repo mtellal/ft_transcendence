@@ -97,6 +97,7 @@ export default function AddElement(props: any) {
             if (validRes.status === 201 && validRes.statusText === "Created") {
                 removeFriendRequest(invitation.id);
                 setUserInvitations((p: any) => p.filter((user: any) => user.id !== u.id))
+                friendsDispatch({type: 'updateFriend', friend: u})
             }
         }
     }

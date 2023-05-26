@@ -66,7 +66,7 @@ function GroupElement(props: any) {
 */
 
 export default function MenuElement({ ...props }) {
-    const [friendsList, setFriendsList] = React.useState();
+    const [friendsList, setFriendsList] = React.useState([]);
 
     React.useEffect(() => {
         if (props.friends && props.friends.length) {
@@ -84,6 +84,8 @@ export default function MenuElement({ ...props }) {
                 ))
             )
         }
+        else
+            setFriendsList([]);
     }, [props.friends])
 
 

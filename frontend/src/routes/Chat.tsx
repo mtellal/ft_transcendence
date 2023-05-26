@@ -1,24 +1,18 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import MenuElement from "../Chat/MenuElement";
-import { Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
     getChannelByIDs,
-    getFriendList,
-    getMessages,
     getUser,
     getUserInvitations,
-    removeUserFriend
 } from "../utils/User";
 
-import { io } from 'socket.io-client';
-
-
-import { useConversations, useFriends, useUser } from "../Hooks";
-import { isEqual } from "../utils";
+import { useChatSocketContext, useConversations, useFriends, useUser } from "../Hooks";
 
 import { FriendsProvider } from "../contexts/Chat/FriendsContext";
 import { ConversationsProvider } from "../contexts/Chat/ConversationsContexts";
+import { SocketProvider } from "../contexts/Chat/ChatSocketContext";
 
 import './Chat.css'
 
@@ -33,7 +27,7 @@ function ChatInterface() {
         token
     }: any = useUser();
 
-    const [socket, setSocket]: [any, any] = useState();
+    const { socket }: any = useChatSocketContext();
     const [currentElement, setCurrentElement]: [any, any] = useState();
 
     const [friends, friendsDispatch]: any = useFriends();
@@ -47,13 +41,6 @@ function ChatInterface() {
     /////////////////////////////////////////////////////////////////////////
     //                         M E S S A G E S                             //
     /////////////////////////////////////////////////////////////////////////
-
-    function sendMessage(channelId: any, content: any) {
-        socket.emit('message', {
-            channelId,
-            content
-        })
-    }
 
     useEffect(() => {
         if (socket && socket.connected) {
@@ -155,36 +142,32 @@ function ChatInterface() {
 
     useEffect(() => {
         loadInvitations();
-        let s = io(`${process.env.REACT_APP_BACK}`, {
-            transports: ['websocket'],
-            extraHeaders: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        if (socket) {
+            socket.on('receivedRequest', (e: any) => {
+                if (e) {
+                    setNotifInvitation(true);
+                    setFriendInvitations((p: any) => [...p, e])
+                }
+                console.log("EVENT RECIEVED REQUEST => ", e)
+            })
 
-        setSocket(s);
+            socket.on('updatedUser', (friend: any) => {
+                console.log("UPDATE FRIEND EVENT => ", friend)
+                if (friend && friend.id) {
+                    friendsDispatch({ type: 'updateFriend', friend });
+                }
+            })
 
-        s.on('receivedRequest', (e: any) => {
-            if (e)
-            {
-                setNotifInvitation(true);
-                setFriendInvitations((p: any) => [...p, e])
-            }
-            console.log("EVENT RECIEVED REQUEST => ", e)
-        })
+            socket.on('removedFriend', (friend: any) => {
+                console.log("REMOVE FRIEND EVENT")
+                if (friend && friend.id) {
+                    friendsDispatch({ type: 'removeFriend', friend });
+                    navigate("/chat")
+                }
+            })
+        }
 
-        s.on('updatedFriend', (friend: any) => {
-            console.log("UPDATE FRIEND EVENT => ", friend)
-            if (friend.length && friend[0].id)
-            {
-                friendsDispatch({ type: 'updateFriend', friend: friend[0] });
-            }
-        })
-
-        return (() => {
-            s.disconnect();
-        })
-    }, [])
+    }, [socket])
 
     return (
         <div className="chat">
@@ -201,7 +184,6 @@ function ChatInterface() {
                     {
                         currentElement,
                         channel,
-                        sendMessage,
                         friendInvitations,
                         removeFriendRequest,
                     }
@@ -215,10 +197,12 @@ function ChatInterface() {
 
 export default function Chat() {
     return (
-        <FriendsProvider>
-            <ConversationsProvider>
-                <ChatInterface />
-            </ConversationsProvider>
-        </FriendsProvider>
+        <SocketProvider>
+            <FriendsProvider>
+                <ConversationsProvider>
+                    <ChatInterface />
+                </ConversationsProvider>
+            </FriendsProvider>
+        </SocketProvider>
     )
 }
