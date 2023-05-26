@@ -69,8 +69,7 @@ function ChatInterface() {
     */
 
     function updateFriendList(friend: any) {
-        if (friend)
-            friendsDispatch({ type: 'updateFriend', friend });
+        friendsDispatch({ type: 'updateFriend', friend });
     }
 
 
@@ -129,16 +128,10 @@ function ChatInterface() {
     async function loadInvitations() {
         getUserInvitations(user.id)
             .then(invitationsRes => {
-                if (invitationsRes.status === 200 && invitationsRes.statusText === "OK") {
-                    if (invitationsRes.data.length) {
-                        setFriendInvitations((p: any) => {
-                            if (!isEqual(p, invitationsRes.data)) {
-                                setNotifInvitation(true);
-                                return (invitationsRes.data);
-                            }
-                            return (p);
-                        });
-                    }
+                if (invitationsRes.status === 200 && 
+                        invitationsRes.statusText === "OK" && invitationsRes.data.length) {
+                        setNotifInvitation(true);
+                        setFriendInvitations(invitationsRes.data);
                 }
             })
 
@@ -195,23 +188,12 @@ function ChatInterface() {
         }
     }, [socket, channel])
 
-
-    if (socket)
-    {
-        console.log("listenning on recievedRequest")
-                socket.on('recievedRequest', (e : any) => console.log("EVENT RECIEVED REQUEST => ", e))
-    }
-
     /////////////////////////////////////////////////////////////////////////
     //                       U S E    E F F E C T S                        //
     /////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         loadInvitations();
-        const loadFriendsInterval = setInterval(async () => {
-            loadInvitations();
-        }, 3000)
-
         let s = io(`${process.env.REACT_APP_BACK}`, {
             transports: ['websocket'],
             extraHeaders: {
@@ -221,11 +203,22 @@ function ChatInterface() {
 
         setSocket(s);
 
-        console.log("listenning on recievedRequest")
-            s.on('recievedRequest', (e : any) => console.log("EVENT RECIEVED REQUEST => ", e))
+        s.on('receivedRequest', (e: any) => {
+            setNotifInvitation(true);
+            setFriendInvitations((p : any) => [...p, e])
+            console.log("EVENT RECIEVED REQUEST => ", e)
+        })
+
+
+        // data => array 
+        
+        s.on('updatedFriend', (friend : any) => {
+            console.log("UPDATE FRIEND EVENT => ", friend)
+            console.log(friends)
+            friendsDispatch({ type: 'updateFriend', friend: friend[0] });
+        })
 
         return (() => {
-            clearInterval(loadFriendsInterval);
             s.disconnect();
         })
     }, [])
@@ -249,7 +242,6 @@ function ChatInterface() {
                         sendMessage,
                         friendInvitations,
                         removeFriendRequest,
-                        updateFriendList
                     }
                 }
                 />
