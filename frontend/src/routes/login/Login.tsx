@@ -36,8 +36,7 @@ export async function loader({ params, request }: any) {
     let url = request.url.split('oauth_code=');
     if (url && url.length > 1) {
         let oauth_code = decodeURI(url[1]);
-        if (oauth_code.length > 2) {
-            oauth_code = oauth_code.slice(1, oauth_code.length - 1);
+        if (oauth_code) {
             await getTokenRequest(oauth_code, "wfw")
                 .then(res => {
                     setCookie("access_token", res.data.access_token);
