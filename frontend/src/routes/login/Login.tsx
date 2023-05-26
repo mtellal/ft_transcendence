@@ -5,6 +5,7 @@ import { setCookie } from "../../utils/Cookie";
 import userImg from '../../assets/icon-login.png'
 
 import './Sign.css'
+import { getTokenRequest } from "../../utils/User";
 
 
 export function ChooseLogin() {
@@ -31,16 +32,23 @@ export function ChooseLogin() {
 
 
 export async function loader({ params, request }: any) {
-    let url = request.url.split('token=');
-    if (url.length > 1) {
-        let data = JSON.parse(decodeURI(url[1]));
-        if (data.access_token) {
-            setCookie("access_token", data.access_token);
-            return (redirect("/"));
+    let validLogin = false;
+    let url = request.url.split('oauth_code=');
+    if (url && url.length > 1) {
+        let oauth_code = decodeURI(url[1]);
+        if (oauth_code.length > 2) {
+            oauth_code = oauth_code.slice(1, oauth_code.length - 1);
+            await getTokenRequest(oauth_code, "wfw")
+                .then(res => {
+                    setCookie("access_token", res.data.access_token);
+                    validLogin = true;
+                })
         }
     }
     else
         setCookie("access_token", "")
+    if (validLogin)
+        return (redirect("/"))
     return ({})
 }
 
