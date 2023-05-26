@@ -180,4 +180,20 @@ export class BackApi {
 
 		return response;
 	}
+
+	static async getChannelsById(idUser) {
+		const response = await axios.get(`${BASE_URL}/users/${idUser}/channels`, {
+			// params: {
+			// 	id: id,
+			// 	friendId: idFriend
+			// },
+			headers: {
+				'accept': '*/*'
+			}
+		})
+			.then(rep => rep)
+			.catch(error => error)
+
+		return response;
+	}
 }

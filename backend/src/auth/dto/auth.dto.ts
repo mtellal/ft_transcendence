@@ -31,3 +31,15 @@ export class SigninDto {
 	@IsOptional()
 	code?: string;
 }
+
+export class TradeDto {
+	@ApiProperty({ description: 'OAuth code', example: 'oauth_code' })
+ 	@IsString()
+	@IsNotEmpty()
+	oauth_code: string;
+
+	@ApiProperty({ description: 'OTP code. Is optional', example: 'otp_code' })
+	@IsString()
+	@IsOptional()
+	otp_code?: string;
+}

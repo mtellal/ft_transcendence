@@ -1,0 +1,52 @@
+.container {
+	margin-top: 10px;
+	height: 460px;
+	margin-left: 10px;
+	margin-right: 10px;
+	border-radius: 20px;
+
+
+
+	/* background-color: white; */
+}
+
+/* .messages { */
+	/* height: 50%; */
+	/* border-radius: 20px 20px 0 0; */
+	/* border-radius: 20px; */
+
+	/* background-color: rgba(0, 0, 0, 0.1); */
+/* } */
+
+.inputBox {
+	height: 10%;
+	/* display: flex; */
+	border-radius: 0 0 20px 20px;
+	/* border-top: solid 1px grey; */
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.input {
+	border-radius: 20px;
+	width: 98%;
+	height: 80%;
+	background-color: rgba(165, 151, 151, 0.1);
+	border: solid 1px rgb(53, 53, 53);
+	padding-left: 5px;
+	font-size: 17px;
+}
+
+
+
+
+
+
+
+
+
+
+.list {
+    display: flex;
+    justify-content: center;
+    /* background-color: black; */
+}

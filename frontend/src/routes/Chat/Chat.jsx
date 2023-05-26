@@ -5,12 +5,14 @@ import { BackApi } from '../../api/back';
 import { AddFriend } from '../../components/AddFriend/AddFriend';
 import { Chatbox } from '../../components/Chatbox/Chatbox';
 import { FriendRequest } from '../../components/FriendRequest/FriendRequest';
-import s from './style.module.css'
 import { Group } from '../../components/Group/Group';
+import { ChatboxChannel } from '../../components/ChatboxChannel/ChatboxChannel';
+import s from './style.module.css'
 
 export function Chat() {
 
     const [friends, setFriends] = useState([]);
+    const [channels, setChannels] = useState([]);
     const [friendRequest, setFriendRequest] = useState([]);
     const [idFriendSelected, setIdFriendSelected] = useState();
     const [btnFriendsRequest, setBtnFriendsRequest] = useState('GROUP');
@@ -21,6 +23,15 @@ export function Chat() {
         if (response.status === 200) {
             if (response.data.length > 0 && friends !== response.data) {
 				setFriends(response.data);
+            }
+        }
+    }
+
+	async function getChannels() {
+        const response = await BackApi.getChannelsById(selector.id);
+        if (response.status === 200) {
+            if (response.data.length > 0 && channels !== response.data) {
+				setChannels(response.data);
             }
         }
     }
@@ -61,6 +72,7 @@ export function Chat() {
         // console.log('2');
         if (selector.id) {
             getFriends();
+			getChannels();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id, friendRequest])
@@ -97,8 +109,9 @@ export function Chat() {
                 </div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest}/>}
                 {btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
-                {btnFriendsRequest === 'GROUP' && <Group />}
-				{idFriendSelected && <Chatbox idFriendSelected={idFriendSelected}/>}
+                {btnFriendsRequest === 'GROUP' && channels && <Group channels={channels} />}
+				{idFriendSelected && btnFriendsRequest !== 'GROUP' && <Chatbox idFriendSelected={idFriendSelected}/>}
+				{idFriendSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel />}
             </div>
         </div>
     );
