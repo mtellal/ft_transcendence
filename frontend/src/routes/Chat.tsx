@@ -45,50 +45,8 @@ function ChatInterface() {
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
 
     /////////////////////////////////////////////////////////////////////////
-    //                          F R I E N D S                              //
-    /////////////////////////////////////////////////////////////////////////
-
-    async function removeFriend(friend: any) {
-        if (friend) {
-            removeUserFriend(friend.id, token)
-                .then(res => {
-                    if (res.status === 200 && res.statusText === "OK") {
-                        friendsDispatch({ type: 'removeFriend', friend })
-                        navigate("/chat");
-                    }
-                })
-        }
-    }
-
-
-    // socket.on('updateFriend', friend => updateFriendList(friendList))
-
-    /*
-        if a friend exists inside friendList[] then it updates, 
-        else he is added in the array 
-    */
-
-    function updateFriendList(friend: any) {
-        friendsDispatch({ type: 'updateFriend', friend });
-    }
-
-
-    /////////////////////////////////////////////////////////////////////////
     //                         M E S S A G E S                             //
     /////////////////////////////////////////////////////////////////////////
-
-
-
-    function initMessages(arrayMessages: any) {
-        conversationsDispatch({ type: 'initMessages', messages: arrayMessages });
-    }
-
-    function addMessage(message: any) {
-        if (message.sendBy !== user.id && message.sendBy !== currentElement.id) {
-            friendsDispatch({ type: 'addNotif', friendId: message.sendBy })
-        }
-        conversationsDispatch({ type: 'addMessage', message });
-    }
 
     function sendMessage(channelId: any, content: any) {
         socket.emit('message', {
@@ -101,10 +59,13 @@ function ChatInterface() {
         if (socket && socket.connected) {
             socket.on('message', (m: any) => {
                 if (m.length) {
-                    initMessages(m)
+                    conversationsDispatch({ type: 'initMessages', messages: m });
                 }
                 if (m.content) {
-                    addMessage(m)
+                    if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
+                        friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
+                    }
+                    conversationsDispatch({ type: 'addMessage', message: m });
                 }
             });
         }
@@ -128,10 +89,10 @@ function ChatInterface() {
     async function loadInvitations() {
         getUserInvitations(user.id)
             .then(invitationsRes => {
-                if (invitationsRes.status === 200 && 
-                        invitationsRes.statusText === "OK" && invitationsRes.data.length) {
-                        setNotifInvitation(true);
-                        setFriendInvitations(invitationsRes.data);
+                if (invitationsRes.status === 200 &&
+                    invitationsRes.statusText === "OK" && invitationsRes.data.length) {
+                    setNotifInvitation(true);
+                    setFriendInvitations(invitationsRes.data);
                 }
             })
 
@@ -204,18 +165,20 @@ function ChatInterface() {
         setSocket(s);
 
         s.on('receivedRequest', (e: any) => {
-            setNotifInvitation(true);
-            setFriendInvitations((p : any) => [...p, e])
+            if (e)
+            {
+                setNotifInvitation(true);
+                setFriendInvitations((p: any) => [...p, e])
+            }
             console.log("EVENT RECIEVED REQUEST => ", e)
         })
 
-
-        // data => array 
-        
-        s.on('updatedFriend', (friend : any) => {
+        s.on('updatedFriend', (friend: any) => {
             console.log("UPDATE FRIEND EVENT => ", friend)
-            console.log(friends)
-            friendsDispatch({ type: 'updateFriend', friend: friend[0] });
+            if (friend.length && friend[0].id)
+            {
+                friendsDispatch({ type: 'updateFriend', friend: friend[0] });
+            }
         })
 
         return (() => {
@@ -237,7 +200,6 @@ function ChatInterface() {
                 <Outlet context={
                     {
                         currentElement,
-                        removeFriend,
                         channel,
                         sendMessage,
                         friendInvitations,

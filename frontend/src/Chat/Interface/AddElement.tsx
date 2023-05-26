@@ -1,6 +1,14 @@
 
 import React from "react";
-import { getUserByUsername, addUserFriend, getUser, sendFriendRequest, validFriendRequest, refuseFriendRequest } from '../../utils/User'
+import {
+    getUserByUsername,
+    addUserFriend,
+    getUser,
+    sendFriendRequest,
+    validFriendRequest,
+    refuseFriendRequest
+} from '../../utils/User'
+
 import { FriendSearch } from "../../Components/FriendElement";
 
 import IconInput from "../../Components/IconInput";
@@ -64,7 +72,7 @@ export default function AddElement(props: any) {
 
     async function addFriend() {
         if (validFriend()) {
-            const sendRes = await sendFriendRequest(friend.id, token);
+            await sendFriendRequest(friend.id, token);
         }
     }
 

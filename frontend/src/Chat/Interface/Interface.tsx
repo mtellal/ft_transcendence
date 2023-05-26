@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useLoaderData, useOutletContext, useParams } from "react-router-dom";
+import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import Banner from "./Banner";
 import Profile from "./Profile";
@@ -8,7 +8,7 @@ import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
 import { useConversations, useFriends, useUser } from "../../Hooks";
-import { blockUserRequest, unblockUserRequest } from "../../utils/User";
+import { blockUserRequest, removeUserFriend, unblockUserRequest } from "../../utils/User";
 
 function RemoveFriend(props: any) {
     return (
@@ -95,15 +95,15 @@ export default function Interface({ friend, group }: any) {
         token,
         user,
         userDispatch,
-        setUser
     }: any = useUser();
 
     const {
         currentElement,
-        removeFriend,
         channel,
         sendMessage,
     }: any = useOutletContext();
+
+    const navigate = useNavigate();
 
     const [friends, friendsDispatch]: any = useFriends();
     const [conversations, conversationsDispatch]: any = useConversations();
@@ -127,23 +127,17 @@ export default function Interface({ friend, group }: any) {
     }
 
 
-    React.useEffect(() => {
-        console.log("INTERFACE MOUNT")
-        return () => {
-            console.log("INTERFACE UNMOUNT")
+    async function removeFriend(friend: any) {
+        if (friend) {
+            removeUserFriend(friend.id, token)
+                .then(res => {
+                    if (res.status === 200 && res.statusText === "OK") {
+                        friendsDispatch({ type: 'removeFriend', friend })
+                        navigate("/chat");
+                    }
+                })
         }
-    }, [])
-
-    // when a friend is selected but the page is refreshed
-    // then it reload user data from URI id
-
-    React.useEffect(() => {
-        if (friends) {
-            setCurrent(friends.find((u: any) => u.id.toString() === id.toString()))
-
-        }
-    }, [friends])
-
+    }
 
     // update current friend selected when he is picked from MenuElement
 
@@ -153,7 +147,7 @@ export default function Interface({ friend, group }: any) {
         if (currentElement) {
             setCurrent(currentElement);
             if (user.blockedList.length) {
-                if (user.blockedList.find((id: any) => currentElement.id === id))
+                if (user.blockedList.find((obj: any) => currentElement.id === obj.blockedId))
                     setBlocked(true);
                 else
                     setBlocked(false)
