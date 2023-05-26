@@ -12,8 +12,8 @@ function reducer(friends: any, action: any) {
         }
         case ('updateFriend'): {
             const friend = action.friend;
-            if (friends &&
-                friends.find((p: any) => p.length && p.find((u: any) => u.id === friend.id))) {
+            if (friends.length &&
+                friends.find((u: any) => u.id === friend.id)) {
                 return (
                     friends.map((u: any) => {
                         if (u.id === friend.id) {
@@ -27,18 +27,25 @@ function reducer(friends: any, action: any) {
                 return ([...friends, friend]);
         }
         case ('removeFriend'): {
-            return (friends.filter((u: any) => u.id !== action.friend.id))
+            if (friends.length)
+                return (friends.filter((u: any) => u.id !== action.friend.id))
+            return (friends);
         }
-        case('addNotif'): {
-            friends.map((f: any) => {
-                if (f.id === action.friendId) {
-                    if (!f.notifs)
-                        f.notifs = 1;
-                    else
-                        f.notifs += 1;
-                }
-                return (f)
-            })
+        case ('addNotif'): {
+            if (friends.length)
+                return (
+                    friends.map((f: any) => {
+                        if (f.id === action.friendId) {
+                            if (!f.notifs)
+                                f.notifs = 1;
+                            else
+                                f.notifs += 1;
+                        }
+                        return (f)
+                    })
+                )
+            else
+                return (friends);
         }
         case ('removeNotif'): {
             friends.map((f: any) => {
@@ -53,22 +60,21 @@ function reducer(friends: any, action: any) {
 
 
 export function FriendsProvider({ children }: any) {
-    const [friends, dispatch] : any = useReducer(reducer, [])
+    const [friends, dispatch]: any = useReducer(reducer, [])
     const {
         user
-    } : any = useUser();
+    }: any = useUser();
 
     useEffect(() => {
-        if (user)
-        {
+        if (user) {
             getFriendList(user.id)
-            .then(friendListRes => {
-                if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
-                    let friendList = friendListRes.data;
-                    friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
-                    dispatch({type:'setFriendList', friendList})
-                }
-            })
+                .then(friendListRes => {
+                    if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
+                        let friendList = friendListRes.data;
+                        friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
+                        dispatch({ type: 'setFriendList', friendList })
+                    }
+                })
         }
     }, [user])
 

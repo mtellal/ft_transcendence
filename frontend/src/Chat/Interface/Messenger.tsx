@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import './Messenger.css'
 import { getChannelByIDs, getMessages } from "../../utils/User";
@@ -7,6 +7,7 @@ import userEvent from "@testing-library/user-event";
 import { measureMemory } from "vm";
 import { ElementFlags } from "typescript";
 import { useOutlet, useOutletContext } from "react-router-dom";
+import { useChatSocketContext, useConversations, useFriends, useUser } from "../../Hooks";
 
 function BlockMessage({ username }: any) {
     return (
@@ -87,17 +88,23 @@ function Message(props: any) {
 
 
 export default function Messenger({
-     user, 
-     conversation,
-     sendMessage,
-     element, 
-     channel, 
-     blocked, 
-     invitation, 
+    channel,
+    element,
+    blocked,
+    invitation,
 }: any) {
 
     const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");
+
+    const [renderMessages, setRenderMessages]: any = useState([]);
+
+    const {
+        user
+    }: any = useUser();
+    const [conversations, conversationsDispatch]: any = useConversations();
+
+    const { socket }: any = useChatSocketContext();
 
     function handleChange(e: any) {
         setValue(e.target.value)
@@ -105,35 +112,61 @@ export default function Messenger({
 
     function submit(e: any) {
         if (e.key === "Enter" && value !== "" && !blocked) {
-           sendMessage(conversation.id, value)
+            socket.emit('message', {
+                channelId: channel.id,
+                content: value
+            })
             setValue("")
         }
     }
 
-    const renderMessages = conversation ? 
-        conversation.messages.map((m: any) =>
-            <Message
-                key={m.id}
-                id={m.id}
-                message={m.content}
-                author={m.sendBy}
-                userId={user.id}
-                group={null}
-                administrators={null}
-            />
-        ) : null
+    useEffect(() => {
+        if (conversations &&
+            conversations.length && channel) {
+            const conversation = conversations.find((c: any) => c.id === channel.id);
+
+            let block: any;
+            let messages: any;
+
+            if (conversation && conversation.messages.length) {
+
+                if (conversation.type === "WHISPER" &&
+                    user.blockedList.length &&
+                    (block = user.blockedList.find((o: any) => o.blockedId === element.id))) {
+                    messages = conversation.messages.filter((m: any) => m.createdAt < block.createdAt)
+                }
+                else
+                    messages = conversation.messages;
+                if (messages)
+                {
+                    setRenderMessages(
+                        messages.map((m: any) =>
+                            <Message
+                                key={m.id}
+                                id={m.id}
+                                message={m.content}
+                                author={m.sendBy}
+                                userId={user.id}
+                                group={null}
+                                administrators={null}
+                            />
+                        )
+                    )
+                }
+            }
+        }
+    }, [conversations, channel, user])
+
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
     }, [element, blocked, invitation, renderMessages])
 
-
-
     return (
         <>
             <div className="messages-display">
                 {
-                    renderMessages ?
+                    renderMessages.length ?
                         renderMessages : <NoMessages />
                 }
                 {blocked && <BlockMessage username={element.username || element.name} />}

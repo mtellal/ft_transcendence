@@ -32,10 +32,23 @@ function reducer(user: any, action: any) {
             return ({ ...user, blockedList: action.blockedList });
         }
         case ('blockUser'): {
-            return ({ ...user, blockedList: [...user.blockedList, action.friendId] })
+            return ({
+                ...user,
+                blockedList: [
+                    ...user.blockedList,
+                    {
+                        blockedId: action.friendId,
+                        createdAt: new Date().toISOString()
+                    }
+                ]
+            })
         }
         case ('unblockUser'): {
-            return ({ ...user, blockedList: user.blockedList.filter((id: any) => id !== action.friendId) })
+            return ({
+                ...user,
+                blockedList: user.blockedList.filter((obj: any) =>
+                    obj.blockedId !== action.friendId)
+            })
         }
         default: return (user);
     }

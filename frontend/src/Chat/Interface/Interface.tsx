@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import Banner from "./Banner";
@@ -144,7 +144,7 @@ export default function Interface({ friend, group }: any) {
     React.useEffect(() => {
         setProfile(false);
         setRemoveFriendView(false);
-        if (currentElement) {
+        if (currentElement && user) {
             setCurrent(currentElement);
             if (user.blockedList.length) {
                 if (user.blockedList.find((obj: any) => currentElement.id === obj.blockedId))
@@ -153,8 +153,7 @@ export default function Interface({ friend, group }: any) {
                     setBlocked(false)
             }
         }
-    }, [currentElement])
-
+    }, [currentElement, user])
 
     return (
         <>
@@ -181,6 +180,7 @@ export default function Interface({ friend, group }: any) {
                                             <Messenger
                                                 user={user}
                                                 element={current}
+                                                channel={channel}
                                                 conversation={conversations &&
                                                     conversations.find((c: any) => c.id === channel.id)}
                                                 sendMessage={sendMessage}
