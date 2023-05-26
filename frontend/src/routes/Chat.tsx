@@ -48,17 +48,6 @@ function ChatInterface() {
     //                          F R I E N D S                              //
     /////////////////////////////////////////////////////////////////////////
 
-    async function loadFriends() {
-        getFriendList(user.id)
-            .then(friendListRes => {
-                if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
-                    let friendList = friendListRes.data;
-                    friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
-                    friendsDispatch({ type: 'set', newFriends: friendList })
-                }
-            })
-    }
-
     async function removeFriend(friend: any) {
         if (friend) {
             removeUserFriend(friend.id, token)
@@ -206,16 +195,21 @@ function ChatInterface() {
         }
     }, [socket, channel])
 
+
+    if (socket)
+    {
+        console.log("listenning on recievedRequest")
+                socket.on('recievedRequest', (e : any) => console.log("EVENT RECIEVED REQUEST => ", e))
+    }
+
     /////////////////////////////////////////////////////////////////////////
     //                       U S E    E F F E C T S                        //
     /////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         loadInvitations();
-        loadFriends();
         const loadFriendsInterval = setInterval(async () => {
             loadInvitations();
-            loadFriends();
         }, 3000)
 
         let s = io(`${process.env.REACT_APP_BACK}`, {
@@ -226,6 +220,9 @@ function ChatInterface() {
         });
 
         setSocket(s);
+
+        console.log("listenning on recievedRequest")
+            s.on('recievedRequest', (e : any) => console.log("EVENT RECIEVED REQUEST => ", e))
 
         return (() => {
             clearInterval(loadFriendsInterval);
@@ -246,13 +243,9 @@ function ChatInterface() {
                 />
                 <Outlet context={
                     {
-                        user,
                         currentElement,
-                        friends,
-                        token,
                         removeFriend,
                         channel,
-                        conversations,
                         sendMessage,
                         friendInvitations,
                         removeFriendRequest,

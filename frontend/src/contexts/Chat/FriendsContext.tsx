@@ -1,12 +1,14 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
 import { isEqual } from "../../utils";
+import { useUser } from "../../Hooks";
+import { getFriendList } from "../../utils/User";
 
 export const FriendsContext: React.Context<any> = createContext([]);
 
 function reducer(friends: any, action: any) {
     switch (action.type) {
-        case ('set'): {
-            return (isEqual(friends, action.newFriends) ? friends : action.newFriends)
+        case ('setFriendList'): {
+            return (isEqual(friends, action.friendList) ? friends : action.friendList)
         }
         case ('updateFriend'): {
             const friend = action.friend;
@@ -52,6 +54,23 @@ function reducer(friends: any, action: any) {
 
 export function FriendsProvider({ children }: any) {
     const [friends, dispatch] : any = useReducer(reducer, [])
+    const {
+        user
+    } : any = useUser();
+
+    useEffect(() => {
+        if (user)
+        {
+            getFriendList(user.id)
+            .then(friendListRes => {
+                if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
+                    let friendList = friendListRes.data;
+                    friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
+                    dispatch({type:'setFriendList', friendList})
+                }
+            })
+        }
+    }, [user])
 
     return (
         <FriendsContext.Provider value={[friends, dispatch]}>
