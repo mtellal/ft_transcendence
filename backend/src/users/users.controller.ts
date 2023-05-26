@@ -154,11 +154,12 @@ export class UsersController {
     const user: User = req.user;
     if (req.user.avatar && path.extname(file.filename) != path.extname(user.avatar))
       this.usersService.deleteImg(req.user.avatar);
-    await this.usersService.update(user.id, {
+    const updatedUser = await this.usersService.update(user.id, {
       avatar: file.path
     })
-    const updatedFriendList = await this.usersService.getUpdatedFriendList(user.id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendList);
+    for (const friendId of updatedUser.friendList) {
+      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedUser', updatedUser);
+    }
   }
 
   @Get(':id/profileImage')
@@ -255,10 +256,7 @@ export class UsersController {
   async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
     const newFriend = await this.usersService.acceptFriendRequest(user.id, requestId);
-    const updatedFriendListForUser = await this.usersService.getUpdatedFriendList(user.id);
-    const updatedFriendListForFriend = await this.usersService.getUpdatedFriendList(newFriend.id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendListForUser);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('updatedFriend', updatedFriendListForFriend);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('updatedUser', user);
   }
 
   @UseGuards(JwtGuard)
@@ -268,8 +266,6 @@ export class UsersController {
   async deleteFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
     await this.usersService.deleteFriendRequest(user.id, requestId);
-    const updatedFriendList = await this.usersService.getUpdatedFriendList(user.id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('updatedFriend', updatedFriendList);
   }
 
   @UseGuards(JwtGuard)
@@ -324,16 +320,19 @@ export class UsersController {
       throw new NotAcceptableException('Not friends!')
     }
 
-    await this.usersService.removeFriend(user.id, id);
+    const updatedUser = await this.usersService.removeFriend(user.id, id);
     await this.usersService.removeFriend(id, user.id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(id)).emit('removedFriend', updatedUser);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update the user, all the fields are optional. Will be protected by JWT in the future'})
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
     const updatedUser = await this.usersService.update(id, updateUserDto);
-    const updatedFriendList = await this.usersService.getUpdatedFriendList(id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(id)).emit('updatedFriend', updatedFriendList);
+    for (const friendId of updatedUser.friendList) {
+      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedUser', updatedUser);
+    }
+    return updatedUser;
   }
 
   @Delete(':id')
