@@ -3,16 +3,17 @@ import { Friends } from '../../components/Friends/Friends';
 import { useEffect, useState } from 'react';
 import { BackApi } from '../../api/back';
 import { AddFriend } from '../../components/AddFriend/AddFriend';
-import { Chatbox } from '../../components/Chatbot/Chatbot';
+import { Chatbox } from '../../components/Chatbox/Chatbox';
 import { FriendRequest } from '../../components/FriendRequest/FriendRequest';
 import s from './style.module.css'
+import { Group } from '../../components/Group/Group';
 
 export function Chat() {
 
     const [friends, setFriends] = useState([]);
     const [friendRequest, setFriendRequest] = useState([]);
     const [idFriendSelected, setIdFriendSelected] = useState();
-    const [btnFriendsRequest, setBtnFriendsRequest] = useState('FRIEND');
+    const [btnFriendsRequest, setBtnFriendsRequest] = useState('GROUP');
     const selector = useSelector(store => store.USER.user);
 
     async function getFriends() {
@@ -96,6 +97,7 @@ export function Chat() {
                 </div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest}/>}
                 {btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
+                {btnFriendsRequest === 'GROUP' && <Group />}
 				{idFriendSelected && <Chatbox idFriendSelected={idFriendSelected}/>}
             </div>
         </div>
