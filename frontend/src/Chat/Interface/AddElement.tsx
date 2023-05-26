@@ -8,7 +8,7 @@ import { useOutletContext } from "react-router-dom";
 import { CollectionElement } from "../MenuElement";
 
 import './AddElement.css'
-import { useUser } from "../../Hooks";
+import { useFriends, useUser } from "../../Hooks";
 
 export default function AddElement(props : any)
 {
@@ -26,8 +26,9 @@ export default function AddElement(props : any)
         setUser
     } : any = useUser();
 
+    const [friends, friendsDispatch] : any = useFriends();
+
     const {
-        friends, 
         updateFriendList, 
         friendInvitations,
         removeFriendRequest

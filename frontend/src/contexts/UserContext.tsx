@@ -1,5 +1,5 @@
 import React, { useReducer, createContext, useState } from "react";
-import { getBlockedList, getUser } from "../utils/User";
+import { getBlockedList, getFriendList, getUser } from "../utils/User";
 import { updateUser } from "../utils/User";
 
 async function login(user: any) {
@@ -28,14 +28,14 @@ function reducer(user: any, action: any) {
         case ('logout'): {
             return ({ ...user, userStatus: "OFFLINE" })
         }
-        case('setblockedList'): {
-            return ({...user, blockedList: action.blockedList});
+        case ('setblockedList'): {
+            return ({ ...user, blockedList: action.blockedList });
         }
         case ('blockUser'): {
             return ({ ...user, blockedList: [...user.blockedList, action.friendId] })
         }
         case ('unblockUser'): {
-            return ({ ...user, blockedList: user.blockedList.filter((id : any) => id !== action.friendId)})
+            return ({ ...user, blockedList: user.blockedList.filter((id: any) => id !== action.friendId) })
         }
         default: return (user);
     }
@@ -53,10 +53,9 @@ export function UserProvider({ children, ...props }: any) {
 
         getBlockedList(user.id, props.token)
             .then(res => {
-                userDispatch({type: 'setblockedList', blockedList: res.data})
+                userDispatch({ type: 'setblockedList', blockedList: res.data })
             })
-            .catch(err => console.log(err))
-        
+
         return () => {
             logout(user);
             userDispatch({ type: 'logout' })
@@ -67,6 +66,7 @@ export function UserProvider({ children, ...props }: any) {
         if (!image)
             setImage("./assets/user.png")
     }, [image])
+
 
     return (
         <UserContext.Provider

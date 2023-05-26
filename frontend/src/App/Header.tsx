@@ -8,7 +8,7 @@ import { useUser } from '../Hooks';
 export default function Header({profilePicture} : any)
 {
     const {user, image} = useUser();
-
+    
     return (
         <header className='header'>
             <p className='header-pong'>Pong</p>
