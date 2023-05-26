@@ -18,6 +18,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION: UsersGateway ///////////////////////////////")
 
+    console.log(this.server.engine.clientsCount);
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
