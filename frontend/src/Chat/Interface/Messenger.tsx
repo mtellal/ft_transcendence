@@ -1,13 +1,12 @@
 
 import React, { useEffect, useState } from "react";
 
+import { 
+    useChatSocket, 
+    useConversations, 
+    useUser 
+} from "../../Hooks";
 import './Messenger.css'
-import { getChannelByIDs, getMessages } from "../../utils/User";
-import userEvent from "@testing-library/user-event";
-import { measureMemory } from "vm";
-import { ElementFlags } from "typescript";
-import { useOutlet, useOutletContext } from "react-router-dom";
-import { useChatSocketContext, useConversations, useFriends, useUser } from "../../Hooks";
 
 function BlockMessage({ username }: any) {
     return (
@@ -94,17 +93,13 @@ export default function Messenger({
     invitation,
 }: any) {
 
-    const lastMessageRef: any = React.useRef(null);
-    const [value, setValue] = React.useState("");
-
-    const [renderMessages, setRenderMessages]: any = useState([]);
-
-    const {
-        user
-    }: any = useUser();
+    const { user } : any = useUser();
+    const { socket }: any = useChatSocket();
     const [conversations, conversationsDispatch]: any = useConversations();
 
-    const { socket }: any = useChatSocketContext();
+    const lastMessageRef: any = React.useRef(null);
+    const [value, setValue] = React.useState("");
+    const [renderMessages, setRenderMessages]: any = useState([]);
 
     function handleChange(e: any) {
         setValue(e.target.value)
@@ -120,39 +115,34 @@ export default function Messenger({
         }
     }
 
+
     useEffect(() => {
+        setRenderMessages([]);
         if (conversations &&
             conversations.length && channel) {
             const conversation = conversations.find((c: any) => c.id === channel.id);
 
             let block: any;
-            let messages: any;
-
-            if (conversation && conversation.messages.length) {
-
+            let messages: any = conversation && conversation.messages;
+            if (messages && messages.length) {
                 if (conversation.type === "WHISPER" &&
                     user.blockedList.length &&
                     (block = user.blockedList.find((o: any) => o.blockedId === element.id))) {
                     messages = conversation.messages.filter((m: any) => m.createdAt < block.createdAt)
                 }
-                else
-                    messages = conversation.messages;
-                if (messages)
-                {
-                    setRenderMessages(
-                        messages.map((m: any) =>
-                            <Message
-                                key={m.id}
-                                id={m.id}
-                                message={m.content}
-                                author={m.sendBy}
-                                userId={user.id}
-                                group={null}
-                                administrators={null}
-                            />
-                        )
+                setRenderMessages(
+                    messages.map((m: any) =>
+                        <Message
+                            key={m.id}
+                            id={m.id}
+                            message={m.content}
+                            author={m.sendBy}
+                            userId={user.id}
+                            group={null}
+                            administrators={null}
+                        />
                     )
-                }
+                )
             }
         }
     }, [conversations, channel, user])

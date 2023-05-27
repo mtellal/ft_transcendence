@@ -145,8 +145,7 @@ export async function getChats() {
 }
 
 
-
-export async function getChannelByIDs(id: string | number, friendId: string | number) {
+export async function getFriendChannel(id: string | number, friendId: string | number) {
     return (
         axios.get(`${back}/users/whispers?id=${id}&friendId=${friendId}`)
             .then(res => res)
@@ -154,6 +153,14 @@ export async function getChannelByIDs(id: string | number, friendId: string | nu
     )
 }
 
+export async function getChannels(id: string | number)
+{
+    return (
+        axios.get(`${back}/users/${id}/channels`)
+            .then(res => res)
+            .catch(err => err)
+    )
+}
 
 export async function getMessages(channelId: string | number) {
     return (

@@ -4,51 +4,16 @@
 
 .add-container
 {
-    width: 70%;
+    width: 60%;
+    padding: 5%;
     overflow: hidden;
-}
-
-.add-div
-{
-    padding: 10% ;
-}
-
-.add-searchbar
-{
-    display: flex;
-}
-
-
-.add-input
-{
-    padding: 5px;
-    margin-left: 5px;
-}
-
-.search-input
-{
-    display: flex;
-    align-self: center;
-    justify-self: center;
+    background-color: antiquewhite;
 }
 
 .add-button
 {
     background-color: white;
-    margin-top: 20px;
-    padding:0;
-    width: 100px;
-    height: 30px;
-    border-radius: 5px;
-    border: none;
-    box-shadow: 0 1px 2px black;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.add-button:hover
-{
-    box-shadow: 0 1px 5px black;
+    width: 30%;
 }
 
 .user-found
@@ -61,4 +26,24 @@
 {
     width: 100%;
     height: 100%;
+}
+
+.add-channel
+{
+    width: 70%;
+}
+
+.addchannel-button-container
+{
+    height: 150px;
+    justify-content: space-around;
+}
+
+.add-channel-button
+{
+    height: 30px;
+    font-weight: 500;
+    font-size: medium;
+    text-decoration: none;
+    color: black;
 }
