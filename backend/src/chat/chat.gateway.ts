@@ -106,6 +106,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           socket.join(newChannel.id.toString());
         }
       }
+      this.server.to(newChannel.id.toString()).emit('newChannel', newChannel);
     }
     catch (error) {
       throw new WsException(error);
