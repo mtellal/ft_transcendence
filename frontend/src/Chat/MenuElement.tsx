@@ -58,7 +58,6 @@ key={channel.id}
     */
 
 function ChannelElement(props: any) {
-    console.log("PROPS =>", props)
     return (
         <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
             style={props.selected ? { backgroundColor: '#F4F4F4' } : {}}
@@ -92,7 +91,7 @@ export default function MenuElement({ ...props }) {
                         username={user.username}
                         avatar={user.avatar}
                         userStatus={user.userStatus}
-                        click={(user: any) => props.setCurrentElement(user)}
+                        click={(user: any) => props.setCurrentElement(user, "friend")}
                         notifs={user.notifs}
                     />
                 ))
@@ -104,7 +103,6 @@ export default function MenuElement({ ...props }) {
 
 
     useEffect(() => {
-        console.log(props.channels)
         if (props.channels && props.channels.length) {
             setChannelsList(
                 props.channels.map((channel: any) => (
@@ -113,7 +111,7 @@ export default function MenuElement({ ...props }) {
                         id={channel.id}
                         name={channel.name}
                         nbMembers={channel.members.length}
-                        click={(user: any) => props.setCurrentElement(user)}
+                        click={(user: any) => props.setCurrentElement(user, "channel")}
                         notifs={0}
                     />
                 ))
@@ -122,14 +120,6 @@ export default function MenuElement({ ...props }) {
         else
             setChannelsList([]);
     }, [props.channels])
-
-
-    useEffect(() => {
-        if (conversations && conversations.length) {
-            const channels = conversations.file((c: any) => c.type !== "WHISPER");
-            console.log("props.channels => ", props.channels)
-        }
-    }, [conversations])
 
     return (
         <div className="menu-container">
