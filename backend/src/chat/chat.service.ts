@@ -10,13 +10,19 @@ export class ChatService {
   constructor(private prisma: PrismaService, private userService: UsersService) {}
 
   async findAll() {
-    return this.prisma.channel.findMany()
+    return await this.prisma.channel.findMany()
   }
 
   async findOne(id: number) {
-    return this.prisma.channel.findUnique({
+    return await this.prisma.channel.findUnique({
       where: { id }
     });
+  }
+
+  async findbyName(name: string) {
+    return await this.prisma.channel.findMany({
+      where: {name}
+    })
   }
 
   async createMessage(messageDto: MessageDto, sender: User)
