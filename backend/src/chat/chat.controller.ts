@@ -1,5 +1,5 @@
-import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, Patch, Body, UseGuards, Req, ForbiddenException, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, Patch, Body, UseGuards, Req, ForbiddenException, UsePipes, ValidationPipe, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { JwtGuard } from 'src/auth/guard';
 import { UpdateChannelDto } from './dto/channel.dto';
@@ -11,8 +11,20 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Returns all channels'})
-  async getChannels() {
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    type: String
+  })
+  @ApiOperation({ summary: 'Returns all channels or an array of channel with the corresponding name'})
+  async getChannels(@Query('name') name: string) {
+    if (name) {
+      const channels = await this.chatService.findbyName(name);
+      if (channels.length === 0) {
+        throw new NotFoundException(`No channel with the name ${name} exists`)
+      }
+      return (channels);
+    }
     return this.chatService.findAll();
   }
 
