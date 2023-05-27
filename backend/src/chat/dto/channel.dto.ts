@@ -17,21 +17,26 @@ export class MessageDto {
 
 export class CreateChannelDto {
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   name?: string
 
+  @ApiProperty()
   @IsEnum(ChannelType)
   type: ChannelType
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   password?: string
 
+  @ApiProperty()
   @IsArray()
   @IsOptional()
   memberList?: number[]
 
+  @ApiProperty()
   @IsArray()
   @IsOptional()
   adminList?: number[]
