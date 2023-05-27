@@ -6,7 +6,8 @@ import {
     getUser,
     sendFriendRequest,
     validFriendRequest,
-    refuseFriendRequest
+    refuseFriendRequest,
+    getChannelByName
 } from '../../utils/User'
 
 import { FriendSearch } from "../../Components/FriendElement";
@@ -182,7 +183,7 @@ export default function AddElement(props: any) {
                     error ? <p>User not found</p> : null
                 }
                 <button
-                    className="add-button"
+                    className="add-button button"
                     onClick={searchUser}
                 >
                     Search
@@ -246,8 +247,10 @@ export function JoinChannel() {
     async function searchChannel() {
         if (prevValue === value)
             return;
-        const res = await getUserByUsername(value);
+        const res = await getChannelByName(value);
         handleResponse(res);
+        console.log(res)
+        
         setPrevValue(value);
     }
 

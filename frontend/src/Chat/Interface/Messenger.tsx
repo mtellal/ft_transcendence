@@ -106,7 +106,7 @@ export default function Messenger({
     }
 
     function submit(e: any) {
-        if (e.key === "Enter" && value !== "" && !blocked) {
+        if (e.key === "Enter" && value !== "" && !blocked && channel) {
             socket.emit('message', {
                 channelId: channel.id,
                 content: value

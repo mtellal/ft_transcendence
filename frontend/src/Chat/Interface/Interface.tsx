@@ -181,7 +181,7 @@ export default function Interface({ friend, group }: any) {
                                                 user={user}
                                                 element={current}
                                                 channel={channel}
-                                                conversation={conversations &&
+                                                conversation={conversations && channel && 
                                                     conversations.find((c: any) => c.id === channel.id)}
                                                 sendMessage={sendMessage}
                                                 blocked={blocked}
