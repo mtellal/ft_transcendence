@@ -7,6 +7,9 @@ import { Messages } from '../Messages/Messages';
 
 export function Chatbox({ idFriendSelected }) {
 
+	// console.log('id select friend', idFriendSelected);
+
+
     const selector = useSelector(store => store.USER.user);
 	const [socket, setSocket] = useState();
     const [messages, setMessages] = useState([]);

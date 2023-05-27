@@ -78,6 +78,7 @@ export function Chat() {
     }, [selector.id, friendRequest])
 
 	// console.log('id select friend', idFriendSelected);
+	// console.log('channels', channels);
 
     return (
         <div className={s.container}>
@@ -109,9 +110,9 @@ export function Chat() {
                 </div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest}/>}
                 {btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
-                {btnFriendsRequest === 'GROUP' && channels && <Group channels={channels} idFriendSelected={idFriendSelected}/>}
-				{idFriendSelected && btnFriendsRequest !== 'GROUP' && <Chatbox setIdFriendSelected={setIdFriendSelected}/>}
-				{btnFriendsRequest === 'GROUP' && <ChatboxChannel />}
+                {btnFriendsRequest === 'GROUP' && channels && <Group channels={channels} setIdFriendSelected={setIdFriendSelected}/>}
+				{idFriendSelected && btnFriendsRequest !== 'GROUP' && <Chatbox idFriendSelected={idFriendSelected}/>}
+				{idFriendSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel idFriendSelected={idFriendSelected}/>}
             </div>
         </div>
     );

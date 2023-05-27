@@ -25,6 +25,8 @@ model User {
   password        String
   email           String?         @unique
   avatar          String?
+  oauth_code      String?         @unique
+  oauth_exp       DateTime?
   twoFactorSecret String?
   twoFactorStatus Boolean         @default(false)
   twoFactorOtpUrl String?
@@ -40,7 +42,7 @@ model BlockedUser {
   id        Int      @id @default(autoincrement())
   userId    Int
   User      User     @relation(fields: [userId], references: [id])
-  blockedId Int      @unique
+  blockedId Int
   createdAt DateTime @default(now())
 }
 
@@ -81,7 +83,7 @@ model MutedUser {
   id        Int      @id @default(autoincrement())
   userId    Int
   duration  DateTime
-  Channel   Channel? @relation(fields: [channelId], references: [id])
+  Channel   Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int?
 }
 

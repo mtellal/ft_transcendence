@@ -1,0 +1,13 @@
+.container {
+	display: flex;
+	align-items: center;
+	font-size: large;
+	font-weight: bold;
+}
+
+.image {
+	height: 40px;
+	width: 40px;
+	border-radius: 50px;
+	margin-left: 5px;
+}

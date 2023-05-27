@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { HeaderProfile } from '../HeaderProfile/HeaderProfile';
 import s from './style.module.css'
 
 export function Header() {
@@ -15,6 +16,7 @@ export function Header() {
 				<li className={s.element} onClick={() => navigate('/chat')}>Chat</li>
 				<li className={s.element}>{selector.username}</li>
 			</ul>
+			<span className={s.profileInfos}><HeaderProfile selector={selector}/></span>
 		</div>
 	);
 }

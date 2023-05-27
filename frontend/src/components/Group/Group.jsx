@@ -12,18 +12,18 @@ export function Group({ channels, setIdFriendSelected }) {
 
 	async function handleSubmit(e) {
 		e.preventDefault();
-		console.log('e.target.username.value', e.target.username.value);
+		// console.log('e.target.username.value', e.target.username.value);
 		const rep = await BackApi.getUserByUsername(e.target.username.value);
-		console.log('rep.data', rep.data.id);
+		// console.log('rep.data', rep.data.id);
 		if (rep.status === 200) {
-			console.log('code === 200')
+			// console.log('code === 200')
 			socket.emit('createChannel', {
 				name: "mgrp",
 				type: "PUBLIC",
 				memberList: [rep.data.id]
 			})
 		} else {
-			console.log('ERR code api')
+			console.log('ERR code api');
 		}
 	}
 

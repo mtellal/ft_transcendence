@@ -5,57 +5,25 @@ import { Messages } from '../Messages/Messages';
 import io from 'socket.io-client'
 import s from './style.module.css'
 
-export function ChatboxChannel() {
+export function ChatboxChannel({ idFriendSelected }) {
+
+	console.log('id select friend', idFriendSelected);
 
 	const selector = useSelector(store => store.USER.user);
 	const [socket, setSocket] = useState();
     const [messages, setMessages] = useState([]);
-    const [idChannel, setIdChannel] = useState();
 
     const send = (value) => {
         socket.emit('message', {
             sendBy: selector.id,
             content: value,
-            channelId: idChannel,
+            channelId: idFriendSelected,
         });
     }
 
-	async function creteOrJoinChannel() {
-		// console.log('idFriendSelected', idFriendSelected)
-		const response = await BackApi.getChannelsById(selector.id);
-		if (response.data.length === 1) {
-			console.log('GROUP Chennel exist');
-			// console.log('REP', response.data);
-			// console.log('TEST 2', response.data[0].id);
-			setIdChannel(response.data[0].id);
-			joinChannel(response.data[0].id);
-		} else if (response.data.length === 0) {
-			console.log('response.data.length === 0');
-			console.log('GROUP Create chennel');
-			socket.emit('createChannel', {
-				name: "mgrp",
-				type: "PUBLIC",
-				// memberList: [idFriendSelected]
-			})
-			setTimeout(async function() {
-				const response = await BackApi.getChannelsById(selector.id);
-				if (response.status.length === 1) {
-					console.log('GROUP Chennel exist');
-					// console.log('TEST 1', response.data.id);
-					// console.log('TEST 2', response.data[0].id);
-					setIdChannel(response.data[0].id);
-					joinChannel(response.data[0].id);
-				}
-			  }, 1000);
-		} else {
-			console.log('ERR Len est ni 0 ni 1');
-		}
-	}
-
-	function joinChannel(idChan) {
-		console.log('GROUP idChan', idChan);
+	function joinChannel() {
 		socket.emit('joinChannel', {
-			channelId: idChan
+			channelId: idFriendSelected
 		})
 	}
 
@@ -73,13 +41,12 @@ export function ChatboxChannel() {
 
     useEffect(() => {
 		if (selector.id && socket) {
-			creteOrJoinChannel();
+			joinChannel();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, selector.id])
 
 	const messageListener = (message) => {
-		console.log('GROUP Msg', message);
 		if (message.length) {
 			setMessages(message);
 		} else {
@@ -99,6 +66,18 @@ export function ChatboxChannel() {
 
 	return (
 		<div className={s.container} >
+			<form onSubmit={(e) => {
+				e.preventDefault();
+				console.log('User invite');
+				socket.emit('addtoChannel', {
+					channelId: idFriendSelected,
+					userId: 3,
+				})
+				console.log('FIN User invite');
+			}}>
+				<input name='invitUser' placeholder='Invit user'></input>
+				<button type='submit'>Invit</button>
+			</form>
 			{messages && <Messages messages={messages} id={selector.id} />}
 			<div className={s.inputBox}>
 				<form onSubmit={(e) => {

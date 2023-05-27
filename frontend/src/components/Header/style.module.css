@@ -5,16 +5,21 @@
 	/* background-color: white; */
 	background-color: rgb(0, 0, 0, 0.1);
 	border-radius: 10px;
+
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .tabs {
 	display: flex;
 	/* justify-content: space-between; */
-	justify-content: center;
+	/* justify-content: center; */
 	list-style: none;
 	height: 50px;
 	padding: 0;
-	/* padding-top: 10px; */
+	/* padding-bottom: 50px; */
 }
 
 .element {
@@ -31,4 +36,8 @@
 	/* background-color: black; */
 	background-color: rgb(0, 0, 0, 0.2);
 	cursor: pointer;
+}
+
+.profileInfos {
+	margin-left: 150px;
 }
