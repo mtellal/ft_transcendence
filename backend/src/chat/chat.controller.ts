@@ -74,7 +74,7 @@ export class ChatController {
       throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
     if (channel.ownerId !== user.id)
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
-    await this.chatService.updateChannel(dto, channel);
+    return await this.chatService.updateChannel(dto, channel);
   }
 
   @Delete(':id')
