@@ -104,22 +104,19 @@ function ChatInterface() {
                 setChannel(res.data)
             }
             else {
+                console.log("channel created EMIT")
                 socket.emit('createChannel', {
                     name: "privateMessage",
                     type: "WHISPER",
                     memberList: [e.id]
                 })
-                await getFriendChannel(user.id, e.id)
-                    .then(res => {
-                        if (res.status === 200 &&
-                            res.statusText === "OK") {
-                            setChannel(res.data)
-                        }
-                    })
+                
+                socket.on('newChannel', (e : any) => {
+                    console.log("neChannel called, and channel setted")
+                    setChannel(e)
+                })
+                socket.off('createChannel')
             }
-        }
-        else {
-            console.log("CHANNELS SELECTED", e)
         }
     }
 
