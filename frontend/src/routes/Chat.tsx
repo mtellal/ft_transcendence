@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
+    createChannel,
     getChannels,
     getFriendChannel,
     getUser,
@@ -70,7 +71,7 @@ function ChatInterface() {
 
     async function selectCurrentElement(e: any, type: string) {
 
-        let channelSelected : any;
+        let channelSelected: any;
 
         if (type === "friend") {
             friendsDispatch({ type: 'removeNotif', friend: e });
@@ -79,36 +80,30 @@ function ChatInterface() {
             const res = await getFriendChannel(user.id, e.id);
             if (res.status === 200 &&
                 res.statusText === "OK") {
-                console.log("channel fetched and exists", res.data)
                 channelSelected = res.data;
-                console.log("channel joined")
-                socket.emit('joinChannel', {
-                    channelId: channelSelected.id,
-                })
             }
             else {
-                console.log("channel created EMIT")
-                socket.emit('createChannel', {
+                await createChannel({
                     name: "privateMessage",
                     type: "WHISPER",
-                    memberList: [e.id]
-                })
-
-                await socket.on('createChannel', async (e: any) => {
-                    channelSelected = e;
-                    console.log("createChannel called, and channel setted")
-                })
-
-                
+                    memberList: [
+                        e.id
+                    ],
+                }, token)
+                    .then(res => {
+                        channelSelected = res.data
+                    })
             }
-            
-            if (conversations && 
+
+            socket.emit('joinChannel', {
+                channelId: channelSelected.id,
+            })
+
+            if (conversations &&
                 !conversations.find((e: any) => e.id === channelSelected.id)) {
                 conversationsDispatch({ type: 'addConv', conversation: channelSelected })
-                    console.log("channel added in a conversation")
             }
 
-            console.log("channel => ", channelSelected)
             setChannel(channelSelected)
         }
 
