@@ -132,9 +132,9 @@ export async function removeUserFriend(friendId: number | string, token: number 
 }
 
 
-/*
-    get all chats from backend 
-*/
+/////////////////////////////////////////////////////////////////////////
+//                     C H A T        R E Q U E S T S                  //
+/////////////////////////////////////////////////////////////////////////
 
 export async function getChats() {
     return (
@@ -150,6 +150,17 @@ export async function getChannelByName(name : string)
         axios.get(`${back}/chat?name=${name}`)
         .then(res => res)
         .catch(err => err)
+    )
+}
+
+export async function createChannel(channel : any, token : number | string)
+{
+    return (
+        axios.put(`${back}/chat`, channel, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
     )
 }
 
