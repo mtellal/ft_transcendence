@@ -97,9 +97,10 @@
     color: gray;
     font-size: small;
     min-width: 10px;
+    white-space: nowrap;
 }
 
-@media (max-width: 900px)
+@media (max-width: 720px)
 {
     .group-members, .group-separator{
         display: none;

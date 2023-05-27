@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import FriendElement from "../Components/FriendElement";
 import './MenuElement.css'
+import { useChannels, useConversations } from "../Hooks";
 
 export function CollectionElement(props: any) {
     return (
@@ -46,15 +47,26 @@ export function CollectionElement(props: any) {
     )
 }
 
-function GroupElement(props: any) {
+/*
+key={channel.id}
+                        id={channel.id}
+                        username={channel.name}
+                        avatar={null}
+                        userStatus={"OFFLINE"}
+                        click={(user: any) => props.setCurrentElement(user)}
+                        notifs={0}
+    */
+
+function ChannelElement(props: any) {
+    console.log("PROPS =>", props)
     return (
         <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
             style={props.selected ? { backgroundColor: '#F4F4F4' } : {}}
             onClick={() => props.click(props)}
         >
-            <p className="group-name">{props.name}</p>
+            <p>{props.name}</p>
             <p className="group-separator">-</p>
-            <p className="group-members">{props.members} members</p>
+            <p className="group-members">{props.nbMembers} members</p>
         </Link>
     )
 }
@@ -67,6 +79,8 @@ function GroupElement(props: any) {
 
 export default function MenuElement({ ...props }) {
     const [friendsList, setFriendsList] = React.useState([]);
+    const [channelsList, setChannelsList] = useState([]);
+    const [conversations, conversationsDispatch] = useConversations();
 
     React.useEffect(() => {
         if (props.friends && props.friends.length) {
@@ -89,11 +103,39 @@ export default function MenuElement({ ...props }) {
     }, [props.friends])
 
 
+    useEffect(() => {
+        console.log(props.channels)
+        if (props.channels && props.channels.length) {
+            setChannelsList(
+                props.channels.map((channel: any) => (
+                    <ChannelElement
+                        key={channel.id}
+                        id={channel.id}
+                        name={channel.name}
+                        nbMembers={channel.members.length}
+                        click={(user: any) => props.setCurrentElement(user)}
+                        notifs={0}
+                    />
+                ))
+            )
+        }
+        else
+            setChannelsList([]);
+    }, [props.channels])
+
+
+    useEffect(() => {
+        if (conversations && conversations.length) {
+            const channels = conversations.file((c: any) => c.type !== "WHISPER");
+            console.log("props.channels => ", props.channels)
+        }
+    }, [conversations])
+
     return (
         <div className="menu-container">
             <CollectionElement
                 title="Groups"
-                collection={null}
+                collection={channelsList}
                 addClick={props.addGroup}
                 add={true}
             />

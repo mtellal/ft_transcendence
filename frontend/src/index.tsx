@@ -13,7 +13,7 @@ import LaunchGame from './routes/Game';
 import History from './routes/History';
 
 
-import AddElement from "./Chat/Interface/AddElement";
+import AddElement, { AddChannel, CreateChannel, JoinChannel } from "./Chat/Interface/AddElement";
 import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
 
 
@@ -66,7 +66,17 @@ const router = createBrowserRouter([
                         path: "add-group",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement title="group" />
+                        element:  <AddChannel />
+                    },
+                    {
+                        path: "add-group/join",
+                        errorElement: <Navigate to="/chat" replace/>,
+                        element:  <JoinChannel />
+                    },
+                    {
+                        path: "add-group/create",
+                        errorElement: <Navigate to="/chat" replace/>,
+                        element:  <CreateChannel />
                     },
                     {
                         path: "groups/:groupid",

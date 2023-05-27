@@ -3,18 +3,20 @@ import React, { useEffect, useState } from "react";
 import MenuElement from "../Chat/MenuElement";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
-    getChannelByIDs,
+    getChannels,
+    getFriendChannel,
     getUser,
     getUserInvitations,
 } from "../utils/User";
 
-import { useChatSocketContext, useConversations, useFriends, useUser } from "../Hooks";
+import { useChannels, useChatSocket, useConversations, useFriends, useUser } from "../Hooks";
 
 import { FriendsProvider } from "../contexts/Chat/FriendsContext";
 import { ConversationsProvider } from "../contexts/Chat/ConversationsContexts";
 import { SocketProvider } from "../contexts/Chat/ChatSocketContext";
 
 import './Chat.css'
+import { ChannelsProvider } from "../contexts/Chat/ChannelsContext";
 
 function ChatInterface() {
 
@@ -27,11 +29,12 @@ function ChatInterface() {
         token
     }: any = useUser();
 
-    const { socket }: any = useChatSocketContext();
+    const { socket }: any = useChatSocket();
     const [currentElement, setCurrentElement]: [any, any] = useState();
 
     const [friends, friendsDispatch]: any = useFriends();
     const [conversations, conversationsDispatch]: any = useConversations();
+    const [channels, channelsDispatch] : any = useChannels();
 
     const [channel, setChannel]: [any, any] = useState();
 
@@ -89,21 +92,35 @@ function ChatInterface() {
     //                            C H A N N E L                            //
     /////////////////////////////////////////////////////////////////////////
 
-    async function selectCurrentElement(e: any) {
-        friendsDispatch({ type: 'removeNotif', friend: e });
-        setCurrentElement({ ...e, notifs: 0 });
+    async function selectCurrentElement(e: any, type: string) {
 
-        getChannelByIDs(user.id, e.id)
-            .then(d => {
-                setChannel(d.data)
-            })
-            .catch(e => {
+        if (type === "friend") {
+            friendsDispatch({ type: 'removeNotif', friend: e });
+            setCurrentElement({ ...e, notifs: 0 });
+
+            const res = await getFriendChannel(user.id, e.id);
+            if (res.status === 200 &&
+                res.statusText === "OK") {
+                setChannel(res.data)
+            }
+            else {
                 socket.emit('createChannel', {
                     name: "privateMessage",
                     type: "WHISPER",
                     memberList: [e.id]
                 })
-            })
+                await getFriendChannel(user.id, e.id)
+                    .then(res => {
+                        if (res.status === 200 &&
+                            res.statusText === "OK") {
+                            setChannel(res.data)
+                        }
+                    })
+            }
+        }
+        else {
+            console.log("CHANNELS SELECTED", e)
+        }
     }
 
     /*
@@ -114,7 +131,7 @@ function ChatInterface() {
         if (friends && friends.length &&
             params && params.id) {
             getUser(params.id)
-                .then(res => selectCurrentElement(res.data))
+                .then(res => selectCurrentElement(res.data, "friend"))
         }
     }, [friends])
 
@@ -174,6 +191,7 @@ function ChatInterface() {
             <div className="chat-container">
                 <MenuElement
                     friends={friends}
+                    channels={channels}
                     user={user}
                     addGroup={() => { }}
                     setCurrentElement={selectCurrentElement}
@@ -182,8 +200,9 @@ function ChatInterface() {
                 />
                 <Outlet context={
                     {
-                        currentElement,
                         channel,
+                        channels,
+                        currentElement,
                         friendInvitations,
                         removeFriendRequest,
                     }
@@ -194,14 +213,15 @@ function ChatInterface() {
     )
 }
 
-
 export default function Chat() {
     return (
         <SocketProvider>
             <FriendsProvider>
-                <ConversationsProvider>
-                    <ChatInterface />
-                </ConversationsProvider>
+                <ChannelsProvider>
+                    <ConversationsProvider>
+                        <ChatInterface />
+                    </ConversationsProvider>
+                </ChannelsProvider>
             </FriendsProvider>
         </SocketProvider>
     )

@@ -26,6 +26,13 @@ export function ChooseLogin() {
             >
                 Signin as <img className="chooselogin-img" src="./assets/42_Logo.svg" />
             </a>
+
+            <a
+                className="flex-center button chooselogin-button"
+                onClick={() => navigate("/login/signup")}
+            >
+                Signup
+            </a>
         </div>
     )
 }
