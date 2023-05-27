@@ -105,13 +105,13 @@ export function Chat() {
 					>
 						Groups
 					</button>
-                    <AddFriend id={selector.id} addFriend={addFriend} />
+                    {btnFriendsRequest !== 'GROUP' && <AddFriend id={selector.id} addFriend={addFriend} />}
                 </div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest}/>}
                 {btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
-                {btnFriendsRequest === 'GROUP' && channels && <Group channels={channels} />}
-				{idFriendSelected && btnFriendsRequest !== 'GROUP' && <Chatbox idFriendSelected={idFriendSelected}/>}
-				{idFriendSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel />}
+                {btnFriendsRequest === 'GROUP' && channels && <Group channels={channels} idFriendSelected={idFriendSelected}/>}
+				{idFriendSelected && btnFriendsRequest !== 'GROUP' && <Chatbox setIdFriendSelected={setIdFriendSelected}/>}
+				{btnFriendsRequest === 'GROUP' && <ChatboxChannel />}
             </div>
         </div>
     );

@@ -47,10 +47,8 @@ export class UsersService {
   async checkFriendRequest(senderId: number, receiverId: number): Promise<FriendRequest> {
     return await this.prisma.friendRequest.findFirst({
       where: {
-        OR: [
-          { sendBy: senderId, userId: receiverId },
-          { sendBy: receiverId, userId: senderId },
-        ],
+        sendBy: senderId,
+        userId: receiverId,
         status: false,
       }
     })
@@ -141,10 +139,11 @@ export class UsersService {
   async checkifUserblocked(userId: number, blockedId: number) {
     const isBlocked = await this.prisma.blockedUser.findFirst({
       where: {
-        userId: userId,
+        id: userId,
         blockedId: blockedId
     }})
     if (!isBlocked) {
+      console.log('User is not blocked');
       return false
     }
     return true;
@@ -166,17 +165,11 @@ export class UsersService {
   }
 
   async unblockUser(user: User, unblockedUser: number) {
-    const blockedRequest = await this.prisma.blockedUser.findFirst({
-      where: {
-        userId: user.id,
-        blockedId: unblockedUser
-      }
-    })
     return await this.prisma.user.update({
       where: { id: user.id },
       data: {
         blockedList: {
-          delete: [{id:blockedRequest.id}]
+          delete: [{ blockedId: unblockedUser}]
         }
       }
     })

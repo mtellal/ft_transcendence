@@ -1,137 +1,57 @@
-// import { useEffect, useState } from 'react';
-// import { useSelector } from 'react-redux';
-// import io from 'socket.io-client'
-import s from './style.module.css'
-// import { BackApi } from '../../api/back';
-// import { Messages } from '../Messages/Messages';
+import { BackApi } from '../../api/back';
 import { GroupList } from '../GroupList/GroupList';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import io from 'socket.io-client'
+import s from './style.module.css'
 
-export function Group({ channels }) {
+export function Group({ channels, setIdFriendSelected }) {
 
+	const selector = useSelector(store => store.USER.user);
+	const [socket, setSocket] = useState();
 
-	// const selector = useSelector(store => store.USER.user);
-	// const [socket, setSocket] = useState();
-    // const [messages, setMessages] = useState([]);
-    // const [idChannel, setIdChannel] = useState();
-	
-	// const idFriendSelected = selector.id === 2 ? 1 : 2;
+	async function handleSubmit(e) {
+		e.preventDefault();
+		console.log('e.target.username.value', e.target.username.value);
+		const rep = await BackApi.getUserByUsername(e.target.username.value);
+		console.log('rep.data', rep.data.id);
+		if (rep.status === 200) {
+			console.log('code === 200')
+			socket.emit('createChannel', {
+				name: "mgrp",
+				type: "PUBLIC",
+				memberList: [rep.data.id]
+			})
+		} else {
+			console.log('ERR code api')
+		}
+	}
 
-    // const send = (value) => {
-    //     socket.emit('message', {
-    //         sendBy: selector.id,
-    //         content: value,
-    //         channelId: idChannel,
-    //     });
-    // }
-
-	// async function creteOrJoinChannel() {
-	// 	// console.log('idFriendSelected', idFriendSelected)
-	// 	const response = await BackApi.getChannelsById(selector.id);
-	// 	if (response.data.length === 1) {
-	// 		console.log('GROUP Chennel exist');
-	// 		// console.log('REP', response.data);
-	// 		// console.log('TEST 2', response.data[0].id);
-	// 		setIdChannel(response.data[0].id);
-	// 		joinChannel(response.data[0].id);
-	// 	} else if (response.data.length === 0) {
-	// 		console.log('response.data.length === 0');
-	// 		console.log('GROUP Create chennel');
-	// 		socket.emit('createChannel', {
-	// 			name: "mgrp",
-	// 			type: "PUBLIC",
-	// 			memberList: [idFriendSelected]
-	// 		})
-	// 		setTimeout(async function() {
-	// 			const response = await BackApi.getChannelsById(selector.id);
-	// 			if (response.status.length === 1) {
-	// 				console.log('GROUP Chennel exist');
-	// 				// console.log('TEST 1', response.data.id);
-	// 				// console.log('TEST 2', response.data[0].id);
-	// 				setIdChannel(response.data[0].id);
-	// 				joinChannel(response.data[0].id);
-	// 			}
-	// 		  }, 1000);
-	// 	} else {
-	// 		console.log('ERR Len est ni 0 ni 1');
-	// 	}
-	// }
-
-	// function joinChannel(idChan) {
-	// 	console.log('GROUP idChan', idChan);
-	// 	socket.emit('joinChannel', {
-	// 		channelId: idChan
-	// 	})
-	// }
-
-    // useEffect(() => {
-    //     if (selector.token) {
-    //         const newSocket = io('http://localhost:3000', {
-    //             transports: ['websocket'],
-    //             extraHeaders: {
-    //                 'Authorization': `Bearer ${selector.token}`
-    //             }
-    //         })
-    //         setSocket(newSocket);
-    //     }
-    // }, [setSocket, selector.token, idFriendSelected])
-
-    // useEffect(() => {
-	// 	if (selector.id && socket) {
-	// 		creteOrJoinChannel();
-	// 	}
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [socket, selector.id, idFriendSelected])
-
-	// const messageListener = (message) => {
-	// 	console.log('GROUP Msg', message);
-	// 	if (message.length) {
-	// 		setMessages(message);
-	// 	} else {
-	// 		setMessages([...messages, message]);
-	// 	}
-	// }
-
-	// useEffect(() => {
-	// 	if (selector.id && socket) {
-	// 		socket.on('message', messageListener);
-	// 		return () => {
-	// 			socket.off('message', messageListener)
-	// 		}
-	// 	}
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [messageListener, idFriendSelected])
-
-	// // console.log('messages', messages);
-
-	// return (
-	// 	<div className={s.container} >
-	// 		{messages && <Messages messages={messages} id={selector.id} />}
-	// 		<div className={s.inputBox}>
-	// 			<form onSubmit={(e) => {
-	// 				e.preventDefault()
-	// 				send(e.target.inputText.value);
-	// 			}}>
-	// 				<input name='inputText' className={s.input} placeholder='Type your message...'></input>
-	// 				<button type='submit'>Send</button>
-	// 			</form>
-	// 		</div>
-	// 	</div>
-	// );
-
-
-
-
-
-
-
+	useEffect(() => {
+        if (selector.token) {
+            const newSocket = io('http://localhost:3000', {
+                transports: ['websocket'],
+                extraHeaders: {
+                    'Authorization': `Bearer ${selector.token}`
+                }
+            })
+            setSocket(newSocket);
+        }
+    }, [setSocket, selector.token])
 
 	return (
         <div>
+			<div>
+				<form className={s.form} onSubmit={handleSubmit}>
+					<input className={s.input} type="text" placeholder="Username" name="username"/>
+					<button className={s.button} type="submit">Create group</button>
+				</form>
+			</div>
             <div className={s.list}>
                 {channels.map((channel) => {
                     return (
                         <span key={channel.id}>
-                            <GroupList channel={channel}/>
+                            <GroupList channel={channel} setIdFriendSelected={setIdFriendSelected}/>
                         </span>
                     );
                 })}

@@ -12,8 +12,6 @@ export function ChatboxChannel() {
     const [messages, setMessages] = useState([]);
     const [idChannel, setIdChannel] = useState();
 
-	// const idFriendSelected = selector.id === 2 ? 1 : 2;
-
     const send = (value) => {
         socket.emit('message', {
             sendBy: selector.id,
@@ -98,8 +96,6 @@ export function ChatboxChannel() {
 		}
         // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [messageListener])
-
-	// console.log('messages', messages);
 
 	return (
 		<div className={s.container} >

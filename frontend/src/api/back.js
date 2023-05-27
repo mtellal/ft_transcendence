@@ -12,6 +12,21 @@ export class BackApi {
 		return response;
 	}
 
+	static async getUserByUsername(username) {
+		const response = await axios.get(`${BASE_URL}/users`, {
+			params: {
+				username: username,
+			},
+			headers: {
+				'accept': '*/*'
+			}
+		})
+		.then (rep => rep)
+		.catch (error => error)
+
+		return response;
+	}
+
 	static async getUserInfoById(id) {
 		const response = await axios.get(`${BASE_URL}/users/${id}`)
 		.then (rep => rep)

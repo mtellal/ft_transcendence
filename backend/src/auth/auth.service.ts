@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException } from "@nestjs/common"
+import { ForbiddenException, Injectable } from "@nestjs/common"
 import { AuthDto } from "./dto";
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -12,16 +12,16 @@ import { join } from 'path';
 import { createWriteStream } from 'fs';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
-import * as crypto from 'crypto';
- 
+import * as fs from 'fs'
+import { use } from "passport";
+import { connected } from "process";
+
 
 @Injectable()
 export class AuthService {
-	constructor(
-		private prisma: PrismaService,
+	constructor(private prisma: PrismaService,
 		private jwt: JwtService,
-		private config: ConfigService
-	) {}
+		private config: ConfigService) {}
 
 	async signup(dto: AuthDto) {
 		const hash = await argon.hash(dto.password);
@@ -62,10 +62,10 @@ export class AuthService {
 			})
 			console.log(code, verified);
 			if (!verified) {
-				return { step: '2fa', access_token: null };
+				throw new ForbiddenException('2FA code incorrect');
 			}
 		}
-		return { step: 'completed', access_token: (await this.signToken(user.id, user.username)).access_token };
+		return this.signToken(user.id, user.username);
 	}
 
 	async oauthLogIn(profile: Profile) {
@@ -75,7 +75,6 @@ export class AuthService {
 		const user = await this.prisma.user.findUnique({
 			where: { id: parseInt(profile.id) },
 		})
-		const { password, expirationTime } = await this.generateOneTimePassword();
 		if (!user)
 		{
 			let userCheck = await this.prisma.user.findUnique({
@@ -90,7 +89,14 @@ export class AuthService {
 					where: { username: username },
 				})
 			}
-			const hash = await this.generateHash();
+			const password = generator.generate({
+				length: 12, // length of password
+				numbers: true, // include numbers
+				symbols: true, // include symbols
+				uppercase: true, // include uppercase letters
+				excludeSimilarCharacters: true // exclude similar characters
+			  });
+			const hash = await argon.hash(password);
 			console.log(profile);
 			this.download42Pic(profile._json.image.link, profile.id + '.png');
 			try {
@@ -99,12 +105,10 @@ export class AuthService {
 					id: parseInt(profile.id),
 					username: username,
 					password: hash,
-					oauth_code: password,
-					oauth_exp: expirationTime ? new Date(expirationTime) : null,
 					avatar: './uploads/' + profile.id + '.png',
 				  },
 			  });
-			  return newuser.oauth_code;
+			  return this.signToken(newuser.id, newuser.username);
 			}
 			catch (error) {
 			  if (error instanceof PrismaClientKnownRequestError) {
@@ -114,66 +118,8 @@ export class AuthService {
 			  throw error;
 			}
 		}
-		const updatedUser = await this.prisma.user.update({
-			where: { id: user.id  },
-			data: {
-				oauth_code: password,
-				oauth_exp: expirationTime ? new Date(expirationTime) : null,
-			},
-		});
-		return updatedUser.oauth_code;
-	}
-
-	async generateHash() {
-		const password = generator.generate({
-			length: 12, // length of password
-			numbers: true, // include numbers
-			symbols: true, // include symbols
-			uppercase: true, // include uppercase letters
-			excludeSimilarCharacters: true // exclude similar characters
-		  });
-		const hash = await argon.hash(password);
-		return hash;
-	}
-
-	async generateOneTimePassword() {
-		const password = crypto.randomBytes(10).toString('hex');
-		const expirationTime = Date.now() + 2 * 60 * 1000;
-		return { password, expirationTime };
-	}
-	
-	async oauthTrade(oauth_code: string, code?: string) {
-		const user = await this.prisma.user.findUnique({
-			where: { oauth_code: oauth_code },
-		});
-		if (!user) {
-			throw new ForbiddenException('Credentials incorrect');
-		}
-		if (user.oauth_exp && Date.now() > user.oauth_exp.getTime()) {
-			throw new ForbiddenException('Authentication code has expired');
-		}
-		if (user.twoFactorStatus) {
-			const verified = speakeasy.totp.verify({
-				secret: user.twoFactorSecret,
-				encoding: 'base32',
-				token: code,
-				window: 1
-			})
-			console.log(code, verified);
-			if (!verified) {
-				throw new ForbiddenException('2FA incorrect');
-			}
-		}
-		const updatedUser = await this.prisma.user.update({
-			where: { id: user.id  },
-			data: {
-				oauth_code: null,
-				oauth_exp: null,
-			},
-		});
-		if (!updatedUser)
-			throw new InternalServerErrorException('Failed to update user');
-		return await this.signToken(user.id, user.username);
+		else
+			return this.signToken(user.id, user.username);
 	}
 	
 	async signToken(userId: number, username: string): Promise< {access_token: string} > {
@@ -182,12 +128,11 @@ export class AuthService {
 			username,
 		}
 		const secret = this.config.get('JWT_SECRET');
-		const exp = this.config.get('EXPIRESIN');
 
 		const token = await this.jwt.signAsync(
 			payload,
 			{
-				// expiresIn: exp,
+				// expiresIn: '15m',
 				secret: secret,
 			},
 		);
@@ -242,9 +187,8 @@ export class AuthService {
 				},
 			});
 		}
+		// console.log(updatedUser);
 		delete updatedUser.hash;
-		delete updatedUser.twoFactorSecret;
-		delete updatedUser.twoFactorOtpUrl;
 		return updatedUser;
 	}
 
@@ -256,7 +200,7 @@ export class AuthService {
 			throw new ForbiddenException('QRcode generation error');
 
 		//Google Auth encoding
-		const otpauthUrl = `otpauth://totp/${encodeURIComponent(user.username)}?secret=${encodeURIComponent(user.twoFactorSecret)}&issuer=ft_transcendence`;
+		const otpauthUrl = `otpauth://totp/${encodeURIComponent(user.username)}?secret=${encodeURIComponent(user.twoFactorSecret)}&issuer=Ft_transcendence`;
 
 		try {
 			const qrCodeImageBuffer = await qrcode.toDataURL(otpauthUrl);
