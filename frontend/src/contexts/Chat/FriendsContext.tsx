@@ -65,17 +65,22 @@ export function FriendsProvider({ children }: any) {
         user
     }: any = useUser();
 
+    async function loadFriendList() {
+        await getFriendList(user.id)
+            .then(friendListRes => {
+                if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
+                    let friendList = friendListRes.data;
+                    friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
+                    dispatch({ type: 'setFriendList', friendList })
+                }
+            })
+    }
+
     useEffect(() => {
         if (user) {
-            getFriendList(user.id)
-                .then(friendListRes => {
-                    if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
-                        let friendList = friendListRes.data;
-                        friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
-                        dispatch({ type: 'setFriendList', friendList })
-                    }
-                })
+            loadFriendList();
         }
+
     }, [user])
 
     return (

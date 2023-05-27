@@ -144,6 +144,15 @@ export async function getChats() {
     )
 }
 
+export async function getChannelByName(name : string)
+{
+    return (
+        axios.get(`${back}/chat?name=${name}`)
+        .then(res => res)
+        .catch(err => err)
+    )
+}
+
 
 export async function getFriendChannel(id: string | number, friendId: string | number) {
     return (

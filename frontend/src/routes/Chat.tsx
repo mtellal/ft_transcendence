@@ -34,37 +34,13 @@ function ChatInterface() {
 
     const [friends, friendsDispatch]: any = useFriends();
     const [conversations, conversationsDispatch]: any = useConversations();
-    const [channels, channelsDispatch] : any = useChannels();
+    const [channels, channelsDispatch]: any = useChannels();
 
     const [channel, setChannel]: [any, any] = useState();
 
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
 
-    /////////////////////////////////////////////////////////////////////////
-    //                         M E S S A G E S                             //
-    /////////////////////////////////////////////////////////////////////////
-
-    useEffect(() => {
-        if (socket && socket.connected) {
-            socket.on('message', (m: any) => {
-                if (m.length) {
-                    conversationsDispatch({ type: 'initMessages', messages: m });
-                }
-                if (m.content) {
-                    if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
-                        friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
-                    }
-                    conversationsDispatch({ type: 'addMessage', message: m });
-                }
-            });
-        }
-
-        return () => {
-            if (socket)
-                socket.off('message');
-        }
-    }, [socket, channel])
 
     /////////////////////////////////////////////////////////////////////////
     //                         I N V I T A T I O N S                       //
@@ -94,6 +70,8 @@ function ChatInterface() {
 
     async function selectCurrentElement(e: any, type: string) {
 
+        let channelSelected : any;
+
         if (type === "friend") {
             friendsDispatch({ type: 'removeNotif', friend: e });
             setCurrentElement({ ...e, notifs: 0 });
@@ -101,7 +79,12 @@ function ChatInterface() {
             const res = await getFriendChannel(user.id, e.id);
             if (res.status === 200 &&
                 res.statusText === "OK") {
-                setChannel(res.data)
+                console.log("channel fetched and exists", res.data)
+                channelSelected = res.data;
+                console.log("channel joined")
+                socket.emit('joinChannel', {
+                    channelId: channelSelected.id,
+                })
             }
             else {
                 console.log("channel created EMIT")
@@ -110,14 +93,25 @@ function ChatInterface() {
                     type: "WHISPER",
                     memberList: [e.id]
                 })
-                
-                socket.on('newChannel', (e : any) => {
-                    console.log("neChannel called, and channel setted")
-                    setChannel(e)
+
+                await socket.on('createChannel', async (e: any) => {
+                    channelSelected = e;
+                    console.log("createChannel called, and channel setted")
                 })
-                socket.off('createChannel')
+
+                
             }
+            
+            if (conversations && 
+                !conversations.find((e: any) => e.id === channelSelected.id)) {
+                conversationsDispatch({ type: 'addConv', conversation: channelSelected })
+                    console.log("channel added in a conversation")
+            }
+
+            console.log("channel => ", channelSelected)
+            setChannel(channelSelected)
         }
+
     }
 
     /*
@@ -137,18 +131,31 @@ function ChatInterface() {
         when a channel is picked we add it in conversations state and join it 
     */
     useEffect(() => {
-        if (socket && channel) {
-            if (conversations &&
-                !conversations.find((e: any) => e.id === channel.id)) {
-                conversationsDispatch({ type: 'addConv', conversation: channel })
-            }
 
-            socket.emit('joinChannel', {
-                channelId: channel.id,
-            })
+        if (socket && user && currentElement) {
+
+            socket.on('message', (m: any) => {
+                console.log("messages loaded ", m)
+                if (m.length) {
+                    console.log("init messages called - conversations", m)
+                    conversationsDispatch({ type: 'initMessages', messages: m });
+                }
+                if (m.content) {
+                    if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
+                        friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
+                    }
+                    conversationsDispatch({ type: 'addMessage', message: m });
+                }
+            });
 
         }
-    }, [socket, channel])
+
+        return () => {
+            if (socket)
+                socket.off('message');
+        }
+    }, [user, socket, channel, currentElement])
+
 
     /////////////////////////////////////////////////////////////////////////
     //                       U S E    E F F E C T S                        //
