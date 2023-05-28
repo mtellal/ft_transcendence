@@ -34,12 +34,17 @@ export class CreateChannelDto {
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  memberList?: number[]
+  members?: number[]
 
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  adminList?: number[]
+  administrators?: number[]
+
+  @ApiProperty()
+  @IsArray()
+  @IsOptional()
+  banList?: number[]
 }
 
 export class JoinChannelDto {

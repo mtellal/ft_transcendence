@@ -72,28 +72,36 @@ export class ChatService {
   async createChannel(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
     let userArray: number[] = [];
     let adminArray: number[] = [];
+    let banArray: number[] = [];
     userArray.push(owner.id);
     adminArray.push(owner.id);
-    if (createChannelDto.memberList) {
-      for (let i = 0; i < createChannelDto.memberList.length; i++) {
-        const user = await this.userService.findOne(createChannelDto.memberList[i]);
+    if (createChannelDto.members) {
+      for (let i = 0; i < createChannelDto.members.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.members[i]);
         console.log(user);
         if (user)
           if (!await this.userService.checkifUserblocked(user.id, owner.id))
-            userArray.push(createChannelDto.memberList[i]);
+            userArray.push(createChannelDto.members[i]);
       }
     }
-    if (createChannelDto.adminList) {
-      for (let i = 0; i < createChannelDto.adminList.length; i++) {
-        const user = await this.userService.findOne(createChannelDto.adminList[i]);
+    if (createChannelDto.administrators) {
+      for (let i = 0; i < createChannelDto.administrators.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.administrators[i]);
         if (user)
           if (!await this.userService.checkifUserblocked(user.id, owner.id))
-            adminArray.push(createChannelDto.adminList[i]);
+            adminArray.push(createChannelDto.administrators[i]);
       }
     }
     for (const adminId of adminArray) {
       if (!userArray.includes(adminId))
         userArray.push(adminId);
+    }
+    if (createChannelDto.banList) {
+      for (let i = 0; i < createChannelDto.banList.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.banList[i])
+        if (user)
+          banArray.push(createChannelDto.banList[i]);
+      }
     }
     if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
       createChannelDto.password = await argon.hash(createChannelDto.password);
@@ -108,6 +116,7 @@ export class ChatService {
         ownerId: owner.id,
         administrators: adminArray,
         members: userArray,
+        banList: banArray
       }
     })
     for (const userId of userArray) {
