@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
 
 
 export const ConversationsContext : React.Context<any> = createContext([]);
@@ -47,8 +47,6 @@ function reducer(conversations : any, action : any) {
 export function ConversationsProvider({children} : any)
 {
     const [conversations, dispatch] : any = useReducer(reducer, []);
-
-
 
 
     

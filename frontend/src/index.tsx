@@ -13,8 +13,9 @@ import LaunchGame from './routes/Game';
 import History from './routes/History';
 
 
-import AddElement, { AddChannel, CreateChannel, JoinChannel } from "./Chat/Interface/AddElement";
+import AddElement, { AddChannel, JoinChannel } from "./Chat/Interface/AddElement";
 import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
+import { CreateChannel } from './Chat/Interface/CreateChannel';
 
 
 import {

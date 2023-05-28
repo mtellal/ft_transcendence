@@ -136,3 +136,13 @@ code {
 {
   overflow-y: scroll;
 }
+
+.hidden
+{
+  overflow: hidden;
+}
+
+.no-wrap
+{
+  white-space: nowrap;
+}
