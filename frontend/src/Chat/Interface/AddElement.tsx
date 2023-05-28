@@ -23,6 +23,8 @@ import { match } from "assert";
 import ProfilePicture from "../../Components/ProfilePicture";
 import Icon from "../../Components/Icon";
 import InfoInput from "../../Components/InfoInput";
+import { createChannel } from "../../utils/User";
+import UsersCollection from "../../Components/UsersCollection";
 
 export default function AddElement(props: any) {
     const [prevValue, setPrevValue] = React.useState("");
@@ -424,35 +426,63 @@ export function JoinChannel() {
     )
 }
 
+function PickMenu(props: any) {
+    const [show, setShow] = useState(false);
+
+    return (
+        <div onClick={() => setShow(p => !p)}>
+            <h2>{props.title}</h2>
+            <div className="flex-column">
+            {
+                <div className="pickmenu-option">
+                    <p>{props.selected || "Visibilty ..."}</p>
+                </div>
+            }
+            {
+                show && props.collection && props.collection.length &&
+                props.collection.map((option: any) =>
+                <div 
+                    key={option} 
+                    className="pickmenu-option hover-gray" 
+                    style={{borderTop: '0'}}
+                    onClick={() => props.setSelected(option)}
+                >
+                        <p>
+                            {option}
+                        </p>
+                    </div>
+                )
+            }
+            </div>
+        </div>
+    )
+}
+
 
 export function CreateChannel() {
 
-    const [name, setName] = useState();
-    const [password, setPassword] = useState();
-    const [searchAdminValue, setSearchAdminValue]: any = useState("");
+    const [name, setName] = useState("");
+    const [type, setType] = useState("")
+    const [password, setPassword] = useState("");
+    const [admins, setAdmins] = useState([]);
+    const [members, setMembers] = useState([]);
+    const [banMembers, setBanMembers] = useState([]);
 
-    const [searchAdmin, setSearchAdmin]: any = useState();
-    const [admins, setAdmins] = useState([])
-    const [searchMember, setSearchMember] = useState();
-    const [members, setMembers] = useState([])
+    const { token } = useUser();
 
-    async function searchAdminUser() {
-        console.log("search admin called")
-        await getUserByUsername(searchAdminValue)
-            .then(res => setSearchAdmin(res.data))
-    }
-
-    function addAdmin(user : any)
-    {
-        setAdmins(p => [...p, user])
-        setSearchAdmin(null)
-        setSearchAdminValue("")
-    }
-
-    function removeAdmins(user: any) {
-        console.log("admin removed")
-        setAdmins((p: any) => p.filter((u: any) => u.id !== user.id))
-    }
+    /*  async function submit() {
+         if (!name)
+             return;
+         await createChannel({
+             name,
+             type: "PUBLIC",
+             password,
+             adminList: admins.map((u : any) => u.id),
+             memberList: ,
+             banList: banMembers.map,
+         }, token)
+         console.log("channelCreated")
+     } */
 
     return (
         <div className="add-container scroll">
@@ -471,61 +501,30 @@ export function CreateChannel() {
                 setValue={setPassword}
                 submit={() => { }}
             />
-            <p>Visibility (public / private / protected) ....</p>
-            <InfoInput
-                id="searchAdmin"
-                label="Admins"
-                value={searchAdminValue}
-                setValue={setSearchAdminValue}
-                submit={() => searchAdminUser()}
+            <PickMenu
+                title="Visibility"
+                collection={["public", "protected", "private"]}
+                selected={type}
+                setSelected={setType}
             />
-            {
-                searchAdmin &&
-                <FriendSearch
-                    key={searchAdmin.id}
-                    id={searchAdmin.id}
-                    username={searchAdmin.username}
-                    avatar={searchAdmin.avatar}
-                    userStatus={searchAdmin.userStatus}
-                    invitation={true}
-                    accept={() => addAdmin(searchAdmin)}
-                    refuse={() => console.log("admin refused")}
-                />
-            }
-            {
-                admins.length ?
-                    <CollectionElement
-                        title="Admins"
-                        collection={
-                            admins.map((user: any) =>
-                                <FriendSearch
-                                    key={user.id}
-                                    id={user.id}
-                                    username={user.username}
-                                    avatar={user.avatar}
-                                    userStatus={user.userStatus}
-                                    delete={() => removeAdmins(user)}
-                                />
-                            )
-                        }
-                    />
-                    : null
-            }
-            <InfoInput
-                id="searchMember"
-                label="Members"
-                value={searchMember}
-                setValue={setSearchMember}
-                submit={() => { }}
+            <UsersCollection
+                title="Admins"
+                users={admins}
+                setUsers={setAdmins}
             />
-            {
-                members.length ?
-                    <CollectionElement
-                        title="Members"
-                        collection={[]}
-                    />
-                    : null
-            }
+            <UsersCollection
+                title="Members"
+                users={members}
+                setUsers={setMembers}
+            />
+            <UsersCollection
+                title="Banned Members"
+                users={banMembers}
+                setUsers={setBanMembers}
+            />
+            <button className="button" onClick={() => { }}>
+                Create
+            </button>
         </div>
     )
 }
