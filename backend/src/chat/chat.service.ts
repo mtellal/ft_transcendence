@@ -99,8 +99,11 @@ export class ChatService {
     if (createChannelDto.banList) {
       for (let i = 0; i < createChannelDto.banList.length; i++) {
         const user = await this.userService.findOne(createChannelDto.banList[i])
-        if (user)
+        if (user) {
+          if (userArray.includes(user.id))
+            throw new ForbiddenException(`Can't ban a member during channel creation`);
           banArray.push(createChannelDto.banList[i]);
+        }
       }
     }
     if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
