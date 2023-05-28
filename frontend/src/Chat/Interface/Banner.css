@@ -7,27 +7,6 @@
     justify-content: space-between ;
 }
 
-.banner-icon
-{
-    position: relative;
-    align-self: center;
-    justify-self: center ;
-    height: 40px;
-    width: 40px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.banner-icon:hover div
-{
-    visibility: visible;
-}
-
-.banner-icon:active
-{
-    background-color: white;
-}
-
 .description
 {
     position:absolute;

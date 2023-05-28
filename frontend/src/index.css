@@ -18,6 +18,12 @@ code {
   background-color: rgb(231, 231, 231);
 }
 
+.flex-ai
+{
+  display: flex;
+  align-items: center;
+}
+
 .flex-column
 {
   display: flex;
@@ -63,9 +69,15 @@ code {
   box-shadow: 0 1px 5px black;
 }
 
+
 .light-red
 {
  background-color: rgb(255, 220, 220);
+}
+
+.gray-c
+{
+  color: gray
 }
 
 .red
@@ -114,4 +126,9 @@ code {
 {
   position: sticky;
   bottom: 0;
+}
+
+.scroll
+{
+  overflow-y: scroll;
 }

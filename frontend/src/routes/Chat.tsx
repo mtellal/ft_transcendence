@@ -130,9 +130,7 @@ function ChatInterface() {
         if (socket && user && currentElement) {
 
             socket.on('message', (m: any) => {
-                console.log("messages loaded ", m)
                 if (m.length) {
-                    console.log("init messages called - conversations", m)
                     conversationsDispatch({ type: 'initMessages', messages: m });
                 }
                 if (m.content) {

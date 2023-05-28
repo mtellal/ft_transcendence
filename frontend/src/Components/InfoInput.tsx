@@ -1,20 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import './InfoInput.css'
 
 export default function InfoInput(props : any) {
     const inputRef : any = React.useRef();
-    const [value, setValue] = React.useState(props.value || "");
 
     function onChange(e : any) {
-        setValue(e.target.value);
-        if (e.target.value) {
-            props.getValue(e.target.value);
-        }
+        props.setValue(e.target.value);
     }
 
     function handleKeyDown(e : any) {
-        if (e.key === 'Enter' && value) {
+        if (e.key === 'Enter' && props.value) {
             props.submit()
             inputRef.current.blur();
         }
@@ -28,7 +24,7 @@ export default function InfoInput(props : any) {
                 id={props.id}
                 className="infoinput-input"
                 placeholder={props.label}
-                value={value}
+                value={props.value}
                 onChange={onChange}
                 onKeyDown={handleKeyDown}
             />
