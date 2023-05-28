@@ -14,7 +14,7 @@ import {
 import FriendElement, { FriendSearch } from "../../Components/FriendElement";
 
 import IconInput from "../../Components/IconInput";
-import { useOutletContext, Link } from "react-router-dom";
+import { useOutletContext, Link, useNavigate } from "react-router-dom";
 import { CollectionElement } from "../MenuElement";
 
 import './AddElement.css'
@@ -25,6 +25,8 @@ import Icon from "../../Components/Icon";
 import InfoInput from "../../Components/InfoInput";
 import { createChannel } from "../../utils/User";
 import UsersCollection from "../../Components/UsersCollection";
+
+import defaultUserPP from '../../assets/user.png'
 
 export default function AddElement(props: any) {
     const [prevValue, setPrevValue] = React.useState("");
@@ -217,7 +219,7 @@ function ChannelSearch(props: any) {
             i < 5 ? await getUserProfilePictrue(id).then(res => res.data) : null
         ))
         const images = rawProfilePictures.map((i: any) =>
-            window.URL.createObjectURL(new Blob([i]))
+            i ? window.URL.createObjectURL(new Blob([i])) : defaultUserPP
         )
         setMembers(images.map((url: any) =>
             <ProfilePicture key={url} image={url} />
@@ -231,9 +233,9 @@ function ChannelSearch(props: any) {
 
     return (
         <div className="flex-ai channel-search">
-            <h3>{props.name} - </h3>
-            <p className="channelsearch-members gray-c flex-center">{props.members.length} members</p>
-            <div className="channelsearch-pps">
+            <h3 className="no-wrap">{props.name} - </h3>
+            <p className="channelsearch-members gray-c flex-center no-wrap">{props.members.length} members</p>
+            <div className="channelsearch-pps flex-center hidden">
                 {members}
             </div>
             <div style={{ marginLeft: 'auto' }}>
@@ -268,6 +270,9 @@ export function JoinChannel() {
         friendInvitations,
         removeFriendRequest
     }: any = useOutletContext();
+
+    const { socket } = useChatSocket();
+
 
     /* function validFriend() {
         return (friends.every((user: any) => element.id !== user.id) && element.id !== user.id)
@@ -351,6 +356,10 @@ export function JoinChannel() {
 
     function joinChannel(channel: any) {
         channelsDispatch({ type: 'addChannel', channel })
+        socket.emit('joinChannel', {
+            channelId: channel.id
+        })
+        setRenderChannels([]);
     }
 
     React.useEffect(() => {
@@ -388,7 +397,6 @@ export function JoinChannel() {
         }
     }, [matchChannels])
 
-
     return (
         <div className="add-container">
             <h2 className="add-title">Join a Channel</h2>
@@ -407,7 +415,7 @@ export function JoinChannel() {
                 </button>
                 {renderChannels}
                 {
-                    error ? <p>User not found</p> : null
+                    error ? <p>Channel not found</p> : null
                 }
                 {
                     userInvitations.length ?
@@ -425,110 +433,6 @@ export function JoinChannel() {
         </div>
     )
 }
-
-function PickMenu(props: any) {
-    const [show, setShow] = useState(false);
-
-    return (
-        <div onClick={() => setShow(p => !p)}>
-            <h2>{props.title}</h2>
-            <div className="flex-column">
-            {
-                <div className="pickmenu-option">
-                    <p>{props.selected || "Visibilty ..."}</p>
-                </div>
-            }
-            {
-                show && props.collection && props.collection.length &&
-                props.collection.map((option: any) =>
-                <div 
-                    key={option} 
-                    className="pickmenu-option hover-gray" 
-                    style={{borderTop: '0'}}
-                    onClick={() => props.setSelected(option)}
-                >
-                        <p>
-                            {option}
-                        </p>
-                    </div>
-                )
-            }
-            </div>
-        </div>
-    )
-}
-
-
-export function CreateChannel() {
-
-    const [name, setName] = useState("");
-    const [type, setType] = useState("")
-    const [password, setPassword] = useState("");
-    const [admins, setAdmins] = useState([]);
-    const [members, setMembers] = useState([]);
-    const [banMembers, setBanMembers] = useState([]);
-
-    const { token } = useUser();
-
-    /*  async function submit() {
-         if (!name)
-             return;
-         await createChannel({
-             name,
-             type: "PUBLIC",
-             password,
-             adminList: admins.map((u : any) => u.id),
-             memberList: ,
-             banList: banMembers.map,
-         }, token)
-         console.log("channelCreated")
-     } */
-
-    return (
-        <div className="add-container scroll">
-            <h2>Create a channel</h2>
-            <InfoInput
-                id="name"
-                label="Name"
-                value={name}
-                setValue={setName}
-                submit={() => { }}
-            />
-            <InfoInput
-                id="password"
-                label="Password"
-                value={password}
-                setValue={setPassword}
-                submit={() => { }}
-            />
-            <PickMenu
-                title="Visibility"
-                collection={["public", "protected", "private"]}
-                selected={type}
-                setSelected={setType}
-            />
-            <UsersCollection
-                title="Admins"
-                users={admins}
-                setUsers={setAdmins}
-            />
-            <UsersCollection
-                title="Members"
-                users={members}
-                setUsers={setMembers}
-            />
-            <UsersCollection
-                title="Banned Members"
-                users={banMembers}
-                setUsers={setBanMembers}
-            />
-            <button className="button" onClick={() => { }}>
-                Create
-            </button>
-        </div>
-    )
-}
-
 
 export function AddChannel() {
 

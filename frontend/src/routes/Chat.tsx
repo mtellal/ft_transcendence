@@ -86,7 +86,7 @@ function ChatInterface() {
                 await createChannel({
                     name: "privateMessage",
                     type: "WHISPER",
-                    memberList: [
+                    members: [
                         e.id
                     ],
                 }, token)
@@ -182,6 +182,8 @@ function ChatInterface() {
         }
 
     }, [socket])
+
+    console.log(currentElement)
 
     return (
         <div className="chat">

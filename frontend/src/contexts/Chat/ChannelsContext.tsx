@@ -10,6 +10,15 @@ function reducer(channels : any, action : any)
         case('setChannels'): {
             return (action.channels);
         }
+        case('addChannel'): {
+            if (!channels.length)
+            return ([action.channel])
+            if (!channels.find((c : any) => c.id === action.channel.id))
+            {
+                console.log("channels updated")
+                return ([...channels, action.channel])
+            }
+        }
         default: return (channels)
     }
 }
@@ -23,7 +32,6 @@ export function ChannelsProvider({children} : any)
         console.log("load channels");
         getChannels(user.id)
         .then(res => {
-            console.log(res);
             if (res.status === 200 && res.statusText === "OK")
             {
                 dispatch({type: 'setChannels', channels: res.data})
