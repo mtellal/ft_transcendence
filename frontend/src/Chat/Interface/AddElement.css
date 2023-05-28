@@ -6,14 +6,13 @@
 {
     width: 60%;
     padding: 5%;
-    overflow: hidden;
-    background-color: antiquewhite;
 }
 
 .add-button
 {
     background-color: white;
     width: 30%;
+    margin-top: 10px;
 }
 
 .user-found
@@ -46,4 +45,27 @@
     font-size: medium;
     text-decoration: none;
     color: black;
+}
+
+.channel-search
+{
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px black;
+    width: 96%;
+    padding: 0 2%;
+    margin-top: 2%;
+    height: 70px;
+}
+
+.channelsearch-members
+{
+    font-size: small;
+    padding-left: 5px;
+}
+
+.channelsearch-pps
+{
+    padding: 0 5px;
+    overflow: hidden;
 }

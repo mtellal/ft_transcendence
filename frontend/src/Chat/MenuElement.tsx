@@ -6,6 +6,15 @@ import FriendElement from "../Components/FriendElement";
 import './MenuElement.css'
 import { useChannels, useConversations } from "../Hooks";
 
+/*
+    tittle
+    add => {
+        removeNotif
+        notification
+    }
+    collection
+*/
+
 export function CollectionElement(props: any) {
     return (
         <div className="collection">

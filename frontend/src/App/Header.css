@@ -47,25 +47,6 @@
     color: black;
 }
 
-.pp-round
-{
-    overflow: hidden;
-    height: 50px;
-    width: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    margin-right: 5px;
-}
-
-.pp
-{    
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-}
-
 .pp-username
 {
     white-space: nowrap;

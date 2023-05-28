@@ -50,9 +50,7 @@ function App() {
         token={token} 
         image={image}
       >
-        <Header
-          profilePicture={user.image}
-        />
+        <Header />
         <Sidebar />
         <Footer />
         <Outlet />
