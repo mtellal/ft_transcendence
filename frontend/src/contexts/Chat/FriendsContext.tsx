@@ -1,18 +1,31 @@
 import React, { createContext, useEffect, useReducer } from "react";
 import { isEqual } from "../../utils";
 import { useUser } from "../../Hooks";
-import { getFriendList } from "../../utils/User";
+import { getFriendList, getUserProfilePictrue } from "../../utils/User";
 
 export const FriendsContext: React.Context<any> = createContext([]);
+
+function newFriend(friend: any) {
+    return (
+        {
+            ...friend,
+            notifs: 0,
+        }
+    )
+}
 
 function reducer(friends: any, action: any) {
     switch (action.type) {
         case ('setFriendList'): {
-            return (isEqual(friends, action.friendList) ? friends : action.friendList)
+            if (action.friendList && action.friendList.length) {
+                const nfriends = action.friendList.map((f: any) => newFriend(f))
+                return (isEqual(friends, nfriends) ? friends : nfriends)
+            }
+            else return (friends);
         }
         case ('updateFriend'): {
             const friend = action.friend;
-            if (friends.length &&
+            if (friends.length && friend &&
                 friends.find((u: any) => u.id === friend.id)) {
                 return (
                     friends.map((u: any) => {
@@ -24,7 +37,7 @@ function reducer(friends: any, action: any) {
                 )
             }
             else
-                return ([...friends, friend]);
+                return ([...friends, newFriend(friend)]);
         }
         case ('removeFriend'): {
             if (friends.length)
@@ -66,14 +79,19 @@ export function FriendsProvider({ children }: any) {
     }: any = useUser();
 
     async function loadFriendList() {
-        await getFriendList(user.id)
-            .then(friendListRes => {
-                if (friendListRes.status === 200 && friendListRes.statusText === "OK") {
-                    let friendList = friendListRes.data;
-                    friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
-                    dispatch({ type: 'setFriendList', friendList })
-                }
-            })
+        let f: any = await getFriendList(user.id)
+            .then(res =>
+                res.data.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
+            )
+
+        f = await Promise.all(f.map(async (u: any) => {
+            const url = await getUserProfilePictrue(u.id)
+                .then(res => window.URL.createObjectURL(new Blob([res.data])))
+            return ({ ...u, url })
+        }
+        ))
+
+        dispatch({ type: 'setFriendList', friendList: f })
     }
 
     useEffect(() => {

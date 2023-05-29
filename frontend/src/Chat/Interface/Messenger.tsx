@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 
 import { 
+    useChannels,
     useChatSocket, 
     useConversations, 
     useUser 
@@ -87,48 +88,42 @@ function Message(props: any) {
 
 
 export default function Messenger({
-    channel,
-    element,
+    user, 
+    socket,
     blocked,
     invitation,
 }: any) {
 
-    const { user } : any = useUser();
-    const { socket }: any = useChatSocket();
-    const [conversations, conversationsDispatch]: any = useConversations();
-
     const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");
     const [renderMessages, setRenderMessages]: any = useState([]);
+
+    const { currentChannel, channels } = useChannels();
 
     function handleChange(e: any) {
         setValue(e.target.value)
     }
 
     function submit(e: any) {
-        if (e.key === "Enter" && value !== "" && !blocked && channel) {
+        if (e.key === "Enter" && value !== "" && !blocked && currentChannel) {
             socket.emit('message', {
-                channelId: channel.id,
+                channelId: currentChannel.id,
                 content: value
             })
             setValue("")
         }
     }
 
-
     useEffect(() => {
         setRenderMessages([]);
-        if (conversations &&
-            conversations.length && channel) {
-            const conversation = conversations.find((c: any) => c.id === channel.id);
-
+        if (currentChannel) {
             let block: any;
-            let messages: any = conversation && conversation.messages;
+            let messages: any = currentChannel && currentChannel.messages;
             if (messages && messages.length) {
-                if (conversation.type === "WHISPER" &&
+                if (currentChannel.type === "WHISPER" &&
                     user.blockedList.length &&
-                    (block = user.blockedList.find((o: any) => o.blockedId === element.id))) {
-                    messages = conversation.messages.filter((m: any) => m.createdAt < block.createdAt)
+                    (block = user.blockedList.find((o: any) => o.blockedId === currentChannel.id))) {
+                    messages = currentChannel.messages.filter((m: any) => m.createdAt < block.createdAt)
                 }
                 setRenderMessages(
                     messages.map((m: any) =>
@@ -145,12 +140,12 @@ export default function Messenger({
                 )
             }
         }
-    }, [conversations, channel, user])
+    }, [channels, currentChannel, user])
 
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
-    }, [element, blocked, invitation, renderMessages])
+    }, [currentChannel, blocked, invitation, renderMessages])
 
     return (
         <>
@@ -159,7 +154,7 @@ export default function Messenger({
                     renderMessages.length ?
                         renderMessages : <NoMessages />
                 }
-                {blocked && <BlockMessage username={element.username || element.name} />}
+                {blocked && <BlockMessage username={currentChannel.username || currentChannel.name} />}
                 <div ref={lastMessageRef}></div>
             </div>
             <div className="messages-input"

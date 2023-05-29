@@ -83,13 +83,13 @@ const router = createBrowserRouter([
                         path: "groups/:groupid",
                         loader: interfaceLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <Interface friend={false} group={true}/>
+                        element:  <Interface />
                     },
                     {
                         path: "friends/:username/:id",
                         loader: interfaceLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element: <Interface friend={true} group={false}/>
+                        element: <Interface />
                     }
                 ]
             },
