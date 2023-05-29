@@ -198,12 +198,20 @@ export class BackApi {
 		return response;
 	}
 
-	static async getChannelsById(idUser) {
+	static async getChannelsByUserId(idUser) {
 		const response = await axios.get(`${BASE_URL}/users/${idUser}/channels`, {
-			// params: {
-			// 	id: id,
-			// 	friendId: idFriend
-			// },
+			headers: {
+				'accept': '*/*'
+			}
+		})
+			.then(rep => rep)
+			.catch(error => error)
+
+		return response;
+	}
+
+	static async getAllChannels() {
+		const response = await axios.get(`${BASE_URL}/chat`, {
 			headers: {
 				'accept': '*/*'
 			}

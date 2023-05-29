@@ -19,10 +19,12 @@
 .menu {
 	display: flex;
 	flex-direction: row;
+	/* font-size: 10px; */
 	/* justify-content: space-between; */
 }
 
 .button {
+	font-size: 12px;
 	/* display: flex; */
 	/* width: 120px; */
 	height: 30px;
