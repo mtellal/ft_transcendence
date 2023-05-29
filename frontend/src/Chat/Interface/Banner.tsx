@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { UserInfos } from "../../Components/FriendElement";
 import './Banner.css'
 import Icon from "../../Components/Icon";
 
-export default function Banner({ element, ...props }: any) {
+export default function Banner({ friend , ...props }: any) {
 
     return (
         <div className="banner">
             <UserInfos
-                id={element.id}
-                username={element.username}
-                userStatus={element.userStatus}
-                userAvatar={element.avatar}
+                id={friend && friend.id}
+                username={friend && friend.username}
+                userStatus={friend && friend.userStatus}
+                userAvatar={friend && friend.avatar}
             />
             <div className="flex-center">
                 <Icon icon="person" onClick={props.profile} description="Profile" />

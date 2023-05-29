@@ -31,13 +31,14 @@ function ChatInterface() {
     }: any = useUser();
 
     const { socket }: any = useChatSocket();
-    const [currentElement, setCurrentElement]: [any, any] = useState();
 
     const [friends, friendsDispatch]: any = useFriends();
-    const [conversations, conversationsDispatch]: any = useConversations();
-    const [channels, channelsDispatch]: any = useChannels();
-
-    const [channel, setChannel]: [any, any] = useState();
+    const {
+        channels,
+        channelsDispatch,
+        currentChannel,
+        setCurrentChannel
+    }: any = useChannels();
 
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
@@ -69,57 +70,19 @@ function ChatInterface() {
     //                            C H A N N E L                            //
     /////////////////////////////////////////////////////////////////////////
 
-    async function selectCurrentElement(e: any, type: string) {
 
-        let channelSelected: any;
-
-        if (type === "friend") {
-            friendsDispatch({ type: 'removeNotif', friend: e });
-            setCurrentElement({ ...e, notifs: 0 });
-
-            const res = await getFriendChannel(user.id, e.id);
-            if (res.status === 200 &&
-                res.statusText === "OK") {
-                channelSelected = res.data;
-            }
-            else {
-                await createChannel({
-                    name: "privateMessage",
-                    type: "WHISPER",
-                    members: [
-                        e.id
-                    ],
-                }, token)
-                    .then(res => {
-                        channelSelected = res.data
-                    })
-            }
-
-            socket.emit('joinChannel', {
-                channelId: channelSelected.id,
-            })
-
-            if (conversations &&
-                !conversations.find((e: any) => e.id === channelSelected.id)) {
-                conversationsDispatch({ type: 'addConv', conversation: channelSelected })
-            }
-
-            setChannel(channelSelected)
-        }
-
-    }
 
     /*
         when messenger (chat/friends/username/id) is refreshed then 
             we need to set manually the current friend  
     */
-    useEffect(() => {
+    /* useEffect(() => {
         if (friends && friends.length &&
             params && params.id) {
             getUser(params.id)
                 .then(res => selectCurrentElement(res.data, "friend"))
         }
-    }, [friends])
+    }, [friends]) */
 
 
     /*
@@ -127,17 +90,18 @@ function ChatInterface() {
     */
     useEffect(() => {
 
-        if (socket && user && currentElement) {
+        if (socket && user) {
 
             socket.on('message', (m: any) => {
+                console.log("messages recieved")
                 if (m.length) {
-                    conversationsDispatch({ type: 'initMessages', messages: m });
+                    channelsDispatch({ type: 'initMessages', messages: m });
                 }
                 if (m.content) {
-                    if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
+                    /* if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
                         friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
-                    }
-                    conversationsDispatch({ type: 'addMessage', message: m });
+                    } */
+                    channelsDispatch({ type: 'addMessage', message: m });
                 }
             });
 
@@ -147,7 +111,7 @@ function ChatInterface() {
             if (socket)
                 socket.off('message');
         }
-    }, [user, socket, channel, currentElement])
+    }, [user, socket, currentChannel])
 
 
     /////////////////////////////////////////////////////////////////////////
@@ -165,12 +129,12 @@ function ChatInterface() {
                 console.log("EVENT RECIEVED REQUEST => ", e)
             })
 
-            socket.on('updatedUser', (friend: any) => {
+            /* socket.on('updatedUser', (friend: any) => {
                 console.log("UPDATE FRIEND EVENT => ", friend)
                 if (friend && friend.id) {
                     friendsDispatch({ type: 'updateFriend', friend });
                 }
-            })
+            }) */
 
             socket.on('removedFriend', (friend: any) => {
                 console.log("REMOVE FRIEND EVENT")
@@ -183,25 +147,22 @@ function ChatInterface() {
 
     }, [socket])
 
-    console.log(currentElement)
-
     return (
         <div className="chat">
             <div className="chat-container">
                 <MenuElement
+                    user={user}
                     friends={friends}
                     channels={channels}
-                    user={user}
                     addGroup={() => { }}
-                    setCurrentElement={selectCurrentElement}
+                    setCurrentChannel={setCurrentChannel}
                     notification={notifInvitation}
                     removeNotif={() => setNotifInvitation(false)}
                 />
                 <Outlet context={
                     {
-                        channel,
+                        channel: currentChannel,
                         channels,
-                        currentElement,
                         friendInvitations,
                         removeFriendRequest,
                     }
@@ -217,9 +178,7 @@ export default function Chat() {
         <SocketProvider>
             <FriendsProvider>
                 <ChannelsProvider>
-                    <ConversationsProvider>
-                        <ChatInterface />
-                    </ConversationsProvider>
+                    <ChatInterface />
                 </ChannelsProvider>
             </FriendsProvider>
         </SocketProvider>
