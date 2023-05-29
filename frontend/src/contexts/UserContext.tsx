@@ -23,10 +23,10 @@ async function logout(user: any) {
 function reducer(user: any, action: any) {
     switch (action.type) {
         case ('login'): {
-            return ({ ...user, userStatus: "ONLINE" })
+            return ({ ...user, userStatus: "ONLINE", blockedList: [] })
         }
         case ('logout'): {
-            return ({ ...user, userStatus: "OFFLINE" })
+            return ({ ...user, userStatus: "OFFLINE", blockedList: [] })
         }
         case ('setblockedList'): {
             return ({ ...user, blockedList: action.blockedList });

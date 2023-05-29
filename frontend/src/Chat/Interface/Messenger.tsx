@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { 
     useChannels,
     useChatSocket, 
-    useConversations, 
     useUser 
 } from "../../Hooks";
 import './Messenger.css'
@@ -88,12 +87,12 @@ function Message(props: any) {
 
 
 export default function Messenger({
-    user, 
-    socket,
     blocked,
     invitation,
 }: any) {
 
+    const { user } = useUser();
+    const { socket } = useChatSocket();
     const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");
     const [renderMessages, setRenderMessages]: any = useState([]);

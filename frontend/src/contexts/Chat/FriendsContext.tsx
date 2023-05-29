@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from "react";
+import React, { createContext, useEffect, useReducer, useState } from "react";
 import { isEqual } from "../../utils";
 import { useUser } from "../../Hooks";
 import { getFriendList, getUserProfilePictrue } from "../../utils/User";
@@ -73,10 +73,9 @@ function reducer(friends: any, action: any) {
 
 
 export function FriendsProvider({ children }: any) {
-    const [friends, dispatch]: any = useReducer(reducer, [])
-    const {
-        user
-    }: any = useUser();
+    const { user }: any = useUser();
+    const [friends, friendsDispatch]: any = useReducer(reducer, []);
+    const [currentFriend, setCurrentFriendLocal] = useState();
 
     async function loadFriendList() {
         let f: any = await getFriendList(user.id)
@@ -91,7 +90,7 @@ export function FriendsProvider({ children }: any) {
         }
         ))
 
-        dispatch({ type: 'setFriendList', friendList: f })
+        friendsDispatch({ type: 'setFriendList', friendList: f })
     }
 
     useEffect(() => {
@@ -101,8 +100,25 @@ export function FriendsProvider({ children }: any) {
 
     }, [user])
 
+    function setCurrentFriend(friend : any)
+    {
+        const f = friends.find((f : any) => friend.id === f.id);
+        setCurrentFriendLocal(f);
+    }
+
+    useEffect(() => {
+        if (friends && friends.length && currentFriend)
+            setCurrentFriend(currentFriend)
+    }, [friends])
+
+
     return (
-        <FriendsContext.Provider value={[friends, dispatch]}>
+        <FriendsContext.Provider value={{
+            friends, 
+            friendsDispatch,
+            currentFriend,
+            setCurrentFriend
+        }}>
             {children}
         </FriendsContext.Provider>
     )

@@ -10,10 +10,9 @@ import {
     getUserInvitations,
 } from "../utils/User";
 
-import { useChannels, useChatSocket, useConversations, useFriends, useUser } from "../Hooks";
+import { useChannels, useChatSocket, useFriends, useUser } from "../Hooks";
 
 import { FriendsProvider } from "../contexts/Chat/FriendsContext";
-import { ConversationsProvider } from "../contexts/Chat/ConversationsContexts";
 import { SocketProvider } from "../contexts/Chat/ChatSocketContext";
 
 import './Chat.css'
@@ -32,12 +31,11 @@ function ChatInterface() {
 
     const { socket }: any = useChatSocket();
 
-    const [friends, friendsDispatch]: any = useFriends();
+    const { friendsDispatch }: any = useFriends();
     const {
         channels,
         channelsDispatch,
         currentChannel,
-        setCurrentChannel
     }: any = useChannels();
 
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
@@ -93,7 +91,6 @@ function ChatInterface() {
         if (socket && user) {
 
             socket.on('message', (m: any) => {
-                console.log("messages recieved")
                 if (m.length) {
                     channelsDispatch({ type: 'initMessages', messages: m });
                 }
@@ -151,18 +148,11 @@ function ChatInterface() {
         <div className="chat">
             <div className="chat-container">
                 <MenuElement
-                    user={user}
-                    friends={friends}
-                    channels={channels}
-                    addGroup={() => { }}
-                    setCurrentChannel={setCurrentChannel}
                     notification={notifInvitation}
                     removeNotif={() => setNotifInvitation(false)}
                 />
                 <Outlet context={
                     {
-                        channel: currentChannel,
-                        channels,
                         friendInvitations,
                         removeFriendRequest,
                     }

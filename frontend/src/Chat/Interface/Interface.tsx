@@ -40,7 +40,7 @@ function InterfaceFriend(props: any) {
         <>
             {
                 props.profile ?
-                    <Profile element={props.element} /> :
+                    <Profile /> :
                     <Messenger
                         user={props.user}
                         element={props.element}
@@ -95,17 +95,19 @@ export default function Interface() {
     const {
         token,
         user,
-        userDispatch,
     }: any = useUser();
 
-    const {
-        channel,
-        sendMessage,
-    }: any = useOutletContext();
+    const { sendMessage }: any = useOutletContext();
+
+    const { currentChannel } = useChannels();
 
     const navigate = useNavigate();
 
-    const [friends, friendsDispatch]: any = useFriends();
+    const {
+        friends, 
+        friendsDispatch,
+        currentFriend
+    }: any = useFriends();
 
     const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
@@ -113,15 +115,6 @@ export default function Interface() {
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
     const [friend, setFriend]: any = useState();
-
-    useEffect(() => {
-        if (channel) {
-            if (channel.type === "WHISPER" && user) {
-                const friendId = channel.members.find((id: any) => id !== user.id);
-                setFriend(friends.find((f: any) => f.id === friendId))
-            }
-        }
-    }, [channel, user])
 
 
     function block() {
@@ -138,6 +131,7 @@ export default function Interface() {
 
 
     async function removeFriend(friend: any) {
+        console.log(friend)
         if (friend) {
             removeUserFriend(friend.id, token)
                 .then(res => {
@@ -154,25 +148,22 @@ export default function Interface() {
     React.useEffect(() => {
         setProfile(false);
         setRemoveFriendView(false);
-        if (channel && user) {
+        if (currentChannel && user) {
             if (user.blockedList.length) {
-                if (user.blockedList.find((obj: any) => channel.id === obj.blockedId))
+                if (user.blockedList.find((obj: any) => currentChannel.id === obj.blockedId))
                     setBlocked(true);
                 else
                     setBlocked(false)
             }
         }
-    }, [channel, user])
-
+    }, [currentChannel, user])
 
     return (
         <>
             {
-                channel ?
+                currentChannel ?
                     <div className="flex-column relative interface-container">
                         <Banner
-                            friend={friend}
-                            channel={channel}
                             profile={() => setProfile(prev => !prev)}
                             invitation={() => { }}
                             block={() => block()}
@@ -183,16 +174,10 @@ export default function Interface() {
                                 <>
                                     {
                                         profile ?
-                                            <Profile element={channel} /> :
+                                            <Profile /> :
                                             <Messenger
-                                                socket={socket}
-                                                user={user}
-                                                friend={friend}
-                                                currentChannel={channel}
-                                                sendMessage={sendMessage}
                                                 blocked={blocked}
                                                 invitation={render}
-                                                group={null}
                                             />
                                     }
                                 </>
@@ -200,7 +185,7 @@ export default function Interface() {
                                 <InterfaceGroup
                                     group={true}
                                     profile={profile}
-                                    item={channel}
+                                    item={currentChannel}
                                     blocked={blocked}
                                     invitation={render}
                                     user={user}
@@ -209,9 +194,9 @@ export default function Interface() {
                         {
                             removeFriendView &&
                             <RemoveFriend
-                                user={friend && friend.username}
+                                user={currentFriend && currentFriend.username}
                                 cancel={() => setRemoveFriendView(prev => !prev)}
-                                remove={() => removeFriend(friend)}
+                                remove={() => removeFriend(currentFriend)}
                             />
                         }
                     </div>
