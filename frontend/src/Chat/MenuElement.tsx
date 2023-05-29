@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import FriendElement from "../Components/FriendElement";
 import './MenuElement.css'
-import { useChannels, useChatSocket, useConversations, useFriends, useUser } from "../Hooks";
+import { useChannels, useChatSocket, useFriends, useUser } from "../Hooks";
 import { createChannel } from "../utils/User";
 
 /*
@@ -87,84 +87,55 @@ function ChannelElement(props: any) {
 */
 
 export default function MenuElement({ ...props }) {
+
+    const { token } = useUser();
+    const {friends, friendsDispatch, setCurrentFriend} = useFriends();
+    const { channels, channelsDispatch, joinChannel, setCurrentChannel } = useChannels();
+
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
 
-    const [friends, friendsDispatch] = useFriends();
-
-    const { token } = useUser();
-    const { socket } = useChatSocket();
-    const { channelsDispatch, joinChannel } = useChannels();
-
-    async function selectChannel(channel: any) {
-        let channelSelected: any;
-
-
-        if (channel.type === "WHISPER")
-            friendsDispatch({ type: 'removeNotif', friend: channel });
-
-        if (props.channels.length) {
-            channelSelected = props.channels.find((c: any) => c.typechannel.id === c.id);
+    async function selectCurrentChannel(element: any, type : string) {
+        let channelSelected: any = element;
+        if (type =="friend")
+        {
+            friendsDispatch({ type: 'removeNotif', friend: element });
+            if (channels.length) {
+                channelSelected = channels.find((c: any) =>
+                    c.type === "WHISPER" && c.members.find((id: any) => element.id === id)
+                )
+            }
+            if (!channelSelected) {
+                await createChannel({
+                    name: "privateMessage",
+                    type: "WHISPER",
+                    members: [
+                        element.id
+                    ],
+                }, token)
+                    .then(res => {
+                        channelSelected = res.data
+                    })
+                channelsDispatch({ type: 'addChannel', channel: channelSelected });
+            }
+            setCurrentFriend(element);
         }
-        if (!channelSelected) {
-            await createChannel({
-                name: "privateMessage",
-                type: "WHISPER",
-                members: [
-                    channel.id
-                ],
-            }, token)
-                .then(res => {
-                    channelSelected = res.data
-                })
-            channelsDispatch({ type: 'addChannel', channel: channelSelected })
-        }
-
         joinChannel(channelSelected);
-        props.setCurrentChannel(channelSelected);
-    }
-
-    async function selectChannelFromFriend(user: any) {
-        let channelSelected: any;
-
-        friendsDispatch({ type: 'removeNotif', friend: user });
-
-        if (props.channels.length) {
-            channelSelected = props.channels.find((c: any) =>
-                c.type === "WHISPER" && c.members.find((id: any) => user.id === id)
-            )
-        }
-
-        if (!channelSelected) {
-            await createChannel({
-                name: "privateMessage",
-                type: "WHISPER",
-                members: [
-                    user.id
-                ],
-            }, token)
-                .then(res => {
-                    channelSelected = res.data
-                })
-            channelsDispatch({ type: 'addChannel', channel: channelSelected })
-        }
-
-        joinChannel(channelSelected);
-        props.setCurrentChannel(channelSelected);
+        setCurrentChannel(channelSelected);
     }
 
 
     React.useEffect(() => {
-        if (props.friends && props.friends.length) {
+        if (friends && friends.length) {
             setFriendsList(
-                props.friends.map((user: any) => (
+                friends.map((user: any) => (
                     <FriendElement
                         key={user.id}
                         id={user.id}
                         username={user.username}
                         avatar={user.avatar}
                         userStatus={user.userStatus}
-                        click={() => selectChannelFromFriend(user)}
+                        click={() => selectCurrentChannel(user, "friend")}
                         notifs={user.notifs}
                     />
                 ))
@@ -172,34 +143,34 @@ export default function MenuElement({ ...props }) {
         }
         else
             setFriendsList([]);
-    }, [props.friends, props.channels])
+    }, [friends, channels])
 
 
     useEffect(() => {
-        if (props.channels && props.channels.length) {
+        if (channels && channels.length) {
             setChannelsList(
-                props.channels.map((channel: any) => (
-                    <ChannelElement
-                        key={channel.id}
-                        id={channel.id}
-                        name={channel.name}
-                        nbMembers={channel.members.length}
-                        click={(user: any) => selectChannel(user)}
-                        notifs={0}
-                    />
-                ))
+                channels.map((channel: any) =>
+                    channel.type !== "WHISPER" && (
+                        <ChannelElement
+                            key={channel.id}
+                            id={channel.id}
+                            name={channel.name}
+                            nbMembers={channel.members.length}
+                            click={() => selectCurrentChannel(channel, "channel")}
+                            notifs={0}
+                        />
+                    ))
             )
         }
         else
             setChannelsList([]);
-    }, [props.channels])
+    }, [channels])
 
     return (
         <div className="menu-container">
             <CollectionElement
                 title="Groups"
                 collection={channelsList}
-                addClick={props.addGroup}
                 add={true}
             />
             <CollectionElement

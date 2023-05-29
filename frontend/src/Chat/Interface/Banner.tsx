@@ -2,16 +2,20 @@ import React, { useEffect, useState } from "react";
 import { UserInfos } from "../../Components/FriendElement";
 import './Banner.css'
 import Icon from "../../Components/Icon";
+import { useChannels, useFriends } from "../../Hooks";
 
-export default function Banner({ friend , ...props }: any) {
+export default function Banner({...props }: any) {
+
+    const { currentFriend } = useFriends();
+    const { currentChannel } = useChannels();
 
     return (
         <div className="banner">
             <UserInfos
-                id={friend && friend.id}
-                username={friend && friend.username}
-                userStatus={friend && friend.userStatus}
-                userAvatar={friend && friend.avatar}
+                id={currentFriend && currentFriend.id}
+                username={currentFriend && currentFriend.username}
+                userStatus={currentFriend && currentFriend.userStatus}
+                userAvatar={currentFriend && currentFriend.avatar}
             />
             <div className="flex-center">
                 <Icon icon="person" onClick={props.profile} description="Profile" />

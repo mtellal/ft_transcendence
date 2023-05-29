@@ -43,7 +43,7 @@ export default function AddElement(props: any) {
         setUser
     }: any = useUser();
 
-    const [friends, friendsDispatch]: any = useFriends();
+    const {friends, friendsDispatch}: any = useFriends();
 
     const {
         friendInvitations,
@@ -264,7 +264,7 @@ export function JoinChannel() {
         setUser
     }: any = useUser();
 
-    const [friends, friendsDispatch]: any = useFriends();
+    const {friends, friendsDispatch}: any = useFriends();
 
     const {
         friendInvitations,

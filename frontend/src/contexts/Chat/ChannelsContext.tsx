@@ -49,9 +49,7 @@ function reducer(channels: any, action: any) {
         }
         case ('addMessage'): {
             const message = action.message;
-            console.log(message)
             if (channels.length) {
-                console.log("addMessage")
                 return (
                     channels.map((c: any, i: number) => {
                         if (c.id === message.channelId)
@@ -68,18 +66,8 @@ function reducer(channels: any, action: any) {
 export function ChannelsProvider({ children }: any) {
     const { user } = useUser();
     const { socket } = useChatSocket();
-    const [friends] = useFriends();
     const [channels, channelsDispatch] = useReducer(reducer, []);
     const [currentChannel, setCurrentChannelLocal] = useState();
-
-    async function loadDirectMessages() {
-        friends.map(async (f: any) =>
-            await getFriendChannel(user.id, f.id)
-                .then(res =>  {
-                    channelsDispatch({ type: 'addChannel', channel: res.data })
-            })
-        )
-    }
 
     async function loadChannels() {
         await getChannels(user.id)
@@ -93,13 +81,6 @@ export function ChannelsProvider({ children }: any) {
     useEffect(() => {
         loadChannels();
     }, [])
-
-    useEffect(() => {
-        if (friends) {
-            loadDirectMessages();
-        }
-
-    }, [friends])
 
     function joinChannel(channel: any) {
         socket.emit('joinChannel', {
