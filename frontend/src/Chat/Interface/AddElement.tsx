@@ -242,7 +242,7 @@ export function JoinChannel() {
 
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
-    const [channels, channelsDispatch] = useChannels();
+    const {channels, channelsDispatch} = useChannels();
 
     const {
         token,

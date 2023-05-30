@@ -11,13 +11,14 @@ import {
     getUserProfilePictrue,
 } from "../utils/User";
 
-import { useChannels, useChatSocket, useFriends, useUser } from "../Hooks";
+import { useChannels, useChannelsUsers, useChatSocket, useFriends, useUser } from "../Hooks";
 
 import { FriendsProvider } from "../contexts/Chat/FriendsContext";
 import { SocketProvider } from "../contexts/Chat/ChatSocketContext";
 
 import './Chat.css'
 import { ChannelsProvider } from "../contexts/Chat/ChannelsContext";
+import ChannelsUsersProvider from "../contexts/Chat/ChannelsUsersContext";
 
 function ChatInterface() {
 
@@ -42,6 +43,7 @@ function ChatInterface() {
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
 
+    const {channelsUsers } = useChannelsUsers();
 
     /////////////////////////////////////////////////////////////////////////
     //                         I N V I T A T I O N S                       //
@@ -102,7 +104,6 @@ function ChatInterface() {
                     channelsDispatch({ type: 'addMessage', message: m });
                 }
             });
-
         }
 
         return () => {
@@ -167,7 +168,9 @@ export default function Chat() {
         <SocketProvider>
             <FriendsProvider>
                 <ChannelsProvider>
-                    <ChatInterface />
+                    <ChannelsUsersProvider>
+                        <ChatInterface />
+                    </ChannelsUsersProvider>
                 </ChannelsProvider>
             </FriendsProvider>
         </SocketProvider>

@@ -1,7 +1,6 @@
 import React, { createContext, useEffect, useReducer, useState } from "react";
-import { getChannels } from "../../utils/User";
+import { getChannels, getUser } from "../../utils/User";
 import { useChatSocket, useFriends, useUser } from "../../Hooks";
-import { getFriendChannel } from "../../utils/User";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 
@@ -9,7 +8,8 @@ function newConversation(channel: any) {
     return (
         {
             ...channel,
-            messages: []
+            messages: channel.messages ? channel.messages : [],
+            users: channel.users ? channel.users : []
         }
     )
 }
@@ -21,6 +21,15 @@ function reducer(channels: any, action: any) {
                 return (action.channels.map((c: any) => newConversation(c)))
             }
             return (action.channels);
+        }
+        case ('updateChannel'): {
+            if (channels.length) {
+                channels.map((c: any) => {
+                    if (action.channel && c.id === action.channel.id)
+                        return ({...c, ...action.channel})
+                    return (c)
+                })
+            }
         }
         case ('addChannel'): {
             if (!channels.length)
@@ -44,7 +53,7 @@ function reducer(channels: any, action: any) {
                         }
                         return (c);
                     })
-                    )
+                )
             }
         }
         case ('addMessage'): {
@@ -70,12 +79,33 @@ export function ChannelsProvider({ children }: any) {
     const [currentChannel, setCurrentChannelLocal] = useState();
 
     async function loadChannels() {
-        await getChannels(user.id)
+        let channelList = await getChannels(user.id)
             .then(res => {
                 if (res.status === 200 && res.statusText === "OK") {
-                    channelsDispatch({ type: 'setChannels', channels: res.data });
+                    return (res.data)
                 }
             })
+
+
+        channelList = await Promise.all(channelList.map(async (c: any) => {
+            if (c.members && c.members.length) {
+                let users = await Promise.all(c.members.map(async (id: number) => {
+                    if (id !== user.id) {
+                        return (
+                            await getUser(id)
+                                .then(res => {
+                                    if (res.status === 200 && res.statusText === "OK")
+                                        return (res.data)
+                                })
+                        )
+                    }
+                    return (null)
+                }))
+                users = users.filter((u: any) => u)
+                return ({ ...c, users })
+            }
+        }))
+        channelsDispatch({ type: 'setChannels', channels: channelList })
     }
 
     useEffect(() => {
@@ -96,8 +126,8 @@ export function ChannelsProvider({ children }: any) {
 
     useEffect(() => {
         if (channels)
-            setCurrentChannelLocal((p : any) => p ? channels.find((c : any) => c.id == p.id) : p)
-    }, [channels]) 
+            setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p)
+    }, [channels])
 
     return (
         <ChannelsContext.Provider value={{

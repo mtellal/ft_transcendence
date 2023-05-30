@@ -35,48 +35,6 @@ function RemoveFriend(props: any) {
 }
 
 
-function InterfaceFriend(props: any) {
-    return (
-        <>
-            {
-                props.profile ?
-                    <Profile /> :
-                    <Messenger
-                        user={props.user}
-                        element={props.element}
-                        channel={props.channel}
-                        blocked={props.blocked}
-                        invitation={props.invitation}
-                        group={null}
-                    />
-            }
-        </>
-    )
-}
-
-function InterfaceGroup(props: any) {
-    return (
-        <>
-            {
-                props.profile &&
-                <ProfileGroup
-                    channel={props.item}
-                    user={props.user}
-                />
-            }
-            {
-                !props.profile &&
-                <Messenger
-                    group={props.group}
-                    item={props.item}
-                    blocked={props.blocked}
-                    invitation={props.invitation}
-                />
-            }
-        </>
-    )
-}
-
 export function loader({ params }: any) {
     return ({})
 }
@@ -105,7 +63,7 @@ export default function Interface() {
     const navigate = useNavigate();
 
     const {
-        friends, 
+        friends,
         friendsDispatch,
         currentFriend
     }: any = useFriends();
@@ -132,7 +90,6 @@ export default function Interface() {
 
 
     async function removeFriend(friend: any) {
-        console.log(friend)
         if (friend) {
             removeUserFriend(friend.id, token)
                 .then(res => {
@@ -159,6 +116,7 @@ export default function Interface() {
         }
     }, [currentFriend, user])
 
+
     return (
         <>
             {
@@ -171,27 +129,15 @@ export default function Interface() {
                             remove={() => setRemoveFriendView(prev => !prev)}
                         />
                         {
-                            friend ?
-                                <>
-                                    {
-                                        profile ?
-                                            <Profile /> :
-                                            <Messenger
-                                                blocked={blocked}
-                                                invitation={render}
-                                            />
-                                    }
-                                </>
-                                :
-                                <InterfaceGroup
-                                    group={true}
-                                    profile={profile}
-                                    item={currentChannel}
+                            profile ?
+                                <Profile /> :
+                                <Messenger
+                                    currentChannel={currentChannel}
                                     blocked={blocked}
                                     invitation={render}
-                                    user={user}
                                 />
                         }
+
                         {
                             removeFriendView &&
                             <RemoveFriend

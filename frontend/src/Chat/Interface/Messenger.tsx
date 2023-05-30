@@ -1,11 +1,12 @@
 
 import React, { useEffect, useState } from "react";
 
-import { 
+import {
     useChannels,
-    useChatSocket, 
-    useFriends, 
-    useUser 
+    useChannelsUsers,
+    useChatSocket,
+    useFriends,
+    useUser
 } from "../../Hooks";
 import './Messenger.css'
 
@@ -54,31 +55,31 @@ function GameInvitation(props: any) {
 function Message(props: any) {
 
     function isAdmin() {
-        return (props.administrators.find((username: any) => username === props.author));
+        if (props.currentChannel) {
+            return (props.currentChannel.administrators.find((id: any) => id === props.sendBy));
+        }
     }
 
     function addStyle() {
-        let obj;
-
-        if (props.author === props.userId)
-            obj = { backgroundColor: '#FFF5DD' };
-        return (obj);
+        if (props.sendBy === props.userId)
+            return ({ backgroundColor: '#FFF5DD' });
     }
 
     return (
         <div className="message-div"
-            style={props.author === props.userId ? { justifyContent: 'right' } : {}}
+            style={props.sendBy === props.userId ? { justifyContent: 'right' } : {}}
         >
             <div className="message-infos">
                 <p className="message"
                     style={addStyle()}
                 >
-                    {props.message}
+                    {props.message.content}
                 </p>
                 {props.group && <p className="message-author">{props.author}</p>}
             </div>
             {
-                props.group && isAdmin() && <span className="material-symbols-outlined">
+                props.group && isAdmin() &&
+                <span className="material-symbols-outlined">
                     shield_person
                 </span>
             }
@@ -100,6 +101,7 @@ export default function Messenger({
 
     const { currentChannel, channels } = useChannels();
     const { currentFriend, friends } = useFriends();
+    const { getMembers, channelsUsers } = useChannelsUsers();
 
     function handleChange(e: any) {
         setValue(e.target.value)
@@ -118,30 +120,36 @@ export default function Messenger({
     useEffect(() => {
         setRenderMessages([]);
         if (currentChannel) {
+
+            const members = getMembers(currentChannel.id);
+            console.log(members)
+
             let block: any;
             let messages: any = currentChannel && currentChannel.messages;
-            if (messages && messages.length) {
+            if (messages && messages.length && members) {
                 if (currentChannel.type === "WHISPER" &&
-                user.blockedList.length &&
-                (block = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
+                    user.blockedList.length &&
+                    (block = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
                     messages = currentChannel.messages.filter((m: any) => m.createdAt < block.createdAt)
                 }
                 setRenderMessages(
                     messages.map((m: any) =>
                         <Message
                             key={m.id}
+                            message={m}
                             id={m.id}
-                            message={m.content}
-                            author={m.sendBy}
+                            sendBy={m.sendBy}
+                            author={members.map((u : any) => u.id === m.sendBy ? u.username : "")}
                             userId={user.id}
-                            group={null}
+                            currentChannel={currentChannel}
+                            group={currentChannel && currentChannel.type !== "WHISPER"}
                             administrators={null}
                         />
                     )
                 )
             }
         }
-    }, [channels, currentChannel, user])
+    }, [channels, currentChannel, channelsUsers, user])
 
 
     React.useEffect(() => {
