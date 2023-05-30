@@ -21,7 +21,7 @@ export function CreateChannel() {
 
     const { token } = useUser();
 
-    const [channels, channelsDispatch] = useChannels();
+    const {channels, channelsDispatch} = useChannels();
 
     const navigate = useNavigate();
 

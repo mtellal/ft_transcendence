@@ -144,17 +144,15 @@ export async function getChats() {
     )
 }
 
-export async function getChannelByName(name : string)
-{
+export async function getChannelByName(name: string) {
     return (
         axios.get(`${back}/chat?name=${name}`)
-        .then(res => res)
-        .catch(err => err)
+            .then(res => res)
+            .catch(err => err)
     )
 }
 
-export async function createChannel(channel : any, token : number | string)
-{
+export async function createChannel(channel: any, token: number | string) {
     return (
         axios.put(`${back}/chat`, channel, {
             headers: {
@@ -173,8 +171,7 @@ export async function getFriendChannel(id: string | number, friendId: string | n
     )
 }
 
-export async function getChannels(id: string | number)
-{
+export async function getChannels(id: string | number) {
     return (
         axios.get(`${back}/users/${id}/channels`)
             .then(res => res)
@@ -190,6 +187,13 @@ export async function getMessages(channelId: string | number) {
     )
 }
 
+export async function removeChannel(id: number) {
+    return (
+        axios.delete(`${back}/chat/${id}`)
+            .then(res => res)
+            .catch(err => err)
+    )
+}
 
 /////////////////////////////////////////////////////////////////////////
 //                     F R I E N D    R E Q U E S T S                  //
@@ -284,11 +288,10 @@ export async function unblockUserRequest(id: number | string, token: number | st
 /////////////////////////////////////////////////////////////////////////
 
 
-export async function getTokenRequest(oauth_code : string, otp_code: string)
-{
+export async function getTokenRequest(oauth_code: string, otp_code: string) {
     return (
         axios.post(`${back}/auth/42/trade`, {
-            oauth_code, 
+            oauth_code,
             otp_code
         })
     )
