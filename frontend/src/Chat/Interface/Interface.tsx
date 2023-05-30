@@ -95,6 +95,7 @@ export default function Interface() {
     const {
         token,
         user,
+        userDispatch
     }: any = useUser();
 
     const { sendMessage }: any = useOutletContext();
@@ -118,15 +119,15 @@ export default function Interface() {
 
 
     function block() {
-      /*   if (!blocked) {
-            userDispatch({ type: 'blockUser', friendId: current.id })
-            blockUserRequest(current.id, token)
+        if (!blocked) {
+            userDispatch({ type: 'blockUser', friendId: currentFriend.id })
+            blockUserRequest(currentFriend.id, token)
         }
         else {
-            unblockUserRequest(current.id, token)
-            userDispatch({ type: 'unblockUser', friendId: current.id })
+            unblockUserRequest(currentFriend.id, token)
+            userDispatch({ type: 'unblockUser', friendId: currentFriend.id })
         }
-        setBlocked((p: any) => !p) */
+        setBlocked((p: any) => !p)
     }
 
 
@@ -148,15 +149,15 @@ export default function Interface() {
     React.useEffect(() => {
         setProfile(false);
         setRemoveFriendView(false);
-        if (currentChannel && user) {
+        if (currentFriend && user) {
             if (user.blockedList.length) {
-                if (user.blockedList.find((obj: any) => currentChannel.id === obj.blockedId))
+                if (user.blockedList.find((obj: any) => currentFriend.id === obj.blockedId))
                     setBlocked(true);
                 else
                     setBlocked(false)
             }
         }
-    }, [currentChannel, user])
+    }, [currentFriend, user])
 
     return (
         <>

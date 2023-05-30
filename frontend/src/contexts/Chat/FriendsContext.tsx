@@ -78,44 +78,60 @@ export function FriendsProvider({ children }: any) {
     const [currentFriend, setCurrentFriendLocal] = useState();
 
     async function loadFriendList() {
-        let f: any = await getFriendList(user.id)
+        let friendList: any = await getFriendList(user.id)
             .then(res =>
                 res.data.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
             )
 
-        f = await Promise.all(f.map(async (u: any) => {
+        friendList = await Promise.all(friendList.map(async (u: any) => {
             const url = await getUserProfilePictrue(u.id)
                 .then(res => window.URL.createObjectURL(new Blob([res.data])))
             return ({ ...u, url })
         }
         ))
 
-        friendsDispatch({ type: 'setFriendList', friendList: f })
+        friendsDispatch({ type: 'setFriendList', friendList })
     }
 
     useEffect(() => {
         if (user) {
             loadFriendList();
         }
-
     }, [user])
 
-    function setCurrentFriend(friend : any)
-    {
-        const f = friends.find((f : any) => friend.id === f.id);
+    function setCurrentFriend(friend: any) {
+        const f = friends.find((f: any) => friend.id === f.id);
         setCurrentFriendLocal(f);
     }
 
     useEffect(() => {
-        if (friends && friends.length && currentFriend)
-            setCurrentFriend(currentFriend)
+        if (friends && friends.length) {
+            if (currentFriend)
+                setCurrentFriend(currentFriend)
+        }
     }, [friends])
+
+
+    async function updateFriend(friend : any)
+    {
+        if (friend)
+        {
+            let url;
+            await getUserProfilePictrue(friend.id)
+                .then(res => {
+                    if (res.status === 200 && res.statusText)
+                        url = window.URL.createObjectURL(new Blob([res.data]))
+                } )
+            friendsDispatch({type: 'updateFriend', friend: {...friend, url}})
+        }
+    }
 
 
     return (
         <FriendsContext.Provider value={{
-            friends, 
+            friends,
             friendsDispatch,
+            updateFriend,
             currentFriend,
             setCurrentFriend
         }}>

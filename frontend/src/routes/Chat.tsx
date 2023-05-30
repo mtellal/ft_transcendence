@@ -8,6 +8,7 @@ import {
     getFriendChannel,
     getUser,
     getUserInvitations,
+    getUserProfilePictrue,
 } from "../utils/User";
 
 import { useChannels, useChatSocket, useFriends, useUser } from "../Hooks";
@@ -31,7 +32,7 @@ function ChatInterface() {
 
     const { socket }: any = useChatSocket();
 
-    const { friendsDispatch }: any = useFriends();
+    const { friendsDispatch, updateFriend }: any = useFriends();
     const {
         channels,
         channelsDispatch,
@@ -126,12 +127,10 @@ function ChatInterface() {
                 console.log("EVENT RECIEVED REQUEST => ", e)
             })
 
-            /* socket.on('updatedUser', (friend: any) => {
+            socket.on('updatedUser', async (friend: any) => {
                 console.log("UPDATE FRIEND EVENT => ", friend)
-                if (friend && friend.id) {
-                    friendsDispatch({ type: 'updateFriend', friend });
-                }
-            }) */
+                updateFriend(friend)
+            })
 
             socket.on('removedFriend', (friend: any) => {
                 console.log("REMOVE FRIEND EVENT")

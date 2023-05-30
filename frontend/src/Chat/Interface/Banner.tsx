@@ -15,6 +15,7 @@ export default function Banner({...props }: any) {
                 id={currentFriend && currentFriend.id}
                 username={currentFriend && currentFriend.username}
                 userStatus={currentFriend && currentFriend.userStatus}
+                profilePictureURL={currentFriend && currentFriend.url}
                 userAvatar={currentFriend && currentFriend.avatar}
             />
             <div className="flex-center">
