@@ -27,6 +27,21 @@ export function ChatboxChannel({ idFriendSelected }) {
 		})
 	}
 
+	async function invitUser(e) {
+		e.preventDefault();
+		const rep = await BackApi.getUserByUsername(e.target.invitUser.value);
+		if (rep.status === 200) {
+			console.log('User invite', rep.data.id);
+			socket.emit('addtoChannel', {
+				channelId: idFriendSelected,
+				userId: rep.data.id,
+			})
+			console.log('FIN User invite');
+		} else {
+			console.log('err', rep.status);
+		}
+	}
+
     useEffect(() => {
         if (selector.token) {
             const newSocket = io('http://localhost:3000', {
@@ -66,15 +81,7 @@ export function ChatboxChannel({ idFriendSelected }) {
 
 	return (
 		<div className={s.container} >
-			<form onSubmit={(e) => {
-				e.preventDefault();
-				console.log('User invite');
-				socket.emit('addtoChannel', {
-					channelId: idFriendSelected,
-					userId: 3,
-				})
-				console.log('FIN User invite');
-			}}>
+			<form onSubmit={invitUser}>
 				<input name='invitUser' placeholder='Invit user'></input>
 				<button type='submit'>Invit</button>
 			</form>

@@ -32,11 +32,12 @@ export function CreateGroup() {
 		// const rep = await BackApi.getUserByUsername(e.target.username.value);
 		// if (rep.status === 200) {
 		if (e.target.privacy.value === 'Public') {
-			socket.emit('createChannel', {
+			const res = socket.emit('createChannel', {
 				name: e.target.name.value,
 				type: "PUBLIC",
 				// memberList: [rep.data.id]
 			})
+			console.log('res', res);
 		} else if (e.target.privacy.value === 'Private') {
 				socket.emit('createChannel', {
 					name: e.target.name.value,

@@ -1,9 +1,16 @@
 import s from './style.module.css'
 
-export function PublicChannelsList({ channel }) {
+export function PublicChannelsList({ channel, socket }) {
+
+	function joinChannel() {
+		socket.emit('joinChannel', {
+			channelId: channel.id
+		})
+	}
+
 	return (
 		<div>
-			<button>{channel.name}</button>
+			<button onClick={joinChannel}>{channel.name}</button>
 		</div>
 	);
 }

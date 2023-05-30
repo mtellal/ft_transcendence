@@ -9,7 +9,7 @@ export function GroupList({ channel, setIdFriendSelected }) {
 
 	return (
         <div>
-			<button onClick={test}>{channel.id}</button>
+			<button onClick={test}>{channel.name ? channel.name : channel.id}</button>
         </div>
 	);
 }
