@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { 
     useChannels,
     useChatSocket, 
+    useFriends, 
     useUser 
 } from "../../Hooks";
 import './Messenger.css'
@@ -98,6 +99,7 @@ export default function Messenger({
     const [renderMessages, setRenderMessages]: any = useState([]);
 
     const { currentChannel, channels } = useChannels();
+    const { currentFriend, friends } = useFriends();
 
     function handleChange(e: any) {
         setValue(e.target.value)
@@ -120,8 +122,8 @@ export default function Messenger({
             let messages: any = currentChannel && currentChannel.messages;
             if (messages && messages.length) {
                 if (currentChannel.type === "WHISPER" &&
-                    user.blockedList.length &&
-                    (block = user.blockedList.find((o: any) => o.blockedId === currentChannel.id))) {
+                user.blockedList.length &&
+                (block = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
                     messages = currentChannel.messages.filter((m: any) => m.createdAt < block.createdAt)
                 }
                 setRenderMessages(
@@ -153,7 +155,7 @@ export default function Messenger({
                     renderMessages.length ?
                         renderMessages : <NoMessages />
                 }
-                {blocked && <BlockMessage username={currentChannel.username || currentChannel.name} />}
+                {blocked && <BlockMessage username={currentFriend.username || currentChannel.name} />}
                 <div ref={lastMessageRef}></div>
             </div>
             <div className="messages-input"

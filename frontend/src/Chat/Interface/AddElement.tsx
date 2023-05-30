@@ -37,18 +37,11 @@ export default function AddElement(props: any) {
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
 
-    const {
-        token,
-        user,
-        setUser
-    }: any = useUser();
+    const { token, user }: any = useUser();
 
-    const {friends, friendsDispatch}: any = useFriends();
+    const {friends, friendsDispatch, updateFriend}: any = useFriends();
 
-    const {
-        friendInvitations,
-        removeFriendRequest
-    }: any = useOutletContext();
+    const { friendInvitations, removeFriendRequest }: any = useOutletContext();
 
     function validFriend() {
         return (friends.every((user: any) => friend.id !== user.id) && friend.id !== user.id)
@@ -73,19 +66,11 @@ export default function AddElement(props: any) {
         setPrevValue(value);
     }
 
-    async function updateFriend() {
-        if (friend) {
-            const res = await getUser(friend.id);
-            handleResponse(res)
-        }
-    }
-
     async function addFriend() {
         if (validFriend()) {
             await sendFriendRequest(friend.id, token);
         }
     }
-
 
     async function loadUser(id: number | string) {
         const userRes = await getUser(id);
@@ -102,7 +87,7 @@ export default function AddElement(props: any) {
             if (validRes.status === 201 && validRes.statusText === "Created") {
                 removeFriendRequest(invitation.id);
                 setUserInvitations((p: any) => p.filter((user: any) => user.id !== u.id))
-                friendsDispatch({ type: 'updateFriend', friend: u })
+                updateFriend(u)
             }
         }
     }
@@ -142,6 +127,7 @@ export default function AddElement(props: any) {
         if (userInvitations && userInvitations.length) {
             setInvitations(userInvitations.map((u: any) =>
                 <FriendSearch
+                    user={u}
                     key={u.id}
                     id={u.id}
                     username={u.username}

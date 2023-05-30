@@ -96,7 +96,7 @@ export default function MenuElement({ ...props }) {
     const [channelsList, setChannelsList] = useState([]);
 
     async function selectCurrentChannel(element: any, type : string) {
-        let channelSelected: any = element;
+        let channelSelected: any;
         if (type =="friend")
         {
             friendsDispatch({ type: 'removeNotif', friend: element });
@@ -120,6 +120,10 @@ export default function MenuElement({ ...props }) {
             }
             setCurrentFriend(element);
         }
+        else
+            channelSelected = element;
+
+        console.log("channelSelected => ", channelSelected)
         joinChannel(channelSelected);
         setCurrentChannel(channelSelected);
     }
@@ -127,12 +131,14 @@ export default function MenuElement({ ...props }) {
 
     React.useEffect(() => {
         if (friends && friends.length) {
+            console.log("messenger updated and friends elements re rendered", friends)
             setFriendsList(
                 friends.map((user: any) => (
                     <FriendElement
                         key={user.id}
                         id={user.id}
                         username={user.username}
+                        profilePictureURL={user.url}
                         avatar={user.avatar}
                         userStatus={user.userStatus}
                         click={() => selectCurrentChannel(user, "friend")}
@@ -143,7 +149,7 @@ export default function MenuElement({ ...props }) {
         }
         else
             setFriendsList([]);
-    }, [friends, channels])
+    }, [friends])
 
 
     useEffect(() => {
@@ -165,6 +171,7 @@ export default function MenuElement({ ...props }) {
         else
             setChannelsList([]);
     }, [channels])
+
 
     return (
         <div className="menu-container">

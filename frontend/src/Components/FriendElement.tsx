@@ -1,5 +1,5 @@
 
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 
 import imgUser from '../assets/user.png'
 import { Link, NavLink } from 'react-router-dom'
@@ -24,19 +24,7 @@ click={handleFriendsMessage}
 */
 
 
-export function UserInfos({ id, username, userStatus, userAvatar, ...props }: any) {
-    const [avatar, setAvatar]: [any, any] = React.useState();
-
-    async function loadProfilePicture() {
-        const res = await getUserProfilePictrue(id);
-        if (res.status === 200 && res.statusText === "OK") {
-            setAvatar(window.URL.createObjectURL(new Blob([res.data])))
-        }
-    }
-
-    React.useEffect(() => {
-        loadProfilePicture();
-    }, [userAvatar])
+export function UserInfos({ id, username, profilePictureURL, userStatus, ...props }: any) {
 
     function selectStatusDiv() {
         if (userStatus === "ONLINE")
@@ -59,7 +47,7 @@ export function UserInfos({ id, username, userStatus, userAvatar, ...props }: an
     return (
         <div className="infos-div" >
             <div className='friend-image-container'>
-                <img className="friend-image" src={avatar || imgUser} />
+                <img className="friend-image" src={profilePictureURL || imgUser} />
             </div>
             <div
                 className="firend-icon-status"
@@ -79,6 +67,24 @@ export function UserInfos({ id, username, userStatus, userAvatar, ...props }: an
 export function FriendSearch(props: any) {
     const [invitation, setInvitation]: [any, any] = React.useState(false);
 
+    const [url, setUrl] : any = useState();
+
+    async function loadURL()
+    {
+        await getUserProfilePictrue(props.id)
+            .then(res => {
+                if (res.status == 200 && res.statusText == "OK")
+                    setUrl(window.URL.createObjectURL(new Blob([res.data])))
+            })   
+    }   
+
+    useEffect(() => {
+        if (props.id)
+        {
+            loadURL();
+        }
+    }, [props.id])
+
     return (
         <div style={{
             boxShadow: '0 1px 3px black',
@@ -89,7 +95,7 @@ export function FriendSearch(props: any) {
             justifyContent: 'space-between',
             alignItems: 'center'
         }}>
-            <UserInfos {...props} userAvatar={props.avatar} />
+            <UserInfos {...props} profilePictureURL={url} />
             {props.add &&
                 !invitation &&
                 <Icon
