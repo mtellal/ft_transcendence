@@ -9,7 +9,7 @@
 
 .banner-icon-container
 {
-    width: 30%;
+    width: 50%;
     height: 100%;
 }
 
@@ -40,7 +40,8 @@
 {
     padding: 0 5px;
     flex-wrap: wrap;
-    height: 100%;
+    height: 40px;
     width: 100%;
     overflow: hidden;
+
 }

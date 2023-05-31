@@ -45,13 +45,14 @@
 .message-div
 {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: left;
     padding: 0 2%;
 }
 
 .message-infos
 {
+    padding: 0 5px;
     max-width: 70%;
 }
 
@@ -65,6 +66,13 @@
     border-radius: 5px;
     word-break: break-all;
     font-size: 15px;
+}
+
+.message-author-infos
+{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .message-author
@@ -122,7 +130,6 @@
 
 .message-resize-pp
 {
-    padding: 0 5px;
     height: 30px;
     width: 30px;
 }
@@ -130,4 +137,10 @@
 .admin-icon
 {
     align-self: flex-end;
+}
+
+.message-notification
+{
+    padding: 5px 0;
+    margin: 10px 0;
 }

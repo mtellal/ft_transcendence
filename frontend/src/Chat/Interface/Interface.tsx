@@ -109,8 +109,6 @@ export default function Interface() {
         }
     }, [currentFriend, user])
 
-    console.log(currentChannel)
-
     return (
         <>
             {

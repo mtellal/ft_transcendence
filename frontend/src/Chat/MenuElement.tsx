@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import FriendElement from "../Components/FriendElement";
@@ -95,7 +95,7 @@ export default function MenuElement({ ...props }) {
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
 
-    const selectCurrentChannel = async (element: any, type: string) => {
+    const selectCurrentChannel = useCallback(async (element: any, type: string) => {
         let channelSelected: any;
         if (type == "friend") {
             friendsDispatch({ type: 'removeNotif', friend: element });
@@ -104,6 +104,7 @@ export default function MenuElement({ ...props }) {
                     c.type === "WHISPER" && c.members.find((id: number) => element.id === id)
                 )
             }
+            console.log("channels from menuelement => ", channels)
             if (!channelSelected) {
                 await createChannel({
                     name: "privateMessage",
@@ -123,7 +124,7 @@ export default function MenuElement({ ...props }) {
             channelSelected = element;
         joinChannel(channelSelected);
         setCurrentChannel(channelSelected);
-    }
+    }, [channels, friends])
 
     React.useEffect(() => {
         if (friends && friends.length) {

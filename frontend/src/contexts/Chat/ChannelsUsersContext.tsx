@@ -33,7 +33,7 @@ function reducer(channelsUsers: ChannelUsers[], action: ReducerAction) {
 }
 
 export default function ChannelsUsersProvider({ children }: any) {
-    const { user } = useUser();
+    const { user, image } = useUser();
     const { currentChannel } = useChannels();
     const [channelsUsers, channelsUsersDispatch] = useReducer(reducer, []);
 
@@ -93,12 +93,13 @@ export default function ChannelsUsersProvider({ children }: any) {
     }, [currentChannel])
 
     function getMembers(channelId: number) {
+        let members = [{...user, url: image}]
         if (channelsUsers.length) {
             const obj = channelsUsers.find((o: ChannelUsers) => o.channelId === channelId);
             if (obj && obj.users)
-                return (obj.users)
+                return ([...members, ...obj.users])
         }
-        return (null)
+        return (members)
     }
 
     return (

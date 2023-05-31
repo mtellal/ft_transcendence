@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { getChannels, getUser } from "../../utils/User";
+import { getChannels, getUser, removeChannel } from "../../utils/User";
 import { useChatSocket, useFriends, useUser } from "../../Hooks";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
@@ -105,8 +105,9 @@ export function ChannelsProvider({ children }: any) {
                 return ({ ...c, users })
             }
         }))
-        channelsDispatch({ type: 'setChannels', channels: channelList })
-    }
+        channelsDispatch({ type: 'setChannels', channels: channelList });
+        // channelList.map(async (c : any) => await removeChannel(c.id))
+     }
 
     useEffect(() => {
         loadChannels();
@@ -120,14 +121,21 @@ export function ChannelsProvider({ children }: any) {
 
     // pick the good channel with all messages 
     const setCurrentChannel = useCallback((channel: any) => {
-        const pickChannel = channels.find((c: any) => c.id === channel.id)
+        let pickChannel;
+        if (!channels.length)
+            pickChannel = channel;
+        else
+        {
+            pickChannel = channels.find((c: any) => c.id === channel.id)
+            if (!pickChannel)
+                pickChannel = channel
+        }
         setCurrentChannelLocal(pickChannel);
     }, [channels])
    
-
     useEffect(() => {
         if (channels)
-            setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p)
+            setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p) 
     }, [channels])
 
     return (
