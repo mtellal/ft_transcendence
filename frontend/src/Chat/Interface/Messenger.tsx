@@ -81,14 +81,22 @@ function Message(props: any) {
             return (props.author.username)
     }
 
-    function pickMessageStyle()
-    {
+    function pickMessageStyle() {
         let style = {};
         if (props.author)
-            style = {marginBottom: '15px'}
+            style = { marginBottom: '15px' }
         if (props.sendBy === props.userId)
-            style = {...style, justifyContent: 'right', flexDirection: 'row-reverse' }
-        return (style)    
+            style = { ...style, justifyContent: 'right', flexDirection: 'row-reverse' }
+        return (style)
+    }
+
+    function pickAuthorInfosStyle() {
+        let style = {};
+        if (props.author)
+            style = { marginBottom: '15px' }
+        if (props.sendBy === props.userId)
+            style = { ...style, justifyContent: 'right', flexDirection: 'row-reverse' }
+        return (style)
     }
 
     return (
@@ -107,21 +115,31 @@ function Message(props: any) {
                         <div className="message-infos">
 
                             <div className="flex-center">
-                                {
-                                    isAdmin() &&
-                                    <div className="admin-icon">
-                                        <span className="material-symbols-outlined">
-                                            shield_person
-                                        </span>
-                                    </div>
-                                }
                                 <p className="message" style={addStyle()} >
                                     {props.content}
                                 </p>
                             </div>
 
-                            <p className="message-author" style={props.userId === props.sendBy ? { textAlign: 'right' } : {}}>{pickName()}</p>
+                            {
+                                props.author ?
 
+                                    <div
+                                        className="flex-center"
+                                        style={
+                                            props.sendBy === props.userId ?
+                                                { justifyContent: 'flex-end' } : { justifyContent: 'flex-end', flexDirection: 'row-reverse' }
+                                        }
+                                    >
+                                        {
+                                            props.admin && <span className="material-symbols-outlined">
+                                                shield_person
+                                            </span>
+                                        }
+                                        <p className="message-author" style={props.userId === props.sendBy ? { textAlign: 'right' } : {}}>{pickName()}</p>
+                                    </div>
+
+                                    : null
+                            }
                         </div>
                     </div>
             }
@@ -132,7 +150,7 @@ function Message(props: any) {
 
 function MessageNotification(props: any) {
     return (
-        <div className="flex-center" >
+        <div className="flex-center gray-c message-notification" >
             {props.content}
         </div>
     )
@@ -167,43 +185,59 @@ export default function Messenger({
         }
     }
 
+    // check if a user is in the user blockedList and filter messages from block timestamp
+    function filterMessages(messages: any[]) {
+        let blockObj: any;
+        if (currentChannel.type === "WHISPER" && user.blockedList.length &&
+            (blockObj = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
+            messages = currentChannel.messages.filter((m: any) => m.createdAt < blockObj.createdAt)
+        }
+        return (messages)
+    }
+
+    function formatMessages(messages: any[], members: any[]) {
+        let author: any;
+        let admin: boolean;
+        messages = messages.map((m: any, index: number) => {
+            admin = false;
+            author = null;
+            if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
+                if (m.sendBy === user.id)
+                    author = user;
+                else
+                    author = members.find((u: any) => u.id === m.sendBy)
+            }
+            if (author && currentChannel.administrators.find((id: number) => id === author.id))
+                admin = true;
+
+            return (
+                <Message
+                    key={m.id}
+                    id={m.id}
+                    content={m.content}
+                    sendBy={m.sendBy}
+                    type={m.type}
+                    author={author}
+                    admin={admin}
+                    userId={user.id}
+                    userImage={image}
+                    currentUsername={user.username}
+                    currentChannel={currentChannel}
+                />
+            )
+        })
+        return (messages)
+    }
+
     useEffect(() => {
         setRenderMessages([]);
         if (currentChannel) {
 
             const members = getMembers(currentChannel.id);
-
-            let block: any;
             let messages: any = currentChannel && currentChannel.messages;
-            if (messages && messages.length && members) {
-                if (currentChannel.type === "WHISPER" &&
-                    user.blockedList.length &&
-                    (block = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
-                    messages = currentChannel.messages.filter((m: any) => m.createdAt < block.createdAt)
-                }
-
-                let author: any;
-                messages = messages.map((m: any, index : number) => {
-                    if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1))
-                        author = members.find((u: any) => u.id === m.sendBy)
-                    else 
-                        author = null
-                    return (
-                        <Message
-                            key={m.id}
-                            id={m.id}
-                            content={m.content}
-                            sendBy={m.sendBy}
-                            type={m.type}
-                            author={author}
-                            userId={user.id}
-                            userImage={image}
-                            currentUsername={user.username}
-                            currentChannel={currentChannel}
-                        />
-                    )
-                })
-
+            if (messages && messages.length && members && members.length) {
+                messages = filterMessages(messages);
+                messages = formatMessages(messages, members)
                 setRenderMessages(messages)
             }
         }

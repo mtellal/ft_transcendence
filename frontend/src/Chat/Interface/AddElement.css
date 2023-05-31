@@ -67,6 +67,7 @@
 .channelsearch-pps
 {
     padding: 0 5px;
+    height: 100%;
 }
 
 .pickmenu-option
@@ -75,4 +76,9 @@
     padding: 0 5px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.channelsearch-pp-container
+{
+    height: 70%;
 }

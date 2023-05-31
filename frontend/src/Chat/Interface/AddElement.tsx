@@ -39,7 +39,7 @@ export default function AddElement(props: any) {
 
     const { token, user }: any = useUser();
 
-    const {friends, friendsDispatch, updateFriend}: any = useFriends();
+    const { friends, friendsDispatch, updateFriend }: any = useFriends();
 
     const { friendInvitations, removeFriendRequest }: any = useOutletContext();
 
@@ -208,7 +208,9 @@ function ChannelSearch(props: any) {
             i ? window.URL.createObjectURL(new Blob([i])) : defaultUserPP
         )
         setMembers(images.map((url: any) =>
-            <ProfilePicture key={url} image={url} />
+            <div className="channelsearch-pp-container">
+                <ProfilePicture key={url} image={url} />
+            </div>
         ))
     }
 
@@ -242,7 +244,7 @@ export function JoinChannel() {
 
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
-    const {channels, channelsDispatch} = useChannels();
+    const { channels, channelsDispatch } = useChannels();
 
     const {
         token,
@@ -250,7 +252,7 @@ export function JoinChannel() {
         setUser
     }: any = useUser();
 
-    const {friends, friendsDispatch}: any = useFriends();
+    const { friends, friendsDispatch }: any = useFriends();
 
     const {
         friendInvitations,

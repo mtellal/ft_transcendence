@@ -15,22 +15,18 @@ function ChannelInfos(props: any) {
 
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 
-
     async function loadMembers() {
         let members = getMembers(currentChannel.id);
-        if (members)
-        {
+        if (members && members.length) {
             members = members.map((u: any) => u.id);
-            members = await Promise.all(members.map( async (id: number) => 
+            members = await Promise.all(members.map(async (id: number) =>
                 await getUserProfilePictrue(id).
                     then(res => window.URL.createObjectURL(new Blob([res.data])))
             ))
-            members = [image, ...members];
-    
             setRenderMembersPP(
-                members.map((url : string) => 
-                    <div className="channelinfos-pp-container">
-                        <ProfilePicture key={url} image={url}/>
+                members.map((url: string) =>
+                    <div key={url} className="channelinfos-pp-container">
+                        <ProfilePicture image={url} />
                     </div>
                 )
             );
@@ -40,13 +36,13 @@ function ChannelInfos(props: any) {
     useEffect(() => {
         setRenderMembersPP([])
         if (currentChannel) {
-           loadMembers();
+            loadMembers();
         }
     }, [currentChannel, channelsUsers])
 
     return (
         <div className="flex-center">
-            <h2 style={{whiteSpace:'nowrap'}}>{props.name} - </h2>
+            <h2 style={{ whiteSpace: 'nowrap' }}>{props.name} - </h2>
             <div className="flex-center channelinfos-members-container">
                 {renderMembersPP}
             </div>
@@ -61,20 +57,37 @@ export default function Banner({ ...props }: any) {
     const { currentFriend } = useFriends();
     const { currentChannel } = useChannels();
 
+    const [friend, setFriend]: any = useState();
+    const [channel, setChannel]: any = useState();
+
+    useEffect(() => {
+        setFriend(null);
+        if (currentFriend)
+            setFriend(currentFriend)
+    }, [currentFriend])
+
+    useEffect(() => {
+        setChannel(null);
+        if (currentChannel)
+            setChannel(currentChannel)
+    }, [currentChannel])
+
+    console.log(channel)
+
     return (
         <div className="banner">
             {
-                currentChannel && currentChannel.type === "WHISPER" ?
+                channel && channel.type === "WHISPER" ?
                     <UserInfos
-                        id={currentFriend && currentFriend.id}
-                        username={currentFriend && currentFriend.username}
-                        userStatus={currentFriend && currentFriend.userStatus}
-                        profilePictureURL={currentFriend && currentFriend.url}
-                        userAvatar={currentFriend && currentFriend.avatar}
+                        id={friend && friend.id}
+                        username={friend && friend.username}
+                        userStatus={friend && friend.userStatus}
+                        profilePictureURL={friend && friend.url}
+                        userAvatar={friend && friend.avatar}
                     />
                     :
                     <ChannelInfos
-                        name={currentChannel && currentChannel.name}
+                        name={channel && channel.name}
                     />
             }
             <div className="flex-center banner-icon-container">
