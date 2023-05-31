@@ -81,6 +81,16 @@ function Message(props: any) {
             return (props.author.username)
     }
 
+    function pickMessageStyle()
+    {
+        let style = {};
+        if (props.author)
+            style = {marginBottom: '15px'}
+        if (props.sendBy === props.userId)
+            style = {...style, justifyContent: 'right', flexDirection: 'row-reverse' }
+        return (style)    
+    }
+
     return (
         <>
             {
@@ -88,7 +98,7 @@ function Message(props: any) {
                     <MessageNotification content={props.content} />
                     :
                     <div className="message-div"
-                        style={props.sendBy === props.userId ? { justifyContent: 'right', flexDirection: 'row-reverse' } : {}}
+                        style={pickMessageStyle()}
                     >
                         <div className="message-resize-pp">
                             {props.author && <ProfilePicture image={pickProfilePicture()} />}

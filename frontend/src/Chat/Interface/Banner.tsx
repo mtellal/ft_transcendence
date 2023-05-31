@@ -38,6 +38,7 @@ function ChannelInfos(props: any) {
     }
 
     useEffect(() => {
+        setRenderMembersPP([])
         if (currentChannel) {
            loadMembers();
         }
