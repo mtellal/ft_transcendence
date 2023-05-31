@@ -42,7 +42,7 @@ export function CreateChannel() {
                 channelsDispatch({ type: 'addChannel', channel: res.data })
             })
         console.log("channelCreated")
-        navigate("/chat/groups/")
+        navigate(`/chat/groups/${name}`)
     }
 
 

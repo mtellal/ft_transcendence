@@ -9,6 +9,7 @@ import {
     useUser
 } from "../../Hooks";
 import './Messenger.css'
+import ProfilePicture from "../../Components/ProfilePicture";
 
 function BlockMessage({ username }: any) {
     return (
@@ -65,24 +66,58 @@ function Message(props: any) {
             return ({ backgroundColor: '#FFF5DD' });
     }
 
+    function pickProfilePicture() {
+        if (props.sendBy === props.userId)
+            return (props.userImage)
+        else if (props.author)
+            return (props.author.url)
+    }
+
+    function pickName()
+    {
+        if (props.sendBy === props.userId)
+            return (props.currentUsername)
+        else if (props.author)
+            return (props.author.username)
+    }
+
     return (
-        <div className="message-div"
-            style={props.sendBy === props.userId ? { justifyContent: 'right' } : {}}
-        >
-            <div className="message-infos">
-                <p className="message"
-                    style={addStyle()}
-                >
-                    {props.message.content}
-                </p>
-                {props.group && <p className="message-author">{props.author}</p>}
-            </div>
+        <>
             {
-                props.group && isAdmin() &&
-                <span className="material-symbols-outlined">
-                    shield_person
-                </span>
+                props.type === "NOTIF" ?
+                    <MessageNotification content={props.content} />
+                    :
+                    <div className="message-div"
+                        style={props.sendBy === props.userId ? { justifyContent: 'right', flexDirection: 'row-reverse' } : {}}
+                    >
+                        <div className="message-resize-pp">
+                            <ProfilePicture image={pickProfilePicture()} />
+                        </div>
+                        <div className="message-infos">
+                            <p className="message" style={addStyle()} >
+                                {props.content}
+                            </p>
+                            <p className="message-author">{pickName()}</p>
+                        </div>
+                        {
+                            props.type && props.type !== "WHISPER" && isAdmin() &&
+                            <div className="admin-icon">
+                                <span className="material-symbols-outlined">
+                                    shield_person
+                                </span>
+                            </div>
+                        }
+                    </div>
             }
+        </>
+    )
+}
+
+
+function MessageNotification(props: any) {
+    return (
+        <div className="flex-center" >
+            {props.content}
         </div>
     )
 }
@@ -90,10 +125,9 @@ function Message(props: any) {
 
 export default function Messenger({
     blocked,
-    invitation,
 }: any) {
 
-    const { user } = useUser();
+    const { user, image } = useUser();
     const { socket } = useChatSocket();
     const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");
@@ -132,21 +166,28 @@ export default function Messenger({
                     (block = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
                     messages = currentChannel.messages.filter((m: any) => m.createdAt < block.createdAt)
                 }
-                setRenderMessages(
-                    messages.map((m: any) =>
+
+
+                messages = messages.map((m: any) => {
+                    const author = members.find((u: any) => u.id === m.sendBy)
+                    console.log(author)
+                    return (
                         <Message
                             key={m.id}
-                            message={m}
                             id={m.id}
+                            content={m.content}
                             sendBy={m.sendBy}
-                            author={members.map((u : any) => u.id === m.sendBy ? u.username : "")}
+                            type={m.type}
+                            author={author}
                             userId={user.id}
+                            userImage={image}
+                            currentUsername={user.username}
                             currentChannel={currentChannel}
-                            group={currentChannel && currentChannel.type !== "WHISPER"}
-                            administrators={null}
                         />
                     )
-                )
+                })
+
+                setRenderMessages(messages)
             }
         }
     }, [channels, currentChannel, channelsUsers, user])
@@ -154,7 +195,7 @@ export default function Messenger({
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
-    }, [currentChannel, blocked, invitation, renderMessages])
+    }, [currentChannel, blocked, renderMessages])
 
     return (
         <>

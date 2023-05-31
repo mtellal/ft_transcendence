@@ -7,6 +7,12 @@
     justify-content: space-between ;
 }
 
+.banner-icon-container
+{
+    width: 30%;
+    height: 100%;
+}
+
 .description
 {
     position:absolute;
@@ -14,10 +20,27 @@
     visibility: hidden;
 }
 
-@media (max-width: 700px)
+/* @media (max-width: 700px)
 {
     .banner-icon
     {
         display: none;
     }
+} */
+
+
+.channelinfos-pp-container
+{
+    height: 50px;
+    width: 50px;
+    padding: 0 2px;
+}
+
+.channelinfos-members-container
+{
+    padding: 0 5px;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
