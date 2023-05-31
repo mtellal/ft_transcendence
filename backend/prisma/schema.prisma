@@ -35,6 +35,8 @@ model User {
   friendList      Int[]           @default([])
   blockedList     BlockedUser[]
   channelList     Int[]           @default([])
+  player1Games    Game[]          @relation("Player1")
+  player2Games    Game[]          @relation("Player2")
   createdAt       DateTime        @default(now())
 }
 
@@ -103,7 +105,28 @@ model Message {
   createdAt DateTime    @default(now())
 }
 
+enum GameStatus {
+  MATCHMAKING
+  INVITE
+  ONGOING
+  FINISHED
+}
+
 // For a Game, need at least the ID of the two players involved, the score, if the match is ongoing or over. Will add more.
 model Game {
   id Int @id @default(autoincrement())
+
+  player1      User? @relation("Player1", fields: [player1Id], references: [id])
+  player1Id    Int?
+  player1Score Int   @default(0)
+
+  player2      User? @relation("Player2", fields: [player2Id], references: [id])
+  player2Id    Int?
+  player2Score Int   @default(0)
+
+  wonBy Int?
+
+  status GameStatus
+
+  createdAt DateTime @default(now())
 }
