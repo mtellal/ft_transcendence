@@ -104,7 +104,6 @@ export default function MenuElement({ ...props }) {
                     c.type === "WHISPER" && c.members.find((id: number) => element.id === id)
                 )
             }
-            console.log("channels from menuelement => ", channels)
             if (!channelSelected) {
                 await createChannel({
                     name: "privateMessage",

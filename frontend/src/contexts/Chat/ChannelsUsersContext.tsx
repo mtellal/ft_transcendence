@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useState } from "react";
+import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { useChannels, useUser } from "../../Hooks";
 import { getUser, getUserProfilePictrue } from "../../utils/User";
 
@@ -23,9 +23,9 @@ function reducer(channelsUsers: ChannelUsers[], action: ReducerAction) {
                 return ([...channelsUsers, action.channelsUsers])
             return ([action.channelsUsers])
         }
-        case('removeChannelsUsers'): {
+        case ('removeChannelsUsers'): {
             if (channelsUsers)
-                return (channelsUsers.filter((o : ChannelUsers) => o.channelId !== action.channelId))
+                return (channelsUsers.filter((o: ChannelUsers) => o.channelId !== action.channelId))
             return (channelsUsers)
         }
         default: return (channelsUsers)
@@ -53,13 +53,11 @@ export default function ChannelsUsersProvider({ children }: any) {
         return (null)
     }
 
-    async function fetchProfilePicture(users: any[])
-    {
-        if (users && users.length)
-        {
-            let newUsers = await Promise.all(users.map(async (u : any) => 
+    async function fetchProfilePicture(users: any[]) {
+        if (users && users.length) {
+            let newUsers = await Promise.all(users.map(async (u: any) =>
                 await getUserProfilePictrue(u.id)
-                    .then(res => ({...u, url: window.URL.createObjectURL(new Blob([res.data]))}))
+                    .then(res => ({ ...u, url: window.URL.createObjectURL(new Blob([res.data])) }))
             ))
             return (newUsers)
         }
@@ -92,21 +90,38 @@ export default function ChannelsUsersProvider({ children }: any) {
         }
     }, [currentChannel])
 
-    function getMembers(channelId: number) {
-        let members = [{...user, url: image}]
-        if (channelsUsers.length) {
+    const getMembers = useCallback((channelId: number) => {
+        let members: any = null;
+        if (user)
+            members = [{ ...user, url: image }]
+        if (channelsUsers && channelsUsers.length) {
             const obj = channelsUsers.find((o: ChannelUsers) => o.channelId === channelId);
             if (obj && obj.users)
                 return ([...members, ...obj.users])
         }
         return (members)
-    }
+    }, [channelsUsers, user])
+
+    const getAdmins = useCallback((channel: any) => {
+        let admins: any = [];
+        if (channelsUsers && channelsUsers.length && user && channel) {
+            let users: any = getMembers(channel.id)
+            if (users && channel.administrators) {
+                let a = users.map((u : any) => channel.administrators.find((id : any) => u.id === id) ? u : null);
+                a = a.filter((u : any) => u)
+                if (a)
+                    admins = [...a, ...admins]
+            }
+        }
+        return (admins)
+    }, [channelsUsers, user])
 
     return (
         <ChannelsUsersContext.Provider value={{
             channelsUsers,
             channelsUsersDispatch,
-            getMembers
+            getMembers,
+            getAdmins
         }}>
             {children}
         </ChannelsUsersContext.Provider>

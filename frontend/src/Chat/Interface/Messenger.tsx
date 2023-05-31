@@ -207,7 +207,8 @@ export default function Messenger({
                 else
                     author = members.find((u: any) => u.id === m.sendBy)
             }
-            if (author && currentChannel.administrators.find((id: number) => id === author.id))
+            if (author && currentChannel.type !== "WHISPER" &&  
+                    currentChannel.administrators.find((id: number) => id === author.id))
                 admin = true;
 
             return (
