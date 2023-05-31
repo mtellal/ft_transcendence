@@ -91,10 +91,19 @@ export default function Banner({ ...props }: any) {
                     />
             }
             <div className="flex-center banner-icon-container">
-                <Icon icon="person" onClick={props.profile} description="Profile" />
+                {
+                    channel && channel.type === "WHISPER" ?
+                    <Icon icon="person" onClick={props.profile} description="Profile" />
+                    : <Icon icon="groups" onClick={props.profile} description="Channel" />
+                }
                 <Icon icon="sports_esports" onClick={props.invitation} description="Invitation" />
                 <Icon icon="block" onClick={props.block} description="Block" />
-                <Icon icon="person_remove" onClick={props.remove} description="Remove" />
+                {
+                    channel && channel.type === "WHISPER" ?  
+                    <Icon icon="person_remove" onClick={props.remove} description="Remove" />
+                    :
+                    <Icon icon="logout" onClick={props.remove} description="Logout" />
+                }
             </div>
         </div>
     )
