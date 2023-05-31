@@ -56,7 +56,8 @@ function GameInvitation(props: any) {
 function Message(props: any) {
 
     function isAdmin() {
-        if (props.currentChannel) {
+        if (props.currentChannel &&
+            props.currentChannel.administrators && props.currentChannel.administrators.length) {
             return (props.currentChannel.administrators.find((id: any) => id === props.sendBy));
         }
     }
@@ -73,8 +74,7 @@ function Message(props: any) {
             return (props.author.url)
     }
 
-    function pickName()
-    {
+    function pickName() {
         if (props.sendBy === props.userId)
             return (props.currentUsername)
         else if (props.author)
@@ -91,22 +91,28 @@ function Message(props: any) {
                         style={props.sendBy === props.userId ? { justifyContent: 'right', flexDirection: 'row-reverse' } : {}}
                     >
                         <div className="message-resize-pp">
-                            <ProfilePicture image={pickProfilePicture()} />
+                            {props.author && <ProfilePicture image={pickProfilePicture()} />}
                         </div>
+
                         <div className="message-infos">
-                            <p className="message" style={addStyle()} >
-                                {props.content}
-                            </p>
-                            <p className="message-author">{pickName()}</p>
-                        </div>
-                        {
-                            props.type && props.type !== "WHISPER" && isAdmin() &&
-                            <div className="admin-icon">
-                                <span className="material-symbols-outlined">
-                                    shield_person
-                                </span>
+
+                            <div className="flex-center">
+                                {
+                                    isAdmin() &&
+                                    <div className="admin-icon">
+                                        <span className="material-symbols-outlined">
+                                            shield_person
+                                        </span>
+                                    </div>
+                                }
+                                <p className="message" style={addStyle()} >
+                                    {props.content}
+                                </p>
                             </div>
-                        }
+
+                            <p className="message-author" style={props.userId === props.sendBy ? { textAlign: 'right' } : {}}>{pickName()}</p>
+
+                        </div>
                     </div>
             }
         </>
@@ -156,7 +162,6 @@ export default function Messenger({
         if (currentChannel) {
 
             const members = getMembers(currentChannel.id);
-            console.log(members)
 
             let block: any;
             let messages: any = currentChannel && currentChannel.messages;
@@ -167,10 +172,12 @@ export default function Messenger({
                     messages = currentChannel.messages.filter((m: any) => m.createdAt < block.createdAt)
                 }
 
-
-                messages = messages.map((m: any) => {
-                    const author = members.find((u: any) => u.id === m.sendBy)
-                    console.log(author)
+                let author: any;
+                messages = messages.map((m: any, index : number) => {
+                    if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1))
+                        author = members.find((u: any) => u.id === m.sendBy)
+                    else 
+                        author = null
                     return (
                         <Message
                             key={m.id}
