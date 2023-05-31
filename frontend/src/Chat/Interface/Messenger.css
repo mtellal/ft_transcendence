@@ -120,3 +120,16 @@
     font-size: large;
     font-weight: 600;
 }
+
+
+.message-resize-pp
+{
+    padding: 0 5px;
+    height: 40px;
+    width: 40px;
+}
+
+.admin-icon
+{
+    align-self: flex-end;
+}

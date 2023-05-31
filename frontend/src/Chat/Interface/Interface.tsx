@@ -48,19 +48,15 @@ export function loader({ params }: any) {
 
 export default function Interface() {
 
-    const { id }: any = useParams();
     const { socket } = useChatSocket();
+    const navigate = useNavigate();
     const {
         token,
         user,
         userDispatch
     }: any = useUser();
 
-    const { sendMessage }: any = useOutletContext();
-
     const { currentChannel } = useChannels();
-
-    const navigate = useNavigate();
 
     const {
         friends,
@@ -68,12 +64,9 @@ export default function Interface() {
         currentFriend
     }: any = useFriends();
 
-    const [render, setRender] = React.useState(false);
     const [profile, setProfile] = React.useState(false);
     const [removeFriendView, setRemoveFriendView] = React.useState(false);
     const [blocked, setBlocked]: [any, any] = React.useState(false);
-
-    const [friend, setFriend]: any = useState();
 
 
     function block() {
@@ -134,7 +127,6 @@ export default function Interface() {
                                 <Messenger
                                     currentChannel={currentChannel}
                                     blocked={blocked}
-                                    invitation={render}
                                 />
                         }
 

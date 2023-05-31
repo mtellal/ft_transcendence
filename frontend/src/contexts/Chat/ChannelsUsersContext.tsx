@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useReducer, useState } from "react";
 import { useChannels, useUser } from "../../Hooks";
-import { getUser } from "../../utils/User";
+import { getUser, getUserProfilePictrue } from "../../utils/User";
 
 
 export const ChannelsUsersContext: React.Context<any> = createContext([]);
@@ -53,12 +53,26 @@ export default function ChannelsUsersProvider({ children }: any) {
         return (null)
     }
 
+    async function fetchProfilePicture(users: any[])
+    {
+        if (users && users.length)
+        {
+            let newUsers = await Promise.all(users.map(async (u : any) => 
+                await getUserProfilePictrue(u.id)
+                    .then(res => ({...u, url: window.URL.createObjectURL(new Blob([res.data]))}))
+            ))
+            return (newUsers)
+        }
+    }
+
+
     async function addChannelUsers(channel: any) {
         const members = channel.members;
         if (channelsUsers.length) {
             channelsUsers.find(async (obj: ChannelUsers) => {
                 if (obj.channelId !== channel.id) {
-                    const users = await fetchMembers(members);
+                    let users = await fetchMembers(members);
+                    users = await fetchProfilePicture(users);
                     if (users)
                         channelsUsersDispatch({ type: 'addChannelsUsers', channelsUsers: { channelId: channel.id, users } })
                 }
@@ -66,7 +80,7 @@ export default function ChannelsUsersProvider({ children }: any) {
         }
         else {
             let users = await fetchMembers(members);
-            console.log(users)
+            users = await fetchProfilePicture(users);
             if (users)
                 channelsUsersDispatch({ type: 'addChannelsUsers', channelsUsers: { channelId: channel.id, users } })
         }
