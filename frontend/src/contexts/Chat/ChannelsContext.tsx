@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useState } from "react";
+import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { getChannels, getUser } from "../../utils/User";
 import { useChatSocket, useFriends, useUser } from "../../Hooks";
 
@@ -119,10 +119,11 @@ export function ChannelsProvider({ children }: any) {
     }
 
     // pick the good channel with all messages 
-    function setCurrentChannel(channel: any) {
+    const setCurrentChannel = useCallback((channel: any) => {
         const pickChannel = channels.find((c: any) => c.id === channel.id)
         setCurrentChannelLocal(pickChannel);
-    }
+    }, [channels])
+   
 
     useEffect(() => {
         if (channels)

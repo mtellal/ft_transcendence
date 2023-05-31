@@ -17,7 +17,9 @@ export default function Header() {
                     className='pp-link'
                     to={"/profile"}
                 >
-                    <ProfilePicture image={image} />
+                    <div style={{height: '60%', padding: '0 5px'}}>
+                        <ProfilePicture image={image} />
+                    </div>
                     <p className='pp-username'>{user.username}</p>
                 </Link>
             </div>

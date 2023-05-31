@@ -89,43 +89,41 @@ function ChannelElement(props: any) {
 export default function MenuElement({ ...props }) {
 
     const { token } = useUser();
-    const {friends, friendsDispatch, setCurrentFriend} = useFriends();
+    const { friends, friendsDispatch, setCurrentFriend } = useFriends();
     const { channels, channelsDispatch, joinChannel, setCurrentChannel } = useChannels();
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
 
-       const selectCurrentChannel = async (element: any, type : string) => {
-            let channelSelected: any;
-            if (type =="friend")
-            {
-                friendsDispatch({ type: 'removeNotif', friend: element });
-                if (channels.length) {
-                    channelSelected = channels.find((c: any) =>
-                        c.type === "WHISPER" && c.members.find((id: number) => element.id === id)
-                    )
-                }
-                if (!channelSelected) {
-                    await createChannel({
-                        name: "privateMessage",
-                        type: "WHISPER",
-                        members: [
-                            element.id
-                        ],
-                    }, token)
-                        .then(res => {
-                            channelSelected = res.data
-                        })
-                    channelsDispatch({ type: 'addChannel', channel: channelSelected });
-                }
-                setCurrentFriend(element);
+    const selectCurrentChannel = async (element: any, type: string) => {
+        let channelSelected: any;
+        if (type == "friend") {
+            friendsDispatch({ type: 'removeNotif', friend: element });
+            if (channels.length) {
+                channelSelected = channels.find((c: any) =>
+                    c.type === "WHISPER" && c.members.find((id: number) => element.id === id)
+                )
             }
-            else
-                channelSelected = element;
-    
-            joinChannel(channelSelected);
-            setCurrentChannel(channelSelected);
+            if (!channelSelected) {
+                await createChannel({
+                    name: "privateMessage",
+                    type: "WHISPER",
+                    members: [
+                        element.id
+                    ],
+                }, token)
+                    .then(res => {
+                        channelSelected = res.data
+                    })
+                channelsDispatch({ type: 'addChannel', channel: channelSelected });
+            }
+            setCurrentFriend(element);
         }
+        else
+            channelSelected = element;
+        joinChannel(channelSelected);
+        setCurrentChannel(channelSelected);
+    }
 
     React.useEffect(() => {
         if (friends && friends.length) {
