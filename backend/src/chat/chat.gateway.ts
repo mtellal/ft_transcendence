@@ -164,8 +164,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           type: MessageType.NOTIF,
           content: `${user.username} joined the channel`
         }
-        await this.chatService.createNotif(notif);
-        this.server.to(channel.id.toString()).emit('message', notif);
+        const message = await this.chatService.createNotif(notif);
+        this.server.to(channel.id.toString()).emit('message', message);
       }
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);
@@ -293,13 +293,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         leaveMessage += ` ${(await newOwner).username} is now the owner of the channel`
       }
       if (updatedChannel) {
-        const message: MessageDto = {
+        const leaveNotif: MessageDto = {
           channelId: updatedChannel.id,
           type: MessageType.NOTIF,
           content: leaveMessage
         }
         console.log(updatedChannel);
-        await this.chatService.createNotif(message);
+        const message = await this.chatService.createNotif(leaveNotif);
         this.server.to(updatedChannel.id.toString()).emit('message', message);
       }
     }
@@ -364,12 +364,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       let kickMessage = `${usertoKick.username} was kicked by ${user.username}.`;
       if (dto.reason)
         kickMessage += ` Reason: ${dto.reason}`;
-      const message: MessageDto = {
+      const kickNotif: MessageDto = {
         channelId: channel.id,
         type: MessageType.NOTIF,
         content: kickMessage
       }
-      await this.chatService.createNotif(message);
+      const message = await this.chatService.createNotif(kickNotif);
       this.server.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
@@ -429,8 +429,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         type: MessageType.NOTIF,
         content: muteNotif
       }
-      await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', notif);
+      const message = await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
@@ -495,8 +495,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         type: MessageType.NOTIF,
         content: banNotif
       }
-      await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', notif);
+      const message = await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
@@ -605,8 +605,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       type: MessageType.NOTIF,
       content: updateNotif
     }
-    await this.chatService.createNotif(notif);
-    this.server.to(channel.id.toString()).emit('message', notif);
+    const message = await this.chatService.createNotif(notif);
+    this.server.to(channel.id.toString()).emit('message', message);
   }
 
   async handleConnection(client: Socket) {
