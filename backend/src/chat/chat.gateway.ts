@@ -285,8 +285,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException('Channel not found');
       if (!user.channelList.includes(channel.id))
         throw new BadRequestException('User is not on the channel');
-      await this.chatService.leave(channel, user);
+      const updatedChannel = await this.chatService.leave(channel, user);
+      console.log(updatedChannel);
       client.leave(channel.id.toString());
+      let leaveMessage = `${user.username} left the channel.`
+      if (channel.ownerId === user.id && updatedChannel) {
+        const newOwner = await this.userService.findOne(updatedChannel.ownerId)
+        leaveMessage += ` ${(await newOwner).username} is now the owner of the channel`
+      }
+      if (updatedChannel) {
+        const message: MessageDto = {
+          channelId: updatedChannel.id,
+          type: MessageType.NOTIF,
+          content: leaveMessage
+        }
+        console.log(updatedChannel);
+        await this.chatService.createNotif(message);
+        this.server.to(updatedChannel.id.toString()).emit('message', message);
+      }
     }
     catch(error) {
       console.log(error);

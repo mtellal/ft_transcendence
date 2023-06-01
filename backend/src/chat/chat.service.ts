@@ -310,13 +310,14 @@ export class ChatService {
     }
     updatedAdmin = channel.administrators.filter((num) => num != user.id);
     const updatedMember = channel.members.filter((num) => num != user.id);
+    let updatedChannel: Channel | null = null;
     if (updatedMember.length === 0) {
       await this.prisma.channel.delete({
         where: {id: channel.id},
       });
     }
     else {
-      await this.prisma.channel.update({
+      updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           ownerId: newOwner,
@@ -331,6 +332,7 @@ export class ChatService {
         channelList: user.channelList.filter((num) => num !== channel.id)
       }
     })
+    return updatedChannel;
   }
 
   async remove(id: number)
