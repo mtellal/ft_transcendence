@@ -28,51 +28,105 @@ import UsersCollection from "../../Components/UsersCollection";
 
 import defaultUserPP from '../../assets/user.png'
 
-export default function AddElement(props: any) {
+import './JoinChannel.css'
+
+function ChannelSearch(props: any) {
+
+    const [members, setMembers] = useState([]);
+
+    async function loadUsersProfilePicter() {
+        const rawProfilePictures = await Promise.all(props.members.map(async (id: any, i: number) =>
+            i < 5 ? await getUserProfilePictrue(id).then(res => res.data) : null
+        ))
+        const images = rawProfilePictures.map((i: any) =>
+            i ? window.URL.createObjectURL(new Blob([i])) : defaultUserPP
+        )
+        setMembers(images.map((url: any) =>
+            <div key={url} className="channelsearch-pp-container">
+                <ProfilePicture key={url} image={url} />
+            </div>
+        ))
+    }
+
+    useEffect(() => {
+        if (props.members)
+            loadUsersProfilePicter();
+    }, [props.members])
+
+    return (
+        <div className="flex-ai channel-search">
+            <h3 className="no-wrap">{props.name} - </h3>
+            <p className="channelsearch-members gray-c flex-center no-wrap">{props.members.length} members</p>
+            <div className="channelsearch-pps flex-center hidden">
+                {members}
+            </div>
+            {
+                props.isJoin && 
+                <div style={{ marginLeft: 'auto' }}>
+                    <Icon icon="login" description="Join" onClick={props.join} />
+                </div>
+            }
+        </div>
+    )
+}
+
+
+export default function JoinChannel() {
+
     const [prevValue, setPrevValue] = React.useState("");
     const [value, setValue] = React.useState("");
-    const [friend, setFriend]: [any, any] = React.useState(null);
     const [error, setError] = React.useState(false);
+    const { socket } = useChatSocket();
+
+    const [matchChannels, setMatchChannels] = useState([]);
+    const [renderChannels, setRenderChannels] = useState([]);
 
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
+    const { channels, channelsDispatch, channelAlreadyExists } = useChannels();
 
-    const { token, user }: any = useUser();
+    const {
+        token,
+        user,
+        setUser
+    }: any = useUser();
 
-    const { friends, friendsDispatch, updateFriend }: any = useFriends();
+    const { friends, friendsDispatch }: any = useFriends();
 
-    const { friendInvitations, removeFriendRequest }: any = useOutletContext();
+    const {
+        friendInvitations,
+        removeFriendRequest
+    }: any = useOutletContext();
 
-    function validFriend() {
-        return (friends.every((user: any) => friend.id !== user.id) && friend.id !== user.id)
+
+    function fetchError() {
+        setError(true);
+        setMatchChannels(null);
     }
 
-    function handleResponse(res: any) {
-        if (res.status === 200 && res.statusText === "OK") {
-            setFriend(res.data);
-            setError(false)
-        }
-        else {
-            setFriend(null);
-            setError(true)
-        }
-    }
-
-    async function searchUser() {
+    async function searchChannel() {
         if (prevValue === value)
             return;
-        const res = await getUserByUsername(value);
-        handleResponse(res);
+        await getChannelByName(value)
+            .then(res => {
+                if (res.status === 200 && res.statusText === "OK") {
+                    let channels: any[];
+                    setError(false)
+                    if (res.data.length)
+                        channels = res.data.filter((c: any) => c.type !== "WHISPER");
+                    if (channels.length)
+                        setMatchChannels(channels)
+                    else
+                        fetchError();
+                }
+                else
+                    fetchError();
+            })
+            .catch(err => fetchError())
         setPrevValue(value);
     }
 
-    async function addFriend() {
-        if (validFriend()) {
-            await sendFriendRequest(friend.id, token);
-        }
-    }
-
-    async function loadUser(id: number | string) {
+    async function loadElement(id: number | string) {
         const userRes = await getUser(id);
         if (userRes.status === 200 && userRes.statusText === "OK") {
             return (userRes.data);
@@ -87,7 +141,7 @@ export default function AddElement(props: any) {
             if (validRes.status === 201 && validRes.statusText === "Created") {
                 removeFriendRequest(invitation.id);
                 setUserInvitations((p: any) => p.filter((user: any) => user.id !== u.id))
-                updateFriend(u)
+                friendsDispatch({ type: 'updateFriend', friend: u })
             }
         }
     }
@@ -104,9 +158,9 @@ export default function AddElement(props: any) {
     }
 
 
-    async function loadFriends() {
+    async function loadElementsInvitations() {
         const users = await Promise.all(friendInvitations.map(async (u: any) =>
-            await loadUser(u.sendBy)
+            await loadElement(u.sendBy)
         ))
         setUserInvitations(users);
     }
@@ -114,7 +168,7 @@ export default function AddElement(props: any) {
     React.useEffect(() => {
 
         if (friendInvitations && friendInvitations.length) {
-            loadFriends();
+            loadElementsInvitations();
         }
         else {
             setInvitations([]);
@@ -123,11 +177,18 @@ export default function AddElement(props: any) {
     }, [friendInvitations])
 
 
+    function joinChannel(channel: any) {
+        channelsDispatch({ type: 'addChannel', channel })
+        socket.emit('joinChannel', {
+            channelId: channel.id
+        })
+        setRenderChannels([]);
+    }
+
     React.useEffect(() => {
         if (userInvitations && userInvitations.length) {
             setInvitations(userInvitations.map((u: any) =>
                 <FriendSearch
-                    user={u}
                     key={u.id}
                     id={u.id}
                     username={u.username}
@@ -144,78 +205,56 @@ export default function AddElement(props: any) {
     }, [userInvitations])
 
 
+    useEffect(() => {
+        if (matchChannels && matchChannels.length) {
+
+
+            setRenderChannels(
+                matchChannels.map((c: any) =>
+                    <ChannelSearch
+                        key={c.id}
+                        id={c.id}
+                        name={c.name}
+                        members={c.members}
+                        isJoin={!channelAlreadyExists(c)}
+                        join={() => joinChannel(c)}
+                    />)
+            )
+        }
+    }, [matchChannels])
+
     return (
         <div className="add-container">
-            <div className="flex-column-center add-div">
-                <h2 className="add-title">Add a {props.title}</h2>
+            <h2 className="add-title">Join a Channel</h2>
+            <div className="flex-column-center">
                 <IconInput
                     icon="search"
-                    placeholder="Username"
+                    placeholder="Channel"
                     getValue={(v: string) => setValue(v.trim())}
-                    submit={() => value && searchUser()}
+                    submit={() => value && searchChannel()}
                 />
-                {
-                    friend ?
-                        <div className="user-found">
-                            <FriendSearch
-                                key={friend.id}
-                                id={friend.id}
-                                username={friend.username}
-                                avatar={friend.avatar}
-                                userStatus={friend.userStatus}
-                                onCLick={() => addFriend()}
-                                add={validFriend()}
-                            />
-                        </div>
-                        : null
-                }
-                {
-                    error ? <p>User not found</p> : null
-                }
                 <button
-                    className="add-button button"
-                    onClick={searchUser}
+                    className="button add-button"
+                    onClick={searchChannel}
                 >
                     Search
                 </button>
+                {renderChannels}
+                {
+                    error ? <p>Channel not found</p> : null
+                }
                 {
                     userInvitations.length ?
                         <div className="add-element-invitations">
                             <CollectionElement
                                 title="Invitations"
                                 collection={invitations}
-                                addClick={props.addGroup}
+                                addClick={() => console.log("addClick")}
                             />
                         </div>
                         :
                         null
                 }
-            </div>
-        </div>
-    )
-}
-
-export function AddChannel() {
-
-    const { socket } = useChatSocket();
-
-    useEffect(() => {
-        /* console.log("channel created")
-        socket.emit('createChannel', {
-            name: "channel2",
-            type: "PUBLIC",
-        }) */
-    }, [])
-
-    return (
-        <div className="flex-center add-channel">
-            <div className="flex-column-center addchannel-button-container">
-                <Link to={"join"} className="button flex-center add-channel-button">
-                    Join a Channel
-                </Link>
-                <Link to={"create"} className="button flex-center add-channel-button">
-                    Create a Channel
-                </Link>
             </div>
         </div>
     )

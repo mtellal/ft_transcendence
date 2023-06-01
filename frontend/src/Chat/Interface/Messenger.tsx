@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import {
     useChannels,
@@ -53,15 +53,24 @@ function GameInvitation(props: any) {
     style and display one single message
 */
 
+function MessageDisplay(props: any) {
+
+    return (
+        <div>
+            {
+                props.type === "NOTIF" && 
+                    <MessageNotification content={props.content} />
+            }        
+            {
+                props.type !== "NOTIF" && props.type !== "INVITATION" && 
+                <Message {...props} />
+            }
+        </div>
+    )
+}
+
+
 function Message(props: any) {
-
-    function isAdmin() {
-        if (props.currentChannel &&
-            props.currentChannel.administrators && props.currentChannel.administrators.length) {
-            return (props.currentChannel.administrators.find((id: any) => id === props.sendBy));
-        }
-    }
-
     function addStyle() {
         if (props.sendBy === props.userId)
             return ({ backgroundColor: '#FFF5DD' });
@@ -90,63 +99,49 @@ function Message(props: any) {
         return (style)
     }
 
-    function pickAuthorInfosStyle() {
-        let style = {};
-        if (props.author)
-            style = { marginBottom: '15px' }
-        if (props.sendBy === props.userId)
-            style = { ...style, justifyContent: 'right', flexDirection: 'row-reverse' }
-        return (style)
-    }
-
     return (
-        <>
-            {
-                props.type === "NOTIF" ?
-                    <MessageNotification content={props.content} />
-                    :
-                    <div className="message-div"
-                        style={pickMessageStyle()}
-                    >
-                        <div className="message-resize-pp">
-                            {props.author && <ProfilePicture image={pickProfilePicture()} />}
-                        </div>
+        <div>
 
-                        <div className="message-infos">
+            <div className="message-div"
+                style={pickMessageStyle()}
+            >
+                <div className="message-resize-pp">
+                    {props.author && <ProfilePicture image={pickProfilePicture()} />}
+                </div>
 
-                            <div className="flex-center">
-                                <p className="message" style={addStyle()} >
-                                    {props.content}
-                                </p>
+                <div className="message-infos">
+
+                    <div className="flex-center" style={{ justifyContent: 'flex-end' }}>
+                        <p className="message" style={addStyle()} >
+                            {props.content}
+                        </p>
+                    </div>
+
+                    {
+                        props.author ?
+
+                            <div
+                                className="flex-center"
+                                style={
+                                    props.sendBy === props.userId ?
+                                        { justifyContent: 'flex-end' } : { justifyContent: 'flex-end', flexDirection: 'row-reverse' }
+                                }
+                            >
+                                {
+                                    props.admin && <span className="material-symbols-outlined">
+                                        shield_person
+                                    </span>
+                                }
+                                <p className="message-author" style={props.userId === props.sendBy ? { textAlign: 'right' } : {}}>{pickName()}</p>
                             </div>
 
-                            {
-                                props.author ?
-
-                                    <div
-                                        className="flex-center"
-                                        style={
-                                            props.sendBy === props.userId ?
-                                                { justifyContent: 'flex-end' } : { justifyContent: 'flex-end', flexDirection: 'row-reverse' }
-                                        }
-                                    >
-                                        {
-                                            props.admin && <span className="material-symbols-outlined">
-                                                shield_person
-                                            </span>
-                                        }
-                                        <p className="message-author" style={props.userId === props.sendBy ? { textAlign: 'right' } : {}}>{pickName()}</p>
-                                    </div>
-
-                                    : null
-                            }
-                        </div>
-                    </div>
-            }
-        </>
+                            : null
+                    }
+                </div>
+            </div>
+        </div>
     )
 }
-
 
 function MessageNotification(props: any) {
     return (
@@ -175,15 +170,17 @@ export default function Messenger({
         setValue(e.target.value)
     }
 
-    function submit(e: any) {
-        if (e.key === "Enter" && value !== "" && !blocked && currentChannel) {
+    const submit = useCallback((e : any) => {
+        if (e.key === "Enter" && value !== "" && !blocked && currentChannel && socket) {
+            console.log("message send", currentChannel, currentChannel.id)
             socket.emit('message', {
                 channelId: currentChannel.id,
                 content: value
             })
             setValue("")
         }
-    }
+    }, [value, currentChannel, socket])
+
 
     // check if a user is in the user blockedList and filter messages from block timestamp
     function filterMessages(messages: any[]) {
@@ -207,12 +204,12 @@ export default function Messenger({
                 else
                     author = members.find((u: any) => u.id === m.sendBy)
             }
-            if (author && currentChannel.type !== "WHISPER" &&  
-                    currentChannel.administrators.find((id: number) => id === author.id))
+            if (author && currentChannel.type !== "WHISPER" &&
+                currentChannel.administrators.find((id: number) => id === author.id))
                 admin = true;
 
             return (
-                <Message
+                <MessageDisplay
                     key={m.id}
                     id={m.id}
                     content={m.content}
@@ -233,10 +230,12 @@ export default function Messenger({
     useEffect(() => {
         setRenderMessages([]);
         if (currentChannel) {
-
+            console.log("currentChannel updated")
             const members = getMembers(currentChannel.id);
+            console.log("members => ", members);
             let messages: any = currentChannel && currentChannel.messages;
             if (messages && messages.length && members && members.length) {
+                console.log("render messagse")
                 messages = filterMessages(messages);
                 messages = formatMessages(messages, members)
                 setRenderMessages(messages)

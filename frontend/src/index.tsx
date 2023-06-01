@@ -13,7 +13,7 @@ import LaunchGame from './routes/Game';
 import History from './routes/History';
 
 
-import AddElement, { AddChannel, JoinChannel } from "./Chat/Interface/AddElement";
+import AddElement, { AddChannel } from "./Chat/Interface/AddElement";
 import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
 import { CreateChannel } from './Chat/Interface/CreateChannel';
 
@@ -24,6 +24,7 @@ import {
 } from 'react-router-dom';
 
 import Chat from './routes/Chat';
+import JoinChannel from './Chat/Interface/JoinChannel';
 
 
 const router = createBrowserRouter([

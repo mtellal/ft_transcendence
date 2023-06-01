@@ -4,6 +4,21 @@ import { useChatSocket, useFriends, useUser } from "../../Hooks";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 
+type Channel = {
+    id: number
+    name?: string,
+    password?: string,
+    messages?: any[],
+    ownerId: number,
+    administrators: any[],
+    members: number[],
+    banList: number[],
+    muteList: any[],
+    type: string,
+    createdAt?: string
+}
+
+
 function newConversation(channel: any) {
     return (
         {
@@ -26,7 +41,7 @@ function reducer(channels: any, action: any) {
             if (channels.length) {
                 channels.map((c: any) => {
                     if (action.channel && c.id === action.channel.id)
-                        return ({...c, ...action.channel})
+                        return ({ ...c, ...action.channel })
                     return (c)
                 })
             }
@@ -76,7 +91,7 @@ export function ChannelsProvider({ children }: any) {
     const { user } = useUser();
     const { socket } = useChatSocket();
     const [channels, channelsDispatch] = useReducer(reducer, []);
-    const [currentChannel, setCurrentChannelLocal] = useState();
+    const [currentChannel, setCurrentChannelLocal]: any = useState();
 
     async function loadChannels() {
         let channelList = await getChannels(user.id)
@@ -107,7 +122,7 @@ export function ChannelsProvider({ children }: any) {
         }))
         channelsDispatch({ type: 'setChannels', channels: channelList });
         // channelList.map(async (c : any) => await removeChannel(c.id))
-     }
+    }
 
     useEffect(() => {
         loadChannels();
@@ -119,32 +134,55 @@ export function ChannelsProvider({ children }: any) {
         })
     }
 
+    function leaveChannel(channel: any) {
+        // if (channel && currentChannel && channel.id === currentChannel.id)
+        console.log("leave channel function", channel)
+        if (channel && channel.id) {
+            channelsDispatch({ type: 'removeChannel', channel })
+            socket.emit('leaveChannel', {
+                channelId: channel.id
+            })
+            console.log(channel.name, " leaved ")
+        }
+    }
+
+    const channelAlreadyExists = useCallback((channel: any) => {
+        if (channels) {
+            if (!channels.length)
+                return (false);
+            return (channels.find((c: any) => c.id === channel.id))
+        }
+        return (false)
+    }, [channels])
+
+
     // pick the good channel with all messages 
     const setCurrentChannel = useCallback((channel: any) => {
         let pickChannel;
         if (!channels.length)
             pickChannel = channel;
-        else
-        {
+        else {
             pickChannel = channels.find((c: any) => c.id === channel.id)
             if (!pickChannel)
                 pickChannel = channel
         }
         setCurrentChannelLocal(pickChannel);
     }, [channels])
-   
+
     useEffect(() => {
         if (channels)
-            setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p) 
+            setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p)
     }, [channels])
 
     return (
         <ChannelsContext.Provider value={{
             channels,
             channelsDispatch,
-            joinChannel,
             currentChannel,
             setCurrentChannel,
+            joinChannel,
+            leaveChannel,
+            channelAlreadyExists
         }}>
             {children}
         </ChannelsContext.Provider>

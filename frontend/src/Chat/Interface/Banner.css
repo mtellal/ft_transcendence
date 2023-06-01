@@ -9,8 +9,9 @@
 
 .banner-icon-container
 {
-    width: 50%;
+    min-width: auto;
     height: 100%;
+    margin-left: auto;
 }
 
 .description

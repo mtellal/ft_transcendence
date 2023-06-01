@@ -94,6 +94,7 @@ function ChatInterface() {
         if (socket && user) {
 
             socket.on('message', (m: any) => {
+                console.log("message recieved")
                 if (m.length) {
                     channelsDispatch({ type: 'initMessages', messages: m });
                 }
@@ -101,6 +102,7 @@ function ChatInterface() {
                     /* if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
                         friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
                     } */
+                    console.log(m.content)
                     channelsDispatch({ type: 'addMessage', message: m });
                 }
             });
@@ -110,7 +112,7 @@ function ChatInterface() {
             if (socket)
                 socket.off('message');
         }
-    }, [user, socket, currentChannel])
+    }, [user, socket])
 
 
     /////////////////////////////////////////////////////////////////////////
