@@ -128,6 +128,11 @@ function Message(props: any) {
                                 }
                             >
                                 {
+                                    props.ownerId && <span className="material-symbols-outlined">
+                                        location_away
+                                    </span>
+                                }
+                                {
                                     props.admin && <span className="material-symbols-outlined">
                                         shield_person
                                     </span>
@@ -221,6 +226,7 @@ export default function Messenger({
                     userImage={image}
                     currentUsername={user.username}
                     currentChannel={currentChannel}
+                    ownerId={currentChannel.ownerId === m.sendBy}
                 />
             )
         })
