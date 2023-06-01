@@ -57,6 +57,7 @@ export class ChatService {
         messages: { connect: {id: message.id}}
       }
     })
+    return (message);
   }
 
   async getMessage(channelId: number): Promise<Message[]> {
