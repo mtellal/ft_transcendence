@@ -19,6 +19,11 @@
     overflow: hidden;
 }
 
+.banner-fill-icon-container
+{
+    background-color: aqua;
+}
+
 .description
 {
     position:absolute;

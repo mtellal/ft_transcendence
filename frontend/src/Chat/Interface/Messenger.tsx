@@ -226,7 +226,7 @@ export default function Messenger({
                     userImage={image}
                     currentUsername={user.username}
                     currentChannel={currentChannel}
-                    ownerId={currentChannel.ownerId === m.sendBy}
+                    ownerId={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
                 />
             )
         })

@@ -121,7 +121,7 @@ export function ChannelsProvider({ children }: any) {
             }
         }))
         channelsDispatch({ type: 'setChannels', channels: channelList });
-        // channelList.map(async (c : any) => await removeChannel(c.id))
+        //channelList.map(async (c : any) => await removeChannel(c.id))
     }
 
     useEffect(() => {
