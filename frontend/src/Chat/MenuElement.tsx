@@ -90,7 +90,13 @@ export default function MenuElement({ ...props }) {
 
     const { token } = useUser();
     const { friends, friendsDispatch, setCurrentFriend } = useFriends();
-    const { channels, channelsDispatch, joinChannel, setCurrentChannel } = useChannels();
+    const { 
+        channels, 
+        channelsDispatch, 
+        joinChannel, 
+        setCurrentChannel,
+        addChannel 
+    } = useChannels();
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
@@ -105,6 +111,7 @@ export default function MenuElement({ ...props }) {
                 )
             }
             if (!channelSelected) {
+                console.log("channel not found and created")
                 await createChannel({
                     name: "privateMessage",
                     type: "WHISPER",
@@ -115,13 +122,14 @@ export default function MenuElement({ ...props }) {
                     .then(res => {
                         channelSelected = res.data
                     })
-                channelsDispatch({ type: 'addChannel', channel: channelSelected });
+                //channelsDispatch({ type: 'addChannel', channel: channelSelected });
+                addChannel(channelSelected);
             }
             setCurrentFriend(element);
         }
         else
             channelSelected = element;
-        joinChannel(channelSelected);
+        //joinChannel(channelSelected);
         setCurrentChannel(channelSelected);
     }, [channels, friends])
 

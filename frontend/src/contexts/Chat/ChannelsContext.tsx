@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { getChannels, getUser, removeChannel } from "../../utils/User";
 import { useChatSocket, useFriends, useUser } from "../../Hooks";
+import { channel } from "diagnostics_channel";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 
@@ -38,12 +39,17 @@ function reducer(channels: any, action: any) {
             return (action.channels);
         }
         case ('updateChannel'): {
-            if (channels.length) {
-                channels.map((c: any) => {
-                    if (action.channel && c.id === action.channel.id)
-                        return ({ ...c, ...action.channel })
-                    return (c)
-                })
+            if (action.channel)
+            {
+                if (channels.length) {
+                    return (channels.map((c: any) => {
+                        if (action.channel && c.id === action.channel.id)
+                            return ({ ...c, ...action.channel })
+                        return (c)
+                    }))
+                }
+                else
+                    return ([newConversation(action.channel)])
             }
         }
         case ('addChannel'): {
@@ -101,11 +107,10 @@ export function ChannelsProvider({ children }: any) {
                 }
             })
 
-
         channelList = await Promise.all(channelList.map(async (c: any) => {
             if (c.members && c.members.length) {
                 let users = await Promise.all(c.members.map(async (id: number) => {
-                    if (id !== user.id) {
+                    if (id !== user.id && c.type !== "WHISPER") {
                         return (
                             await getUser(id)
                                 .then(res => {
@@ -121,30 +126,31 @@ export function ChannelsProvider({ children }: any) {
             }
         }))
         channelsDispatch({ type: 'setChannels', channels: channelList });
+        channelList.forEach(joinChannel);
         //channelList.map(async (c : any) => await removeChannel(c.id))
     }
 
     useEffect(() => {
-        loadChannels();
-    }, [])
+        if (socket)
+            loadChannels();
+    }, [socket])
 
-    function joinChannel(channel: any) {
-        socket.emit('joinChannel', {
-            channelId: channel.id
-        })
-    }
+    const joinChannel = useCallback((channel: any) => {
+        if (socket) {
+            socket.emit('joinChannel', {
+                channelId: channel.id
+            })
+        }
+    }, [socket])
 
-    function leaveChannel(channel: any) {
-        // if (channel && currentChannel && channel.id === currentChannel.id)
-        console.log("leave channel function", channel)
-        if (channel && channel.id) {
+    const leaveChannel = useCallback((channel: any) => {
+        if (channel && channel.id && socket) {
             channelsDispatch({ type: 'removeChannel', channel })
             socket.emit('leaveChannel', {
                 channelId: channel.id
             })
-            console.log(channel.name, " leaved ")
         }
-    }
+    }, [socket])
 
     const channelAlreadyExists = useCallback((channel: any) => {
         if (channels) {
@@ -155,6 +161,12 @@ export function ChannelsProvider({ children }: any) {
         return (false)
     }, [channels])
 
+    const addChannel = useCallback((channel: any) => {
+        if (socket) {
+            channelsDispatch({ type: 'addChannel', channel });
+            joinChannel(channel)
+        }
+    }, [socket])
 
     // pick the good channel with all messages 
     const setCurrentChannel = useCallback((channel: any) => {
@@ -170,8 +182,9 @@ export function ChannelsProvider({ children }: any) {
     }, [channels])
 
     useEffect(() => {
-        if (channels)
+        if (channels && channels.length) {
             setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p)
+        }
     }, [channels])
 
     return (
@@ -180,6 +193,7 @@ export function ChannelsProvider({ children }: any) {
             channelsDispatch,
             currentChannel,
             setCurrentChannel,
+            addChannel,
             joinChannel,
             leaveChannel,
             channelAlreadyExists

@@ -83,7 +83,12 @@ export default function JoinChannel() {
 
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
-    const { channels, channelsDispatch, channelAlreadyExists } = useChannels();
+    const { 
+        channels, 
+        channelsDispatch, 
+        channelAlreadyExists,
+        addChannel
+     } = useChannels();
 
     const {
         token,
@@ -177,13 +182,13 @@ export default function JoinChannel() {
     }, [friendInvitations])
 
 
-    function joinChannel(channel: any) {
+    /* function joinChannel(channel: any) {
         channelsDispatch({ type: 'addChannel', channel })
         socket.emit('joinChannel', {
             channelId: channel.id
         })
         setRenderChannels([]);
-    }
+    } */
 
     React.useEffect(() => {
         if (userInvitations && userInvitations.length) {
@@ -217,7 +222,7 @@ export default function JoinChannel() {
                         name={c.name}
                         members={c.members}
                         isJoin={!channelAlreadyExists(c)}
-                        join={() => joinChannel(c)}
+                        join={() => addChannel(c)}
                     />)
             )
         }

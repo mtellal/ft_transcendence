@@ -21,7 +21,7 @@ export function CreateChannel() {
 
     const { token } = useUser();
 
-    const {channels, channelsDispatch, setCurrentChannel, joinChannel} = useChannels();
+    const {channels, channelsDispatch, setCurrentChannel, addChannel} = useChannels();
 
     const navigate = useNavigate();
 
@@ -38,10 +38,11 @@ export function CreateChannel() {
             banList: banMembers.map((u: any) => u.id),
         }, token)
             .then(res => {
-                channelsDispatch({ type: 'addChannel', channel: res.data })
+                //channelsDispatch({ type: 'addChannel', channel: res.data })
+                addChannel(res.data)
                 console.log("CREATED: current channel setted to ", res.data)
                 setCurrentChannel(res.data);
-                joinChannel(res.data);
+                //joinChannel(res.data);
             })
         console.log("channelCreated")
         navigate(`/chat/groups/${name}`)

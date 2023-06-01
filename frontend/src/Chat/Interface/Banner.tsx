@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { UserInfos } from "../../Components/FriendElement";
 import './Banner.css'
 import Icon from "../../Components/Icon";
@@ -15,13 +15,14 @@ function ChannelInfos(props: any) {
 
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 
-    async function loadMembers() {
+    const loadMembers = useCallback(async () => {
         let members = getMembers(currentChannel.id);
+        console.log(members, currentChannel)
         if (members && members.length) {
             members = members.map((u: any) => u.id);
             members = await Promise.all(members.map(async (id: number) =>
-                await getUserProfilePictrue(id).
-                    then(res => window.URL.createObjectURL(new Blob([res.data])))
+            await getUserProfilePictrue(id).
+            then(res => window.URL.createObjectURL(new Blob([res.data])))
             ))
             setRenderMembersPP(
                 members.map((url: string) =>
@@ -31,7 +32,7 @@ function ChannelInfos(props: any) {
                 )
             );
         }
-    }
+    }, [currentChannel, channelsUsers])
 
     useEffect(() => {
         setRenderMembersPP([])
@@ -39,6 +40,8 @@ function ChannelInfos(props: any) {
             loadMembers();
         }
     }, [currentChannel, channelsUsers])
+
+    console.log(currentChannel)
 
     return (
         <div className="flex-center">
@@ -49,7 +52,6 @@ function ChannelInfos(props: any) {
         </div>
     )
 }
-
 
 
 export default function Banner({ ...props }: any) {
@@ -73,7 +75,7 @@ export default function Banner({ ...props }: any) {
             setChannel(currentChannel)
     }, [currentChannel])
 
-    function pickRemoveIcon() {
+    const pickRemoveIcon = useCallback(() => {
         if (channel) {
             if (channel.type === "WHISPER")
                 return (
@@ -90,7 +92,8 @@ export default function Banner({ ...props }: any) {
                     )
             }
         }
-    }
+    }, [channel])
+
 
     return (
         <div className="banner">

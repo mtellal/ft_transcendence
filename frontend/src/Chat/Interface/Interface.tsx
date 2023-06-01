@@ -7,7 +7,7 @@ import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
-import { useChannels, useChatSocket, useFriends, useUser } from "../../Hooks";
+import { useChannels, useChannelsUsers, useChatSocket, useFriends, useUser } from "../../Hooks";
 import { blockUserRequest, removeUserFriend, unblockUserRequest } from "../../utils/User";
 
 function RemoveFriend(props: any) {
@@ -43,15 +43,15 @@ function RemoveView(props: any) {
                 <RemoveFriend
                     user={props.currentChannel && props.currentChannel.name}
                     cancel={props.cancel}
-                    remove={() => props.leaveChannel(props.currentChannel)}
+                    remove={props.leaveChannel}
                 />
             }
             {
-                props.currentFriend &&
+                props.currentFriend &&  props.currentChannel && props.currentChannel.type === "WHISPER" && 
                 <RemoveFriend
                     user={props.currentFriend && props.currentFriend.username}
                     cancel={props.cancel}
-                    remove={() => props.removeFriend(props.currentFriend)}
+                    remove={props.removeFriend}
                 />
             }
         </>
@@ -79,6 +79,8 @@ export default function Interface() {
         user,
         userDispatch
     }: any = useUser();
+
+    const { removeUser } = useChannelsUsers();
 
     const {
         currentChannel,
@@ -164,7 +166,7 @@ export default function Interface() {
                                 currentFriend={currentFriend}
                                 cancel={() => setRemoveView(prev => !prev)}
                                 leaveChannel={() => leaveChannel(currentChannel)}
-                                removedFriend={() => removeFriend(currentFriend)}
+                                remove={() => removeFriend(currentFriend)}
                             />
                         }
                     </div>

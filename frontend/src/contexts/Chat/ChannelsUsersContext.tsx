@@ -13,7 +13,8 @@ type ChannelUsers = {
 type ReducerAction = {
     type: string,
     channelsUsers?: ChannelUsers,
-    channelId?: number
+    channelId?: number,
+    user?: any
 }
 
 function reducer(channelsUsers: ChannelUsers[], action: ReducerAction) {
@@ -63,7 +64,6 @@ export default function ChannelsUsersProvider({ children }: any) {
         }
     }
 
-
     async function addChannelUsers(channel: any) {
         const members = channel.members;
         if (channelsUsers.length) {
@@ -83,6 +83,12 @@ export default function ChannelsUsersProvider({ children }: any) {
                 channelsUsersDispatch({ type: 'addChannelsUsers', channelsUsers: { channelId: channel.id, users } })
         }
     }
+
+
+    const removeUser = useCallback((user: any, channelId: number) => {
+
+    }, [channelsUsers])
+
 
     useEffect(() => {
         if (currentChannel) {
@@ -107,8 +113,8 @@ export default function ChannelsUsersProvider({ children }: any) {
         if (channelsUsers && channelsUsers.length && user && channel) {
             let users: any = getMembers(channel.id)
             if (users && channel.administrators) {
-                let a = users.map((u : any) => channel.administrators.find((id : any) => u.id === id) ? u : null);
-                a = a.filter((u : any) => u)
+                let a = users.map((u: any) => channel.administrators.find((id: any) => u.id === id) ? u : null);
+                a = a.filter((u: any) => u)
                 if (a)
                     admins = [...a, ...admins]
             }
