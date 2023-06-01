@@ -54,6 +54,7 @@ function ChannelInfos(props: any) {
 
 export default function Banner({ ...props }: any) {
 
+    const { user } = useUser();
     const { currentFriend } = useFriends();
     const { currentChannel } = useChannels();
 
@@ -72,6 +73,25 @@ export default function Banner({ ...props }: any) {
             setChannel(currentChannel)
     }, [currentChannel])
 
+    function pickRemoveIcon() {
+        if (channel) {
+            if (channel.type === "WHISPER")
+                return (
+                    <Icon icon="person_remove" onClick={props.remove} description="Remove" />
+                )
+            else {
+                if (channel.ownerId === user.id)
+                    return (
+                        <Icon icon="delete_forever" onClick={props.remove} description="Delete" />
+                    )
+                else
+                    return (
+                        < Icon icon="logout" onClick={props.remove} description="Leave" />
+                    )
+            }
+        }
+    }
+
     return (
         <div className="banner">
             {
@@ -88,19 +108,16 @@ export default function Banner({ ...props }: any) {
                         name={channel && channel.name}
                     />
             }
-            <div className="flex-ai banner-icon-container">
+            <div className="banner-icon-container">
                 {
                     channel && channel.type === "WHISPER" ?
-                    <Icon icon="person" onClick={props.profile} description="Profile" />
-                    : <Icon icon="groups" onClick={props.profile} description="Channel" />
+                        <Icon icon="person" onClick={props.profile} description="Profile" />
+                        : <Icon icon="groups" onClick={props.profile} description="Channel" />
                 }
                 <Icon icon="sports_esports" onClick={props.invitation} description="Invitation" />
                 <Icon icon="block" onClick={props.block} description="Block" />
                 {
-                    channel && channel.type === "WHISPER" ?  
-                    <Icon icon="person_remove" onClick={props.remove} description="Remove" />
-                    :
-                    <Icon icon="logout" onClick={props.remove} description="Leave" />
+                    pickRemoveIcon()
                 }
             </div>
         </div>

@@ -94,7 +94,7 @@ function ChatInterface() {
         if (socket && user) {
 
             socket.on('message', (m: any) => {
-                console.log("message recieved")
+                console.log("message recieved", m)
                 if (m.length) {
                     channelsDispatch({ type: 'initMessages', messages: m });
                 }
@@ -102,7 +102,6 @@ function ChatInterface() {
                     /* if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
                         friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
                     } */
-                    console.log(m.content)
                     channelsDispatch({ type: 'addMessage', message: m });
                 }
             });
