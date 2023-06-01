@@ -286,7 +286,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user.channelList.includes(channel.id))
         throw new BadRequestException('User is not on the channel');
       const updatedChannel = await this.chatService.leave(channel, user);
-      console.log(updatedChannel);
       client.leave(channel.id.toString());
       let leaveMessage = `${user.username} left the channel.`
       if (channel.ownerId === user.id && updatedChannel) {

@@ -308,7 +308,7 @@ export class ChatService {
           updatedAdmin.push(newOwner);
       }
     }
-    updatedAdmin = channel.administrators.filter((num) => num != user.id);
+    updatedAdmin = updatedAdmin.filter((num) => num != user.id);
     const updatedMember = channel.members.filter((num) => num != user.id);
     let updatedChannel: Channel | null = null;
     if (updatedMember.length === 0) {
