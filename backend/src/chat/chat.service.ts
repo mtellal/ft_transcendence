@@ -294,28 +294,30 @@ export class ChatService {
 
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
-    let newOwner: number;
+    let newOwner = channel.ownerId;
+    let updatedAdmin = channel.administrators;
     if (channel.ownerId === user.id) {
       if (channel.members.length > 1) {
         if (channel.administrators.length > 1) {
-          newOwner = channel.administrators.find((num) => num != channel.ownerId);
+          newOwner = updatedAdmin.find((num) => num != channel.ownerId);
         }
         else {
           newOwner = channel.members.find((num) => num != channel.ownerId);
         }
+        if (!updatedAdmin.includes(newOwner))
+          updatedAdmin.push(newOwner);
       }
     }
-    const updatedAdmin = channel.administrators.filter((num) => num != user.id);
-    if (!updatedAdmin.includes(newOwner))
-      updatedAdmin.push(newOwner);
+    updatedAdmin = updatedAdmin.filter((num) => num != user.id);
     const updatedMember = channel.members.filter((num) => num != user.id);
+    let updatedChannel: Channel | null = null;
     if (updatedMember.length === 0) {
       await this.prisma.channel.delete({
         where: {id: channel.id},
       });
     }
     else {
-      await this.prisma.channel.update({
+      updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           ownerId: newOwner,
@@ -330,6 +332,7 @@ export class ChatService {
         channelList: user.channelList.filter((num) => num !== channel.id)
       }
     })
+    return updatedChannel;
   }
 
   async remove(id: number)
