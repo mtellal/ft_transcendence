@@ -141,6 +141,14 @@ function ChatInterface() {
                     navigate("/chat")
                 }
             })
+
+            socket.on('updatedChannel',(channel : any) => {
+                if (channel)
+                {
+                    console.log("UPDATED CHANNEL", channel)
+                    channelsDispatch({type: 'updateChannel', channel})
+                }
+            })
         }
 
     }, [socket])

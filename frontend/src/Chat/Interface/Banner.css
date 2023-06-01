@@ -9,14 +9,12 @@
 
 .banner-icon-container
 {
-    background-color: antiquewhite;
-    min-width: auto;
-    height: 100%;
-    margin-left: auto;
-    flex-wrap: wrap;
     display: flex;
     align-items: center;
-    overflow: hidden;
+    justify-content: flex-end;
+    margin-left: auto;
+    /* flex-wrap: wrap;
+    overflow: hidden; */
 }
 
 .banner-fill-icon-container

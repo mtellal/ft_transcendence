@@ -177,7 +177,6 @@ export default function Messenger({
 
     const submit = useCallback((e : any) => {
         if (e.key === "Enter" && value !== "" && !blocked && currentChannel && socket) {
-            console.log("message send", currentChannel, currentChannel.id)
             socket.emit('message', {
                 channelId: currentChannel.id,
                 content: value
@@ -236,12 +235,9 @@ export default function Messenger({
     useEffect(() => {
         setRenderMessages([]);
         if (currentChannel) {
-            console.log("currentChannel updated")
             const members = getMembers(currentChannel.id);
-            console.log("members => ", members);
             let messages: any = currentChannel && currentChannel.messages;
             if (messages && messages.length && members && members.length) {
-                console.log("render messagse")
                 messages = filterMessages(messages);
                 messages = formatMessages(messages, members)
                 setRenderMessages(messages)

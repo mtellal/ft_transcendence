@@ -20,9 +20,7 @@ import { useUser } from '../Hooks';
 
 
 export async function loader() {
-  console.log("App loader function called");
   const token = extractCookie("access_token");
-  console.log("token => ", token)
   if (token) {
     let id = jwtDecode<any>(token).id;
 
