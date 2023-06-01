@@ -72,8 +72,6 @@ export default function Banner({ ...props }: any) {
             setChannel(currentChannel)
     }, [currentChannel])
 
-    console.log(channel)
-
     return (
         <div className="banner">
             {
@@ -90,7 +88,7 @@ export default function Banner({ ...props }: any) {
                         name={channel && channel.name}
                     />
             }
-            <div className="flex-center banner-icon-container">
+            <div className="flex-ai banner-icon-container">
                 {
                     channel && channel.type === "WHISPER" ?
                     <Icon icon="person" onClick={props.profile} description="Profile" />
@@ -102,7 +100,7 @@ export default function Banner({ ...props }: any) {
                     channel && channel.type === "WHISPER" ?  
                     <Icon icon="person_remove" onClick={props.remove} description="Remove" />
                     :
-                    <Icon icon="logout" onClick={props.remove} description="Logout" />
+                    <Icon icon="logout" onClick={props.remove} description="Leave" />
                 }
             </div>
         </div>

@@ -35,6 +35,30 @@ function RemoveFriend(props: any) {
 }
 
 
+function RemoveView(props: any) {
+    return (
+        <>
+            {
+                props.currentChannel && props.currentChannel.type !== "WHISPER" &&
+                <RemoveFriend
+                    user={props.currentChannel && props.currentChannel.name}
+                    cancel={props.cancel}
+                    remove={() => props.leaveChannel(props.currentChannel)}
+                />
+            }
+            {
+                props.currentFriend &&
+                <RemoveFriend
+                    user={props.currentFriend && props.currentFriend.username}
+                    cancel={props.cancel}
+                    remove={() => props.removeFriend(props.currentFriend)}
+                />
+            }
+        </>
+    )
+}
+
+
 export function loader({ params }: any) {
     return ({})
 }
@@ -56,7 +80,10 @@ export default function Interface() {
         userDispatch
     }: any = useUser();
 
-    const { currentChannel } = useChannels();
+    const {
+        currentChannel,
+        leaveChannel,
+    } = useChannels();
 
     const {
         friends,
@@ -65,7 +92,7 @@ export default function Interface() {
     }: any = useFriends();
 
     const [profile, setProfile] = React.useState(false);
-    const [removeFriendView, setRemoveFriendView] = React.useState(false);
+    const [removeView, setRemoveView] = React.useState(false);
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
 
@@ -94,11 +121,12 @@ export default function Interface() {
         }
     }
 
+
     // update current friend selected when he is picked from MenuElement
 
     React.useEffect(() => {
         setProfile(false);
-        setRemoveFriendView(false);
+        setRemoveView(false);
         if (currentFriend && user) {
             if (user.blockedList.length) {
                 if (user.blockedList.find((obj: any) => currentFriend.id === obj.blockedId))
@@ -118,7 +146,7 @@ export default function Interface() {
                             profile={() => setProfile(prev => !prev)}
                             invitation={() => { }}
                             block={() => block()}
-                            remove={() => setRemoveFriendView(prev => !prev)}
+                            remove={() => setRemoveView(prev => !prev)}
                         />
                         {
                             profile ?
@@ -130,11 +158,13 @@ export default function Interface() {
                         }
 
                         {
-                            removeFriendView &&
-                            <RemoveFriend
-                                user={currentFriend && currentFriend.username}
-                                cancel={() => setRemoveFriendView(prev => !prev)}
-                                remove={() => removeFriend(currentFriend)}
+                            removeView &&
+                            <RemoveView
+                                currentChannel={currentChannel}
+                                currentFriend={currentFriend}
+                                cancel={() => setRemoveView(prev => !prev)}
+                                leaveChannel={() => leaveChannel(currentChannel)}
+                                removedFriend={() => removeFriend(currentFriend)}
                             />
                         }
                     </div>

@@ -28,7 +28,6 @@ export default function IconInput(props : any)
     {
         if (e.key === 'Enter')
         {
-            console.log("Enter pressed");
             props.submit(e);
         }
     }
