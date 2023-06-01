@@ -137,26 +137,26 @@ export class ChatService {
       if (dto.type !== 'PROTECTED')
         throw new ForbiddenException('Only a protected channel can have a password');
       dto.password = await argon.hash(dto.password);
-      await this.prisma.channel.update({
+      const updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           type: dto.type,
           password: dto.password
         }
       })
-      return ;
+      return updatedChannel;
     }
     if (dto.type !== channel.type) {
       if (dto.type === 'PROTECTED' && !dto.password)
         throw new ForbiddenException(`A protected channel must have a password`);
-      await this.prisma.channel.update({
+        const updatedChannel= await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           type: dto.type,
           password: null
         }
       })
-      return ;
+      return updatedChannel;
     }
   }
 
@@ -179,7 +179,7 @@ export class ChatService {
         channelList: { push: channel.id }
       }
     })
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: { id: channel.id },
       data: {
         members: { push: newUser.id },
@@ -213,7 +213,7 @@ export class ChatService {
     let updatedAdmin = channel.administrators;
     if (channel.administrators.includes(usertoKick.id))
       updatedAdmin = channel.administrators.filter((id) => id !== usertoKick.id);
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: updatedAdmin,
@@ -232,7 +232,7 @@ export class ChatService {
         duration: mutedDuration,
       }
     })
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: dto.channelId},
       data: {
         muteList: {connect: {id: newMute.id}}
@@ -274,7 +274,7 @@ export class ChatService {
     let updatedAdmin = channel.administrators;
     if (channel.administrators.includes(usertoBan.id))
       updatedAdmin = channel.administrators.filter((id) => id !== usertoBan.id);
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: updatedAdmin,
@@ -285,7 +285,7 @@ export class ChatService {
   }
 
   async makeAdmin(channel: Channel, newAdmin: User) {
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: {push: newAdmin.id }
@@ -338,7 +338,7 @@ export class ChatService {
 
   async remove(id: number)
   {
-    return this.prisma.channel.delete({
+    return await this.prisma.channel.delete({
       where:{id}
     });
   }

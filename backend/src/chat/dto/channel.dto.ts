@@ -112,3 +112,15 @@ export class UpdateChannelDto {
   @IsOptional()
   password?: string
 }
+
+export class PatchChannelDto {
+  @ApiProperty()
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string
+}
