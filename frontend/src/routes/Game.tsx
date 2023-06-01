@@ -1,7 +1,8 @@
 import React from "react";
 
 import './Game.css'
-
+import { io, Socket } from 'socket.io-client';
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 
 let up : boolean;
 let down : boolean;
@@ -257,14 +258,50 @@ function Game(props : any)
     )
 }
 
-function PlayPage(props : any)
-{
+function PlayPage(props) {
+    const { user, token } = useOutletContext();
+    const [socket, setSocket] = React.useState<Socket | undefined>();
+  
+    let s: Socket;
+    const handlePlayClick = () => {
+      const s = io('http://localhost:3000/game', {
+        transports: ['websocket'],
+        extraHeaders: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setSocket(s);
+      props.click();
+      s.emit('test', '');
+      console.log("Emitting event here");
+    };
+  
+    const handleBeforeUnload = () => {
+      if (s) {
+        s.disconnect();
+      }
+    };
+  
+    React.useEffect(() => {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+  
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+  
+        if (s) {
+          s.disconnect();
+        }
+      };
+    }, [s]);
+  
     return (
-        <div className="play-page">
-            <button onClick={props.click} className="play-button">Play</button>
-        </div>
-    )
-}
+      <div className="play-page">
+        <button onClick={handlePlayClick} className="play-button">
+          Play
+        </button>
+      </div>
+    );
+  }
 
 
 export default function LaunchGame()
