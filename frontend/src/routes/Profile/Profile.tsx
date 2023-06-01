@@ -1,21 +1,23 @@
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BackApi } from "../../api/back";
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
 import { setAvatar } from "../../store/user/user-slice";
-import s from './style.module.css'
+import { RootState, AppDispatch } from "../../store/index";
+import s from './style.module.css';
 
 export function Profile() {
 
-    const selector = useSelector(store => store.USER.user);
+    const selector = useSelector((store: RootState) => store.user.user);
     const dispatch = useDispatch();
 
-    async function updateProfile(e) {
+    async function updateProfile(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        const user = e.target.username.value;
-        const passwd = e.target.password.value;
+        const user = e.currentTarget.username.value;
+        const passwd = e.currentTarget.password.value;
 
-        let updateinfos = {userStatus: "ONLINE"};
+        let updateinfos = {userStatus: "ONLINE", username: "", password: ""};
         if (user) {
             updateinfos.username = user;
         } if (passwd) {
@@ -24,12 +26,13 @@ export function Profile() {
         await BackApi.updateInfoProfile(selector.id, updateinfos)
     }
 
-    async function setProfilePicture(e) {
+	// Tester sans la declaration de type (pas d'err ni de warn)
+    async function setProfilePicture(e: React.ChangeEvent<HTMLInputElement>) {
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        dispatch(setAvatar(reader.result));
+        dispatch(setAvatar(reader.result as string));
       };
 
       await BackApi.updateProfilePicture(e.target.files[0], selector.token);
