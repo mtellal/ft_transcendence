@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
-import Banner from "./Banner";
+import Banner from "../Banner/Banner";
 import Profile from "./Profile";
 import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";

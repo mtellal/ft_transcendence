@@ -8,14 +8,14 @@ import App, { loader as appLoader, loader } from './routes/App/App';
 import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
-import Profile from './routes/Profile';
-import LaunchGame from './routes/Game';
-import History from './routes/History';
+import Profile from './routes/Profile/Profile';
+import LaunchGame from './routes/Game/Game';
+import History from './routes/History/History';
 
 
-import AddElement from "./routes/Chat/components/addInterface/AddElement";
+import AddFriend from "./routes/Chat/AddFriend/AddFriend";
 import Interface, { loader as interfaceLoader} from './routes/Chat/components/interface/Interface';
-import { CreateChannel } from './routes/Chat/components/addInterface/channels/CreateChannel';
+import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
 
 import {
@@ -24,8 +24,8 @@ import {
 } from 'react-router-dom';
 
 import Chat from './routes/Chat/Chat';
-import JoinChannel from './routes/Chat/components/addInterface/channels/JoinChannel';
-import AddChannel from './routes/Chat/components/addInterface/channels/AddChannel';
+import JoinChannel from './routes/Chat/AddChannel/JoinChannel';
+import AddChannel from './routes/Chat/AddChannel/AddChannel';
 
 
 const router = createBrowserRouter([
@@ -63,7 +63,7 @@ const router = createBrowserRouter([
                         path: "add-friend",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement title="friend" />
+                        element:  <AddFriend/>
                     },
                     {
                         path: "add-group",

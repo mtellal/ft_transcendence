@@ -9,7 +9,7 @@ import {
     useCurrentUser
 } from "../../../../Hooks";
 import './Messenger.css'
-import ProfilePicture from "../../../../components/ProfilePicture";
+import ProfilePicture from "../../../../components/users/ProfilePicture";
 
 function BlockMessage({ username }: any) {
     return (

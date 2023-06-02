@@ -6,23 +6,30 @@ import {
     refuseFriendRequest,
     getChannelByName,
     getUserProfilePictrue
-} from '../../../../../utils/User'
+} from '../../../utils/User'
 
-import { UserLabelSearch } from "../../../../../components/Users/UserLabel";
+import { UserLabelSearch } from "../../../components/users/UserLabel";
 
-import IconInput from "../../../../../components/Input/IconInput";
+import IconInput from "../../../components/Input/IconInput";
 import { useOutletContext } from "react-router-dom";
-import { CollectionElement } from "../../MenuElement";
+import { CollectionElement } from "../components/MenuElement";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../../Hooks";
-import ProfilePicture from "../../../../../components/ProfilePicture";
-import Icon from "../../../../../components/Icon";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../Hooks";
+import ProfilePicture from "../../../components/users/ProfilePicture";
+import Icon from "../../../components/Icon";
 
-import defaultUserPP from '../../../../../assets/user.png'
+import defaultUserPP from '../../../assets/user.png'
 
 import './JoinChannel.css'
 
-function ChannelSearch(props: any) {
+type TChannelSearch = {
+    name: string,
+    members: any[],
+    isJoin: boolean,
+    join: () => {} | any
+}
+
+function ChannelSearch(props: TChannelSearch) {
 
     const [members, setMembers] = useState([]);
 
@@ -46,7 +53,7 @@ function ChannelSearch(props: any) {
     }, [props.members])
 
     return (
-        <div className="flex-ai channel-search">
+        <div className="flex-ai channelsearch-container">
             <h3 className="no-wrap">{props.name} - </h3>
             <p className="channelsearch-members gray-c flex-center no-wrap">{props.members.length} members</p>
             <div className="channelsearch-pps flex-center hidden">
@@ -61,7 +68,6 @@ function ChannelSearch(props: any) {
         </div>
     )
 }
-
 
 export default function JoinChannel() {
 
@@ -205,12 +211,10 @@ export default function JoinChannel() {
     useEffect(() => {
         if (matchChannels && matchChannels.length) {
 
-
             setRenderChannels(
                 matchChannels.map((c: any) =>
                     <ChannelSearch
                         key={c.id}
-                        id={c.id}
                         name={c.name}
                         members={c.members}
                         isJoin={!channelAlreadyExists(c)}
@@ -221,8 +225,8 @@ export default function JoinChannel() {
     }, [matchChannels])
 
     return (
-        <div className="add-container">
-            <h2 className="add-title">Join a Channel</h2>
+        <div className="joinchannel-container">
+            <h2>Join a Channel</h2>
             <div className="flex-column-center">
                 <IconInput
                     id="search"
@@ -233,7 +237,7 @@ export default function JoinChannel() {
                     submit={() => value && searchChannel()}
                 />
                 <button
-                    className="button add-button"
+                    className="button joinchannel-button"
                     onClick={searchChannel}
                 >
                     Search
@@ -244,7 +248,7 @@ export default function JoinChannel() {
                 }
                 {
                     userInvitations.length ?
-                        <div className="add-element-invitations">
+                        <div className="joinchannel-invitations">
                             <CollectionElement
                                 title="Invitations"
                                 collection={invitations}

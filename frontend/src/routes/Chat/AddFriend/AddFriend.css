@@ -1,0 +1,27 @@
+
+/* A D D    F R I E N D */
+
+.add-container
+{
+    width: 60%;
+    padding: 5%;
+}
+
+.add-button
+{
+    background-color: white;
+    width: 30%;
+    margin-top: 10px;
+}
+
+.user-found
+{
+    margin-top: 20px;
+    width: 100%;
+}
+
+.add-element-invitations
+{
+    width: 100%;
+    height: 100%;
+}

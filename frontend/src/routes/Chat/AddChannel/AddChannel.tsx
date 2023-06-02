@@ -8,7 +8,7 @@ import './AddChannel.css'
 export default function AddChannel() {
 
     return (
-        <div className="flex-center add-channel">
+        <div className="flex-center addchannel">
             <div className="flex-column-center addchannel-button-container">
                 <Link to={"join"} className="button flex-center add-channel-button">
                     Join a Channel

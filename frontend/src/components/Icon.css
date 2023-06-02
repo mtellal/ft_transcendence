@@ -1,4 +1,4 @@
-.banner-icon
+.icon-container
 {
     position: relative;
     align-self: center;
@@ -9,12 +9,19 @@
     cursor: pointer;
 }
 
-.banner-icon:hover div
+.icon-container:hover div
 {
     visibility: visible;
 }
 
-.banner-icon:active
+.icon-container:active
 {
     background-color: white;
+}
+
+.description
+{
+    position:absolute;
+    bottom: -15px;
+    visibility: hidden;
 }

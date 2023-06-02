@@ -16,9 +16,9 @@ import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUse
 import { FriendsProvider } from "../../contexts/Chat/FriendsContext";
 import { SocketProvider } from "../../contexts/Chat/ChatSocketContext";
 
-import './Chat.css'
 import { ChannelsProvider } from "../../contexts/Chat/ChannelsContext";
 import ChannelsUsersProvider from "../../contexts/Chat/ChannelsUsersContext";
+import './Chat.css'
 
 function ChatInterface() {
 

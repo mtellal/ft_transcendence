@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import './Profile.css'
 import { useChannels, useChannelsUsers, useFriends, useCurrentUser } from "../../../../Hooks"
-import UserLabel from "../../../../components/Users/UserLabel";
+import UserLabel from "../../../../components/users/UserLabel";
 import { CollectionElement } from "../MenuElement";
 import InfoInput from "../../../../components/Input/InfoInput";
 import PickMenu from "../../../../components/PickMenu";

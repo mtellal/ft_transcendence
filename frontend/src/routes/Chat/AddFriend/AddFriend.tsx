@@ -1,36 +1,36 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
     getUserByUsername,
-    addUserFriend,
     getUser,
     sendFriendRequest,
     validFriendRequest,
     refuseFriendRequest,
-} from '../../../../utils/User'
+} from '../../../utils/User'
 
-import UserLabel, { UserLabelSearch } from "../../../../components/Users/UserLabel";
+import { UserLabelSearch } from "../../../components/users/UserLabel";
 
-import IconInput from "../../../../components/Input/IconInput";
-import { useOutletContext, Link, useNavigate } from "react-router-dom";
-import { CollectionElement } from "../MenuElement";
+import IconInput from "../../../components/Input/IconInput";
+import { useOutletContext } from "react-router-dom";
+import { CollectionElement } from "../components/MenuElement";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../Hooks";
-import './AddElement.css'
+import { useFriends, useCurrentUser } from "../../../Hooks";
+
+import './AddFriend.css'
 
 
-export default function AddElement(props: any) {
-    const [prevValue, setPrevValue] = React.useState("");
-    const [value, setValue] = React.useState("");
-    const [friend, setFriend]: [any, any] = React.useState(null);
-    const [error, setError] = React.useState(false);
+export default function AddFriend() {
+    const [prevValue, setPrevValue] = useState("");
+    const [value, setValue] = useState("");
+    const [friend, setFriend]: [any, any] = useState(null);
+    const [error, setError] = useState(false);
 
-    const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
-    const [invitations, setInvitations]: [any, any] = React.useState([]);
+    const [userInvitations, setUserInvitations]: [any, any] = useState([]);
+    const [invitations, setInvitations]: [any, any] = useState([]);
 
     const { token, user }: any = useCurrentUser();
 
-    const { friends, friendsDispatch, updateFriend }: any = useFriends();
+    const { friends, updateFriend }: any = useFriends();
 
     const { friendInvitations, removeFriendRequest }: any = useOutletContext();
 
@@ -137,9 +137,9 @@ export default function AddElement(props: any) {
     return (
         <div className="add-container">
             <div className="flex-column-center">
-                <h2>Add a {props.title}</h2>
+                <h2>Add a Friend</h2>
                 <IconInput
-                    id={props.title}
+                    id="Friend"
                     icon="search"
                     placeholder="Username"
                     value={value}
@@ -176,7 +176,6 @@ export default function AddElement(props: any) {
                             <CollectionElement
                                 title="Invitations"
                                 collection={invitations}
-                                addClick={props.addGroup}
                             />
                         </div>
                         :

@@ -1,60 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { UserInfos } from "../../../../components/Users/UserLabel";
-import './Banner.css'
+
 import Icon from "../../../../components/Icon";
-import { useChannels, useChannelsUsers, useFriends, useCurrentUser } from "../../../../Hooks";
-import { getUserProfilePictrue } from "../../../../utils/User";
-import ProfilePicture from "../../../../components/ProfilePicture";
+import { UserInfos } from "../../../../components/users/UserInfos";
+import ChannelInfos from "../../../../components/channels/ChannelInfos";
+import { useChannels, useFriends, useCurrentUser } from "../../../../Hooks";
 
+import './Banner.css'
 
-function ChannelInfos(props: any) {
-
-    const { user, image } = useCurrentUser();
-    const { channelsUsers, getMembers } = useChannelsUsers();
-    const { currentChannel } = useChannels();
-
-    const [renderMembersPP, setRenderMembersPP] = useState([]);
-
-    const loadMembers = useCallback(async () => {
-        let members = getMembers(currentChannel.id);
-        console.log(members, currentChannel)
-        if (members && members.length) {
-            members = members.map((u: any) => u.id);
-            members = await Promise.all(members.map(async (id: number) =>
-            await getUserProfilePictrue(id).
-            then(res => window.URL.createObjectURL(new Blob([res.data])))
-            ))
-            setRenderMembersPP(
-                members.map((url: string) =>
-                    <div key={url} className="channelinfos-pp-container">
-                        <ProfilePicture image={url} />
-                    </div>
-                )
-            );
-        }
-    }, [currentChannel, channelsUsers])
-
-    useEffect(() => {
-        setRenderMembersPP([])
-        if (currentChannel) {
-            loadMembers();
-        }
-    }, [currentChannel, channelsUsers])
-
-    console.log(currentChannel)
-
-    return (
-        <div className="flex-center">
-            <h2 style={{ whiteSpace: 'nowrap' }}>{props.name} - </h2>
-            <div className="flex-center channelinfos-members-container">
-                {renderMembersPP}
-            </div>
-        </div>
-    )
+type TBanner = {
+    profile: () => {} | any,
+    invitation: () => {} | any,
+    block: () => {} | any,
+    remove: () => {} | any,
 }
 
-
-export default function Banner({ ...props }: any) {
+export default function Banner({ ...props }: TBanner) {
 
     const { user } = useCurrentUser();
     const { currentFriend } = useFriends();

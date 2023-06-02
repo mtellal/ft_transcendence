@@ -1,0 +1,16 @@
+.channelinfos-pp-container
+{
+    height: 40px;
+    width: 40px;
+    padding: 0 2px;
+}
+
+.channelinfos-members-container
+{
+    padding: 0 5px;
+    flex-wrap: wrap;
+    height: 40px;
+    width: 100%;
+    overflow: hidden;
+
+}

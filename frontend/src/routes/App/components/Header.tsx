@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 
-import './Header.css'
 
 import { Link } from 'react-router-dom';
 import { useCurrentUser } from '../../../Hooks';
-import ProfilePicture from '../../../components/ProfilePicture';
+import ProfilePicture from '../../../components/users/ProfilePicture';
+
+import './Header.css'
 
 export default function Header() {
     const { user } = useCurrentUser();

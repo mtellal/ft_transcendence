@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { updateProfilePicture, updateUser } from "../utils/User";
+import { updateProfilePicture, updateUser } from "../../utils/User";
 
-import InfoInput from "../components/Input/InfoInput";
+import InfoInput from "../../components/Input/InfoInput";
 
-import { useCurrentUser } from "../Hooks";
+import { useCurrentUser } from "../../Hooks";
 
 import './Profile.css'
 
