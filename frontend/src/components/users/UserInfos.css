@@ -1,16 +1,3 @@
-.friend-element {
-    height: 60px;
-    padding: 0 2%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid rgb(112, 112, 112);
-    text-decoration: none;
-    color: black;
-    align-items: center;
-}
-
-
 /*    U S E R    I N F O S      */
 
 .userinfos-container {
@@ -63,17 +50,4 @@
     display: flex;
     font-size: small;
     color: grey;
-}
-
-
-/*   F R I E N D    S E A R C H   */
-
-.UserLabelSearch-container {
-    box-shadow: 0 1px 3px black;
-    border-radius: 5px;
-    width: 96%;
-    display: flex;
-    padding: 2% 2%;
-    justify-content: space-between;
-    align-items: center
 }

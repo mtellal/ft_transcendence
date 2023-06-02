@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 
+import './PickMenu.css'
 
+type TPickMenu = {
+    title: string,
+    selected: boolean | string, 
+    collection: any[],
+    setSelected: (option?: any) => {} | any,
+}
 
-export default function PickMenu(props: any) {
+export default function PickMenu(props: TPickMenu) {
     const [show, setShow] = useState(false);
 
     return (

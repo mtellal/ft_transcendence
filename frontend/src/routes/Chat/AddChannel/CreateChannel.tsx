@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../../Hooks";
-import InfoInput from "../../../../../components/Input/InfoInput";
-import { createChannel } from "../../../../../utils/User";
-import UsersCollection from "../../../../../components/UsersCollection";
-import PickMenu from "../../../../../components/PickMenu";
+import { useChannels, useCurrentUser } from "../../../Hooks";
+import InfoInput from "../../../components/Input/InfoInput";
+import { createChannel } from "../../../utils/User";
+import UsersCollection from "../../../components/collections/UsersCollection";
+import PickMenu from "../../../components/PickMenu";
 
 import './CreateChannel.css'
 
@@ -51,7 +51,7 @@ export function CreateChannel() {
 
 
     return (
-        <div className="add-container scroll">
+        <div className="createchannel-container scroll">
             <h2>Create a channel</h2>
             <InfoInput
                 id="name"

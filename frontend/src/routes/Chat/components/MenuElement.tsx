@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import UserLabel from "../../../components/Users/UserLabel";
+import UserLabel from "../../../components/users/UserLabel";
 import './MenuElement.css'
 import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../Hooks";
 import { createChannel, removeChannel } from "../../../utils/User";

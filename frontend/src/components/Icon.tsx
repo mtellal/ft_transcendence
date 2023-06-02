@@ -2,9 +2,15 @@ import React from "react";
 
 import './Icon.css'
 
-export default function Icon(props: any) {
+type TIcon = {
+    icon: string,
+    description?: string,
+    onClick?: () => {} | any
+}
+
+export default function Icon(props: TIcon) {
     return (
-        <div className="flex-center banner-icon hover-fill-grey" 
+        <div className="flex-center icon-container hover-fill-grey" 
             onClick={props.onClick}
         >
                 <span className="material-symbols-outlined">

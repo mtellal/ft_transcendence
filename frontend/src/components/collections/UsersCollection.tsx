@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { useCurrentUser } from "../Hooks";
-import { getUserByUsername } from "../utils/User";
-import InfoInput from "./Input/InfoInput";
-import { UserLabelSearch } from "./Users/UserLabel";
-import { CollectionElement } from "../routes/Chat/components/MenuElement";
+import { useCurrentUser } from "../../Hooks";
+import { getUserByUsername } from "../../utils/User";
+import InfoInput from "../Input/InfoInput";
+import { UserLabelSearch } from "../users/UserLabel";
+import { CollectionElement } from "../../routes/Chat/components/MenuElement";
 
-export default function UsersCollection(props: any) {
+type TUsersCollection = {
+    title: string,
+    users: any[],
+    setUsers: (u : any) => {} | any
+}
+
+export default function UsersCollection(props: TUsersCollection) {
     const [searchUserValue, setSearchUserValue]: [string, any] = useState("");
     const [searchUser, setSearchUser]: any = useState();
     const { user } = useCurrentUser();
