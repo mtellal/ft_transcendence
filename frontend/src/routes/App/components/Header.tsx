@@ -3,11 +3,11 @@ import React, { useContext } from 'react';
 import './Header.css'
 
 import { Link } from 'react-router-dom';
-import { useUser } from '../Hooks';
-import ProfilePicture from '../Components/ProfilePicture';
+import { useCurrentUser } from '../../../Hooks';
+import ProfilePicture from '../../../components/ProfilePicture';
 
 export default function Header() {
-    const { user, image } = useUser();
+    const { user } = useCurrentUser();
 
     return (
         <header className='header'>
@@ -18,7 +18,7 @@ export default function Header() {
                     to={"/profile"}
                 >
                     <div style={{width: '40px', height: '40px', padding: '0 5px'}}>
-                        <ProfilePicture image={image} />
+                        <ProfilePicture image={user && user.url} />
                     </div>
                     <p className='pp-username'>{user.username}</p>
                 </Link>

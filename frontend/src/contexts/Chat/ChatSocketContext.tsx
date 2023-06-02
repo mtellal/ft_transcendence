@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useUser } from "../../Hooks";
+import { useCurrentUser } from "../../Hooks";
 import { io } from "socket.io-client";
 
 export const ChatSocketContext: React.Context<any> = createContext(null);
@@ -7,7 +7,7 @@ export const ChatSocketContext: React.Context<any> = createContext(null);
 export function SocketProvider({ children }: any) {
     const {
         token
-    }: any = useUser();
+    }: any = useCurrentUser();
     const [socket, setSocket]: any = useState();
 
     useEffect(() => {

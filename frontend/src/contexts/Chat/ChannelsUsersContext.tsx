@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { useChannels, useUser } from "../../Hooks";
+import { useChannels, useCurrentUser } from "../../Hooks";
 import { getUser, getUserProfilePictrue } from "../../utils/User";
 
 
@@ -34,7 +34,7 @@ function reducer(channelsUsers: ChannelUsers[], action: ReducerAction) {
 }
 
 export default function ChannelsUsersProvider({ children }: any) {
-    const { user, image } = useUser();
+    const { user, image } = useCurrentUser();
     const { currentChannel } = useChannels();
     const [channelsUsers, channelsUsersDispatch] = useReducer(reducer, []);
 

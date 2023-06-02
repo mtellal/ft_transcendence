@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useState } from "react";
+import React, { useReducer, createContext, useState, useCallback } from "react";
 import { getBlockedList, getFriendList, getUser } from "../utils/User";
 import { updateUser } from "../utils/User";
 
@@ -28,6 +28,19 @@ function reducer(user: any, action: any) {
         case ('logout'): {
             return ({ ...user, userStatus: "OFFLINE", blockedList: [] })
         }
+        case ('updateUser'): {
+            if (action.user)
+            {
+                if (user)
+                    return ({...user, ...action.user})
+                else
+                    return (action.user)
+            }
+        }
+        case ('updateProfilePicture'): {
+            if (user && action.url)
+                return ({ ...user, url: action.url })
+        }
         case ('setblockedList'): {
             return ({ ...user, blockedList: action.blockedList });
         }
@@ -54,11 +67,10 @@ function reducer(user: any, action: any) {
     }
 }
 
-export const UserContext: React.Context<any> = createContext(0);
+export const CurrentUserContext: React.Context<any> = createContext(0);
 
-export function UserProvider({ children, ...props }: any) {
+export function CurrentUserProvider({ children, ...props }: any) {
     const [user, userDispatch]: any = useReducer(reducer, props.user);
-    const [image, setImage]: any = useState(props.image)
 
     React.useEffect(() => {
         userDispatch({ type: 'login' })
@@ -75,22 +87,25 @@ export function UserProvider({ children, ...props }: any) {
         }
     }, [])
 
-    React.useEffect(() => {
-        if (!image)
-            setImage("./assets/user.png")
-    }, [image])
 
+    const updateCurrentProfilePicture = useCallback((url: string) => {
+        userDispatch({ type: 'updateProfilePicture', url })
+    }, [user])
+
+    const updateCurrentUser = useCallback((user: any) => {
+        userDispatch({ type: 'updateUser', user })
+    }, [user])
 
     return (
-        <UserContext.Provider
+        <CurrentUserContext.Provider
             value={{
                 token: props.token,
                 user,
                 userDispatch,
-                image,
-                setImage
+                updateCurrentUser,
+                updateCurrentProfilePicture
             }}>
             {children}
-        </UserContext.Provider>
+        </CurrentUserContext.Provider>
     )
 }

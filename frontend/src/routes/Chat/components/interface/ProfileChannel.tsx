@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import IconInput from "../../Components/IconInput";
+import IconInput from "../../../../components/Input/IconInput";
 
 import './ProfileChannel.css'
 
@@ -10,6 +10,7 @@ export default function ProfileGroup({user, channel, ...props} : any)
     const administrators = channel.administrators.map((m : any) => <p>{m}</p>)
     const members = channel.members.map((m : any) => <p>{m}</p>)
     const banned = channel.banMembers.map((m : any) => <p>{m}</p>)
+    const [password, setPassword] : any = useState("")
 
     function accessPassword()
     {
@@ -23,8 +24,11 @@ export default function ProfileGroup({user, channel, ...props} : any)
                 accessPassword() && 
                 <div className="password">
                     <IconInput 
+                        id="lock"
                         icon="lock"
                         placeholder="password"
+                        value={password}
+                        setValue={setPassword}
                     />
                     <button className="button">Save</button>
                 </div>

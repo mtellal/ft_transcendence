@@ -1,13 +1,13 @@
 import { useContext } from "react";
-import { UserContext } from "./contexts/UserContext";
+import { CurrentUserContext } from "./contexts/CurrentUserContext";
 import { FriendsContext } from "./contexts/Chat/FriendsContext";
 import { ChatSocketContext } from "./contexts/Chat/ChatSocketContext";
 import { ChannelsContext } from "./contexts/Chat/ChannelsContext";
 import { ChannelsUsersContext } from "./contexts/Chat/ChannelsUsersContext";
 
-export function useUser()
+export function useCurrentUser()
 {
-    return (useContext(UserContext));
+    return (useContext(CurrentUserContext));
 }
 
 export function useFriends()

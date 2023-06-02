@@ -2,14 +2,14 @@ import React, { useContext } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { updateProfilePicture, updateUser } from "../utils/User";
 
-import InfoInput from "../Components/InfoInput";
+import InfoInput from "../components/Input/InfoInput";
 
-import { useUser } from "../Hooks";
+import { useCurrentUser } from "../Hooks";
 
 import './Profile.css'
 
-function ProfileInfos({id, setUser, ...props } : any) {
-    const [username, setUsername] = React.useState(props.username);
+function ProfileInfos({id, updateCurrentUser, ...props } : any) {
+    const [username, setUsername] : [string, any] = React.useState(props.username);
     const [error, setError] = React.useState("");
     const [updated, setUpdated] = React.useState(false);
 
@@ -25,7 +25,7 @@ function ProfileInfos({id, setUser, ...props } : any) {
                     throw "Already yours";
             setError("");
             setUpdated(true);
-            setUser(d.data);
+            updateCurrentUser(d.data);
         })
         .catch(e => {
             if (e === "Already yours")
@@ -42,7 +42,7 @@ function ProfileInfos({id, setUser, ...props } : any) {
                 id={props.id}
                 label="Username"
                 value={username}
-                getValue={setUsername}
+                setValue={setUsername}
                 submit={updateProfile}
             />
             {error && <p className='infos-error' >{error}</p>}
@@ -117,22 +117,21 @@ export default function Profile() {
     const {
         token,
         user, 
-        setUser, 
-        image, 
-        setImage
-    } : any = useUser();
+        updateCurrentUser, 
+        updateCurrentProfilePicture
+    } : any = useCurrentUser();
 
     return (
         <div className="profile">
             <ProfileInfos
                 id={user.id}
                 username={user.username}
-                setUser={setUser}
+                updateCurrentUser={updateCurrentUser}
             />
             <ProfilePicture
                 token={token}
-                image={image}
-                setImage={setImage}
+                image={user && user.url}
+                setImage={updateCurrentProfilePicture}
             />
         </div>
     )

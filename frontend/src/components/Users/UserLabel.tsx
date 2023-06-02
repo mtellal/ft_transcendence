@@ -1,30 +1,20 @@
 
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom'
 
-import imgUser from '../assets/user.png'
-import { Link, NavLink } from 'react-router-dom'
-import { getUserProfilePictrue } from '../utils/User'
+import Icon from '../Icon';
+import imgUser from '../../assets/user.png'
+import ProfilePicture from '../ProfilePicture';
+import { getUserProfilePictrue } from '../../utils/User'
+import './UserLabel.css'
 
-import './FriendElement.css'
-import Icon from './Icon';
+type TUserInfos = {
+    username: string,
+    profilePictureURL: string,
+    userStatus: string
+}
 
-/*  
-
-PROPS
-
-key={f.id}
-id={f.id}
-username={f.username}
-status={e.status}
-chat={false}
-hover={true}
-selected={currentFriend === e.id ? true : false}
-className="chat"
-click={handleFriendsMessage}
-*/
-
-
-export function UserInfos({ id, username, profilePictureURL, userStatus, ...props }: any) {
+export function UserInfos({ username, profilePictureURL, userStatus }: TUserInfos) {
 
     function selectStatusDiv() {
         if (userStatus === "ONLINE")
@@ -45,17 +35,19 @@ export function UserInfos({ id, username, profilePictureURL, userStatus, ...prop
     }
 
     return (
-        <div className="infos-div" >
-            <div className='friend-image-container'>
-                <img className="friend-image" src={profilePictureURL || imgUser} />
+        <div className="userinfos-container" >
+            <div className='userinfos-pp-container'>
+                <ProfilePicture
+                    image={profilePictureURL || imgUser}
+                />
             </div>
             <div
-                className="firend-icon-status"
+                className="userinfos-icon-status"
                 style={selectStatusDiv()}
             />
-            <div className="flex-column friend-infos">
-                <p className="friend-username" >{username}</p>
-                <p className="friend-status">
+            <div className="flex-column user-infos">
+                <p className="userinfos-username" >{username}</p>
+                <p className="userinfos-status">
                     {selectStatusText()}
                 </p>
             </div>
@@ -63,44 +55,44 @@ export function UserInfos({ id, username, profilePictureURL, userStatus, ...prop
     )
 }
 
+type TUserLabelSearch = TUserInfos & {
+    id: number,
+    add?: boolean,
+    invitation?: boolean,
+    accept?: () => {} | any,
+    refuse?: () => {} | any,
+    delete?: () => {} | any,
+    onClick?: () => {} | any,
+}
 
-export function FriendSearch(props: any) {
+
+export function UserLabelSearch(props: TUserLabelSearch) {
     const [invitation, setInvitation]: [any, any] = React.useState(false);
 
-    const [url, setUrl] : any = useState();
+    const [url, setUrl]: any = useState();
 
-    async function loadURL()
-    {
+    async function loadURL() {
         await getUserProfilePictrue(props.id)
             .then(res => {
                 if (res.status == 200 && res.statusText == "OK")
                     setUrl(window.URL.createObjectURL(new Blob([res.data])))
-            })   
-    }   
+            })
+    }
 
     useEffect(() => {
-        if (props.id)
-        {
+        if (props.id) {
             loadURL();
         }
     }, [props.id])
 
     return (
-        <div style={{
-            boxShadow: '0 1px 3px black',
-            borderRadius: '5px',
-            width: '96%',
-            display: 'flex',
-            padding: '2% 2%',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-        }}>
+        <div className='flex-ai UserLabelSearch-container'>
             <UserInfos {...props} profilePictureURL={url} />
             {props.add &&
                 !invitation &&
                 <Icon
                     icon="add"
-                    onClick={() => { props.onCLick(); setInvitation(true) }}
+                    onClick={() => { props.onClick(); setInvitation(true) }}
                 />
             }
             {props.invitation &&
@@ -116,22 +108,29 @@ export function FriendSearch(props: any) {
     )
 }
 
-export default function FriendElement(props: any) {
+type TUserLabel = TUserInfos & {
+    id: number,
+    username: string,
+    notifs?: number,
+    onClick?: () => {} | any
+}
+
+export default function UserLabel(props: TUserLabel) {
     return (
         <NavLink to={`/chat/friends/${props.username}/${props.id}`}
             className={({ isActive }) =>
                 isActive ? "friend-element hover-fill-grey selected" : "friend-element hover-fill-grey"
             }
-            onClick={() => props.click(props)}
+            onClick={() => props.onClick}
         >
-            <UserInfos {...props} userAvatar={props.avatar} />
-            {
+            <UserInfos {...props} />
+            {/* {
                 props.notifs !== 0 ?
-                    <div className='friendelement-notifs'>
+                    <div className='UserLabel-notifs'>
                         <p>{props.notifs > 10 ? "10+" : props.notifs}</p>
                     </div>
                     : null
-            }
+            } */}
         </NavLink>
     )
 }

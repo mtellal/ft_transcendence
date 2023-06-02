@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
-import IconInput from "../../Components/IconInput";
+import IconInput from "../../components/Input/IconInput";
 import { signupRequest } from "../../utils/User";
 import { setCookie } from "../../utils/Cookie";
 
@@ -41,24 +41,30 @@ export default function SignUp() {
     return (
         <div className="flex-column-center login-form-container">
             <IconInput
+                id="signup-username"
                 style={iconInputStyle}
                 icon="person"
                 placeholder="Username"
-                getValue={(value: string) => setUsername(value)}
+                value={username}
+                setValue={setUsername}
                 submit={handleSubmit}
             />
             <IconInput
+                id="signup-password"
                 style={iconInputStyle}
                 icon="lock"
                 placeholder="Password"
-                getValue={(value: string) => setPassword(value)}
+                value={password}
+                setValue={setPassword}
                 submit={handleSubmit}
             />
             <IconInput
+                id="signup-confirm"
                 style={iconInputStyle}
                 icon="lock"
                 placeholder="Confirm password"
-                getValue={(value: string) => setConfirmPassword(value)}
+                value={confirmPassword}
+                setValue={setConfirmPassword}
                 submit={handleSubmit}
             />
             {error && <p>error: {error}</p>}

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
 
 import './Profile.css'
-import { useChannels, useChannelsUsers, useFriends, useUser } from "../../Hooks"
-import FriendElement from "../../Components/FriendElement";
+import { useChannels, useChannelsUsers, useFriends, useCurrentUser } from "../../../../Hooks"
+import UserLabel from "../../../../components/Users/UserLabel";
 import { CollectionElement } from "../MenuElement";
-import InfoInput from "../../Components/InfoInput";
-import PickMenu from "../../Components/PickMenu";
+import InfoInput from "../../../../components/Input/InfoInput";
+import PickMenu from "../../../../components/PickMenu";
 
 function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState();
@@ -13,12 +13,11 @@ function CollectionUsers(props: any) {
     useEffect(() => {
         if (props.users && props.users)
             setRenderUsers(props.users.map((user: any) =>
-                <FriendElement
+                <UserLabel
                     key={user.id}
                     id={user.id}
                     username={user.username}
                     profilePictureURL={user.url}
-                    avatar={user.avatar}
                     userStatus={user.userStatus}
                 />
             ))
@@ -33,7 +32,7 @@ function CollectionUsers(props: any) {
 }
 
 function ChannelName(props: any) {
-    const [name, setName] = useState(props.name || "");
+    const [name, setName]: [string, any] = useState(props.name || "");
 
     return (
         <>
@@ -46,6 +45,7 @@ function ChannelName(props: any) {
                         label={props.title}
                         value={name}
                         setValue={setName}
+                        submit={null}
                     />
                     :
                     <h3 className="reset">{props.name}</h3>
@@ -80,7 +80,7 @@ function ChannelAccess(props: any) {
 
 function ChannelProfile(props: any) {
 
-    const { user } = useUser();
+    const { user } = useCurrentUser();
     const { getAdmins } = useChannelsUsers();
 
     const [access, setAccess] = useState(props.channel && props.channel.type.toLowerCase());

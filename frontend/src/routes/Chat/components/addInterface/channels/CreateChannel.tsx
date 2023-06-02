@@ -2,24 +2,25 @@ import React, { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useChannels, useChatSocket, useFriends, useUser } from "../../Hooks";
-import InfoInput from "../../Components/InfoInput";
-import { createChannel } from "../../utils/User";
-import UsersCollection from "../../Components/UsersCollection";
-import PickMenu from "../../Components/PickMenu";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../../Hooks";
+import InfoInput from "../../../../../components/Input/InfoInput";
+import { createChannel } from "../../../../../utils/User";
+import UsersCollection from "../../../../../components/UsersCollection";
+import PickMenu from "../../../../../components/PickMenu";
 
-import './AddElement.css'
+import './CreateChannel.css'
+
 
 export function CreateChannel() {
 
-    const [name, setName] = useState("");
-    const [type, setType] = useState("")
-    const [password, setPassword] = useState("");
+    const [name, setName]: [string, any] = useState("");
+    const [type, setType]: [string, any] = useState("")
+    const [password, setPassword]: [string, any] = useState("");
     const [admins, setAdmins] = useState([]);
     const [members, setMembers] = useState([]);
     const [banMembers, setBanMembers] = useState([]);
 
-    const { token } = useUser();
+    const { token } = useCurrentUser();
 
     const {channels, channelsDispatch, setCurrentChannel, addChannel} = useChannels();
 
@@ -57,14 +58,14 @@ export function CreateChannel() {
                 label="Name"
                 value={name}
                 setValue={setName}
-                submit={() => { }}
+                submit={null}
             />
             <InfoInput
                 id="password"
                 label="Password"
                 value={password}
                 setValue={setPassword}
-                submit={() => { }}
+                submit={null}
             />
             <PickMenu
                 title="Visibility"
