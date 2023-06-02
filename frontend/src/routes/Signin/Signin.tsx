@@ -1,3 +1,4 @@
+import React from "react";
 import s from "./style.module.css"
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
@@ -12,10 +13,10 @@ export function Signin() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-	async function submitData(e) {
+	async function submitData(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const username = e.target.username.value;
-		const password = e.target.password.value;
+		const username = e.currentTarget.username.value;
+		const password = e.currentTarget.password.value;
 		const response = await BackApi.authSigninpUser(username, password);
 		if (response.status === 200) {
 			createCookie("access_token", response.data.access_token);

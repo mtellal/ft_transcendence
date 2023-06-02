@@ -1,27 +1,24 @@
+import React from 'react';
 import { BackApi } from '../../api/back';
 import { GroupList } from '../GroupList/GroupList';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import io from 'socket.io-client'
+import { RootState } from '../../store';
+import { io, Socket } from 'socket.io-client'
 import s from './style.module.css'
 
-export function Group({ myChannels, setIdFriendSelected }) {
+interface GroupProps {
+	myChannels: any;
+	setIdFriendSelected: any;
+}
 
-	const selector = useSelector(store => store.user.user);
-	const [socket, setSocket] = useState();
+export function Group({ myChannels, setIdFriendSelected }: GroupProps) {
 
-	// async function handleSubmit(e) {
-	// 	e.preventDefault();
-	// 	const rep = await BackApi.getUserByUsername(e.target.username.value);
-	// 	if (rep.status === 200) {
-	// 		socket.emit('createChannel', {
-	// 			name: "mgrp",
-	// 			type: "PUBLIC",
-	// 			memberList: [rep.data.id]
-	// 		})
-	// 	}
-	// }
+	const selector = useSelector((store: RootState) => store.user.user);
+	const [socket, setSocket] = useState<Socket | null>(null);
 
+
+	// Sert a rien ??
 	useEffect(() => {
         if (selector.token) {
             const newSocket = io('http://localhost:3000', {
@@ -43,7 +40,7 @@ export function Group({ myChannels, setIdFriendSelected }) {
 				</form>
 			</div> */}
             <div className={s.list}>
-                {myChannels.map((channel) => {
+                {myChannels.map((channel: any) => {
                     return (
                         <span key={channel.id}>
                             <GroupList channel={channel} setIdFriendSelected={setIdFriendSelected}/>

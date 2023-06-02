@@ -1,13 +1,15 @@
+import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import io from 'socket.io-client'
+import { RootState } from '../../store';
+import io, { Socket } from 'socket.io-client'
 import s from './style.module.css'
 
 export function CreateGroup() {
 
-	const selector = useSelector(store => store.user.user);
-	const [socket, setSocket] = useState();
+	const selector = useSelector((store: RootState) => store.user.user);
+	const [socket, setSocket] = useState<Socket | null>(null);
 	const [privacy, setPrivacy] = useState('Public');
 
 	useEffect(() => {
@@ -22,34 +24,34 @@ export function CreateGroup() {
         }
     }, [setSocket, selector.token])
 
-	function handlePrivacyChange(e) {
+	function handlePrivacyChange(e: React.ChangeEvent<HTMLSelectElement>) {
 		setPrivacy(e.target.value);
 	}
 
-	// async function handleSubmit(e) {
-	function handleSubmit(e) {
+	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+
+		const target = e.target as typeof e.target & {
+			name: { value: string };
+			privacy: { value: string };
+			password?: { value: string };
+		};
+
 		e.preventDefault();
-		// const rep = await BackApi.getUserByUsername(e.target.username.value);
-		// if (rep.status === 200) {
-		if (e.target.privacy.value === 'Public') {
-			const res = socket.emit('createChannel', {
-				name: e.target.name.value,
-				type: "PUBLIC",
-				// memberList: [rep.data.id]
-			})
-			console.log('res', res);
-		} else if (e.target.privacy.value === 'Private') {
+		if ((e.target as HTMLFormElement).privacy.value === 'Public') {
 				socket.emit('createChannel', {
-					name: e.target.name.value,
+				name: target.name.value,
+				type: "PUBLIC",
+			})
+		} else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
+				socket.emit('createChannel', {
+					name: target.name.value,
 					type: "PRIVATE",
-					// memberList: [rep.data.id]
 				})
 		} else {
 			socket.emit('createChannel', {
-				name: e.target.name.value,
+				name: target.name.value,
 				type: "PROTECTED",
-				password: e.target.password.value
-				// memberList: [rep.data.id]
+				password: (e.target as HTMLFormElement).password.value
 			})
 		}
 	}

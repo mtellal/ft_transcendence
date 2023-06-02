@@ -1,21 +1,20 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import io from 'socket.io-client'
-import s from './style.module.css'
 import { BackApi } from '../../api/back';
 import { Messages } from '../Messages/Messages';
+import io, { Socket } from 'socket.io-client'
+import s from './style.module.css'
+import { RootState } from '../../store';
 
-export function Chatbox({ idFriendSelected }) {
+export function Chatbox({ idFriendSelected }: {idFriendSelected: number}) {
 
-	// console.log('id select friend', idFriendSelected);
-
-
-    const selector = useSelector(store => store.user.user);
-	const [socket, setSocket] = useState();
+    const selector = useSelector((store: RootState) => store.user.user);
+	const [socket, setSocket] = useState<Socket | null>();
     const [messages, setMessages] = useState([]);
     const [idChannel, setIdChannel] = useState();
 
-    const send = (value) => {
+    const send = (value: string) => {
         socket.emit('message', {
             sendBy: selector.id,
             content: value,
@@ -24,7 +23,6 @@ export function Chatbox({ idFriendSelected }) {
     }
 
 	async function creteOrJoinChannel() {
-		// console.log('idFriendSelected', idFriendSelected)
 		const response = await BackApi.getWhispers(selector.id, idFriendSelected);
 		if (response.status === 200) {
 			console.log('Chennel exist');
@@ -48,7 +46,7 @@ export function Chatbox({ idFriendSelected }) {
 		}
 	}
 
-	function joinChannel(idChan) {
+	function joinChannel(idChan: number) {
 		console.log('idChan', idChan);
 		socket.emit('joinChannel', {
 			channelId: idChan
@@ -74,7 +72,7 @@ export function Chatbox({ idFriendSelected }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, selector.id, idFriendSelected])
 
-	const messageListener = (message) => {
+	const messageListener = (message: any) => {
 		console.log('Msg', message);
 		if (message.length) {
 			setMessages(message);
@@ -93,16 +91,16 @@ export function Chatbox({ idFriendSelected }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [messageListener, idFriendSelected])
 
-	// console.log('messages', messages);
+	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault()
+		send(e.currentTarget.inputText.value);
+	}
 
 	return (
 		<div className={s.container} >
 			{messages && <Messages messages={messages} id={selector.id} />}
 			<div className={s.inputBox}>
-				<form onSubmit={(e) => {
-					e.preventDefault()
-					send(e.target.inputText.value);
-				}}>
+				<form onSubmit={handleSubmit}>
 					<input name='inputText' className={s.input} placeholder='Type your message...'></input>
 					<button type='submit'>Send</button>
 				</form>

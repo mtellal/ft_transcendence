@@ -1,3 +1,4 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Friends } from '../../components/Friends/Friends';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ import { ChatboxChannel } from '../../components/ChatboxChannel/ChatboxChannel';
 import { CreateGroup } from '../../components/CreateGroup/CreateGroup';
 import { JoinChannel } from '../../components/JoinChannel/JoinChannel';
 import s from './style.module.css'
+import { RootState } from '../../store';
 
 export function Chat() {
 
@@ -18,7 +20,7 @@ export function Chat() {
 	const [friendRequest, setFriendRequest] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
 	const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_GROUP');
-	const selector = useSelector(store => store.user.user);
+	const selector = useSelector((store: RootState) => store.user.user);
 
 	async function getFriends() {
 		const response = await BackApi.getFriendsById(selector.id);
@@ -43,7 +45,7 @@ export function Chat() {
 		setFriends(response.data);
 	}
 
-	function delFriend(delFriendId) {
+	function delFriend(delFriendId: number) {
 		const updatedFriends = friends.filter((friend) => friend.id !== delFriendId);
 		setFriends(updatedFriends);
 	}

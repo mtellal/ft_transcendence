@@ -1,8 +1,12 @@
+import React from "react";
 import { FriendRequestList } from "../FriendRequestList/FriendRequestList";
 
-export function FriendRequest({ listFriendRequest, setFriendRequest }) {
+interface FriendRequestProps {
+	listFriendRequest: any;
+	setFriendRequest: any;
+}
 
-	// console.log('Component FriendRequest len', listFriendRequest.length);
+export function FriendRequest({ listFriendRequest, setFriendRequest }: FriendRequestProps) {
 
 	if (listFriendRequest.length === 0) {
 		return (
@@ -12,7 +16,7 @@ export function FriendRequest({ listFriendRequest, setFriendRequest }) {
 
 	return (
 		<div>
-			{listFriendRequest.map((request) => {
+			{listFriendRequest.map((request: any) => {
 				return (
 					<span key={request.id}>
 						<FriendRequestList

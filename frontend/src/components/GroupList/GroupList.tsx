@@ -1,7 +1,12 @@
+import React from 'react';
 import s from './style.module.css'
 
-export function GroupList({ channel, setIdFriendSelected }) {
-	// console.log('channel.id', channel.id);
+interface GroupListProps {
+	channel: any;
+	setIdFriendSelected: any;
+}
+
+export function GroupList({ channel, setIdFriendSelected }:  GroupListProps) {
 
 	function test() {
 		setIdFriendSelected(channel.id);

@@ -1,16 +1,19 @@
+import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { BackApi } from '../../api/back';
 import { PublicChannels } from '../PublicChannels/PublicChannels';
+import { ProtectedChannels } from '../ProtectedChannels/ProtectedChannels';
+import { RootState } from '../../store';
+import { Socket } from 'socket.io-client';
 import io from 'socket.io-client'
 import s from './style.module.css'
-import { ProtectedChannels } from '../ProtectedChannels/ProtectedChannels';
 
-export function JoinChannel({ myChannels }) {
+export function JoinChannel({ myChannels }: {myChannels: any}) {
 
-	const selector = useSelector(store => store.user.user);
-	const [socket, setSocket] = useState();
+	const selector = useSelector((store: RootState) => store.user.user);
+	const [socket, setSocket] = useState<Socket | null>(null);
 	const [channels, setChannels] = useState();
 
 	async function getAllChannels() {

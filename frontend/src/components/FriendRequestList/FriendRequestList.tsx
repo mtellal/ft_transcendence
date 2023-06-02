@@ -1,17 +1,26 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { BackApi } from "../../api/back";
 import cross from '../../assets/cross.png'
 import check from '../../assets/check.png'
 import s from './style.module.css'
 import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
-export function FriendRequestList({ friendId, requestId, listFriendRequest, setFriendRequest }) {
+interface FriendRequestListProps {
+	friendId: number;
+	requestId: number;
+	listFriendRequest: any;
+	setFriendRequest: any;
+}
 
-	const [infoUser, setInfoUser] = useState();
-	const [avatar, setAvatar] = useState();
+export function FriendRequestList({ friendId, requestId, listFriendRequest, setFriendRequest }: FriendRequestListProps) {
+
+	const [infoUser, setInfoUser] = useState<any>();
+	const [avatar, setAvatar] = useState<string>();
 	const [isLoading, setIsLoading] = useState(true);
 	const [onAvatar, setOnAvatar] = useState(false);
-	const selector = useSelector(store => store.user.user);
+	const selector = useSelector((store: RootState) => store.user.user);
 
 	function showActionsFriendRequest() {
 		setOnAvatar(!onAvatar)
@@ -37,8 +46,8 @@ export function FriendRequestList({ friendId, requestId, listFriendRequest, setF
 		removeListFriendRequestById(requestId);
 	}
 
-	function removeListFriendRequestById(requestId) {
-		let ret = listFriendRequest.filter(objet => objet['id'] !== requestId);
+	function removeListFriendRequestById(requestId: number) {
+		let ret = listFriendRequest.filter((objet: any) => objet['id'] !== requestId);
 		setFriendRequest(ret);
 		console.log('ret', ret);
 	}

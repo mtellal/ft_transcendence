@@ -1,12 +1,14 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { HeaderProfile } from '../HeaderProfile/HeaderProfile';
 import s from './style.module.css'
+import { RootState } from '../../store';
 
 export function Header() {
 
 	const navigate = useNavigate();
-    const selector = useSelector(store => store.user.user);
+    const selector = useSelector((store: RootState) => store.user.user);
 
 	return (
 		<div className={s.container}>

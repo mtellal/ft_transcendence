@@ -1,19 +1,22 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { BackApi } from '../../api/back';
 import { Messages } from '../Messages/Messages';
+import { RootState } from '../../store';
+import { Socket } from 'socket.io-client';
 import io from 'socket.io-client'
 import s from './style.module.css'
 
-export function ChatboxChannel({ idFriendSelected }) {
+export function ChatboxChannel({ idFriendSelected }: {idFriendSelected: number}) {
 
 	console.log('id select friend', idFriendSelected);
 
-	const selector = useSelector(store => store.user.user);
-	const [socket, setSocket] = useState();
+	const selector = useSelector((store: RootState) => store.user.user);
+	const [socket, setSocket] = useState<Socket | null>();
     const [messages, setMessages] = useState([]);
 
-    const send = (value) => {
+    const send = (value: string) => {
         socket.emit('message', {
             sendBy: selector.id,
             content: value,
@@ -27,9 +30,9 @@ export function ChatboxChannel({ idFriendSelected }) {
 		})
 	}
 
-	async function invitUser(e) {
+	async function invitUser(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const rep = await BackApi.getUserByUsername(e.target.invitUser.value);
+		const rep = await BackApi.getUserByUsername(e.currentTarget.invitUser.value);
 		if (rep.status === 200) {
 			console.log('User invite', rep.data.id);
 			socket.emit('addtoChannel', {
@@ -40,6 +43,11 @@ export function ChatboxChannel({ idFriendSelected }) {
 		} else {
 			console.log('err', rep.status);
 		}
+	}
+
+	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault()
+		send(e.currentTarget.inputText.value);
 	}
 
     useEffect(() => {
@@ -61,7 +69,7 @@ export function ChatboxChannel({ idFriendSelected }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, selector.id])
 
-	const messageListener = (message) => {
+	const messageListener = (message: any) => {
 		if (message.length) {
 			setMessages(message);
 		} else {
@@ -87,10 +95,7 @@ export function ChatboxChannel({ idFriendSelected }) {
 			</form>
 			{messages && <Messages messages={messages} id={selector.id} />}
 			<div className={s.inputBox}>
-				<form onSubmit={(e) => {
-					e.preventDefault()
-					send(e.target.inputText.value);
-				}}>
+				<form onSubmit={handleSubmit}>
 					<input name='inputText' className={s.input} placeholder='Type your message...'></input>
 					<button type='submit'>Send</button>
 				</form>

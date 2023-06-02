@@ -1,24 +1,29 @@
+import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { ProtectedChannelsList } from '../ProtectedChannelsList/ProtectedChannelsList';
 import { PublicChannelsList } from '../PublicChannelsList/PublicChannelsList';
 import s from './style.module.css'
+import { Socket } from 'socket.io-client';
 
-export function ProtectedChannels({ channels, myChannels, socket }) {
+interface ProtectedChannelsProps {
+	channels: any;
+	myChannels: any;
+	socket: Socket | null;
+}
+
+export function ProtectedChannels({ channels, myChannels, socket }: ProtectedChannelsProps) {
 
 	const [channelsNotJoined, setChannelsNotJoined] = useState([]);
 
 	function setArrayChannels() {
-		let arr = channels.filter(obj1 => !myChannels.some(obj2 => obj2.id === obj1.id) && obj1.type === 'PROTECTED');
+		let arr = channels.filter((obj1: any) => !myChannels.some((obj2: any) => obj2.id === obj1.id) && obj1.type === 'PROTECTED');
 		setChannelsNotJoined(arr);
 	}
 
 	useEffect(() => {
 		setArrayChannels();
 	}, [])
-
-	// console.log('channels', channels);
-	// console.log('channelsNotJoined', channelsNotJoined);
 
 	if (channelsNotJoined.length === 0) {
 		return (

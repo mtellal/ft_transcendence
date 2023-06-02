@@ -1,15 +1,16 @@
+import React from 'react';
 import s from './style.module.css'
 
-export function Messages({ messages, id }) {
+interface MessagesProps {
+	messages: any;
+	id: number;
+}
 
-	// console.log('Component Messages');
-	// console.log('Component Messages', messages);
-	// console.log('Component Messages 2', messages[0]);
+export function Messages({ messages, id }: MessagesProps) {
+
 	return (
 		<div className={s.container}>
-			{messages.map((message) => {
-				// console.log('ii', message)
-				// return (<div key>{messages.content}</div>);
+			{messages.map((message: any) => {
 				return (
 					<div
 						className={s.boxMessage}
