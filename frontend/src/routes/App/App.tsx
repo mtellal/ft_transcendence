@@ -2,21 +2,20 @@ import React from 'react'
 import jwtDecode from 'jwt-decode';
 import { Outlet, redirect, useLoaderData, useLocation } from 'react-router-dom';
 
-import Header from '../App/Header';
-import Footer from '../App/Footer';
-import Sidebar from '../App/SideBar';
-import { extractCookie } from '../utils/Cookie';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Sidebar from './components/SideBar';
+import { extractCookie } from '../../utils/Cookie';
 import {
   getUser,
   getUserProfilePictrue,
   updateUser,
   blockUserRequest,
   unblockUserRequest
-} from '../utils/User';
+} from '../../utils/User';
 
 import './App.css';
-import { UserProvider } from '../contexts/UserContext';
-import { useUser } from '../Hooks';
+import { CurrentUserProvider } from '../../contexts/CurrentUserContext';
 
 
 export async function loader() {
@@ -32,29 +31,28 @@ export async function loader() {
     if (image.status === 200 && image.statusText === "OK")
       image = window.URL.createObjectURL(new Blob([image.data]))
     else
-      image = null;
+      image = './assets/user.png';
 
-    return ({ user: { ...user.data}, token, image})
+    return ({ user: { ...user.data, url: image }, token })
   }
   return (redirect("/login"));
 }
 
 function App() {
 
-  const {user, token, image}: any = useLoaderData();
+  const { user, token }: any = useLoaderData();
 
   return (
     <div className="App" >
-      <UserProvider 
-        user={user} 
-        token={token} 
-        image={image}
+      <CurrentUserProvider
+        user={user}
+        token={token}
       >
         <Header />
         <Sidebar />
         <Footer />
         <Outlet />
-      </UserProvider>
+      </CurrentUserProvider>
     </div>
   );
 }

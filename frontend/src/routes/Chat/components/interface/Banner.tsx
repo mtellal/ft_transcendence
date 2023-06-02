@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { UserInfos } from "../../Components/FriendElement";
+import { UserInfos } from "../../../../components/Users/UserLabel";
 import './Banner.css'
-import Icon from "../../Components/Icon";
-import { useChannels, useChannelsUsers, useFriends, useUser } from "../../Hooks";
-import { getUserProfilePictrue } from "../../utils/User";
-import ProfilePicture from "../../Components/ProfilePicture";
+import Icon from "../../../../components/Icon";
+import { useChannels, useChannelsUsers, useFriends, useCurrentUser } from "../../../../Hooks";
+import { getUserProfilePictrue } from "../../../../utils/User";
+import ProfilePicture from "../../../../components/ProfilePicture";
 
 
 function ChannelInfos(props: any) {
 
-    const { user, image } = useUser();
+    const { user, image } = useCurrentUser();
     const { channelsUsers, getMembers } = useChannelsUsers();
     const { currentChannel } = useChannels();
 
@@ -56,7 +56,7 @@ function ChannelInfos(props: any) {
 
 export default function Banner({ ...props }: any) {
 
-    const { user } = useUser();
+    const { user } = useCurrentUser();
     const { currentFriend } = useFriends();
     const { currentChannel } = useChannels();
 
@@ -100,11 +100,9 @@ export default function Banner({ ...props }: any) {
             {
                 channel && channel.type === "WHISPER" ?
                     <UserInfos
-                        id={friend && friend.id}
                         username={friend && friend.username}
                         userStatus={friend && friend.userStatus}
                         profilePictureURL={friend && friend.url}
-                        userAvatar={friend && friend.avatar}
                     />
                     :
                     <ChannelInfos

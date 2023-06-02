@@ -7,26 +7,17 @@ import {
     sendFriendRequest,
     validFriendRequest,
     refuseFriendRequest,
-    getChannelByName,
-    getUserProfilePictrue
-} from '../../utils/User'
+} from '../../../../utils/User'
 
-import FriendElement, { FriendSearch } from "../../Components/FriendElement";
+import UserLabel, { UserLabelSearch } from "../../../../components/Users/UserLabel";
 
-import IconInput from "../../Components/IconInput";
+import IconInput from "../../../../components/Input/IconInput";
 import { useOutletContext, Link, useNavigate } from "react-router-dom";
 import { CollectionElement } from "../MenuElement";
 
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../Hooks";
 import './AddElement.css'
-import { useChannels, useChatSocket, useFriends, useUser } from "../../Hooks";
-import { match } from "assert";
-import ProfilePicture from "../../Components/ProfilePicture";
-import Icon from "../../Components/Icon";
-import InfoInput from "../../Components/InfoInput";
-import { createChannel } from "../../utils/User";
-import UsersCollection from "../../Components/UsersCollection";
 
-import defaultUserPP from '../../assets/user.png'
 
 export default function AddElement(props: any) {
     const [prevValue, setPrevValue] = React.useState("");
@@ -37,7 +28,7 @@ export default function AddElement(props: any) {
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
 
-    const { token, user }: any = useUser();
+    const { token, user }: any = useCurrentUser();
 
     const { friends, friendsDispatch, updateFriend }: any = useFriends();
 
@@ -126,12 +117,11 @@ export default function AddElement(props: any) {
     React.useEffect(() => {
         if (userInvitations && userInvitations.length) {
             setInvitations(userInvitations.map((u: any) =>
-                <FriendSearch
-                    user={u}
+                <UserLabelSearch
                     key={u.id}
                     id={u.id}
                     username={u.username}
-                    avatar={u.avatar}
+                    profilePictureURL={u.avatar}
                     userStatus={u.userStatus}
                     invitation={true}
                     accept={() => acceptFriendRequest(u)}
@@ -146,24 +136,26 @@ export default function AddElement(props: any) {
 
     return (
         <div className="add-container">
-            <div className="flex-column-center add-div">
-                <h2 className="add-title">Add a {props.title}</h2>
+            <div className="flex-column-center">
+                <h2>Add a {props.title}</h2>
                 <IconInput
+                    id={props.title}
                     icon="search"
                     placeholder="Username"
-                    getValue={(v: string) => setValue(v.trim())}
-                    submit={() => value && searchUser()}
+                    value={value}
+                    setValue={setValue}
+                    submit={() => {value && searchUser()}}
                 />
                 {
                     friend ?
                         <div className="user-found">
-                            <FriendSearch
+                            <UserLabelSearch
                                 key={friend.id}
                                 id={friend.id}
                                 username={friend.username}
-                                avatar={friend.avatar}
+                                profilePictureURL={friend.avatar}
                                 userStatus={friend.userStatus}
-                                onCLick={() => addFriend()}
+                                onClick={() => addFriend()}
                                 add={validFriend()}
                             />
                         </div>
@@ -195,28 +187,3 @@ export default function AddElement(props: any) {
     )
 }
 
-export function AddChannel() {
-
-    const { socket } = useChatSocket();
-
-    useEffect(() => {
-        /* console.log("channel created")
-        socket.emit('createChannel', {
-            name: "channel2",
-            type: "PUBLIC",
-        }) */
-    }, [])
-
-    return (
-        <div className="flex-center add-channel">
-            <div className="flex-column-center addchannel-button-container">
-                <Link to={"join"} className="button flex-center add-channel-button">
-                    Join a Channel
-                </Link>
-                <Link to={"create"} className="button flex-center add-channel-button">
-                    Create a Channel
-                </Link>
-            </div>
-        </div>
-    )
-}

@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useReducer, useState } from "react";
 import { isEqual } from "../../utils";
-import { useUser } from "../../Hooks";
+import { useCurrentUser } from "../../Hooks";
 import { getFriendList, getUserProfilePictrue } from "../../utils/User";
 
 export const FriendsContext: React.Context<any> = createContext([]);
@@ -73,7 +73,7 @@ function reducer(friends: any, action: any) {
 
 
 export function FriendsProvider({ children }: any) {
-    const { user }: any = useUser();
+    const { user }: any = useCurrentUser();
     const [friends, friendsDispatch]: any = useReducer(reducer, []);
     const [currentFriend, setCurrentFriendLocal] = useState();
 

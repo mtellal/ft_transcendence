@@ -6,10 +6,10 @@ import {
     useChannelsUsers,
     useChatSocket,
     useFriends,
-    useUser
-} from "../../Hooks";
+    useCurrentUser
+} from "../../../../Hooks";
 import './Messenger.css'
-import ProfilePicture from "../../Components/ProfilePicture";
+import ProfilePicture from "../../../../components/ProfilePicture";
 
 function BlockMessage({ username }: any) {
     return (
@@ -161,7 +161,7 @@ export default function Messenger({
     blocked,
 }: any) {
 
-    const { user, image } = useUser();
+    const { user, image } = useCurrentUser();
     const { socket } = useChatSocket();
     const lastMessageRef: any = React.useRef(null);
     const [value, setValue] = React.useState("");

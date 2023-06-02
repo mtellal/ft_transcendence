@@ -2,10 +2,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import FriendElement from "../Components/FriendElement";
+import UserLabel from "../../../components/Users/UserLabel";
 import './MenuElement.css'
-import { useChannels, useChatSocket, useFriends, useUser } from "../Hooks";
-import { createChannel, removeChannel } from "../utils/User";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../Hooks";
+import { createChannel, removeChannel } from "../../../utils/User";
 
 /*
     tittle
@@ -88,7 +88,7 @@ function ChannelElement(props: any) {
 
 export default function MenuElement({ ...props }) {
 
-    const { token } = useUser();
+    const { token } = useCurrentUser();
     const { friends, friendsDispatch, setCurrentFriend } = useFriends();
     const { 
         channels, 
@@ -137,14 +137,13 @@ export default function MenuElement({ ...props }) {
         if (friends && friends.length) {
             setFriendsList(
                 friends.map((user: any) => (
-                    <FriendElement
+                    <UserLabel
                         key={user.id}
                         id={user.id}
                         username={user.username}
                         profilePictureURL={user.url}
-                        avatar={user.avatar}
                         userStatus={user.userStatus}
-                        click={() => selectCurrentChannel(user, "friend")}
+                        onClick={() => selectCurrentChannel(user, "friend")}
                         notifs={user.notifs}
                     />
                 ))

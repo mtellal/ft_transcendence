@@ -7,8 +7,8 @@ import Messenger from "./Messenger";
 import ProfileGroup from "./ProfileChannel";
 
 import './Interface.css'
-import { useChannels, useChannelsUsers, useChatSocket, useFriends, useUser } from "../../Hooks";
-import { blockUserRequest, removeUserFriend, unblockUserRequest } from "../../utils/User";
+import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../../../Hooks";
+import { blockUserRequest, removeUserFriend, unblockUserRequest } from "../../../../utils/User";
 
 function RemoveFriend(props: any) {
     return (
@@ -78,7 +78,7 @@ export default function Interface() {
         token,
         user,
         userDispatch
-    }: any = useUser();
+    }: any = useCurrentUser();
 
     const { removeUser } = useChannelsUsers();
 

@@ -1,6 +1,4 @@
-
-.friend-element
-{
+.friend-element {
     height: 60px;
     padding: 0 2%;
     display: flex;
@@ -12,8 +10,10 @@
     align-items: center;
 }
 
-.infos-div
-{
+
+/*    U S E R    I N F O S      */
+
+.userinfos-container {
     width: 100%;
     height: 50px;
     display: flex;
@@ -21,19 +21,12 @@
     white-space: nowrap;
 }
 
-.friend-image-container
-{
-    border-radius: 50%;
-    min-width: 40px;
+.userinfos-pp-container {
+    width: 40px;
     height: 40px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.friend-image
-{
+.friend-image {
     object-fit: cover;
     width: 100%;
     height: 100%;
@@ -41,8 +34,7 @@
     max-height: 50px;
 }
 
-.firend-icon-status
-{
+.userinfos-icon-status {
     min-width: 10px;
     min-height: 10px;
     border-radius: 50%;
@@ -54,31 +46,34 @@
     border: 2px solid rgb(255, 255, 255);
 }
 
-.friend-infos > p
-{
+.user-infos>p {
     margin: 0;
 }
 
-.friend-infos
-{
+.user-infos {
     padding-bottom: 5px;
     justify-content: space-around;
 }
 
-.friend-username
-{
+.userinfos-username {
     font-size: large;
 }
 
-.friend-status
-{
+.userinfos-status {
     display: flex;
     font-size: small;
     color: grey;
 }
 
-.friendelement-notifs
-{
-    color: rgb(206, 0, 0);
-    font-size: medium;
+
+/*   F R I E N D    S E A R C H   */
+
+.UserLabelSearch-container {
+    box-shadow: 0 1px 3px black;
+    border-radius: 5px;
+    width: 96%;
+    display: flex;
+    padding: 2% 2%;
+    justify-content: space-between;
+    align-items: center
 }

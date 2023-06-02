@@ -1,15 +1,23 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import './InfoInput.css'
 
-export default function InfoInput(props : any) {
-    const inputRef : any = React.useRef();
+type TInfoInput = {
+    id: number | any,
+    label: number | any,
+    value: string,
+    setValue: (s : string) => {},
+    submit?: () => {}
+}
 
-    function onChange(e : any) {
+export default function InfoInput(props: TInfoInput) {
+    const inputRef: any = React.useRef();
+
+    function onChange(e: any) {
         props.setValue(e.target.value);
     }
 
-    function handleKeyDown(e : any) {
+    function handleKeyDown(e: any) {
         if (e.key === 'Enter' && props.value) {
             props.submit()
             inputRef.current.blur();

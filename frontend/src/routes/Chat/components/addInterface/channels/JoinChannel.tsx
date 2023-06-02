@@ -1,32 +1,24 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    getUserByUsername,
-    addUserFriend,
     getUser,
-    sendFriendRequest,
     validFriendRequest,
     refuseFriendRequest,
     getChannelByName,
     getUserProfilePictrue
-} from '../../utils/User'
+} from '../../../../../utils/User'
 
-import FriendElement, { FriendSearch } from "../../Components/FriendElement";
+import { UserLabelSearch } from "../../../../../components/Users/UserLabel";
 
-import IconInput from "../../Components/IconInput";
-import { useOutletContext, Link, useNavigate } from "react-router-dom";
-import { CollectionElement } from "../MenuElement";
+import IconInput from "../../../../../components/Input/IconInput";
+import { useOutletContext } from "react-router-dom";
+import { CollectionElement } from "../../MenuElement";
 
-import './AddElement.css'
-import { useChannels, useChatSocket, useFriends, useUser } from "../../Hooks";
-import { match } from "assert";
-import ProfilePicture from "../../Components/ProfilePicture";
-import Icon from "../../Components/Icon";
-import InfoInput from "../../Components/InfoInput";
-import { createChannel } from "../../utils/User";
-import UsersCollection from "../../Components/UsersCollection";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../../Hooks";
+import ProfilePicture from "../../../../../components/ProfilePicture";
+import Icon from "../../../../../components/Icon";
 
-import defaultUserPP from '../../assets/user.png'
+import defaultUserPP from '../../../../../assets/user.png'
 
 import './JoinChannel.css'
 
@@ -61,7 +53,7 @@ function ChannelSearch(props: any) {
                 {members}
             </div>
             {
-                props.isJoin && 
+                props.isJoin &&
                 <div style={{ marginLeft: 'auto' }}>
                     <Icon icon="login" description="Join" onClick={props.join} />
                 </div>
@@ -83,18 +75,18 @@ export default function JoinChannel() {
 
     const [userInvitations, setUserInvitations]: [any, any] = React.useState([]);
     const [invitations, setInvitations]: [any, any] = React.useState([]);
-    const { 
-        channels, 
-        channelsDispatch, 
+    const {
+        channels,
+        channelsDispatch,
         channelAlreadyExists,
         addChannel
-     } = useChannels();
+    } = useChannels();
 
     const {
         token,
         user,
         setUser
-    }: any = useUser();
+    }: any = useCurrentUser();
 
     const { friends, friendsDispatch }: any = useFriends();
 
@@ -193,11 +185,11 @@ export default function JoinChannel() {
     React.useEffect(() => {
         if (userInvitations && userInvitations.length) {
             setInvitations(userInvitations.map((u: any) =>
-                <FriendSearch
+                <UserLabelSearch
                     key={u.id}
                     id={u.id}
                     username={u.username}
-                    avatar={u.avatar}
+                    profilePictureURL={u.avatar}
                     userStatus={u.userStatus}
                     invitation={true}
                     accept={() => acceptFriendRequest(u)}
@@ -233,9 +225,11 @@ export default function JoinChannel() {
             <h2 className="add-title">Join a Channel</h2>
             <div className="flex-column-center">
                 <IconInput
+                    id="search"
                     icon="search"
                     placeholder="Channel"
-                    getValue={(v: string) => setValue(v.trim())}
+                    value={value}
+                    setValue={setValue}
                     submit={() => value && searchChannel()}
                 />
                 <button

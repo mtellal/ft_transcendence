@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import MenuElement from "../Chat/MenuElement";
+import MenuElement from "./components/MenuElement";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
     createChannel,
@@ -9,16 +9,16 @@ import {
     getUser,
     getUserInvitations,
     getUserProfilePictrue,
-} from "../utils/User";
+} from "../../utils/User";
 
-import { useChannels, useChannelsUsers, useChatSocket, useFriends, useUser } from "../Hooks";
+import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../Hooks";
 
-import { FriendsProvider } from "../contexts/Chat/FriendsContext";
-import { SocketProvider } from "../contexts/Chat/ChatSocketContext";
+import { FriendsProvider } from "../../contexts/Chat/FriendsContext";
+import { SocketProvider } from "../../contexts/Chat/ChatSocketContext";
 
 import './Chat.css'
-import { ChannelsProvider } from "../contexts/Chat/ChannelsContext";
-import ChannelsUsersProvider from "../contexts/Chat/ChannelsUsersContext";
+import { ChannelsProvider } from "../../contexts/Chat/ChannelsContext";
+import ChannelsUsersProvider from "../../contexts/Chat/ChannelsUsersContext";
 
 function ChatInterface() {
 
@@ -29,7 +29,7 @@ function ChatInterface() {
     const {
         user,
         token
-    }: any = useUser();
+    }: any = useCurrentUser();
 
     const { socket }: any = useChatSocket();
 

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Navigate, Route }from 'react-router-dom'
 import './index.css';
-import App, { loader as appLoader, loader } from './routes/App';
+import App, { loader as appLoader, loader } from './routes/App/App';
 
 
 import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
@@ -13,9 +13,9 @@ import LaunchGame from './routes/Game';
 import History from './routes/History';
 
 
-import AddElement, { AddChannel } from "./Chat/Interface/AddElement";
-import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
-import { CreateChannel } from './Chat/Interface/CreateChannel';
+import AddElement from "./routes/Chat/components/addInterface/AddElement";
+import Interface, { loader as interfaceLoader} from './routes/Chat/components/interface/Interface';
+import { CreateChannel } from './routes/Chat/components/addInterface/channels/CreateChannel';
 
 
 import {
@@ -23,8 +23,9 @@ import {
     RouterProvider,
 } from 'react-router-dom';
 
-import Chat from './routes/Chat';
-import JoinChannel from './Chat/Interface/JoinChannel';
+import Chat from './routes/Chat/Chat';
+import JoinChannel from './routes/Chat/components/addInterface/channels/JoinChannel';
+import AddChannel from './routes/Chat/components/addInterface/channels/AddChannel';
 
 
 const router = createBrowserRouter([
