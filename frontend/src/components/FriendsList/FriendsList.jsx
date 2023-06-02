@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { BackApi } from "../../api/back";
-import s from './style.module.css'
 import { useSelector } from "react-redux";
+import s from './style.module.css'
 
 export function FriendsList( { friend, delFriend, setIdFriendSelected } ) {
 
     const [ProfilePicture, setProfilePicture] = useState();
     const [showActionFriend, setShowActionFriend] = useState(false);
-    const selector = useSelector(store => store.USER.user);
+    const selector = useSelector(store => store.user.user);
 
     async function getAvatar() {
         let rep = await BackApi.getProfilePictureById(friend.id);

@@ -6,7 +6,7 @@ import s from './style.module.css'
 export function Header() {
 
 	const navigate = useNavigate();
-    const selector = useSelector(store => store.USER.user);
+    const selector = useSelector(store => store.user.user);
 
 	return (
 		<div className={s.container}>

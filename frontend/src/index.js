@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Signup } from './routes/Signup/Signup.jsx';
+import { Signup } from './routes/Signup/Signup';
 import { Signin } from './routes/Signin/Signin.jsx';
-import { Profile } from './routes/Profile/Profile.jsx';
+import { Profile } from './routes/Profile/Profile';
 import { Provider } from 'react-redux';
-import { store } from './store/index.js';
-import { Chat } from './routes/Chat/Chat.jsx';
+import store from './store/index.js';
+import { Chat } from './routes/Chat/Chat';
 import './global.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

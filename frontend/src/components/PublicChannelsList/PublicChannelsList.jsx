@@ -1,3 +1,4 @@
+import React from 'react';
 import s from './style.module.css'
 
 export function PublicChannelsList({ channel, socket }) {

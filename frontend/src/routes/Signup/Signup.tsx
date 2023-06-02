@@ -1,3 +1,4 @@
+import React, { FormEvent } from 'react';
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
 import avatar_default from "../../assets/alpaga.jpg"
@@ -5,29 +6,29 @@ import { BackApi } from "../../api/back";
 import { createCookie, parseJwt } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import s from "./style.module.css"
 import { setAvatar } from "../../store/user/user-slice";
+import s from "./style.module.css"
 
 export function Signup() {
 
 	const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    async function setDefualtProfilePicture(token, id) {
+    async function setDefualtProfilePicture(token: string, id: number) {
         const img = await fetch(avatar_default);
         const blob = await img.blob();
 		// console.log('img', img);
 		// console.log('blob', blob);
         // await BackApi.updateProfilePicture(img, token, 'file');
-        await BackApi.updateProfilePicture(blob, token, true);
+        await BackApi.updateProfilePicture(blob, token);
         let rep = await BackApi.getProfilePictureById(id);
         dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
     }
 
-	async function submitData(e) {
+	async function submitData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const username = e.target.username.value;
-		const password = e.target.password.value;
+		const username = e.currentTarget.username.value;
+		const password = e.currentTarget.password.value;
 		const response = await BackApi.authSignupUser(username, password);
         const id = parseJwt(response.data.access_token).id;
 		if (response.status === 201) {

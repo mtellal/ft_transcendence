@@ -7,7 +7,7 @@ import s from './style.module.css'
 
 export function Group({ myChannels, setIdFriendSelected }) {
 
-	const selector = useSelector(store => store.USER.user);
+	const selector = useSelector(store => store.user.user);
 	const [socket, setSocket] = useState();
 
 	// async function handleSubmit(e) {

@@ -8,8 +8,8 @@ import { FriendRequest } from '../../components/FriendRequest/FriendRequest';
 import { Group } from '../../components/Group/Group';
 import { ChatboxChannel } from '../../components/ChatboxChannel/ChatboxChannel';
 import { CreateGroup } from '../../components/CreateGroup/CreateGroup';
-import s from './style.module.css'
 import { JoinChannel } from '../../components/JoinChannel/JoinChannel';
+import s from './style.module.css'
 
 export function Chat() {
 
@@ -18,7 +18,7 @@ export function Chat() {
 	const [friendRequest, setFriendRequest] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
 	const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_GROUP');
-	const selector = useSelector(store => store.USER.user);
+	const selector = useSelector(store => store.user.user);
 
 	async function getFriends() {
 		const response = await BackApi.getFriendsById(selector.id);
@@ -118,7 +118,7 @@ export function Chat() {
 					>
 						Join channel
 					</button>
-					<AddFriend id={selector.id} addFriend={addFriend} />
+					<AddFriend addFriend={addFriend} />
 				</div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />}
 				{btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}

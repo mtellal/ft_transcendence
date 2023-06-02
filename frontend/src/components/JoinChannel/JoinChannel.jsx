@@ -9,7 +9,7 @@ import { ProtectedChannels } from '../ProtectedChannels/ProtectedChannels';
 
 export function JoinChannel({ myChannels }) {
 
-	const selector = useSelector(store => store.USER.user);
+	const selector = useSelector(store => store.user.user);
 	const [socket, setSocket] = useState();
 	const [channels, setChannels] = useState();
 

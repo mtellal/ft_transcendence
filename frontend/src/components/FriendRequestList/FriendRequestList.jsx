@@ -11,7 +11,7 @@ export function FriendRequestList({ friendId, requestId, listFriendRequest, setF
 	const [avatar, setAvatar] = useState();
 	const [isLoading, setIsLoading] = useState(true);
 	const [onAvatar, setOnAvatar] = useState(false);
-	const selector = useSelector(store => store.USER.user);
+	const selector = useSelector(store => store.user.user);
 
 	function showActionsFriendRequest() {
 		setOnAvatar(!onAvatar)

@@ -10,7 +10,7 @@ import "./global.css"
 export function App() {
 
     const dispatch = useDispatch();
-    const selector = useSelector(store => store.USER.user);
+    const selector = useSelector(store => store.user.user);
     const navigate = useNavigate();
 
     async function saveInfosUser(token) {

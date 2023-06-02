@@ -10,7 +10,7 @@ export function Chatbox({ idFriendSelected }) {
 	// console.log('id select friend', idFriendSelected);
 
 
-    const selector = useSelector(store => store.USER.user);
+    const selector = useSelector(store => store.user.user);
 	const [socket, setSocket] = useState();
     const [messages, setMessages] = useState([]);
     const [idChannel, setIdChannel] = useState();
