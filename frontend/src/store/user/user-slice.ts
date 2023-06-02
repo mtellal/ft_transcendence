@@ -46,7 +46,7 @@ interface UserState {
 
 const initialState: UserState = {
 	user: {
-		id: -1,
+		id: 0,
 		username: "",
 		status: "",
 		avatar: "",
