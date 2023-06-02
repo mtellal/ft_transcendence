@@ -2,10 +2,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import UserLabel from "../../../components/users/UserLabel";
+import UserLabel from "../../../../components/users/UserLabel";
 import './MenuElement.css'
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../Hooks";
-import { createChannel, removeChannel } from "../../../utils/User";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
+import { createChannel, removeChannel } from "../../../../requests/chat";
 
 /*
     tittle

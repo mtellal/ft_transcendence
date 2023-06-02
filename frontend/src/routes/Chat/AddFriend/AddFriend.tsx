@@ -1,20 +1,23 @@
 
 import React, { useState } from "react";
 import {
-    getUserByUsername,
-    getUser,
     sendFriendRequest,
     validFriendRequest,
     refuseFriendRequest,
-} from '../../../utils/User'
+} from '../../../requests/friendsRequest'
+
+import {
+    getUser,
+    getUserByUsername,
+} from '../../../requests/user'
 
 import { UserLabelSearch } from "../../../components/users/UserLabel";
 
 import IconInput from "../../../components/Input/IconInput";
 import { useOutletContext } from "react-router-dom";
-import { CollectionElement } from "../components/MenuElement";
+import { CollectionElement } from "../components/Menu/MenuElement";
 
-import { useFriends, useCurrentUser } from "../../../Hooks";
+import { useFriends, useCurrentUser } from "../../../hooks/Hooks";
 
 import './AddFriend.css'
 

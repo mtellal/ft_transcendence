@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useCurrentUser } from "../../Hooks";
+import { useCurrentUser } from "../../hooks/Hooks";
 import { io } from "socket.io-client";
 
 export const ChatSocketContext: React.Context<any> = createContext(null);

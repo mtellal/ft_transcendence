@@ -1,64 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
-import Banner from "../Banner/Banner";
-import Profile from "./Profile";
-import Messenger from "./Messenger";
-import ProfileGroup from "./ProfileChannel";
+import Banner from "../components/Banner/Banner";
+import Profile from "../components/Profile/Profile";
+import Messenger from "../components/Messenger/Messenger";
 
+import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
+import RemoveView from "../components/RemoveElement.tsx/RemoveView";
+import { removeUserFriend } from '../../../requests/friends'
 import './Interface.css'
-import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../../../Hooks";
-import { blockUserRequest, removeUserFriend, unblockUserRequest } from "../../../../utils/User";
-
-function RemoveFriend(props: any) {
-    return (
-        <div className="absolute flex-column-center remove-friend">
-            <div className="flex-column-center remove-friend-div">
-                <p>Are you sure to remove <span className="remove-friend-username">{props.user}</span> ?</p>
-                <div className="remove-friend-buttons">
-                    <button
-                        className="button red white-color remove-friend-button"
-                        onClick={props.remove}
-                    >
-                        Remove
-                    </button>
-                    <button
-                        className="button white remove-friend-button"
-                        onClick={props.cancel}
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-
-function RemoveView(props: any) {
-    return (
-        <>
-            {
-                props.currentChannel && props.currentChannel.type !== "WHISPER" &&
-                <RemoveFriend
-                    user={props.currentChannel && props.currentChannel.name}
-                    cancel={props.cancel}
-                    remove={props.leaveChannel}
-                />
-            }
-            {
-                props.currentFriend &&  props.currentChannel && props.currentChannel.type === "WHISPER" && 
-                <RemoveFriend
-                    user={props.currentFriend && props.currentFriend.username}
-                    cancel={props.cancel}
-                    remove={props.removeFriend}
-                />
-            }
-        </>
-    )
-}
-
-
+ 
 export function loader({ params }: any) {
     return ({})
 }
@@ -166,7 +118,7 @@ export default function Interface() {
                                 currentFriend={currentFriend}
                                 cancel={() => setRemoveView(prev => !prev)}
                                 leaveChannel={() => leaveChannel(currentChannel)}
-                                remove={() => removeFriend(currentFriend)}
+                                removeFriend={() => removeFriend(currentFriend)}
                             />
                         }
                     </div>

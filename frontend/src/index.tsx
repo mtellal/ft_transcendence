@@ -14,7 +14,7 @@ import History from './routes/History/History';
 
 
 import AddFriend from "./routes/Chat/AddFriend/AddFriend";
-import Interface, { loader as interfaceLoader} from './routes/Chat/components/interface/Interface';
+import Interface, { loader as interfaceLoader} from './routes/Chat/Interface/Interface';
 import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
 
@@ -23,7 +23,7 @@ import {
     RouterProvider,
 } from 'react-router-dom';
 
-import Chat from './routes/Chat/Chat';
+import Chat from './routes/Chat/Chat/Chat';
 import JoinChannel from './routes/Chat/AddChannel/JoinChannel';
 import AddChannel from './routes/Chat/AddChannel/AddChannel';
 

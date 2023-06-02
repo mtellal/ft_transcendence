@@ -1,11 +1,11 @@
 import React from "react";
 import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
-import { setCookie } from "../../utils/Cookie";
+import { setCookie } from "../../Cookie";
 
 import userImg from '../../assets/icon-login.png'
 
 import './Sign.css'
-import { getTokenRequest } from "../../utils/User";
+import { getTokenRequest } from "../../requests/auth";
 
 
 export function ChooseLogin() {
@@ -45,9 +45,11 @@ export async function loader({ params, request }: any) {
         let oauth_code = decodeURI(url[1]);
         if (oauth_code) {
             await getTokenRequest(oauth_code, "wfw")
-                .then(res => {
-                    setCookie("access_token", res.data.access_token);
-                    validLogin = true;
+                .then(({ error, res }: any) => {
+                    if (!error) {
+                        setCookie("access_token", res.data.access_token);
+                        validLogin = true;
+                    }
                 })
         }
     }

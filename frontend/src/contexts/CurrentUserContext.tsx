@@ -1,24 +1,6 @@
 import React, { useReducer, createContext, useState, useCallback } from "react";
-import { getBlockedList, getFriendList, getUser } from "../utils/User";
-import { updateUser } from "../utils/User";
-
-async function login(user: any) {
-    return (
-        updateUser(
-            { userStatus: "ONLINE" },
-            user.id
-        )
-    )
-}
-
-async function logout(user: any) {
-    return (
-        updateUser(
-            { userStatus: "OFFLINE" },
-            user.id
-        )
-    )
-}
+import { getBlockedList } from "../requests/block";
+import { login, logout, updateUser } from "../requests/user";
 
 function reducer(user: any, action: any) {
     switch (action.type) {

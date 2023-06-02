@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom'
 
 import Icon from '../Icon';
-import { getUserProfilePictrue } from '../../utils/User'
+import { getUserProfilePictrue } from '../../requests/user'
 import { TUserInfos, UserInfos } from './UserInfos';
 
 import './UserLabel.css'

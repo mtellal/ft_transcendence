@@ -2,9 +2,9 @@ import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useChannels, useCurrentUser } from "../../../Hooks";
+import { useChannels, useCurrentUser } from "../../../hooks/Hooks";
 import InfoInput from "../../../components/Input/InfoInput";
-import { createChannel } from "../../../utils/User";
+import { createChannel } from "../../../requests/chat";
 import UsersCollection from "../../../components/collections/UsersCollection";
 import PickMenu from "../../../components/PickMenu";
 

@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { CurrentUserContext } from "./contexts/CurrentUserContext";
-import { FriendsContext } from "./contexts/Chat/FriendsContext";
-import { ChatSocketContext } from "./contexts/Chat/ChatSocketContext";
-import { ChannelsContext } from "./contexts/Chat/ChannelsContext";
-import { ChannelsUsersContext } from "./contexts/Chat/ChannelsUsersContext";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { FriendsContext } from "../contexts/Chat/FriendsContext";
+import { ChatSocketContext } from "../contexts/Chat/ChatSocketContext";
+import { ChannelsContext } from "../contexts/Chat/ChannelsContext";
+import { ChannelsUsersContext } from "../contexts/Chat/ChannelsUsersContext";
 
 export function useCurrentUser()
 {

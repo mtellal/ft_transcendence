@@ -7,7 +7,7 @@ import {
     useChatSocket,
     useFriends,
     useCurrentUser
-} from "../../../../Hooks";
+} from "../../../../hooks/Hooks";
 import './Messenger.css'
 import ProfilePicture from "../../../../components/users/ProfilePicture";
 
