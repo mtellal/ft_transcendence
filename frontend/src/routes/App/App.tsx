@@ -5,14 +5,17 @@ import { Outlet, redirect, useLoaderData, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/SideBar';
-import { extractCookie } from '../../utils/Cookie';
+import { extractCookie } from '../../Cookie';
+import {
+  blockUserRequest,
+  unblockUserRequest
+} from '../../requests/block';
+
 import {
   getUser,
   getUserProfilePictrue,
   updateUser,
-  blockUserRequest,
-  unblockUserRequest
-} from '../../utils/User';
+} from '../../requests/user'
 
 import './App.css';
 import { CurrentUserProvider } from '../../contexts/CurrentUserContext';

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Icon from "../../../../components/Icon";
 import { UserInfos } from "../../../../components/users/UserInfos";
 import ChannelInfos from "../../../../components/channels/ChannelInfos";
-import { useChannels, useFriends, useCurrentUser } from "../../../../Hooks";
+import { useChannels, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
 
 import './Banner.css'
 

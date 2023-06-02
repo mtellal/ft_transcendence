@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { getChannels, getUser, getUserProfilePictrue, removeChannel } from "../../utils/User";
-import { useChatSocket, useFriends, useCurrentUser } from "../../Hooks";
+import { getChannels, removeChannel } from "../../requests/chat";
+import { useChatSocket, useFriends, useCurrentUser } from "../../hooks/Hooks";
+import {
+    getUser, getUserProfilePictrue
+} from '../../requests/user'
 
 export const ChannelsContext: React.Context<any> = createContext([]);
-
 
 /*
 id              Int             @id @default(autoincrement())

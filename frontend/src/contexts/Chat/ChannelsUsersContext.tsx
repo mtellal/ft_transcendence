@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { useChannels, useCurrentUser } from "../../Hooks";
-import { getUser, getUserProfilePictrue } from "../../utils/User";
+import { useChannels, useCurrentUser } from "../../hooks/Hooks";
+import { getUser, getUserProfilePictrue } from "../../requests/user";
 
 
 export const ChannelsUsersContext: React.Context<any> = createContext([]);

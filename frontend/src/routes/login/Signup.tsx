@@ -2,10 +2,10 @@ import React from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 import IconInput from "../../components/Input/IconInput";
-import { signupRequest } from "../../utils/User";
-import { setCookie } from "../../utils/Cookie";
+import { setCookie } from "../../Cookie";
 
 import './Sign.css'
+import { signupRequest } from "../../requests/auth";
 
 
 export default function SignUp() {
@@ -20,15 +20,15 @@ export default function SignUp() {
         if (!username || !password || !confirmPassword)
             return (setError("userame or password empty"));
         if (password !== confirmPassword)
-            return (setError("password !== confirm password"))
+            return (setError("password and confirm password are different"))
         await signupRequest(username, password)
-            .then(res => {
-                if (res && res.status === 201 && res.statusText === "Created") {
+            .then(({ error, errMessage, res }: any) => {
+                if (error)
+                    setError(errMessage)
+                else {
                     setCookie("access_token", res.data.access_token);
                     navigate("/");
                 }
-                else
-                    setError(`${res.response.status} ${res.response.statusText}`);
             })
 
     }

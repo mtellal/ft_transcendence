@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 
 
 import { Link } from 'react-router-dom';
-import { useCurrentUser } from '../../../Hooks';
+import { useCurrentUser } from '../../../hooks/Hooks';
 import ProfilePicture from '../../../components/users/ProfilePicture';
 
 import './Header.css'

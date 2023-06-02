@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from "react";
 
-import MenuElement from "./components/MenuElement";
+import MenuElement from "../components/Menu/MenuElement";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
-    createChannel,
-    getChannels,
-    getFriendChannel,
-    getUser,
     getUserInvitations,
-    getUserProfilePictrue,
-} from "../../utils/User";
+} from "../../../requests/friendsRequest";
 
-import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../Hooks";
+import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 
-import { FriendsProvider } from "../../contexts/Chat/FriendsContext";
-import { SocketProvider } from "../../contexts/Chat/ChatSocketContext";
+import { FriendsProvider } from "../../../contexts/Chat/FriendsContext";
+import { SocketProvider } from "../../../contexts/Chat/ChatSocketContext";
 
-import { ChannelsProvider } from "../../contexts/Chat/ChannelsContext";
-import ChannelsUsersProvider from "../../contexts/Chat/ChannelsUsersContext";
+import { ChannelsProvider } from "../../../contexts/Chat/ChannelsContext";
+import ChannelsUsersProvider from "../../../contexts/Chat/ChannelsUsersContext";
 import './Chat.css'
 
 function ChatInterface() {

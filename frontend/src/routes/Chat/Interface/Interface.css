@@ -1,0 +1,14 @@
+.interface-container
+{
+    width: 70%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.interface-friend
+{
+    background-color: antiquewhite;
+    height: 100%;
+    overflow: scroll;
+}

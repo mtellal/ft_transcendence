@@ -1,7 +1,8 @@
 import React, { createContext, useEffect, useReducer, useState } from "react";
 import { isEqual } from "../../utils";
-import { useCurrentUser } from "../../Hooks";
-import { getFriendList, getUserProfilePictrue } from "../../utils/User";
+import { useCurrentUser } from "../../hooks/Hooks";
+import { getFriendList } from "../../requests/friends";
+import { getUserProfilePictrue } from '../../requests/user'
 
 export const FriendsContext: React.Context<any> = createContext([]);
 

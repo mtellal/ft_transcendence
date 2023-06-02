@@ -1,20 +1,25 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    getUser,
     validFriendRequest,
     refuseFriendRequest,
-    getChannelByName,
-    getUserProfilePictrue
-} from '../../../utils/User'
+} from '../../../requests/friendsRequest'
+
+import { getChannelByName } from '../../../requests/chat'
+
+import {
+    getUser,
+    getUserProfilePictrue,
+
+} from '../../../requests/user'
 
 import { UserLabelSearch } from "../../../components/users/UserLabel";
 
 import IconInput from "../../../components/Input/IconInput";
 import { useOutletContext } from "react-router-dom";
-import { CollectionElement } from "../components/MenuElement";
+import { CollectionElement } from "../components/Menu/MenuElement";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../Hooks";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 import ProfilePicture from "../../../components/users/ProfilePicture";
 import Icon from "../../../components/Icon";
 
