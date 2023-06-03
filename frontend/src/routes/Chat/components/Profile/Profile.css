@@ -2,3 +2,47 @@
 {
     padding: 2% 2%;
 }
+
+
+/*              REMOVE FRIEND VIEW  */
+
+.confirmview-container
+{
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.384);
+    height: 100%;
+    width: 100%;
+    top: 0;
+}
+
+.remove-friend-div
+{
+    padding: 0 2%;
+    background-color: white;
+    min-height: 20%;
+    min-width: 40%;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px black;
+}
+
+.remove-friend-username
+{
+    font-size: medium;
+    font-weight: 500;
+}
+
+.remove-friend-buttons
+{
+    padding: 5% 5%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-friend-button
+{
+    margin: 0 1vw;
+    font-weight: 600;
+}
