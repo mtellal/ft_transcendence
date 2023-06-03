@@ -178,4 +178,17 @@ export class BackApi {
             .catch(error => error);
         return response;
     }
+    static async getChannelById(id) {
+        const response = await axios.get(`${BASE_URL}/chat/${id}`, {
+            params: {
+                id: id,
+            },
+            headers: {
+                'accept': '*/*'
+            }
+        })
+            .then(rep => rep)
+            .catch(error => error);
+        return response;
+    }
 }

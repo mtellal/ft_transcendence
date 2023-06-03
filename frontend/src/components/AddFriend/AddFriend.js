@@ -6,9 +6,11 @@ export function AddFriend({ addFriend }) {
     const selector = useSelector((store) => store.user.user);
     async function handleSubmit(e) {
         e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const friendUsername = formData.get('friend');
         const users = (await BackApi.getAllUsers()).data;
         for (let user of users) {
-            if (user.username === e.currentTarget.friend.value) {
+            if (user.username === friendUsername) {
                 const response = await BackApi.sendFriendRequest(user.id, selector.token);
                 addFriend();
                 if (response.status === 201) {

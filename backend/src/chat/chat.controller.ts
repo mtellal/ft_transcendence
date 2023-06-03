@@ -1,8 +1,8 @@
-import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, Patch, Body, UseGuards, Req, ForbiddenException, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, Patch, Body, UseGuards, Req, ForbiddenException, UsePipes, ValidationPipe, Query, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { JwtGuard } from 'src/auth/guard';
-import { UpdateChannelDto } from './dto/channel.dto';
+import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
 import { User } from '@prisma/client';
 
 @Controller('chat')
@@ -11,8 +11,20 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Returns all channels'})
-  async getChannels() {
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    type: String
+  })
+  @ApiOperation({ summary: 'Returns all channels or an array of channel with the corresponding name'})
+  async getChannels(@Query('name') name: string) {
+    if (name) {
+      const channels = await this.chatService.findbyName(name);
+      if (channels.length === 0) {
+        throw new NotFoundException(`No channel with the name ${name} exists`)
+      }
+      return (channels);
+    }
     return this.chatService.findAll();
   }
 
@@ -39,6 +51,17 @@ export class ChatController {
     return this.chatService.getMessage(id);
   }
 
+  @Put()
+  @UseGuards(JwtGuard)
+  @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
+  @ApiOperation({summary: 'Creates a channel and returns it'})
+  async create(@Body() createChannelDto: CreateChannelDto, @Req() req) {
+    const user: User = req.user
+    const channel = await this.chatService.createChannel(createChannelDto, user);
+    return channel;
+  }
+
   @Patch(':id')
   @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe())
@@ -51,7 +74,7 @@ export class ChatController {
       throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
     if (channel.ownerId !== user.id)
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
-    await this.chatService.updateChannel(dto, channel);
+    return await this.chatService.updateChannel(dto, channel);
   }
 
   @Delete(':id')

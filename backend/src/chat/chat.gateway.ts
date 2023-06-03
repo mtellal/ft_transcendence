@@ -106,6 +106,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           socket.join(newChannel.id.toString());
         }
       }
+      this.server.to(this.getSocketId(user.id)).emit('createChannel', newChannel);
+      this.server.to(newChannel.id.toString()).emit('newChannel', newChannel);
     }
     catch (error) {
       throw new WsException(error);
@@ -594,7 +596,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
-
+    console.log(this.server.engine.clientsCount);
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)

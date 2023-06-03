@@ -19,6 +19,18 @@ export function App() {
         const resp = await BackApi.getProfilePictureById(id);
         dispatch(setAvatar(URL.createObjectURL(new Blob([resp.data]))));
     }
+    // async function getAllMessages() {
+    // 	const rep = await BackApi.getChannelsByUserId(selector.id);
+    // 	if (rep.status === 200) {
+    // 		const channels = rep.data;
+    // 		for (let channel of channels) {
+    // 			const chan = await BackApi.getChannelById(channel.id);
+    // 			console.log('chan', chan.data);
+    // 		}
+    // 	} else {
+    // 		console.log('API err');
+    // 	}
+    // }
     useEffect(() => {
         const token = getCookieByName('access_token');
         if (!token) {
@@ -28,6 +40,9 @@ export function App() {
         if (!selector.id && token) {
             saveInfosUser(token);
         }
+        // if (selector.id) {
+        // 	getAllMessages();
+        // }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id]);
     return (React.createElement("div", null,

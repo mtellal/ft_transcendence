@@ -53,7 +53,6 @@ export function Chat() {
 	async function getFriendRequest() {
 		const response = await BackApi.getFriendRequest(selector.id);
 		if (response.data !== friendRequest) {
-			console.log('refresh');
 			setFriendRequest(response.data);
 		}
 	}
