@@ -9,10 +9,11 @@ import './UserInfos.css'
 export type TUserInfos = {
     username: string,
     profilePictureURL: string,
-    userStatus: string
+    userStatus: string,
+    onClick?: () => {} | any
 }
 
-export function UserInfos({ username, profilePictureURL, userStatus }: TUserInfos) {
+export function UserInfos({ username, profilePictureURL, userStatus, onClick }: TUserInfos) {
 
     function selectStatusDiv() {
         if (userStatus === "ONLINE")
@@ -33,7 +34,7 @@ export function UserInfos({ username, profilePictureURL, userStatus }: TUserInfo
     }
 
     return (
-        <div className="userinfos-container" >
+        <div className="userinfos-container" onClick={onClick} >
             <div className='userinfos-pp-container'>
                 <ProfilePicture
                     image={profilePictureURL || imgUser}

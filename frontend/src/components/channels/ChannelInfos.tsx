@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { useChannels, useChannelsUsers, useFriends, useCurrentUser } from "../../hooks/Hooks";
+import { useChannels, useCurrentUser } from "../../hooks/Hooks";
 import { getUserProfilePictrue } from "../../requests/user";
 import ProfilePicture from "../../components/users/ProfilePicture";
 
@@ -13,14 +13,12 @@ type TChannelInfos = {
 export default function ChannelInfos(props: TChannelInfos) {
 
     const { user, image } = useCurrentUser();
-    const { channelsUsers, getMembers } = useChannelsUsers();
-    const { currentChannel } = useChannels();
+    const { currentChannel, getMembers } = useChannels();
 
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 
     const loadMembers = useCallback(async () => {
         let members = getMembers(currentChannel.id);
-        console.log(members, currentChannel)
         if (members && members.length) {
             members = members.map((u: any) => u.id);
             members = await Promise.all(members.map(async (id: number) =>
@@ -35,16 +33,14 @@ export default function ChannelInfos(props: TChannelInfos) {
                 )
             );
         }
-    }, [currentChannel, channelsUsers])
+    }, [currentChannel])
 
     useEffect(() => {
         setRenderMembersPP([])
         if (currentChannel) {
             loadMembers();
         }
-    }, [currentChannel, channelsUsers])
-
-    console.log(currentChannel)
+    }, [currentChannel])
 
     return (
         <div className="flex-center">

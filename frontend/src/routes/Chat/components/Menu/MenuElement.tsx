@@ -92,10 +92,8 @@ export default function MenuElement({ ...props }) {
     const { friends, friendsDispatch, setCurrentFriend } = useFriends();
     const { 
         channels, 
-        channelsDispatch, 
-        joinChannel, 
         setCurrentChannel,
-        addChannel 
+        addChannel, 
     } = useChannels();
 
     const [friendsList, setFriendsList] = React.useState([]);
@@ -134,27 +132,9 @@ export default function MenuElement({ ...props }) {
     }, [channels, friends])
 
     React.useEffect(() => {
-        if (friends && friends.length) {
-            setFriendsList(
-                friends.map((user: any) => (
-                    <UserLabel
-                        key={user.id}
-                        id={user.id}
-                        username={user.username}
-                        profilePictureURL={user.url}
-                        userStatus={user.userStatus}
-                        onClick={() => selectCurrentChannel(user, "friend")}
-                        notifs={user.notifs}
-                    />
-                ))
-            )
-        }
-        else
-            setFriendsList([]);
-    }, [friends])
+        setChannelsList([]);
+        setFriendsList([]);
 
-
-    useEffect(() => {
         if (channels && channels.length) {
             setChannelsList(
                 channels.map((channel: any) =>
@@ -170,9 +150,24 @@ export default function MenuElement({ ...props }) {
                     ))
             )
         }
-        else
-            setChannelsList([]);
-    }, [channels])
+
+        if (friends && friends.length) {
+            setFriendsList(
+                friends.map((user: any) => (
+                    <UserLabel
+                        key={user.id}
+                        id={user.id}
+                        username={user.username}
+                        profilePictureURL={user.url}
+                        userStatus={user.userStatus}
+                        onClick={() => selectCurrentChannel(user, "friend")}
+                        notifs={user.notifs}
+                    />
+                ))
+            )
+        }
+
+    }, [friends, channels])
 
     return (
         <div className="menu-container">

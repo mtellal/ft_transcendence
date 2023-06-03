@@ -67,15 +67,15 @@ function formatChannel(channel: Channel) {
     return (
         {
             ...channel,
-            messages: channel.messages ? channel.messages : [],
-            users: channel.users ? channel.users : []
+            messages: channel.messages && channel.messages.length ? channel.messages : [],
+            users: channel.users && channel.users.length ? channel.users : []
         }
     )
 }
 
 function reducer(channels: any, action: any) {
     switch (action.type) {
-        case ('setChannels'): {
+        case ('initChannels'): {
             if (action.channels.length) {
                 return (action.channels.map((c: any) => formatChannel(c)))
             }
@@ -121,7 +121,7 @@ function reducer(channels: any, action: any) {
         }
         case ('addMessage'): {
             const message = action.message;
-            if (channels.length) {
+            if (channels.length && message) {
                 return (
                     channels.map((c: any, i: number) => {
                         if (c.id === message.channelId)
@@ -136,7 +136,7 @@ function reducer(channels: any, action: any) {
 }
 
 export function ChannelsProvider({ children }: any) {
-    const { user, image } = useCurrentUser();
+    const { user } = useCurrentUser();
     const { socket } = useChatSocket();
     const [channels, channelsDispatch] = useReducer(reducer, []);
     const [currentChannel, setCurrentChannelLocal]: any = useState();
@@ -170,13 +170,8 @@ export function ChannelsProvider({ children }: any) {
         if (usersId && usersId.length) {
             const users = await Promise.all(
                 usersId.map(async (id: number) => {
-                    let isFriend;
                     if (id === user.id)
-                        return ({ ...user, url: image, })
-                    if (friends && friends.length)
-                        isFriend = friends.find((u: User) => u.id === id)
-                    if (isFriend)
-                        return (isFriend)
+                        return (user)
                     else
                         return (await fetchUser(id))
 
@@ -184,7 +179,7 @@ export function ChannelsProvider({ children }: any) {
             )
             return (users)
         }
-    }, [user, friends])
+    }, [user])
 
     const loadChannels = useCallback(async () => {
         let channelList = await getChannels(user.id)
@@ -202,18 +197,35 @@ export function ChannelsProvider({ children }: any) {
             }
         }))
         // console.log("channelList => ", channelList)
-        channelsDispatch({ type: 'setChannels', channels: channelList });
+        channelsDispatch({ type: 'initChannels', channels: channelList });
         channelList.forEach(joinChannel);
         // channelList.map(async (c : any) => await removeChannel(c.id))
     }, [user, socket])
 
 
     useEffect(() => {
-        if (socket && friends && user)
+        if (socket && user)
             loadChannels();
-    }, [socket, friends, user])
+    }, [socket, user])
 
 
+    ////////////////////////////////////////////////////////////////
+    //                       C H A N N E L S                      //
+    ////////////////////////////////////////////////////////////////
+
+    const addChannel = useCallback(async (channel: any) => {
+        if (socket) {
+            if (!channel.users || !channel.users.length && channel.members)
+            {
+                channel.members = [...channel.members, user.id]
+                const users = await fetchUsers(channel.members)
+                if (users)
+                    channel = {...channel, users} 
+            }
+            channelsDispatch({ type: 'addChannel', channel });
+            joinChannel(channel);
+        }
+    }, [socket])
 
 
     const joinChannel = useCallback((channel: any) => {
@@ -224,8 +236,6 @@ export function ChannelsProvider({ children }: any) {
         }
     }, [socket])
 
-
-
     const leaveChannel = useCallback((channel: any) => {
         if (channel && channel.id && socket) {
             channelsDispatch({ type: 'removeChannel', channel })
@@ -234,6 +244,66 @@ export function ChannelsProvider({ children }: any) {
             })
         }
     }, [socket])
+
+
+    ////////////////////////////////////////////////////////////////
+    //                           U S E R S                        //
+    ////////////////////////////////////////////////////////////////
+
+    const getMembers = useCallback((channelId: number) => {
+        if (channelId && channels && channels.length) {
+            let fChannel = channels.find((c: Channel) => c.id === channelId)
+            if (fChannel) {
+                return (fChannel.users)
+            }
+        }
+        return ([]);
+    }, [channels])
+
+    const getAdministrators = useCallback((channel: Channel) => {
+        if (channel && channels && channels.length) {
+
+            let admins = channel.administrators;
+            let users = channel.users;
+
+            if (admins.length && users.length) {
+                let userAdmins = admins.map((id: number) => users.find((u: User) => u.id === id))
+                userAdmins = userAdmins.filter((u: User) => u)
+                return (userAdmins)
+            }
+        }
+        return ([]);
+    }, [channels])
+
+    const getBanned = useCallback((channel: Channel) => {
+        if (channel && channels && channels.length) {
+
+            let banned = channel.banList;
+            let users = channel.users;
+
+            if (banned.length && users.length) {
+                let userAdmins = banned.map((id: number) => users.find((u: User) => u.id === id))
+                userAdmins = userAdmins.filter((u: User) => u)
+                return (userAdmins)
+            }
+        }
+        return ([]);
+    }, [channels])
+
+    const getMuted = useCallback((channel: Channel) => {
+        if (channel && channels && channels.length) {
+
+            let banned = channel.banList;
+            let users = channel.users;
+
+            if (banned.length && users.length) {
+                let userAdmins = banned.map((id: number) => users.find((u: User) => u.id === id))
+                userAdmins = userAdmins.filter((u: User) => u)
+                return (userAdmins)
+            }
+        }
+        return ([]);
+    }, [channels])
 
 
 
@@ -247,60 +317,23 @@ export function ChannelsProvider({ children }: any) {
     }, [channels])
 
 
-
-    const addChannel = useCallback((channel: any) => {
-        if (socket) {
-            channelsDispatch({ type: 'addChannel', channel });
-            joinChannel(channel)
-        }
-    }, [socket])
-
-
-    const getMembers = useCallback((channel: Channel) => {
-        if (channel && channels && channels.length) {
-            let fChannel = channels.find((c: Channel) => c.id === channel.id)
-            if (fChannel) {
-                return (fChannel.users)
-            }
-        }
-        return ([]);
-    }, [channels])
-
-    const getAdministrators = useCallback((channel: Channel) => {
-        if (channel && channels && channels.length) {
-            let fChannel = channels.find((c: Channel) => c.id === channel.id)
-            if (fChannel) {
-                let admins = fChannel.administrators;
-                let users = fChannel.users;
-
-                if (admins.length && users.length) {
-                    let userAdmins = admins.filter((id: number) =>
-                        users.filter((u: User) => u.id === id ? u : null))
-                    userAdmins = userAdmins.filter((u: User) => u)
-                    return (userAdmins)
-                }
-            }
-        }
-        return ([]);
-    }, [channels])
-
-
-
+    ////////////////////////////////////////////////////////////////
+    //               C U R R E N T    C H A N N E L               //
+    ////////////////////////////////////////////////////////////////
 
 
     // pick the good channel with all messages 
     const setCurrentChannel = useCallback((channel: any) => {
         let pickChannel;
         if (!channels.length)
-            pickChannel = channel;
+        pickChannel = channel;
         else {
             pickChannel = channels.find((c: any) => c.id === channel.id)
             if (!pickChannel)
-                pickChannel = channel
+            pickChannel = channel
         }
         setCurrentChannelLocal(pickChannel);
     }, [channels])
-
 
 
     useEffect(() => {
@@ -320,7 +353,9 @@ export function ChannelsProvider({ children }: any) {
             addChannel,
             joinChannel,
             leaveChannel,
-            channelAlreadyExists
+            channelAlreadyExists,
+            getMembers,
+            getAdministrators
         }}>
             {children}
         </ChannelsContext.Provider>

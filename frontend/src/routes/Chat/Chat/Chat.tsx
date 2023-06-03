@@ -6,13 +6,12 @@ import {
     getUserInvitations,
 } from "../../../requests/friendsRequest";
 
-import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 
 import { FriendsProvider } from "../../../contexts/Chat/FriendsContext";
 import { SocketProvider } from "../../../contexts/Chat/ChatSocketContext";
 
 import { ChannelsProvider } from "../../../contexts/Chat/ChannelsContext";
-import ChannelsUsersProvider from "../../../contexts/Chat/ChannelsUsersContext";
 import './Chat.css'
 
 function ChatInterface() {
@@ -37,8 +36,6 @@ function ChatInterface() {
 
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
-
-    const {channelsUsers } = useChannelsUsers();
 
     /////////////////////////////////////////////////////////////////////////
     //                         I N V I T A T I O N S                       //
@@ -89,7 +86,7 @@ function ChatInterface() {
         if (socket && user) {
 
             socket.on('message', (m: any) => {
-                console.log("message recieved", m)
+                // console.log("message recieved")
                 if (m.length) {
                     channelsDispatch({ type: 'initMessages', messages: m });
                 }
@@ -172,9 +169,7 @@ export default function Chat() {
         <SocketProvider>
             <FriendsProvider>
                 <ChannelsProvider>
-                    <ChannelsUsersProvider>
                         <ChatInterface />
-                    </ChannelsUsersProvider>
                 </ChannelsProvider>
             </FriendsProvider>
         </SocketProvider>

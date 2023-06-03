@@ -5,7 +5,7 @@ import Banner from "../components/Banner/Banner";
 import Profile from "../components/Profile/Profile";
 import Messenger from "../components/Messenger/Messenger";
 
-import { useChannels, useChannelsUsers, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
 import RemoveView from "../components/RemoveElement.tsx/RemoveView";
 import { removeUserFriend } from '../../../requests/friends'
@@ -31,8 +31,6 @@ export default function Interface() {
         user,
         userDispatch
     }: any = useCurrentUser();
-
-    const { removeUser } = useChannelsUsers();
 
     const {
         currentChannel,
@@ -68,6 +66,7 @@ export default function Interface() {
             removeUserFriend(friend.id, token)
                 .then(res => {
                     if (res.status === 200 && res.statusText === "OK") {
+                        setRemoveView(false)
                         friendsDispatch({ type: 'removeFriend', friend })
                         navigate("/chat");
                     }
@@ -117,7 +116,7 @@ export default function Interface() {
                                 currentChannel={currentChannel}
                                 currentFriend={currentFriend}
                                 cancel={() => setRemoveView(prev => !prev)}
-                                leaveChannel={() => leaveChannel(currentChannel)}
+                                leaveChannel={() => {leaveChannel(currentChannel); setRemoveView(false)}}
                                 removeFriend={() => removeFriend(currentFriend)}
                             />
                         }
