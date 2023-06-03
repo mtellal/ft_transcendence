@@ -34,12 +34,17 @@ export class CreateChannelDto {
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  memberList?: number[]
+  members?: number[]
 
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  adminList?: number[]
+  administrators?: number[]
+
+  @ApiProperty()
+  @IsArray()
+  @IsOptional()
+  banList?: number[]
 }
 
 export class JoinChannelDto {
@@ -97,6 +102,18 @@ export class UpdateChannelDto {
   @IsNumber()
   channelId: number
 
+  @ApiProperty()
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string
+}
+
+export class PatchChannelDto {
   @ApiProperty()
   @IsEnum(ChannelType)
   @IsOptional()

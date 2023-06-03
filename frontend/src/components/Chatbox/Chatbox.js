@@ -18,6 +18,7 @@ export function Chatbox({ idFriendSelected }) {
         });
     };
     async function creteOrJoinChannel() {
+		console.log('TEST', selector.id, idFriendSelected);
         const response = await BackApi.getWhispers(selector.id, idFriendSelected);
         if (response.status === 200) {
             console.log('Chennel exist');

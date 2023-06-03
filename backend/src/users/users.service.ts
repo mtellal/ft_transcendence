@@ -205,9 +205,6 @@ export class UsersService {
   async getChannels(id: number) {
     return await this.prisma.channel.findMany({
       where: {
-        type: {
-          in: [ChannelType.PUBLIC, ChannelType.PROTECTED, ChannelType.PRIVATE]
-        },
         members: {
           has: id
         }

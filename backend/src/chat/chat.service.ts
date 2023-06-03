@@ -57,6 +57,7 @@ export class ChatService {
         messages: { connect: {id: message.id}}
       }
     })
+    return (message);
   }
 
   async getMessage(channelId: number): Promise<Message[]> {
@@ -72,28 +73,39 @@ export class ChatService {
   async createChannel(createChannelDto: CreateChannelDto, owner: User): Promise<Channel> {
     let userArray: number[] = [];
     let adminArray: number[] = [];
+    let banArray: number[] = [];
     userArray.push(owner.id);
     adminArray.push(owner.id);
-    if (createChannelDto.memberList) {
-      for (let i = 0; i < createChannelDto.memberList.length; i++) {
-        const user = await this.userService.findOne(createChannelDto.memberList[i]);
+    if (createChannelDto.members) {
+      for (let i = 0; i < createChannelDto.members.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.members[i]);
         console.log(user);
         if (user)
           if (!await this.userService.checkifUserblocked(user.id, owner.id))
-            userArray.push(createChannelDto.memberList[i]);
+            userArray.push(createChannelDto.members[i]);
       }
     }
-    if (createChannelDto.adminList) {
-      for (let i = 0; i < createChannelDto.adminList.length; i++) {
-        const user = await this.userService.findOne(createChannelDto.adminList[i]);
+    if (createChannelDto.administrators) {
+      for (let i = 0; i < createChannelDto.administrators.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.administrators[i]);
         if (user)
           if (!await this.userService.checkifUserblocked(user.id, owner.id))
-            adminArray.push(createChannelDto.adminList[i]);
+            adminArray.push(createChannelDto.administrators[i]);
       }
     }
     for (const adminId of adminArray) {
       if (!userArray.includes(adminId))
         userArray.push(adminId);
+    }
+    if (createChannelDto.banList) {
+      for (let i = 0; i < createChannelDto.banList.length; i++) {
+        const user = await this.userService.findOne(createChannelDto.banList[i])
+        if (user) {
+          if (userArray.includes(user.id))
+            throw new ForbiddenException(`Can't ban a member during channel creation`);
+          banArray.push(createChannelDto.banList[i]);
+        }
+      }
     }
     if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
       createChannelDto.password = await argon.hash(createChannelDto.password);
@@ -108,6 +120,7 @@ export class ChatService {
         ownerId: owner.id,
         administrators: adminArray,
         members: userArray,
+        banList: banArray
       }
     })
     for (const userId of userArray) {
@@ -124,26 +137,26 @@ export class ChatService {
       if (dto.type !== 'PROTECTED')
         throw new ForbiddenException('Only a protected channel can have a password');
       dto.password = await argon.hash(dto.password);
-      await this.prisma.channel.update({
+      const updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           type: dto.type,
           password: dto.password
         }
       })
-      return ;
+      return updatedChannel;
     }
     if (dto.type !== channel.type) {
       if (dto.type === 'PROTECTED' && !dto.password)
         throw new ForbiddenException(`A protected channel must have a password`);
-      await this.prisma.channel.update({
+        const updatedChannel= await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           type: dto.type,
           password: null
         }
       })
-      return ;
+      return updatedChannel;
     }
   }
 
@@ -166,7 +179,7 @@ export class ChatService {
         channelList: { push: channel.id }
       }
     })
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: { id: channel.id },
       data: {
         members: { push: newUser.id },
@@ -200,7 +213,7 @@ export class ChatService {
     let updatedAdmin = channel.administrators;
     if (channel.administrators.includes(usertoKick.id))
       updatedAdmin = channel.administrators.filter((id) => id !== usertoKick.id);
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: updatedAdmin,
@@ -219,7 +232,7 @@ export class ChatService {
         duration: mutedDuration,
       }
     })
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: dto.channelId},
       data: {
         muteList: {connect: {id: newMute.id}}
@@ -261,7 +274,7 @@ export class ChatService {
     let updatedAdmin = channel.administrators;
     if (channel.administrators.includes(usertoBan.id))
       updatedAdmin = channel.administrators.filter((id) => id !== usertoBan.id);
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: updatedAdmin,
@@ -272,7 +285,7 @@ export class ChatService {
   }
 
   async makeAdmin(channel: Channel, newAdmin: User) {
-    await this.prisma.channel.update({
+    return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: {push: newAdmin.id }
@@ -282,28 +295,30 @@ export class ChatService {
 
   async leave(channel: Channel, user: User) {
     //Check to see if the user is the owner of the channel
-    let newOwner: number;
+    let newOwner = channel.ownerId;
+    let updatedAdmin = channel.administrators;
     if (channel.ownerId === user.id) {
       if (channel.members.length > 1) {
         if (channel.administrators.length > 1) {
-          newOwner = channel.administrators.find((num) => num != channel.ownerId);
+          newOwner = updatedAdmin.find((num) => num != channel.ownerId);
         }
         else {
           newOwner = channel.members.find((num) => num != channel.ownerId);
         }
+        if (!updatedAdmin.includes(newOwner))
+          updatedAdmin.push(newOwner);
       }
     }
-    const updatedAdmin = channel.administrators.filter((num) => num != user.id);
-    if (!updatedAdmin.includes(newOwner))
-      updatedAdmin.push(newOwner);
+    updatedAdmin = updatedAdmin.filter((num) => num != user.id);
     const updatedMember = channel.members.filter((num) => num != user.id);
+    let updatedChannel: Channel | null = null;
     if (updatedMember.length === 0) {
       await this.prisma.channel.delete({
         where: {id: channel.id},
       });
     }
     else {
-      await this.prisma.channel.update({
+      updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
           ownerId: newOwner,
@@ -318,11 +333,12 @@ export class ChatService {
         channelList: user.channelList.filter((num) => num !== channel.id)
       }
     })
+    return updatedChannel;
   }
 
   async remove(id: number)
   {
-    return this.prisma.channel.delete({
+    return await this.prisma.channel.delete({
       where:{id}
     });
   }

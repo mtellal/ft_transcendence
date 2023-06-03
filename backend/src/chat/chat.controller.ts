@@ -2,13 +2,14 @@ import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, 
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { JwtGuard } from 'src/auth/guard';
-import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
-import { User } from '@prisma/client';
+import { CreateChannelDto, MessageDto, PatchChannelDto, UpdateChannelDto } from './dto/channel.dto';
+import { MessageType, User } from '@prisma/client';
+import { ChatGateway } from './chat.gateway';
 
 @Controller('chat')
 @ApiTags('chat')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService, private readonly chatGateway: ChatGateway) {}
 
   @Get()
   @ApiQuery({
@@ -67,14 +68,33 @@ export class ChatController {
   @UsePipes(new ValidationPipe())
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Changes the type and/or password of a channel with the given ID'})
-  async updateChannel(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateChannelDto, @Req() req) {
+  async updateChannel(@Param('id', ParseIntPipe) id: number, @Body() dto: PatchChannelDto, @Req() req) {
     const user: User = req.user;
     const channel = await this.chatService.findOne(id);
     if (!channel)
-      throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      throw new NotFoundException(`Channel with id of ${id} does not exist`);
     if (channel.ownerId !== user.id)
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
-    return await this.chatService.updateChannel(dto, channel);
+    const updateChanneldto: UpdateChannelDto = {
+      channelId: id,
+      type: dto.type,
+      password: dto.password
+    };
+    const updatedChannel = await this.chatService.updateChannel(updateChanneldto, channel);
+    let updateNotif = `${user.username} updated the channel:`;
+    if (dto.password)
+      updateNotif += ` ${channel.name} is now protected by a password.`
+    if (dto.type && !dto.password)
+      updateNotif += ` ${channel.name} is now ${dto.type.toLowerCase()}.`
+    const notif: MessageDto = {
+      channelId: channel.id,
+      type: MessageType.NOTIF,
+      content: updateNotif
+    }
+    const message = await this.chatService.createNotif(notif);
+    this.chatGateway.server.to(channel.id.toString()).emit('message', message);
+    this.chatGateway.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+    return updatedChannel;
   }
 
   @Delete(':id')
