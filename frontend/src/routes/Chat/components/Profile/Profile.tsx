@@ -1,11 +1,60 @@
 import React, { useEffect, useState } from "react"
 
 import './Profile.css'
-import { useChannels, useChannelsUsers, useFriends, useCurrentUser } from "../../../../hooks/Hooks"
+import { useChannels, useFriends, useCurrentUser } from "../../../../hooks/Hooks"
 import UserLabel from "../../../../components/users/UserLabel";
 import { CollectionElement } from "../Menu/MenuElement";
 import InfoInput from "../../../../components/Input/InfoInput";
 import PickMenu from "../../../../components/PickMenu";
+import { TUserInfos, UserInfos } from "../../../../components/users/UserInfos";
+import Icon from "../../../../components/Icon";
+
+type TChannelUserLabel = TUserInfos & {
+    id?: number,
+    key?: any,
+    username: string,
+    profilePictureURL: string,
+    userStatus: string,
+    onClick?: () => {} | any,
+    isAdmin?: boolean, 
+    currentUser?: any
+}
+
+function ChannelUserLabel(props: TChannelUserLabel) {
+    console.log(props.username, props.currentUser)
+    return (
+        <div className="friend-element">
+            <UserInfos
+                username={props.username}
+                profilePictureURL={props.profilePictureURL}
+                userStatus={props.userStatus}
+            />
+            {
+                props.isAdmin && props.username !== (props.currentUser && props.currentUser.username) && 
+                <div className="flex-center">
+
+                    <Icon
+                        icon="shield_person"
+                        description="Admin"
+                    />
+                    <Icon
+                        icon="logout"
+                        description="Kick"
+                    />
+                    <Icon
+                        icon="schedule_send"
+                        description="Mute"
+                    />
+                    <Icon
+                        icon="person_off"
+                        description="Ban"
+                    />
+                </div>
+            }
+        </div>
+    )
+}
+
 
 function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState();
@@ -13,15 +62,17 @@ function CollectionUsers(props: any) {
     useEffect(() => {
         if (props.users && props.users)
             setRenderUsers(props.users.map((user: any) =>
-                <UserLabel
+                <ChannelUserLabel
                     key={user.id}
                     id={user.id}
+                    currentUser={props.currentUser}
                     username={user.username}
                     profilePictureURL={user.url}
                     userStatus={user.userStatus}
+                    isAdmin={props.isAdmin}
                 />
             ))
-    }, [props.users])
+    }, [props.users, props.isAdmin, props.currentUser])
 
     return (
         <CollectionElement
@@ -81,23 +132,35 @@ function ChannelAccess(props: any) {
 function ChannelProfile(props: any) {
 
     const { user } = useCurrentUser();
-    const { getAdmins } = useChannelsUsers();
+    const { getAdministrators } = useChannels();
 
     const [access, setAccess] = useState(props.channel && props.channel.type.toLowerCase());
     const [admins, setAdmins] = useState([]);
     const [banned, setBanned] = useState([])
 
+    const [isAdmin, setIsAdmin] = useState(false);
+
+
     useEffect(() => {
         if (props.members && props.members.length) {
-            const administrators = getAdmins(props.channel);
-            if (administrators && administrators.length)
+            const administrators = getAdministrators(props.channel);
+            if (administrators && administrators.length) {
                 setAdmins(administrators)
+            }
         }
     }, [props.members])
 
+
+    useEffect(() => {
+        if (admins && admins.length) {
+            if (admins.find((u: any) => u.id === user.id)) {
+                setIsAdmin(true)
+            }
+        }
+    }, [admins])
+
     return (
         <div className="reset channelprofile">
-
             <ChannelName
                 user={user}
                 title="Name"
@@ -113,17 +176,21 @@ function ChannelProfile(props: any) {
                 name={props.channel && props.channel.name}
                 administrators={props.channel && props.channel.administrators}
             />
-
             {
-                admins && <CollectionUsers
+                admins &&
+                <CollectionUsers
                     title="Administrators"
                     users={admins}
+                    currentUser={user}
                 />
             }
             {
-                props.members && <CollectionUsers
+                props.members &&
+                <CollectionUsers
                     title="Members"
                     users={props.members}
+                    isAdmin={isAdmin}
+                    currentUser={user}
                 />
             }
         </div>
@@ -133,8 +200,7 @@ function ChannelProfile(props: any) {
 
 export default function Profile() {
     const { currentFriend } = useFriends();
-    const { currentChannel } = useChannels();
-    const { channelsUsers, getMembers }: any = useChannelsUsers();
+    const { currentChannel, getMembers } = useChannels();
 
     const [friend, setFriend]: any = useState();
     const [channel, setChannel]: any = useState();
@@ -143,10 +209,9 @@ export default function Profile() {
     useEffect(() => {
         if (currentChannel) {
             setChannel(currentChannel)
-            if (channelsUsers && channelsUsers.length)
-                setMembers(getMembers(currentChannel.id))
+            setMembers(getMembers(currentChannel.id))
         }
-    }, [currentChannel, channelsUsers])
+    }, [currentChannel])
 
 
     useEffect(() => {
@@ -156,7 +221,6 @@ export default function Profile() {
 
     return (
         <div className="fill scroll">
-
             {
                 channel && members &&
                 <ChannelProfile

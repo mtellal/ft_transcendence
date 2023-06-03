@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import {
     useChannels,
-    useChannelsUsers,
     useChatSocket,
     useFriends,
     useCurrentUser
@@ -167,9 +166,8 @@ export default function Messenger({
     const [value, setValue] = React.useState("");
     const [renderMessages, setRenderMessages]: any = useState([]);
 
-    const { currentChannel, channels } = useChannels();
+    const { currentChannel, channels, getMembers } = useChannels();
     const { currentFriend, friends } = useFriends();
-    const { getMembers, channelsUsers } = useChannelsUsers();
 
     function handleChange(e: any) {
         setValue(e.target.value)
@@ -195,6 +193,8 @@ export default function Messenger({
         }
         return (messages)
     }
+
+    // console.log("currentChannel => ", currentChannel)
 
     function formatMessages(messages: any[], members: any[]) {
         let author: any;
@@ -222,7 +222,7 @@ export default function Messenger({
                     author={author}
                     admin={admin}
                     userId={user.id}
-                    userImage={image}
+                    userImage={user.url}
                     currentUsername={user.username}
                     currentChannel={currentChannel}
                     ownerId={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
@@ -243,8 +243,7 @@ export default function Messenger({
                 setRenderMessages(messages)
             }
         }
-    }, [channels, currentChannel, channelsUsers, user])
-
+    }, [channels, currentChannel, user])
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
