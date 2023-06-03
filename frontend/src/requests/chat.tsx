@@ -6,14 +6,6 @@ const back = process.env.REACT_APP_BACK;
 //                     C H A T        R E Q U E S T S                  //
 /////////////////////////////////////////////////////////////////////////
 
-export async function getChats() {
-    return (
-        axios.get(`${back}/chats`)
-            .then(res => res)
-            .catch(err => err)
-    )
-}
-
 export async function getChannelByName(name: string) {
     return (
         axios.get(`${back}/chat?name=${name}`)
@@ -32,26 +24,9 @@ export async function createChannel(channel: any, token: number | string) {
     )
 }
 
-
-export async function getFriendChannel(id: string | number, friendId: string | number) {
-    return (
-        axios.get(`${back}/users/whispers?id=${id}&friendId=${friendId}`)
-            .then(res => res)
-            .catch(err => err)
-    )
-}
-
 export async function getChannels(id: string | number) {
     return (
         axios.get(`${back}/users/${id}/channels`)
-            .then(res => res)
-            .catch(err => err)
-    )
-}
-
-export async function getMessages(channelId: string | number) {
-    return (
-        axios.get(`${back}/chat/${channelId}/messages`)
             .then(res => res)
             .catch(err => err)
     )
