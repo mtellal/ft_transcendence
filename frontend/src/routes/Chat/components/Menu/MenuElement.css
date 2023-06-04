@@ -119,3 +119,12 @@
 {
     background-color: rgb(236, 236, 236);
 }
+
+
+@media screen and (max-width: 700px) {
+    .menu-container {
+        width: 100%;
+        border-bottom: 1px solid black ;
+        overflow: visible;
+    }
+}

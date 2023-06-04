@@ -1,41 +1,48 @@
-.history
-{
-    margin: 0;   
+.history {
+    grid-row: 2 / span 18;
+    grid-column: auto / span 20;
+    margin: 0;
     padding: 5% 5%;
     overflow-y: scroll;
-    width: 50%;
 }
 
-.match-div
-{
+.history-matchs-container {
+    width: 60%;
+    max-width: 500px;
+}
+
+.match-div {
+    width: 60%;
     padding: 2%;
     border-radius: 5px;
     display: flex;
     align-items: center;
-    margin: 10px 0;
-    max-width: 600px;
-    max-height: 100px;
+    margin: 20px 0;
     border: 1px solid black;
     background-color: rgb(218, 218, 218);
     box-shadow: 0px 2px 5px black;
 }
 
-.player-name
-{
+.player-name {
     max-width: 50%;
     overflow: hidden;
     flex: 4;
     text-align: center;
 }
 
-.score
-{
+.score {
     align-self: center;
 }
 
 @media screen and (max-width: 700px) {
     .history {
-        align-self: center;
-        width: 60%;
+        grid-row: auto / span 18;
+        grid-column: 1 / -1;
+        align-items: center;
+    }
+
+    .history-matchs-container
+    {
+        width: 70%;
     }
 }

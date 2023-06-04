@@ -94,10 +94,23 @@ export default function MenuElement({ ...props }) {
         channels, 
         setCurrentChannel,
         addChannel, 
+        currentChannel
     } = useChannels();
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
+
+    const [width, setWidth] = useState(window.innerWidth)
+
+    function getWidth()
+    {
+        setWidth(window.innerWidth)
+    }
+
+    useEffect(() => {
+        window.addEventListener('resize', getWidth);
+        return () => window.removeEventListener('resize', getWidth);
+    }, [])
 
     const selectCurrentChannel = useCallback(async (element: any, type: string) => {
         let channelSelected: any;
@@ -170,7 +183,7 @@ export default function MenuElement({ ...props }) {
     }, [friends, channels])
 
     return (
-        <div className="menu-container">
+        <div className={currentChannel && width <= 700 ? "menu-container hidden" : "menu-container visible"}>
             <CollectionElement
                 title="Groups"
                 collection={channelsList}
