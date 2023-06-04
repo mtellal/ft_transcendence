@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { BackApi } from '../../api/back';
 import { Messages } from '../Messages/Messages';
-import io from 'socket.io-client';
+import { getSocket } from '../../utils/socket';
 import s from './style.module.css';
 export function Chatbox({ idFriendSelected }) {
     const selector = useSelector((store) => store.user.user);
-    const [socket, setSocket] = useState();
+    const [Asocket, AsetSocket] = useState();
     const [messages, setMessages] = useState([]);
     const [idChannel, setIdChannel] = useState();
     const send = (value) => {
-        socket.emit('message', {
+        Asocket.emit('message', {
             sendBy: selector.id,
             content: value,
             channelId: idChannel,
@@ -38,27 +38,30 @@ export function Chatbox({ idFriendSelected }) {
     }
     function joinChannel(idChan) {
         console.log('idChan', idChan);
-        socket.emit('joinChannel', {
+        Asocket.emit('joinChannel', {
             channelId: idChan
         });
     }
+    // useEffect(() => {
+    //     if (selector.token) {
+    //         const newSocket = io('http://localhost:3000', {
+    //             transports: ['websocket'],
+    //             extraHeaders: {
+    //                 'Authorization': `Bearer ${selector.token}`
+    //             }
+    //         })
+    //         setSocket(newSocket);
+    //     }
+    // }, [setSocket, selector.token, idFriendSelected])
     useEffect(() => {
-        if (selector.token) {
-            const newSocket = io('http://localhost:3000', {
-                transports: ['websocket'],
-                extraHeaders: {
-                    'Authorization': `Bearer ${selector.token}`
-                }
-            });
-            setSocket(newSocket);
-        }
-    }, [setSocket, selector.token, idFriendSelected]);
+        AsetSocket(getSocket());
+    }, []);
     useEffect(() => {
-        if (selector.id && socket) {
+        if (selector.id && Asocket) {
             creteOrJoinChannel();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socket, selector.id, idFriendSelected]);
+    }, [Asocket, selector.id, idFriendSelected]);
     const messageListener = (message) => {
         console.log('Msg', message);
         if (message.length) {
@@ -69,10 +72,10 @@ export function Chatbox({ idFriendSelected }) {
         }
     };
     useEffect(() => {
-        if (selector.id && socket) {
-            socket.on('message', messageListener);
+        if (selector.id && Asocket) {
+            Asocket.on('message', messageListener);
             return () => {
-                socket.off('message', messageListener);
+                Asocket.off('message', messageListener);
             };
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
