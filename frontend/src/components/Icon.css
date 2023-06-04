@@ -3,10 +3,10 @@
     position: relative;
     align-self: center;
     justify-self: center ;
-    height: 40px;
-    width: 40px;
     border-radius: 5px;
     cursor: pointer;
+    height: 40px;
+    aspect-ratio: 1 / 1;
 }
 
 .icon-container:hover div

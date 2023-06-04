@@ -275,6 +275,20 @@ export function ChannelsProvider({ children }: any) {
         return ([]);
     }, [channels])
 
+    const getOwner = useCallback((channel: Channel) => {
+        if (channel && channels && channels.length) {
+
+            let ownerId = channel.ownerId;
+            let users = channel.users;
+
+            if (users.length) {
+                let owner = users.find((u: User) => u.id === ownerId)
+                return (owner)
+            }
+        }
+        return ([]);
+    }, [channels])
+
     const getBanned = useCallback((channel: Channel) => {
         if (channel && channels && channels.length) {
 
@@ -354,8 +368,9 @@ export function ChannelsProvider({ children }: any) {
             joinChannel,
             leaveChannel,
             channelAlreadyExists,
+            getOwner,
+            getAdministrators,
             getMembers,
-            getAdministrators
         }}>
             {children}
         </ChannelsContext.Provider>

@@ -46,17 +46,17 @@ function App() {
   const { user, token }: any = useLoaderData();
 
   return (
-    <div className="App" >
-      <CurrentUserProvider
-        user={user}
-        token={token}
-      >
+    <CurrentUserProvider
+      user={user}
+      token={token}
+    >
+      <div className="App" >
         <Header />
-        <Sidebar />
+          <Sidebar />
+            <Outlet />
         <Footer />
-        <Outlet />
-      </CurrentUserProvider>
-    </div>
+      </div>
+    </CurrentUserProvider>
   );
 }
 

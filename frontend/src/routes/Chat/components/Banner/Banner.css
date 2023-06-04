@@ -1,10 +1,10 @@
 .banner
 {
-    height: 50px;
+    min-height: 40px ;
     border-bottom: 1px solid black;
     display: flex;
     padding: 10px 10px;
-    justify-content: space-between ;
+    flex-wrap: wrap;
 }
 
 .banner-icon-container

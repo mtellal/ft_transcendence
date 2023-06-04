@@ -57,30 +57,31 @@ export default function Banner({ ...props }: TBanner) {
 
     return (
         <div className="banner">
-            {
-                channel && channel.type === "WHISPER" ?
-                    <UserInfos
-                        username={friend && friend.username}
-                        userStatus={friend && friend.userStatus}
-                        profilePictureURL={friend && friend.url}
-                    />
-                    :
-                    <ChannelInfos
-                        name={channel && channel.name}
-                    />
-            }
-            <div className="banner-icon-container">
+            <div className="">
+
                 {
                     channel && channel.type === "WHISPER" ?
-                        <Icon icon="person" onClick={props.profile} description="Profile" />
-                        : <Icon icon="groups" onClick={props.profile} description="Channel" />
-                }
-                <Icon icon="sports_esports" onClick={props.invitation} description="Invitation" />
-                <Icon icon="block" onClick={props.block} description="Block" />
-                {
-                    pickRemoveIcon()
+                        <UserInfos
+                            username={friend && friend.username}
+                            userStatus={friend && friend.userStatus}
+                            profilePictureURL={friend && friend.url}
+                        />
+                        :
+                        <ChannelInfos
+                            name={channel && channel.name}
+                        />
                 }
             </div>
+            {
+                channel && channel.type === "WHISPER" ?
+                    <Icon icon="person" onClick={props.profile} description="Profile" />
+                    : <Icon icon="groups" onClick={props.profile} description="Channel" />
+            }
+            <Icon icon="sports_esports" onClick={props.invitation} description="Invitation" />
+            <Icon icon="block" onClick={props.block} description="Block" />
+            {
+                pickRemoveIcon()
+            }
         </div>
     )
 }
