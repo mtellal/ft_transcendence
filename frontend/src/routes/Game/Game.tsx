@@ -8,10 +8,6 @@ let up : boolean;
 let down : boolean;
 
 
-<canvas width="100" height="800">
-    ....
-</canvas>
-
 function Game(props : any)
 {
     const canvasRef : any  = React.useRef();
@@ -245,11 +241,6 @@ function Game(props : any)
 
     return (
         <div className="game">
-            <div className="score--container">
-                <p className="score">{scores.p1}</p>
-                <p className="score">{scores.p2}</p>
-            </div>
-
             <canvas 
                 ref={canvasRef} 
                 className="game--canvas" 
@@ -308,9 +299,9 @@ export default function LaunchGame()
     const [play, setPlay] = React.useState(false);
 
     return (
-        <>
+        <div className="launchgame relative">
             <Game launch={play}/>
             {!play && <PlayPage click={() => setPlay(true)} />}
-        </>
+        </div>
     )
 }

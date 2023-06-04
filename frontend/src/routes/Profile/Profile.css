@@ -1,17 +1,19 @@
 .profile
 {
-    background-color: rgb(255, 255, 255);
-    grid-column: 5 / -1;
-    grid-row: 2 / span 18;
+    grid-row: 2 / span 19;
+    grid-column: 3 / -1;
     margin: 0;   
-    padding: 10vh 10vh;
-    display: flex;
+    padding: 5%;
 }
 
-.form--container
+.profileinfos-container
 {
-    width: 80%;
-    max-width: 500px;
+    width: 70%;
+}
+
+.profileinfos-input-container
+{
+    max-width: 400px;
 }
 
 .profile-infos-button:hover
@@ -24,7 +26,7 @@
     background-color: white;
 }
 
-.infos-updated
+.profileinfos-updated
 {
     color: rgb(0, 211, 63);
     margin: 0;
@@ -32,7 +34,7 @@
     font-size: small;
 }
 
-.infos-error
+.profileinfos-error
 {
     color: rgb(211, 0, 0);
     margin: 0;
@@ -42,12 +44,6 @@
 
 /* ///////////////////////////////////// */
 
-
-.profile-picture-container
-{
-    width: 25%;
-    max-width: 200px;
-}
 
 .picture-container
 {
@@ -80,8 +76,8 @@
 {
     background-color: rgb(255, 255, 255);
     position: relative;
-    top: -2vw;
-    right: -1vw;
+    top: -20px;
+    right: -10px;
     padding: 5px 5px;
     border: 1px solid black;
     border-radius: 5px;
@@ -95,5 +91,32 @@
 
 .profile-picture-button
 {
+    padding: 5px;
     cursor: pointer;
+}
+
+
+@media screen and (max-width: 700px) {
+
+    .profile
+    {
+        padding: 10%;
+        grid-row: auto / span 18;
+        grid-column: 1 / -1;
+    }
+
+    .picture-container
+    {
+        height: 100px;
+        width: 100px;
+    }
+
+    .profil-picture-label
+    {
+        font-size: small;
+        height: 20px;
+        width: 20px;
+        margin: 5px;
+    }
+
 }

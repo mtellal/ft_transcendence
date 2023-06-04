@@ -13,7 +13,7 @@ export default function Header() {
     return (
         <header className='header'>
             <p className='header-pong'>Pong</p>
-            <div className='pp-container'>
+            <div className='header-userinfos-container'>
                 <Link
                     className='pp-link'
                     to={"/profile"}

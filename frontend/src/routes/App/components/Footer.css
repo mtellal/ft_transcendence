@@ -1,5 +1,6 @@
 .footer
 {
+    grid-row: 20 / span 20;
     grid-column: 1 / -1;
     border-top: 1px solid rgb(0, 0, 0);
 }
@@ -7,7 +8,6 @@
 .footer--authors
 {
     margin: 0;
-    padding: 0.5vh 0;
     font-size: small;
 }
 
@@ -22,4 +22,10 @@
     text-decoration: none;
     font-weight: 600;
     color: black;
+}
+
+@media screen and (max-width: 700px) {
+    .footer {
+        grid-row: auto / span 20;
+    }
 }

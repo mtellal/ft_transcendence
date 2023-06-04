@@ -1,4 +1,4 @@
-body {
+html, body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -12,7 +12,6 @@ code {
     monospace;
 }
 
-
 .hover-fill-grey:hover
 {
   background-color: rgb(231, 231, 231);
@@ -20,6 +19,10 @@ code {
 
 .hover-gray:hover{
   background-color: rgb(231, 231, 231);
+}
+
+.flex {
+  display: flex;
 }
 
 .flex-ai
@@ -33,6 +36,7 @@ code {
   display: flex;
   flex-direction: column;
 }
+
 
 .flex-column-center
 {

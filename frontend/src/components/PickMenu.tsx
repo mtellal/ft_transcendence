@@ -13,9 +13,9 @@ export default function PickMenu(props: TPickMenu) {
     const [show, setShow] = useState(false);
 
     return (
-        <div onClick={() => setShow(p => !p)}>
+        <div>
             <h2>{props.title}</h2>
-            <div className="flex-column">
+            <div className="flex-column" onClick={() => setShow(p => !p)}>
                 {
                     <div className="pickmenu-option">
                         <p>{props.selected || "Visibilty ..."}</p>

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import Banner from "../components/Banner/Banner";
-import Profile from "../components/Profile/Profile";
+import Profile from "../Profile/Profile";
 import Messenger from "../components/Messenger/Messenger";
 
 import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";

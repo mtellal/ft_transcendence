@@ -1,13 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
 
 import './Profile.css'
-import { useChannels, useFriends, useCurrentUser, useChatSocket } from "../../../../hooks/Hooks"
-import UserLabel from "../../../../components/users/UserLabel";
-import { CollectionElement } from "../Menu/MenuElement";
-import InfoInput from "../../../../components/Input/InfoInput";
-import PickMenu from "../../../../components/PickMenu";
-import { TUserInfos, UserInfos } from "../../../../components/users/UserInfos";
-import Icon from "../../../../components/Icon";
+import { useChannels, useFriends, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
+import UserLabel from "../../../components/users/UserLabel";
+import { CollectionElement } from "../components/Menu/MenuElement";
+import InfoInput from "../../../components/Input/InfoInput";
+import PickMenu from "../../../components/PickMenu";
+import { TUserInfos, UserInfos } from "../../../components/users/UserInfos";
+import Icon from "../../../components/Icon";
 
 export const PofileChannelContext = createContext({});
 
@@ -15,31 +15,37 @@ export const PofileChannelContext = createContext({});
 
 function ChannelUserLabel(props: any) {
 
+    const { user } = useCurrentUser();
     const {
         setUserOperation,
         setConfirmView,
         adminUser,
         kickUser,
         muteUser,
-        banUser
+        banUser,
+        isAdmin,
+        isOwner
     }: any = useContext(PofileChannelContext)
 
     return (
         <div className="friend-element">
             <UserInfos
-                username={props.username}
-                profilePictureURL={props.profilePictureURL}
-                userStatus={props.userStatus}
+                username={props.user.username}
+                profilePictureURL={props.user.url}
+                userStatus={props.user.userStatus}
             />
             {
-                props.isAdmin && props.username !== (props.currentUser && props.currentUser.username) &&
+                isAdmin && props.user.username !== (user && user.username) &&
                 <div className="flex-center">
 
-                    {/* <Icon
-                        icon="shield_person"
-                        description="Admin"
-                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: adminUser, type: "make admin" }) }}
-                    /> */}
+                    {
+                        isOwner &&
+                        <Icon
+                            icon="shield_person"
+                            description="Admin"
+                            onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: adminUser, type: "make admin" }) }}
+                        />
+                    }
                     <Icon
                         icon="logout"
                         description="Kick"
@@ -61,7 +67,6 @@ function ChannelUserLabel(props: any) {
     )
 }
 
-
 function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState();
 
@@ -69,14 +74,8 @@ function CollectionUsers(props: any) {
         if (props.users && props.users)
             setRenderUsers(props.users.map((user: any) =>
                 <ChannelUserLabel
-                    key={user.id}
-                    id={user.id}
+                    key={`${props.title}-${user.id}`}
                     user={user}
-                    currentUser={props.currentUser}
-                    username={user.username}
-                    profilePictureURL={user.url}
-                    userStatus={user.userStatus}
-                    isAdmin={props.isAdmin}
                 />
             ))
     }, [props.users, props.isAdmin, props.currentUser])
@@ -86,53 +85,6 @@ function CollectionUsers(props: any) {
             title={props.title}
             collection={renderUsers}
         />
-    )
-}
-
-function ChannelName(props: any) {
-    const [name, setName]: [string, any] = useState(props.name || "");
-
-    return (
-        <>
-            <h2>{props.title}</h2>
-            {
-                props.administrators &&
-                    props.administrators.find((id: number) => id === props.user.id) ?
-                    <InfoInput
-                        id={props.user.id}
-                        label={props.title}
-                        value={name}
-                        setValue={setName}
-                        submit={null}
-                    />
-                    :
-                    <h3 className="reset">{props.name}</h3>
-            }
-        </>
-    )
-}
-
-function ChannelAccess(props: any) {
-    const [access, setAccess] = useState(props.channel && props.channel.type.toLowerCase());
-
-    return (
-        <>
-            {
-                props.administrators &&
-                    props.administrators.find((id: number) => id === props.user.id) ?
-                    <PickMenu
-                        title="Access"
-                        collection={["public", "protected", "private"]}
-                        selected={access}
-                        setSelected={setAccess}
-                    />
-                    :
-                    <>
-                        <h2>{props.title}</h2>
-                        <h3 className="reset">{access}</h3>
-                    </>
-            }
-        </>
     )
 }
 
@@ -146,26 +98,26 @@ export function ConfirmView(props: any) {
                     </span> ?
                 </p>
                 {
-                    props.type === "mute" && 
+                    props.type === "mute" &&
                     < div className="red">
                         <p>mute</p>
                     </div>
                 }
-            <div className="remove-friend-buttons">
-                <button
-                    className="button red white-color remove-friend-button"
-                    onClick={props.valid}
-                >
-                    Valid
-                </button>
-                <button
-                    className="button white remove-friend-button"
-                    onClick={props.cancel}
-                >
-                    Cancel
-                </button>
+                <div className="remove-friend-buttons">
+                    <button
+                        className="button red white-color remove-friend-button"
+                        onClick={props.valid}
+                    >
+                        Valid
+                    </button>
+                    <button
+                        className="button white remove-friend-button"
+                        onClick={props.cancel}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
-        </div>
         </div >
     )
 }
@@ -174,13 +126,16 @@ function ChannelProfile(props: any) {
 
     const { socket } = useChatSocket();
     const { user } = useCurrentUser();
-    const { getAdministrators } = useChannels();
+    const { getAdministrators, getOwner } = useChannels();
 
+    const [name, setName]: any = useState(props.channel && props.channel.name);
+    const [password, setPassword] = useState("");
     const [access, setAccess] = useState(props.channel && props.channel.type.toLowerCase());
     const [admins, setAdmins] = useState([]);
     const [banned, setBanned] = useState([])
 
     const [isAdmin, setIsAdmin] = useState(false);
+    const [owner, setOwner] = useState(false);
 
     const [confirmView, setConfirmView] = useState(false);
 
@@ -193,6 +148,8 @@ function ChannelProfile(props: any) {
             if (administrators && administrators.length) {
                 setAdmins(administrators)
             }
+            const owner = getOwner(props.channel);
+            setOwner(owner)
         }
     }, [props.members])
 
@@ -204,8 +161,6 @@ function ChannelProfile(props: any) {
             }
         }
     }, [admins])
-
-
 
     function adminUser(user: any) {
         console.log("admin user ", user);
@@ -229,6 +184,17 @@ function ChannelProfile(props: any) {
         console.log("ban user ", user);
     }
 
+
+    function cancelOperation() {
+        setConfirmView(p => !p);
+
+    }
+
+    function validOperation() {
+        setConfirmView(p => !p);
+        userOperation.function(userOperation.user);
+    }
+
     return (
         <PofileChannelContext.Provider
             value={{
@@ -237,55 +203,80 @@ function ChannelProfile(props: any) {
                 muteUser,
                 banUser,
                 setConfirmView,
-                setUserOperation
+                setUserOperation,
+                isAdmin,
+                owner
             }}
         >
-            <div className="reset ">
-                <div className="channelprofile">
-                    <ChannelName
-                        user={user}
-                        title="Name"
-                        channel={props.channel}
-                        name={props.channel && props.channel.name}
-                        administrators={props.channel && props.channel.administrators}
+            <div className="">
+                <div className="profilepage">
+                    <h2>Name</h2>
+                    <InfoInput
+                        id="name"
+                        label="Name"
+                        value={name}
+                        setValue={setName}
+                        submit={null}
                     />
                     <hr />
-                    <ChannelAccess
-                        user={user}
+                    <PickMenu
                         title="Access"
-                        channel={props.channel}
-                        name={props.channel && props.channel.name}
-                        administrators={props.channel && props.channel.administrators}
+                        collection={["public", "protected", "private"]}
+                        selected={access}
+                        setSelected={setAccess}
                     />
                     {
-                        admins &&
-                        <CollectionUsers
-                            title="Administrators"
-                            users={admins}
-                            currentUser={user}
-                        />
+                        props.channel.type !== "PUBLIC" &&
+                        <>
+                            <h2>Password</h2>
+                            <InfoInput
+                                id="name"
+                                label="Name"
+                                value={name}
+                                setValue={setName}
+                                submit={null}
+                            />
+                        </>
                     }
-                    {
-                        props.members &&
-                        <CollectionUsers
-                            title="Members"
-                            users={props.members}
-                            isAdmin={isAdmin}
-                            currentUser={user}
-                        />
-                    }
+                    <CollectionUsers
+                        title="Owner"
+                        users={[owner]}
+                        currentUser={user}
+                    />
+                    <CollectionUsers
+                        title="Administrators"
+                        users={admins}
+                        currentUser={user}
+                    />
+                    <CollectionUsers
+                        title="Members"
+                        users={props.members}
+                        isAdmin={isAdmin}
+                        currentUser={user}
+                    />
                 </div>
                 {
                     confirmView && userOperation &&
                     <ConfirmView
                         type={userOperation.type}
                         username="friend1"
-                        cancel={() => { setConfirmView(p => !p); console.log("cancel") }}
-                        valid={() => { setConfirmView(p => !p); userOperation.function(userOperation.user) }}
+                        cancel={() => cancelOperation()}
+                        valid={() => validOperation()}
                     />
                 }
             </div>
         </PofileChannelContext.Provider>
+    )
+}
+
+
+function FriendProfile(props : any)
+{
+    return (
+        <div className="reset flex-column profilepage">
+            <h2>Historic</h2>
+            <h2>Stats</h2>
+        </div>
     )
 }
 
@@ -306,20 +297,25 @@ export default function Profile() {
         }
     }, [currentChannel])
 
-
     useEffect(() => {
         if (currentFriend)
             setFriend(currentFriend)
     }, [currentFriend])
 
     return (
-        <div className="fill scroll">
+        <div className="scroll">
             {
-                channel && members &&
+                channel && members && currentChannel.type !== "WHISPER" && 
                 <ChannelProfile
                     name={channel.name}
                     members={members}
                     channel={channel}
+                />
+            }
+            {
+                channel && members && currentChannel.type === "WHISPER" && 
+                <FriendProfile
+                    currentFriend={currentFriend}
                 />
             }
         </div>
