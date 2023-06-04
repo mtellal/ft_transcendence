@@ -210,6 +210,19 @@ export class BackApi {
 		return response;
 	}
 
+	static async createChannel(data: any, token: string) {
+		const response = await axios.put(`${BASE_URL}/chat`, data, {
+			headers: {
+				'Accept': '*/*',
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		.then(rep => rep)
+		.catch(error => error)
+		return response;
+	}
+
 	static async getAllChannels() {
 		const response = await axios.get(`${BASE_URL}/chat`, {
 			headers: {

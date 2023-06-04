@@ -18,7 +18,6 @@ export function Chatbox({ idFriendSelected }) {
         });
     };
     async function creteOrJoinChannel() {
-		console.log('TEST', selector.id, idFriendSelected);
         const response = await BackApi.getWhispers(selector.id, idFriendSelected);
         if (response.status === 200) {
             console.log('Chennel exist');
@@ -27,19 +26,14 @@ export function Chatbox({ idFriendSelected }) {
         }
         else {
             console.log('Create chennel');
-            socket.emit('createChannel', {
-                name: "mp",
-                type: "WHISPER",
-                memberList: [idFriendSelected]
-            });
-            setTimeout(async function () {
-                const response = await BackApi.getWhispers(selector.id, idFriendSelected);
-                if (response.status === 200) {
-                    console.log('Chennel exist');
-                    setIdChannel(response.data.id);
-                    joinChannel(response.data.id);
-                }
-            }, 1000);
+            const rep = await BackApi.createChannel({
+                name: 'testWHISPER',
+                type: 'WHISPER',
+                members: [idFriendSelected],
+            }, selector.token);
+            console.log('rep', rep.data);
+            setIdChannel(rep.data.id);
+            joinChannel(rep.data.id);
         }
     }
     function joinChannel(idChan) {
