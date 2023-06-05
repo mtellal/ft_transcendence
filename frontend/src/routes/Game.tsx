@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 
 import './Game.css'
 import { io, Socket } from 'socket.io-client';
@@ -260,9 +260,8 @@ function Game(props : any)
 
 function PlayPage(props) {
     const { user, token } = useOutletContext();
-    const [socket, setSocket] = React.useState<Socket | undefined>();
+    const [socket, setSocket] = useState(null);
   
-    let s: Socket;
     const handlePlayClick = () => {
       const s = io('http://localhost:3000/game', {
         transports: ['websocket'],
@@ -272,27 +271,22 @@ function PlayPage(props) {
       });
       setSocket(s);
       props.click();
-      s.emit('test', '');
+      s.emit('joinGame', '');
       console.log("Emitting event here");
     };
   
-    const handleBeforeUnload = () => {
-      if (s) {
-        s.disconnect();
-      }
-    };
-  
-    React.useEffect(() => {
-      window.addEventListener('beforeunload', handleBeforeUnload);
-  
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-  
-        if (s) {
-          s.disconnect();
+    useEffect(() => {
+        if (socket) {
+          // Perform any necessary socket operations here
+          console.log('Socket connected:', socket.id);
+    
+          // Clean up the socket connection when the component unmounts
+          return () => {
+            console.log('Socket disconnected:', socket.id);
+            socket.disconnect();
+          };
         }
-      };
-    }, [s]);
+      }, [socket]);
   
     return (
       <div className="play-page">
