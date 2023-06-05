@@ -26,6 +26,8 @@ import Icon from "../../../components/Icon";
 import defaultUserPP from '../../../assets/user.png'
 
 import './JoinChannel.css'
+import { useWindow } from "../../../hooks/useWindow";
+import ArrowBackMenu from "../components/ArrowBackMenu";
 
 type TChannelSearch = {
     name: string,
@@ -83,6 +85,8 @@ export default function JoinChannel() {
     const [matchChannels, setMatchChannels] = useState([]);
     const [renderChannels, setRenderChannels] = useState([]);
 
+    const {isMobileDisplay} = useWindow();
+
     const {
         channels,
         channelAlreadyExists,
@@ -133,7 +137,16 @@ export default function JoinChannel() {
     }, [matchChannels, channels])
 
     return (
-        <div className="joinchannel-container">
+        <div className="joinchannel-container flex-column">
+            {
+                isMobileDisplay &&
+                <div className="flex">
+                    <ArrowBackMenu 
+                        title="Channel"
+                        path="/chat/add-group"
+                    />
+                </div>
+            }
             <h2>Join a Channel</h2>
             <div className="flex-column-center">
                 <IconInput

@@ -1,6 +1,6 @@
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useOutlet, useOutletContext, useParams } from "react-router-dom";
+import { Link, useLocation, useOutlet, useOutletContext, useParams } from "react-router-dom";
 
 import UserLabel from "../../../../components/users/UserLabel";
 import './MenuElement.css'
@@ -89,32 +89,32 @@ function ChannelElement(props: any) {
 
 export default function MenuElement({ ...props }) {
 
+    const location = useLocation();
+    console.log(location)
+
     const { token } = useCurrentUser();
     const { friends, friendsDispatch, setCurrentFriend } = useFriends();
-    const { 
-        channels, 
+    const {
+        channels,
         setCurrentChannel,
-        addChannel, 
+        addChannel,
         currentChannel
     } = useChannels();
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
 
-    const {isMobileDisplay} = useWindow();
-
-
-    /* const [width, setWidth] = useState(window.innerWidth)
-
-    function getWidth()
-    {
-        setWidth(window.innerWidth)
-    }
+    const { isMobileDisplay } = useWindow();
+    const [hideMenu, setHideMenu] = useState(true);
 
     useEffect(() => {
-        window.addEventListener('resize', getWidth);
-        return () => window.removeEventListener('resize', getWidth);
-    }, []) */
+        console.log("in")
+        if (location && location.pathname === "/chat" && isMobileDisplay)
+            setHideMenu(false)
+        else
+            setHideMenu(true)
+    },)
+
 
     const selectCurrentChannel = useCallback(async (element: any, type: string) => {
         let channelSelected: any;
@@ -187,11 +187,9 @@ export default function MenuElement({ ...props }) {
 
     }, [friends, channels])
 
-    console.log(props.backToMenu)
-
     return (
-        <div 
-            className={currentChannel && isMobileDisplay && !props.backToMenu ? "menu-container hidden" : "menu-container visible"}
+        <div
+            className={hideMenu ? "menu-container hidden" : "menu-container visible"}
         >
             <CollectionElement
                 title="Groups"

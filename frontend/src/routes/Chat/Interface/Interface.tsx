@@ -101,7 +101,6 @@ export default function Interface() {
                             invitation={() => { }}
                             block={() => block()}
                             remove={() => setRemoveView(prev => !prev)}
-                            backToMenu={() => setBackToMenu((p : any) => !p)}
                         />
                         {
                             profile ?

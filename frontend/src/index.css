@@ -88,6 +88,11 @@ code {
   color: gray
 }
 
+.black-c
+{
+  color: black;
+}
+
 .red
 {
   background-color: rgb(255, 78, 78);
@@ -157,4 +162,10 @@ code {
 
 .visible {
   display: visible;
+}
+
+.decoration-none
+{
+  outline: none;
+  text-decoration: none;
 }

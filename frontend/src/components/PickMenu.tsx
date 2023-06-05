@@ -13,7 +13,7 @@ export default function PickMenu(props: TPickMenu) {
     const [show, setShow] = useState(false);
 
     return (
-        <div className="fill">
+        <div>
             <h2>{props.title}</h2>
             <div className="flex-column" onClick={() => setShow(p => !p)}>
                 {
