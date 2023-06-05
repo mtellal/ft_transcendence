@@ -249,4 +249,17 @@ export class BackApi {
 
 		return response;
 	}
+
+	static async getChannelMessagesById(id: Promise<any>) {
+		console.log('API id', id);
+		const response = await axios.get(`${BASE_URL}/chat/${id}/messages`, {
+			headers: {
+				'accept': '*/*'
+			}
+		})
+			.then(rep => rep)
+			.catch(error => error)
+
+		return response;
+	}
 }

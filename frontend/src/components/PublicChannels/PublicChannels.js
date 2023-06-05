@@ -10,6 +10,7 @@ export function PublicChannels({ channels, myChannels, socket }) {
     }
     useEffect(() => {
         setArrayChannels();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     if (channelsNotJoined.length === 0) {
         return (React.createElement("div", null, "Pas de channels public a rejoindre"));

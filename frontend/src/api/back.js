@@ -203,4 +203,15 @@ export class BackApi {
             .catch(error => error);
         return response;
     }
+    static async getChannelMessagesById(id) {
+        console.log('API id', id);
+        const response = await axios.get(`${BASE_URL}/chat/${id}/messages`, {
+            headers: {
+                'accept': '*/*'
+            }
+        })
+            .then(rep => rep)
+            .catch(error => error);
+        return response;
+    }
 }

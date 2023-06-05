@@ -16,7 +16,7 @@ export function Chat() {
     const [myChannels, setMyChannels] = useState([]);
     const [friendRequest, setFriendRequest] = useState([]);
     const [idFriendSelected, setIdFriendSelected] = useState();
-    const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_GROUP');
+    const [btnFriendsRequest, setBtnFriendsRequest] = useState('FRIEND');
     const selector = useSelector((store) => store.user.user);
     async function getFriends() {
         const response = await BackApi.getFriendsById(selector.id);

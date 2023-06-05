@@ -23,6 +23,7 @@ export function ProtectedChannels({ channels, myChannels, socket }: ProtectedCha
 
 	useEffect(() => {
 		setArrayChannels();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	if (channelsNotJoined.length === 0) {

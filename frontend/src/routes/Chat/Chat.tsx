@@ -10,8 +10,8 @@ import { Group } from '../../components/Group/Group';
 import { ChatboxChannel } from '../../components/ChatboxChannel/ChatboxChannel';
 import { CreateGroup } from '../../components/CreateGroup/CreateGroup';
 import { JoinChannel } from '../../components/JoinChannel/JoinChannel';
-import s from './style.module.css'
 import { RootState } from '../../store';
+import s from './style.module.css'
 
 export function Chat() {
 
@@ -19,7 +19,7 @@ export function Chat() {
 	const [myChannels, setMyChannels] = useState([]);
 	const [friendRequest, setFriendRequest] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
-	const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_GROUP');
+	const [btnFriendsRequest, setBtnFriendsRequest] = useState('FRIEND');
 	const selector = useSelector((store: RootState) => store.user.user);
 
 	async function getFriends() {

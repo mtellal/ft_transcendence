@@ -7,7 +7,7 @@ import { getSocket } from '../../utils/socket';
 import s from './style.module.css';
 export function Chatbox({ idFriendSelected }) {
     const selector = useSelector((store) => store.user.user);
-    const [Asocket, AsetSocket] = useState();
+    const [Asocket, AsetSocket] = useState(null);
     const [messages, setMessages] = useState([]);
     const [idChannel, setIdChannel] = useState();
     const send = (value) => {
@@ -21,8 +21,10 @@ export function Chatbox({ idFriendSelected }) {
         const response = await BackApi.getWhispers(selector.id, idFriendSelected);
         if (response.status === 200) {
             console.log('Chennel exist');
+            setMessages([]);
             setIdChannel(response.data.id);
             joinChannel(response.data.id);
+            return response.data.id;
         }
         else {
             console.log('Create chennel');
@@ -31,9 +33,10 @@ export function Chatbox({ idFriendSelected }) {
                 type: 'WHISPER',
                 members: [idFriendSelected],
             }, selector.token);
-            console.log('rep', rep.data);
+            setMessages([]);
             setIdChannel(rep.data.id);
             joinChannel(rep.data.id);
+            return rep.data.id;
         }
     }
     function joinChannel(idChan) {
@@ -42,37 +45,55 @@ export function Chatbox({ idFriendSelected }) {
             channelId: idChan
         });
     }
-    // useEffect(() => {
-    //     if (selector.token) {
-    //         const newSocket = io('http://localhost:3000', {
-    //             transports: ['websocket'],
-    //             extraHeaders: {
-    //                 'Authorization': `Bearer ${selector.token}`
-    //             }
-    //         })
-    //         setSocket(newSocket);
-    //     }
-    // }, [setSocket, selector.token, idFriendSelected])
+    async function getMessages(id) {
+        const rep = await BackApi.getChannelMessagesById(id);
+        if (rep.status === 200) {
+            console.log('API OK');
+            setMessages(rep.data);
+        }
+        else {
+            console.log('API NOP');
+        }
+    }
     useEffect(() => {
         AsetSocket(getSocket());
     }, []);
     useEffect(() => {
         if (selector.id && Asocket) {
-            creteOrJoinChannel();
+            const fetchData = async () => {
+                const id = await creteOrJoinChannel();
+                // if (!messages.length) {
+                getMessages(id);
+                // }
+            };
+            fetchData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [Asocket, selector.id, idFriendSelected]);
+    // useEffect(() => {
+    // 	if (selector.id && Asocket) {
+    // 		const id  = creteOrJoinChannel();
+    // 		if (!messages.length) {
+    // 			getMessages(id);
+    // 		}
+    // 	}
+    // 	// eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [Asocket, selector.id, idFriendSelected])
     const messageListener = (message) => {
         console.log('Msg', message);
-        if (message.length) {
-            setMessages(message);
-        }
-        else {
-            setMessages([...messages, message]);
+        // setMessages([]);
+        if (message.channelId === idChannel) {
+            if (message.length) {
+                setMessages(message);
+            }
+            else {
+                setMessages([...messages, message]);
+            }
         }
     };
     useEffect(() => {
         if (selector.id && Asocket) {
+            // setMessages([]);
             Asocket.on('message', messageListener);
             return () => {
                 Asocket.off('message', messageListener);

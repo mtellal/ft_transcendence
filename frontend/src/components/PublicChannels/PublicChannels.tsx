@@ -22,6 +22,7 @@ export function PublicChannels({ channels, myChannels, socket }: PublicChannelsP
 
 	useEffect(() => {
 		setArrayChannels();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	if (channelsNotJoined.length === 0) {
