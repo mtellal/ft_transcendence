@@ -103,6 +103,28 @@ export class UpdateChannelDto {
   channelId: number
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  name?: string
+
+  @ApiProperty()
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string
+}
+
+export class PatchChannelDto {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  name?: string
+
+  @ApiProperty()
   @IsEnum(ChannelType)
   @IsOptional()
   type?: ChannelType
