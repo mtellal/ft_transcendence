@@ -1,10 +1,10 @@
 
 .menu-container
 {
-    width: 30%;
     height: 100%;
     overflow-y: auto;
     border-right: 1px solid black;
+    padding: 5%;
 }
 
 
@@ -100,15 +100,6 @@
     white-space: nowrap;
 }
 
-@media (max-width: 600px)
-{
-    .group-members, .group-separator{
-        display: none;
-    }   
-    .group-name {
-        max-width: 100%;
-    }
-}
 
 .friend-chat
 {
@@ -123,8 +114,6 @@
 
 @media screen and (max-width: 700px) {
     .menu-container {
-        width: 100%;
-        border-bottom: 1px solid black ;
         overflow: visible;
     }
 }

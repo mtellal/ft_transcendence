@@ -3,8 +3,7 @@
     grid-row: 2 / span 18;
     grid-column: auto / span 20;
     margin: 0;
-    padding: 5vh 5vh;
-    overflow: scroll;
+    padding: 5% 5%;
 }
 
 .chat-container
@@ -22,8 +21,7 @@
 @media screen and (max-width: 700px)
 {
     .chat {
-        overflow: visible;
-        grid-row: auto / auto;
+        grid-row: auto / span 19;
         grid-column: auto / span 20;
     }
 

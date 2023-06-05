@@ -9,7 +9,7 @@
 .messages-display
 {
     flex: 7;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 .messages-input
@@ -143,4 +143,9 @@
 {
     padding: 5px 0;
     margin: 10px 0;
+}
+
+
+@media screen and (max-width: 700px) {
+
 }

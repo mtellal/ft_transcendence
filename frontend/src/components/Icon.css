@@ -25,3 +25,12 @@
     bottom: -15px;
     visibility: hidden;
 }
+
+@media screen and (max-width: 700px)
+{
+    .icon-container {
+        margin-left: auto;
+        height: auto;
+        padding: 5px;
+    }
+}

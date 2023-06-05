@@ -36,7 +36,8 @@
 
 @media screen and (max-width: 700px) {
     .history {
-        grid-row: auto / span 18;
+        overflow: visible;
+        grid-row: auto / auto;
         grid-column: 1 / -1;
         align-items: center;
     }

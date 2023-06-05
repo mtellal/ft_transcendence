@@ -1,6 +1,5 @@
 .banner
 {
-    min-height: 40px ;
     border-bottom: 1px solid black;
     display: flex;
     padding: 10px 10px;
@@ -21,3 +20,19 @@
 {
     background-color: aqua;
 }
+
+.banner-menu-back
+{
+    padding: 0 10px 0 5px;
+}
+
+.banner-icons-container
+{
+    width: 100%;
+}
+
+@media  screen and (max-width: 700px) {
+    .banner {
+    }
+}
+

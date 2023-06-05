@@ -1,11 +1,12 @@
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useOutlet, useOutletContext, useParams } from "react-router-dom";
 
 import UserLabel from "../../../../components/users/UserLabel";
 import './MenuElement.css'
 import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
 import { createChannel, removeChannel } from "../../../../requests/chat";
+import { useWindow } from "../../../../hooks/useWindow";
 
 /*
     tittle
@@ -100,7 +101,10 @@ export default function MenuElement({ ...props }) {
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
 
-    const [width, setWidth] = useState(window.innerWidth)
+    const {isMobileDisplay} = useWindow();
+
+
+    /* const [width, setWidth] = useState(window.innerWidth)
 
     function getWidth()
     {
@@ -110,7 +114,7 @@ export default function MenuElement({ ...props }) {
     useEffect(() => {
         window.addEventListener('resize', getWidth);
         return () => window.removeEventListener('resize', getWidth);
-    }, [])
+    }, []) */
 
     const selectCurrentChannel = useCallback(async (element: any, type: string) => {
         let channelSelected: any;
@@ -142,6 +146,7 @@ export default function MenuElement({ ...props }) {
             channelSelected = element;
         //joinChannel(channelSelected);
         setCurrentChannel(channelSelected);
+        props.setBackToMenu(false)
     }, [channels, friends])
 
     React.useEffect(() => {
@@ -182,8 +187,12 @@ export default function MenuElement({ ...props }) {
 
     }, [friends, channels])
 
+    console.log(props.backToMenu)
+
     return (
-        <div className={currentChannel && width <= 700 ? "menu-container hidden" : "menu-container visible"}>
+        <div 
+            className={currentChannel && isMobileDisplay && !props.backToMenu ? "menu-container hidden" : "menu-container visible"}
+        >
             <CollectionElement
                 title="Groups"
                 collection={channelsList}
