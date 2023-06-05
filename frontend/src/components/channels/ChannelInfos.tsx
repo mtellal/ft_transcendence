@@ -7,44 +7,36 @@ import ProfilePicture from "../../components/users/ProfilePicture";
 import './ChannelInfos.css'
 
 type TChannelInfos = {
-    name: string
+    channel: any,
 }
 
 export default function ChannelInfos(props: TChannelInfos) {
 
-    const { user, image } = useCurrentUser();
-    const { currentChannel, getMembers } = useChannels();
+    const {getMembers, channels } = useChannels();
 
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 
     const loadMembers = useCallback(async () => {
-        let members = getMembers(currentChannel.id);
+        let members = getMembers(props.channel.id);
         if (members && members.length) {
-            members = members.map((u: any) => u.id);
-            members = await Promise.all(members.map(async (id: number) =>
-            await getUserProfilePictrue(id).
-            then(res => window.URL.createObjectURL(new Blob([res.data])))
-            ))
             setRenderMembersPP(
-                members.map((url: string) =>
-                    <div key={url} className="channelinfos-pp-container">
-                        <ProfilePicture image={url} />
+                members.map((user: any) =>
+                    <div key={user.id} className="channelinfos-pp-container">
+                        <ProfilePicture image={user.url} />
                     </div>
                 )
             );
         }
-    }, [currentChannel])
+    }, [props.channel, channels])
 
     useEffect(() => {
-        setRenderMembersPP([])
-        if (currentChannel) {
-            loadMembers();
-        }
-    }, [currentChannel])
+        loadMembers();
+    }, [props.channel, channels])
+
 
     return (
         <div className="flex-center">
-            <h2 style={{ whiteSpace: 'nowrap' }}>{props.name} - </h2>
+            <h2 style={{ whiteSpace: 'nowrap' }}>{props.channel && props.channel.name} - </h2>
             <div className="flex-center channelinfos-members-container">
                 {renderMembersPP}
             </div>

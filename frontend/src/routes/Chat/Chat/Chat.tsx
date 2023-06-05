@@ -122,7 +122,7 @@ function ChatInterface() {
             })
 
             socket.on('updatedUser', async (friend: any) => {
-                console.log("UPDATE FRIEND EVENT => ", friend)
+                console.log("UPDATE FRIEND EVENT => ", friend.username)
                 updateFriend(friend)
             })
 
@@ -137,10 +137,11 @@ function ChatInterface() {
             socket.on('updatedChannel',(channel : any) => {
                 if (channel)
                 {
-                    console.log("UPDATED CHANNEL", channel)
-                    channelsDispatch({type: 'updateChannel', channel})
+                    // console.log("UPDATED CHANNEL", channel.name)
+                    //channelsDispatch({type: 'updateChannel', channel})
                 }
             })
+
         }
 
     }, [socket])

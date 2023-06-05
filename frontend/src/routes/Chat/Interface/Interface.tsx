@@ -76,6 +76,13 @@ export default function Interface() {
     }
 
 
+    function validLeaveChannel()
+    {
+        leaveChannel(currentChannel); 
+        setRemoveView(false);
+        navigate("/chat");
+    }
+
     // update current friend selected when he is picked from MenuElement
 
     React.useEffect(() => {
@@ -117,7 +124,7 @@ export default function Interface() {
                                 currentChannel={currentChannel}
                                 currentFriend={currentFriend}
                                 cancel={() => setRemoveView(prev => !prev)}
-                                leaveChannel={() => {leaveChannel(currentChannel); setRemoveView(false)}}
+                                leaveChannel={() => validLeaveChannel()}
                                 removeFriend={() => removeFriend(currentFriend)}
                             />
                         }

@@ -4,6 +4,9 @@ import { useChatSocket, useFriends, useCurrentUser } from "../../hooks/Hooks";
 import {
     getUser, getUserProfilePictrue
 } from '../../requests/user'
+import useFetchUsers from "../../hooks/useFetchUsers";
+import { useNavigate } from "react-router-dom";
+import useKickUser from "../../hooks/usekickUser";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 
@@ -102,8 +105,37 @@ function reducer(channels: any, action: any) {
             }
         }
         case ('removeChannel'): {
-            if (channels.length && action.channel) {
-                return (channels.filter((c: any) => c.id !== action.channel.id))
+            if (channels.length && action.channelId) {
+                return (channels.filter((c: any) => c.id !== action.channelId))
+            }
+        }
+        case ('addMember'): {
+            if (channels.length && action.user && action.channelId) {
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId) {
+                            if (!c.users.find((u: User) => u.id === action.user.id))
+                                c.users.push(action.user);
+                            if (!c.members.find((id: number) => id === action.user.id))
+                                c.members.push(action.user.id)
+                        }
+                        return (c)
+                    })
+                )
+            }
+        }
+        case ('removeMember'): {
+            if (channels.length && action.userId && action.channelId) {
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId) {
+                            c.members = c.members.filter((id: number) => id !== action.userId);
+                            c.users = c.users.filter((u: User) => u.id !== action.userId);
+                            console.log(c.users)
+                        }
+                        return (c)
+                    })
+                )
             }
         }
         case ('initMessages'): {
@@ -141,45 +173,9 @@ export function ChannelsProvider({ children }: any) {
     const [channels, channelsDispatch] = useReducer(reducer, []);
     const [currentChannel, setCurrentChannelLocal]: any = useState();
     const { friends } = useFriends();
+    const { fetchUser, fetchUsers } = useFetchUsers();
+    const navigate = useNavigate();
 
-
-    const fetchUserProfilePicture = useCallback(async (userId: number) => {
-        return (
-            await getUserProfilePictrue(userId)
-                .then(res => {
-                    if (res.status === 200 && res.statusText === "OK")
-                        return (window.URL.createObjectURL(new Blob([res.data])))
-                })
-        )
-    }, [])
-
-    const fetchUser = useCallback(async (userId: number) => {
-        return (
-            await getUser(userId)
-                .then(async (res: any) => {
-                    if (res.status === 200 && res.statusText === "OK") {
-                        let user = res.data;
-                        let url = await fetchUserProfilePicture(userId);
-                        return ({ ...user, url })
-                    }
-                })
-        )
-    }, [])
-
-    const fetchUsers = useCallback(async (usersId: number[]) => {
-        if (usersId && usersId.length) {
-            const users = await Promise.all(
-                usersId.map(async (id: number) => {
-                    if (id === user.id)
-                        return (user)
-                    else
-                        return (await fetchUser(id))
-
-                })
-            )
-            return (users)
-        }
-    }, [user])
 
     const loadChannels = useCallback(async () => {
         let channelList = await getChannels(user.id)
@@ -202,11 +198,44 @@ export function ChannelsProvider({ children }: any) {
         // channelList.map(async (c : any) => await removeChannel(c.id))
     }, [user, socket])
 
+    useEffect(() => {
+        if (socket && user) {
+            socket.on('updateChannelName', (channelId: number, name: string) => {
+                console.log("UPDATE CHANNEL NAME EVENT")
+                console.log(channelId, name)
+            })
+
+            socket.on('joinedChannel', async (res: any) => {
+                console.log("JOINED CHANNEL EVENT")
+                const user = await fetchUser(res.userId);
+                channelsDispatch({ type: 'addMember', channelId: res.channelId, user: user })
+            })
+
+            socket.on('leftChannel', async (res: any) => {
+                console.log("LEFT CHANNEL EVENT")
+                channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
+            })
+
+            if (user)
+                loadChannels();
+        }
+    }, [socket, user])
+
 
     useEffect(() => {
-        if (socket && user)
-            loadChannels();
-    }, [socket, user])
+        if (socket)
+        {
+            socket.on('kickedUser', async (res: any) => {
+                console.log("KICKED CHANNEL EVENT")
+                channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
+                if (res.userId === user.id)
+                    channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
+                if (currentChannel && res.channelId === currentChannel.id)
+                    navigate("/chat");
+            })
+        }
+        return () => socket && socket.off('kickedUser')
+    }, [socket, currentChannel])
 
 
     ////////////////////////////////////////////////////////////////
@@ -215,12 +244,11 @@ export function ChannelsProvider({ children }: any) {
 
     const addChannel = useCallback(async (channel: any) => {
         if (socket) {
-            if (!channel.users || !channel.users.length && channel.members)
-            {
+            if (!channel.users || !channel.users.length && channel.members) {
                 channel.members = [...channel.members, user.id]
                 const users = await fetchUsers(channel.members)
                 if (users)
-                    channel = {...channel, users} 
+                    channel = { ...channel, users }
             }
             channelsDispatch({ type: 'addChannel', channel });
             joinChannel(channel);
@@ -249,6 +277,11 @@ export function ChannelsProvider({ children }: any) {
     ////////////////////////////////////////////////////////////////
     //                           U S E R S                        //
     ////////////////////////////////////////////////////////////////
+
+    /*
+        !!!!!!!!!!! ATTENTION LES USERS DEMANDES SONT ENVOYES AVEC TOUS LEURS DETAILS, 
+            demander seulement les datas pour un ami
+    */
 
     const getMembers = useCallback((channelId: number) => {
         if (channelId && channels && channels.length) {
@@ -340,11 +373,11 @@ export function ChannelsProvider({ children }: any) {
     const setCurrentChannel = useCallback((channel: any) => {
         let pickChannel;
         if (!channels.length)
-        pickChannel = channel;
+            pickChannel = channel;
         else {
             pickChannel = channels.find((c: any) => c.id === channel.id)
             if (!pickChannel)
-            pickChannel = channel
+                pickChannel = channel
         }
         setCurrentChannelLocal(pickChannel);
     }, [channels])
@@ -357,6 +390,8 @@ export function ChannelsProvider({ children }: any) {
     }, [channels])
 
 
+
+    //console.log(channels)
 
     return (
         <ChannelsContext.Provider value={{
