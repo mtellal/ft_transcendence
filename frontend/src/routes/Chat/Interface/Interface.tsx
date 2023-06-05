@@ -47,6 +47,7 @@ export default function Interface() {
     const [removeView, setRemoveView] = React.useState(false);
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
+    const { setBackToMenu, backToMenu } : any = useOutletContext();
 
     function block() {
         if (!blocked) {
@@ -94,12 +95,13 @@ export default function Interface() {
         <>
             {
                 currentChannel ?
-                    <div className="flex-column relative interface-container">
+                    <div className={backToMenu ? "flex-column relative interface-container hidden" : "flex-column relative interface-container visible"}>
                         <Banner
                             profile={() => setProfile(prev => !prev)}
                             invitation={() => { }}
                             block={() => block()}
                             remove={() => setRemoveView(prev => !prev)}
+                            backToMenu={() => setBackToMenu((p : any) => !p)}
                         />
                         {
                             profile ?

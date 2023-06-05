@@ -37,6 +37,9 @@ function ChatInterface() {
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);
 
+    const [backToMenu, setBackToMenu] = useState(false);
+
+
     /////////////////////////////////////////////////////////////////////////
     //                         I N V I T A T I O N S                       //
     /////////////////////////////////////////////////////////////////////////
@@ -151,11 +154,15 @@ function ChatInterface() {
                 <MenuElement
                     notification={notifInvitation}
                     removeNotif={() => setNotifInvitation(false)}
+                    backToMenu={backToMenu}
+                    setBackToMenu={setBackToMenu}
                 />
                 <Outlet context={
                     {
                         friendInvitations,
                         removeFriendRequest,
+                        setBackToMenu, 
+                        backToMenu
                     }
                 }
                 />
