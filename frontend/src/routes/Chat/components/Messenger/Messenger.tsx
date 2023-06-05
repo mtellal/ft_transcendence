@@ -9,6 +9,7 @@ import {
 } from "../../../../hooks/Hooks";
 import './Messenger.css'
 import ProfilePicture from "../../../../components/users/ProfilePicture";
+import useFetchUsers from "../../../../hooks/useFetchUsers";
 
 function BlockMessage({ username }: any) {
     return (
@@ -168,6 +169,8 @@ export default function Messenger({
 
     const { currentChannel, channels, getMembers } = useChannels();
     const { currentFriend, friends } = useFriends();
+    const { fetchUser } = useFetchUsers();
+
 
     function handleChange(e: any) {
         setValue(e.target.value)
@@ -196,17 +199,21 @@ export default function Messenger({
 
     // console.log("currentChannel => ", currentChannel)
 
-    function formatMessages(messages: any[], members: any[]) {
+    const formatMessages = useCallback(async (messages: any[], members: any[]) => {
         let author: any;
         let admin: boolean;
-        messages = messages.map((m: any, index: number) => {
+        messages = messages.map( async (m: any, index: number) => {
             admin = false;
             author = null;
             if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
                 if (m.sendBy === user.id)
                     author = user;
-                else
+                else if (m.sendBy)
+                {
                     author = members.find((u: any) => u.id === m.sendBy)
+                    if (!author)
+                        author = await fetchUser(m.sendBy);
+                }
             }
             if (author && currentChannel.type !== "WHISPER" &&
                 currentChannel.administrators.find((id: number) => id === author.id))
@@ -230,18 +237,23 @@ export default function Messenger({
             )
         })
         return (messages)
-    }
+    }, [currentChannel, channels, user])
+
+
+    const initMessages = useCallback(async () => {
+            const members = getMembers(currentChannel.id);
+                let messages: any = currentChannel && currentChannel.messages;
+                if (messages && messages.length && members && members.length) {
+                    messages = filterMessages(messages);
+                    messages = await Promise.all(await formatMessages(messages, members));
+                    setRenderMessages(messages)
+                }
+    }, [currentChannel, channels, user])
 
     useEffect(() => {
         setRenderMessages([]);
         if (currentChannel) {
-            const members = getMembers(currentChannel.id);
-            let messages: any = currentChannel && currentChannel.messages;
-            if (messages && messages.length && members && members.length) {
-                messages = filterMessages(messages);
-                messages = formatMessages(messages, members)
-                setRenderMessages(messages)
-            }
+            initMessages();
         }
     }, [channels, currentChannel, user])
 

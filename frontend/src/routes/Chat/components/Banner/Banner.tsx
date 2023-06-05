@@ -59,40 +59,22 @@ export default function Banner({ ...props }: TBanner) {
     const { user } = useCurrentUser();
     const { currentFriend } = useFriends();
     const { currentChannel } = useChannels();
-
-    const [friend, setFriend]: any = useState();
-    const [channel, setChannel]: any = useState();
-
     const { isMobileDisplay } = useWindow();
-
-    useEffect(() => {
-        setFriend(null);
-        if (currentFriend)
-            setFriend(currentFriend)
-    }, [currentFriend])
-
-    useEffect(() => {
-        setChannel(null);
-        if (currentChannel)
-            setChannel(currentChannel)
-    }, [currentChannel])
-
-    console.log(isMobileDisplay)
 
     return (
         <div className="banner">
             <div className="flex-center">
                 <ArrowBackMenu/>
                 {
-                    channel && channel.type === "WHISPER" ?
+                    currentChannel && currentChannel.type === "WHISPER" ?
                         <UserInfos
-                            username={friend && friend.username}
-                            userStatus={friend && friend.userStatus}
-                            profilePictureURL={friend && friend.url}
+                            username={currentFriend && currentFriend.username}
+                            userStatus={currentFriend && currentFriend.userStatus}
+                            profilePictureURL={currentFriend && currentFriend.url}
                         />
                         :
                         <ChannelInfos
-                            name={channel && channel.name}
+                            channel={currentChannel}
                         />
                 }
             </div>
@@ -101,14 +83,14 @@ export default function Banner({ ...props }: TBanner) {
 
                     <div className="flex banner-icons-container">
                         <IconsBanner
-                            channel={channel}
+                            channel={currentChannel}
                             user={user}
                             {...props}
                         />
                     </div>
                     : 
                     <IconsBanner
-                    channel={channel}
+                    channel={currentChannel}
                     user={user}
                     {...props}
                 />

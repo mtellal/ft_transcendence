@@ -8,6 +8,7 @@ import InfoInput from "../../../components/Input/InfoInput";
 import PickMenu from "../../../components/PickMenu";
 import { TUserInfos, UserInfos } from "../../../components/users/UserInfos";
 import Icon from "../../../components/Icon";
+import useKickUser from "../../../hooks/usekickUser";
 
 export const PofileChannelContext = createContext({});
 
@@ -16,11 +17,12 @@ export const PofileChannelContext = createContext({});
 function ChannelUserLabel(props: any) {
 
     const { user } = useCurrentUser();
+    const { kickUser } = useKickUser();
+
     const {
         setUserOperation,
         setConfirmView,
         adminUser,
-        kickUser,
         muteUser,
         banUser,
         isAdmin,
@@ -36,7 +38,7 @@ function ChannelUserLabel(props: any) {
             />
             {
                 isAdmin && props.user.username !== (user && user.username) &&
-                <div className="flex-center">
+                <div className="flex-center fill">
 
                     {
                         isOwner &&
@@ -69,6 +71,7 @@ function ChannelUserLabel(props: any) {
 
 function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState();
+    const { channels } = useChannels();
 
     useEffect(() => {
         if (props.users && props.users)
@@ -78,7 +81,7 @@ function CollectionUsers(props: any) {
                     user={user}
                 />
             ))
-    }, [props.users, props.isAdmin, props.currentUser])
+    }, [props.users, props.isAdmin, props.currentUser, channels])
 
     return (
         <CollectionElement
@@ -126,7 +129,7 @@ function ChannelProfile(props: any) {
 
     const { socket } = useChatSocket();
     const { user } = useCurrentUser();
-    const { getAdministrators, getOwner } = useChannels();
+    const { channels, getAdministrators, getOwner } = useChannels();
 
     const [name, setName]: any = useState(props.channel && props.channel.name);
     const [password, setPassword] = useState("");
@@ -151,7 +154,7 @@ function ChannelProfile(props: any) {
             const owner = getOwner(props.channel);
             setOwner(owner)
         }
-    }, [props.members])
+    }, [props.members, channels])
 
 
     useEffect(() => {
@@ -166,7 +169,7 @@ function ChannelProfile(props: any) {
         console.log("admin user ", user);
     }
 
-    const kickUser = useCallback((user: any) => {
+    /* const kickUser = useCallback((user: any) => {
         console.log("kick user ", user);
         if (socket && props.channel && user) {
             socket.emit('kickUser', {
@@ -174,7 +177,7 @@ function ChannelProfile(props: any) {
                 userId: user.id
             })
         }
-    }, [socket, props.channel])
+    }, [socket, props.channel]) */
 
     function muteUser(user: any) {
         console.log("mute user ", user);
@@ -192,14 +195,13 @@ function ChannelProfile(props: any) {
 
     function validOperation() {
         setConfirmView(p => !p);
-        userOperation.function(userOperation.user);
+        userOperation.function(userOperation.user, props.channel);
     }
 
     return (
         <PofileChannelContext.Provider
             value={{
                 adminUser,
-                kickUser,
                 muteUser,
                 banUser,
                 setConfirmView,
@@ -283,37 +285,20 @@ function FriendProfile(props : any)
 
 export default function Profile() {
     const { currentFriend } = useFriends();
-    const { currentChannel, getMembers } = useChannels();
-
-    const [friend, setFriend]: any = useState();
-    const [channel, setChannel]: any = useState();
-    const [members, setMembers]: any = useState();
-
-    useEffect(() => {
-        if (currentChannel) {
-            console.log("current channel updated ", currentChannel)
-            setChannel(currentChannel)
-            setMembers(getMembers(currentChannel.id))
-        }
-    }, [currentChannel])
-
-    useEffect(() => {
-        if (currentFriend)
-            setFriend(currentFriend)
-    }, [currentFriend])
+    const { currentChannel} = useChannels();
 
     return (
         <div className="scroll">
             {
-                channel && members && currentChannel.type !== "WHISPER" && 
+                currentChannel && currentChannel.users && currentChannel.type !== "WHISPER" && 
                 <ChannelProfile
-                    name={channel.name}
-                    members={members}
-                    channel={channel}
+                    name={currentChannel && currentChannel.name}
+                    members={currentChannel && currentChannel.users}
+                    channel={currentChannel}
                 />
             }
             {
-                channel && members && currentChannel.type === "WHISPER" && 
+                currentChannel && currentChannel.users && currentChannel.type === "WHISPER" && 
                 <FriendProfile
                     currentFriend={currentFriend}
                 />
