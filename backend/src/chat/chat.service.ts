@@ -140,6 +140,7 @@ export class ChatService {
       const updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
+          name: dto.name,
           type: dto.type,
           password: dto.password
         }
@@ -152,6 +153,7 @@ export class ChatService {
         const updatedChannel= await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
+          name: dto.name,
           type: dto.type,
           password: null
         }

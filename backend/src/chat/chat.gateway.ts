@@ -167,6 +167,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const message = await this.chatService.createNotif(notif);
         this.server.to(channel.id.toString()).emit('message', message);
         this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+        this.server.to(channel.id.toString()).emit('joinedChannel', {
+          channelId: channel.id,
+          userId: user.id
+        })
       }
       client.join(channel.id.toString());
       const messages = await this.chatService.getMessage(channel.id);
@@ -306,6 +310,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const message = await this.chatService.createNotif(leaveNotif);
         this.server.to(updatedChannel.id.toString()).emit('message', message);
         this.server.to(updatedChannel.id.toString()).emit('updatedChannel', updatedChannel);
+        this.server.to(updatedChannel.id.toString()).emit('leftChannel', {
+          channelId: channel.id,
+          userId: user.id
+        });
+        if (channel.ownerId !== updatedChannel.ownerId) {
+          this.server.to(updatedChannel.id.toString()).emit('ownerChaned', {
+            channelId: channel.id,
+            userId: updatedChannel.ownerId
+          })
+        }
       }
     }
     catch(error) {
@@ -363,8 +377,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const socketId = this.connectedUsers.get(usertoKick.id);
       if (socketId) {
         const socket = this.server.sockets.sockets.get(socketId);
-        if (socket.rooms.has(channel.id.toString()))
+        if (socket.rooms.has(channel.id.toString())) {
+          this.server.to(socketId).emit('kickedUser', {
+            channelId: channel.id,
+            userId: dto.userId
+          })
           socket.leave(channel.id.toString());
+        }
       }
       let kickMessage = `${usertoKick.username} was kicked by ${user.username}.`;
       if (dto.reason)
@@ -427,7 +446,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(usertoMute.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't mute another administrator`)
       const updatedChannel = await this.chatService.muteUser(dto, usertoMute);
-      let muteNotif = `${usertoMute.username} was muted by ${user.username} for ${dto.duration}".`;
+      let muteNotif = `${usertoMute.username} was muted by ${user.username} for ${dto.duration}\".`;
       if (dto.reason)
         muteNotif += ` Reason: ${dto.reason}`;
       const notif: MessageDto = {
@@ -438,6 +457,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const message = await this.chatService.createNotif(notif);
       this.server.to(channel.id.toString()).emit('message', message);
       this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+      const socketId = this.connectedUsers.get(usertoMute.id);
+      this.server.to(socketId).emit('mutedUser', {
+        channelId: channel.id,
+        userId: usertoMute.id
+      })
     }
     catch(error) {
       throw new WsException(error)
@@ -491,6 +515,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const socketId = this.connectedUsers.get(usertoBan.id);
       if (socketId) {
         const socket = this.server.sockets.sockets.get(socketId);
+        this.server.to(socketId).emit('bannedUser', {
+          channelId: channel.id,
+          userId: usertoBan.id
+        });
         if (socket.rooms.has(channel.id.toString()))
           socket.leave(channel.id.toString());
       }
@@ -555,6 +583,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(newAdmin.id))
         throw new ForbiddenException(`${newAdmin.username} is already an administrator`)
       const updatedChannel = await this.chatService.makeAdmin(channel, newAdmin);
+      const socketId = this.connectedUsers.get(newAdmin.id);
+      this.server.to(socketId).emit('madeAdmin', {
+        channelId: channel.id,
+        userId: newAdmin.id
+      })
       let promoteNotif = `${newAdmin.username} was promoted to administrator by ${user.username}.`;
       const notif: MessageDto = {
         channelId: channel.id,
@@ -570,7 +603,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage('updateChannel')
+/*   @SubscribeMessage('updateChannel')
   async updateChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: UpdateChannelDto) {
     console.log("/////////////////////////////// EVENT UPDATECHANNEL ///////////////////////////////")
     let user: User;
@@ -582,7 +615,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
-      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      Temporary to test with postman, will need to be changed depending on the way the front sends the info
       const authToken = token
       if (!authToken)
         throw new UnauthorizedException();
@@ -616,7 +649,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     const message = await this.chatService.createNotif(notif);
     this.server.to(channel.id.toString()).emit('message', message);
-  }
+  } */
 
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
