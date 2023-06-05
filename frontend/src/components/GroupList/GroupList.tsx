@@ -3,13 +3,13 @@ import s from './style.module.css'
 
 interface GroupListProps {
 	channel: any;
-	setIdFriendSelected: any;
+	setidChannelSelected: any;
 }
 
-export function GroupList({ channel, setIdFriendSelected }:  GroupListProps) {
+export function GroupList({ channel, setidChannelSelected }:  GroupListProps) {
 
 	function setIdChannel() {
-		setIdFriendSelected(channel.id);
+		setidChannelSelected(channel.id);
 	}
 
 	return (

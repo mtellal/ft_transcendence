@@ -43,6 +43,8 @@ export function ChatboxChannel({ idChannelSelected }) {
     }
     async function getMessages(id) {
         const rep = await BackApi.getChannelMessagesById(id);
+        console.log('API STATUS');
+        console.log('API DATA', rep.data);
         if (rep.status === 200) {
             setMessages(rep.data);
         }
@@ -50,13 +52,14 @@ export function ChatboxChannel({ idChannelSelected }) {
     useEffect(() => {
         if (selector.id && Asocket) {
             const fetchData = async () => {
+                console.log('OKKKKKKKKKKKKKKKKKKKKKKKKK');
                 joinChannel();
                 await getMessages(idChannelSelected);
             };
             fetchData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [Asocket, selector.id]);
+    }, [Asocket, selector.id, idChannelSelected]);
     const messageListener = (message) => {
         if (message.channelId === idChannelSelected) {
             if (message.length) {
@@ -75,7 +78,7 @@ export function ChatboxChannel({ idChannelSelected }) {
             };
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [messageListener]);
+    }, [messageListener, idChannelSelected]);
     useEffect(() => {
         AsetSocket(getSocket());
     }, []);

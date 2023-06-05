@@ -17,7 +17,7 @@ export function Chatbox({ idFriendSelected }) {
             channelId: idChannel,
         });
     };
-    async function creteOrJoinChannel() {
+    async function createOrJoinChannel() {
         const response = await BackApi.getWhispers(selector.id, idFriendSelected);
         if (response.status === 200) {
             console.log('Chennel exist');
@@ -57,7 +57,7 @@ export function Chatbox({ idFriendSelected }) {
     useEffect(() => {
         if (selector.id && Asocket) {
             const fetchData = async () => {
-                const id = await creteOrJoinChannel();
+                const id = await createOrJoinChannel();
                 getMessages(id);
             };
             fetchData();

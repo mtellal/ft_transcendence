@@ -1,7 +1,7 @@
 import React from 'react';
-export function GroupList({ channel, setIdFriendSelected }) {
+export function GroupList({ channel, setidChannelSelected }) {
     function setIdChannel() {
-        setIdFriendSelected(channel.id);
+        setidChannelSelected(channel.id);
     }
     return (React.createElement("div", null,
         React.createElement("button", { onClick: setIdChannel }, channel.name ? channel.name : channel.id)));

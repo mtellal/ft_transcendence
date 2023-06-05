@@ -3,58 +3,74 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import { initializeSocket, getSocket } from '../../utils/socket';
 import io, { Socket } from 'socket.io-client'
 import s from './style.module.css'
+import { BackApi } from '../../api/back';
 
 export function CreateGroup() {
 
 	const selector = useSelector((store: RootState) => store.user.user);
-	const [socket, setSocket] = useState<Socket | null>(null);
+	const [Asocket, AsetSocket] = useState<any>(null);
 	const [privacy, setPrivacy] = useState('Public');
-
-	useEffect(() => {
-        if (selector.token) {
-            const newSocket = io('http://localhost:3000', {
-                transports: ['websocket'],
-                extraHeaders: {
-                    'Authorization': `Bearer ${selector.token}`
-                }
-            })
-            setSocket(newSocket);
-        }
-    }, [setSocket, selector.token])
 
 	function handlePrivacyChange(e: React.ChangeEvent<HTMLSelectElement>) {
 		setPrivacy(e.target.value);
 	}
 
-	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
+		e.preventDefault();
 		const target = e.target as typeof e.target & {
 			name: { value: string };
 			privacy: { value: string };
 			password?: { value: string };
 		};
 
-		e.preventDefault();
 		if ((e.target as HTMLFormElement).privacy.value === 'Public') {
-				socket.emit('createChannel', {
+			const rep = await BackApi.createChannel({
 				name: target.name.value,
-				type: "PUBLIC",
-			})
+				type: 'PUBLIC',
+				members: [selector.id],
+			}, selector.token);
 		} else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
-				socket.emit('createChannel', {
-					name: target.name.value,
-					type: "PRIVATE",
-				})
-		} else {
-			socket.emit('createChannel', {
+			const rep = await BackApi.createChannel({
 				name: target.name.value,
-				type: "PROTECTED",
-				password: (e.target as HTMLFormElement).password.value
-			})
+				type: 'PRIVATE',
+				members: [selector.id],
+			}, selector.token);
+		} else {
+			console.log('TEST', target.password.value);
+			const rep = await BackApi.createChannel({
+				name: target.name.value,
+				type: 'PROTECTED',
+				members: [selector.id],
+				password: target.password.value
+			}, selector.token);
 		}
+
+		// if ((e.target as HTMLFormElement).privacy.value === 'Public') {
+		// 		Asocket.emit('createChannel', {
+		// 		name: target.name.value,
+		// 		type: "PUBLIC",
+		// 	})
+		// } else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
+		// 		Asocket.emit('createChannel', {
+		// 			name: target.name.value,
+		// 			type: "PRIVATE",
+		// 		})
+		// } else {
+		// 	Asocket.emit('createChannel', {
+		// 		name: target.name.value,
+		// 		type: "PROTECTED",
+		// 		password: (e.target as HTMLFormElement).password.value
+		// 	})
+		// }
 	}
+
+	useEffect(() => {
+		AsetSocket(getSocket());
+	}, [])
 
 	return (
 		<div>

@@ -19,6 +19,7 @@ export function Chat() {
 	const [myChannels, setMyChannels] = useState([]);
 	const [friendRequest, setFriendRequest] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
+	const [idChannelSelected, setidChannelSelected] = useState();
 	const [btnFriendsRequest, setBtnFriendsRequest] = useState('FRIEND');
 	const selector = useSelector((store: RootState) => store.user.user);
 
@@ -80,6 +81,8 @@ export function Chat() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selector.id, friendRequest])
 
+	console.log('idchanselected', idChannelSelected);
+
 	return (
 		<div className={s.container}>
 			<div className={s.item}>
@@ -123,11 +126,11 @@ export function Chat() {
 				</div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />}
 				{btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
-				{btnFriendsRequest === 'GROUP' && myChannels && <Group myChannels={myChannels} setIdFriendSelected={setIdFriendSelected} />}
+				{btnFriendsRequest === 'GROUP' && myChannels && <Group myChannels={myChannels} setidChannelSelected={setidChannelSelected} />}
 				{btnFriendsRequest === 'CREATE_GROUP' && myChannels && <CreateGroup />}
 				{btnFriendsRequest === 'JOIN_GROUP' && myChannels && <JoinChannel myChannels={myChannels} />}
 				{idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && <Chatbox idFriendSelected={idFriendSelected} />}
-				{idFriendSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel idChannelSelected={idFriendSelected} />}
+				{idChannelSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel idChannelSelected={idChannelSelected} />}
 			</div>
 		</div>
 	);

@@ -16,6 +16,7 @@ export function Chat() {
     const [myChannels, setMyChannels] = useState([]);
     const [friendRequest, setFriendRequest] = useState([]);
     const [idFriendSelected, setIdFriendSelected] = useState();
+    const [idChannelSelected, setidChannelSelected] = useState();
     const [btnFriendsRequest, setBtnFriendsRequest] = useState('FRIEND');
     const selector = useSelector((store) => store.user.user);
     async function getFriends() {
@@ -69,6 +70,7 @@ export function Chat() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id, friendRequest]);
+    console.log('idchanselected', idChannelSelected);
     return (React.createElement("div", { className: s.container },
         React.createElement("div", { className: s.item },
             React.createElement("div", { className: s.menu },
@@ -80,9 +82,9 @@ export function Chat() {
                 React.createElement(AddFriend, { addFriend: addFriend })),
             btnFriendsRequest === 'REQUEST' && friendRequest && React.createElement(FriendRequest, { listFriendRequest: friendRequest, setFriendRequest: setFriendRequest }),
             btnFriendsRequest === 'FRIEND' && friends && React.createElement(Friends, { friends: friends, delFriend: delFriend, setIdFriendSelected: setIdFriendSelected }),
-            btnFriendsRequest === 'GROUP' && myChannels && React.createElement(Group, { myChannels: myChannels, setIdFriendSelected: setIdFriendSelected }),
+            btnFriendsRequest === 'GROUP' && myChannels && React.createElement(Group, { myChannels: myChannels, setidChannelSelected: setidChannelSelected }),
             btnFriendsRequest === 'CREATE_GROUP' && myChannels && React.createElement(CreateGroup, null),
             btnFriendsRequest === 'JOIN_GROUP' && myChannels && React.createElement(JoinChannel, { myChannels: myChannels }),
             idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && React.createElement(Chatbox, { idFriendSelected: idFriendSelected }),
-            idFriendSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idChannelSelected: idFriendSelected }))));
+            idChannelSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idChannelSelected: idChannelSelected }))));
 }
