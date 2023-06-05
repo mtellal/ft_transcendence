@@ -127,7 +127,7 @@ export function Chat() {
 				{btnFriendsRequest === 'CREATE_GROUP' && myChannels && <CreateGroup />}
 				{btnFriendsRequest === 'JOIN_GROUP' && myChannels && <JoinChannel myChannels={myChannels} />}
 				{idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && <Chatbox idFriendSelected={idFriendSelected} />}
-				{idFriendSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel idFriendSelected={idFriendSelected} />}
+				{idFriendSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel idChannelSelected={idFriendSelected} />}
 			</div>
 		</div>
 	);

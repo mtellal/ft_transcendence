@@ -84,5 +84,5 @@ export function Chat() {
             btnFriendsRequest === 'CREATE_GROUP' && myChannels && React.createElement(CreateGroup, null),
             btnFriendsRequest === 'JOIN_GROUP' && myChannels && React.createElement(JoinChannel, { myChannels: myChannels }),
             idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && React.createElement(Chatbox, { idFriendSelected: idFriendSelected }),
-            idFriendSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idFriendSelected: idFriendSelected }))));
+            idFriendSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idChannelSelected: idFriendSelected }))));
 }

@@ -5,28 +5,29 @@ import { BackApi } from '../../api/back';
 import { Messages } from '../Messages/Messages';
 import { RootState } from '../../store';
 import { Socket } from 'socket.io-client';
+import { initializeSocket, getSocket } from '../../utils/socket';
 import io from 'socket.io-client'
 import s from './style.module.css'
 
-export function ChatboxChannel({ idFriendSelected }: {idFriendSelected: number}) {
+export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number}) {
 
-	console.log('id select friend', idFriendSelected);
+	console.log('id select friend', idChannelSelected);
 
 	const selector = useSelector((store: RootState) => store.user.user);
-	const [socket, setSocket] = useState<Socket | null>();
+	const [Asocket, AsetSocket] = useState<any>(null);
     const [messages, setMessages] = useState([]);
 
     const send = (value: string) => {
-        socket.emit('message', {
+        Asocket.emit('message', {
             sendBy: selector.id,
             content: value,
-            channelId: idFriendSelected,
+            channelId: idChannelSelected,
         });
     }
 
 	function joinChannel() {
-		socket.emit('joinChannel', {
-			channelId: idFriendSelected
+		Asocket.emit('joinChannel', {
+			channelId: idChannelSelected
 		})
 	}
 
@@ -35,8 +36,8 @@ export function ChatboxChannel({ idFriendSelected }: {idFriendSelected: number})
 		const rep = await BackApi.getUserByUsername(e.currentTarget.invitUser.value);
 		if (rep.status === 200) {
 			console.log('User invite', rep.data.id);
-			socket.emit('addtoChannel', {
-				channelId: idFriendSelected,
+			Asocket.emit('addtoChannel', {
+				channelId: idChannelSelected,
 				userId: rep.data.id,
 			})
 			console.log('FIN User invite');
@@ -50,42 +51,47 @@ export function ChatboxChannel({ idFriendSelected }: {idFriendSelected: number})
 		send(e.currentTarget.inputText.value);
 	}
 
-    useEffect(() => {
-        if (selector.token) {
-            const newSocket = io('http://localhost:3000', {
-                transports: ['websocket'],
-                extraHeaders: {
-                    'Authorization': `Bearer ${selector.token}`
-                }
-            })
-            setSocket(newSocket);
-        }
-    }, [setSocket, selector.token])
-
-    useEffect(() => {
-		if (selector.id && socket) {
-			joinChannel();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socket, selector.id])
-
-	const messageListener = (message: any) => {
-		if (message.length) {
-			setMessages(message);
-		} else {
-			setMessages([...messages, message]);
+	async function getMessages(id: Promise<any> | any) {
+		const rep = await BackApi.getChannelMessagesById(id);
+		if (rep.status === 200) {
+			setMessages(rep.data);
 		}
 	}
 
 	useEffect(() => {
-		if (selector.id && socket) {
-			socket.on('message', messageListener);
+		if (selector.id && Asocket) {
+			const fetchData = async () => {
+				joinChannel();
+				await getMessages(idChannelSelected);
+			};
+			fetchData();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [Asocket, selector.id]);
+
+	const messageListener = (message: any) => {
+		if (message.channelId === idChannelSelected) {
+			if (message.length) {
+				setMessages(message);
+			} else {
+				setMessages([...messages, message]);
+			}
+		}
+	}
+
+	useEffect(() => {
+		if (selector.id && Asocket) {
+			Asocket.on('message', messageListener);
 			return () => {
-				socket.off('message', messageListener)
+				Asocket.off('message', messageListener)
 			}
 		}
         // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [messageListener])
+
+	useEffect(() => {
+		AsetSocket(getSocket());
+	}, [])
 
 	return (
 		<div className={s.container} >

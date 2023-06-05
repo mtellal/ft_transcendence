@@ -48,11 +48,7 @@ export function Chatbox({ idFriendSelected }) {
     async function getMessages(id) {
         const rep = await BackApi.getChannelMessagesById(id);
         if (rep.status === 200) {
-            console.log('API OK');
             setMessages(rep.data);
-        }
-        else {
-            console.log('API NOP');
         }
     }
     useEffect(() => {
@@ -62,26 +58,13 @@ export function Chatbox({ idFriendSelected }) {
         if (selector.id && Asocket) {
             const fetchData = async () => {
                 const id = await creteOrJoinChannel();
-                // if (!messages.length) {
                 getMessages(id);
-                // }
             };
             fetchData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [Asocket, selector.id, idFriendSelected]);
-    // useEffect(() => {
-    // 	if (selector.id && Asocket) {
-    // 		const id  = creteOrJoinChannel();
-    // 		if (!messages.length) {
-    // 			getMessages(id);
-    // 		}
-    // 	}
-    // 	// eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [Asocket, selector.id, idFriendSelected])
     const messageListener = (message) => {
-        console.log('Msg', message);
-        // setMessages([]);
         if (message.channelId === idChannel) {
             if (message.length) {
                 setMessages(message);
@@ -93,7 +76,6 @@ export function Chatbox({ idFriendSelected }) {
     };
     useEffect(() => {
         if (selector.id && Asocket) {
-            // setMessages([]);
             Asocket.on('message', messageListener);
             return () => {
                 Asocket.off('message', messageListener);

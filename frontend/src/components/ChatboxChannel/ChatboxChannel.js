@@ -3,23 +3,23 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { BackApi } from '../../api/back';
 import { Messages } from '../Messages/Messages';
-import io from 'socket.io-client';
+import { getSocket } from '../../utils/socket';
 import s from './style.module.css';
-export function ChatboxChannel({ idFriendSelected }) {
-    console.log('id select friend', idFriendSelected);
+export function ChatboxChannel({ idChannelSelected }) {
+    console.log('id select friend', idChannelSelected);
     const selector = useSelector((store) => store.user.user);
-    const [socket, setSocket] = useState();
+    const [Asocket, AsetSocket] = useState(null);
     const [messages, setMessages] = useState([]);
     const send = (value) => {
-        socket.emit('message', {
+        Asocket.emit('message', {
             sendBy: selector.id,
             content: value,
-            channelId: idFriendSelected,
+            channelId: idChannelSelected,
         });
     };
     function joinChannel() {
-        socket.emit('joinChannel', {
-            channelId: idFriendSelected
+        Asocket.emit('joinChannel', {
+            channelId: idChannelSelected
         });
     }
     async function invitUser(e) {
@@ -27,8 +27,8 @@ export function ChatboxChannel({ idFriendSelected }) {
         const rep = await BackApi.getUserByUsername(e.currentTarget.invitUser.value);
         if (rep.status === 200) {
             console.log('User invite', rep.data.id);
-            socket.emit('addtoChannel', {
-                channelId: idFriendSelected,
+            Asocket.emit('addtoChannel', {
+                channelId: idChannelSelected,
                 userId: rep.data.id,
             });
             console.log('FIN User invite');
@@ -41,40 +41,44 @@ export function ChatboxChannel({ idFriendSelected }) {
         e.preventDefault();
         send(e.currentTarget.inputText.value);
     }
-    useEffect(() => {
-        if (selector.token) {
-            const newSocket = io('http://localhost:3000', {
-                transports: ['websocket'],
-                extraHeaders: {
-                    'Authorization': `Bearer ${selector.token}`
-                }
-            });
-            setSocket(newSocket);
+    async function getMessages(id) {
+        const rep = await BackApi.getChannelMessagesById(id);
+        if (rep.status === 200) {
+            setMessages(rep.data);
         }
-    }, [setSocket, selector.token]);
+    }
     useEffect(() => {
-        if (selector.id && socket) {
-            joinChannel();
+        if (selector.id && Asocket) {
+            const fetchData = async () => {
+                joinChannel();
+                await getMessages(idChannelSelected);
+            };
+            fetchData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socket, selector.id]);
+    }, [Asocket, selector.id]);
     const messageListener = (message) => {
-        if (message.length) {
-            setMessages(message);
-        }
-        else {
-            setMessages([...messages, message]);
+        if (message.channelId === idChannelSelected) {
+            if (message.length) {
+                setMessages(message);
+            }
+            else {
+                setMessages([...messages, message]);
+            }
         }
     };
     useEffect(() => {
-        if (selector.id && socket) {
-            socket.on('message', messageListener);
+        if (selector.id && Asocket) {
+            Asocket.on('message', messageListener);
             return () => {
-                socket.off('message', messageListener);
+                Asocket.off('message', messageListener);
             };
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messageListener]);
+    useEffect(() => {
+        AsetSocket(getSocket());
+    }, []);
     return (React.createElement("div", { className: s.container },
         React.createElement("form", { onSubmit: invitUser },
             React.createElement("input", { name: 'invitUser', placeholder: 'Invit user' }),

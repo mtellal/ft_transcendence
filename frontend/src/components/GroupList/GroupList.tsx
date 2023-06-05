@@ -8,13 +8,13 @@ interface GroupListProps {
 
 export function GroupList({ channel, setIdFriendSelected }:  GroupListProps) {
 
-	function test() {
+	function setIdChannel() {
 		setIdFriendSelected(channel.id);
 	}
 
 	return (
         <div>
-			<button onClick={test}>{channel.name ? channel.name : channel.id}</button>
+			<button onClick={setIdChannel}>{channel.name ? channel.name : channel.id}</button>
         </div>
 	);
 }
