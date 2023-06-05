@@ -9,6 +9,7 @@ import UsersCollection from "../../../components/collections/UsersCollection";
 import PickMenu from "../../../components/PickMenu";
 
 import './CreateChannel.css'
+import ArrowBackMenu from "../components/ArrowBackMenu";
 
 
 export function CreateChannel() {
@@ -22,7 +23,7 @@ export function CreateChannel() {
 
     const { token } = useCurrentUser();
 
-    const {channels, channelsDispatch, setCurrentChannel, addChannel} = useChannels();
+    const { channels, channelsDispatch, setCurrentChannel, addChannel } = useChannels();
 
     const navigate = useNavigate();
 
@@ -52,6 +53,12 @@ export function CreateChannel() {
 
     return (
         <div className="createchannel-container scroll">
+            <div className="flex">
+                <ArrowBackMenu
+                    title="Channel"
+                    path="/chat/add-group"
+                />
+            </div>
             <h2>Create a channel</h2>
             <InfoInput
                 id="name"

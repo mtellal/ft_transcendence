@@ -30,8 +30,8 @@
 /*  J O I N     C H A N N E L */
 
 .joinchannel-container {
-    width: 60%;
     padding: 5%;
+    height: 100%;
 }
 
 .joinchannel-button {

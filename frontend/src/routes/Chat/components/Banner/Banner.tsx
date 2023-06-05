@@ -7,6 +7,8 @@ import { useChannels, useFriends, useCurrentUser } from "../../../../hooks/Hooks
 
 import './Banner.css'
 import { useWindow } from "../../../../hooks/useWindow";
+import { Link, NavLink } from "react-router-dom";
+import ArrowBackMenu from "../ArrowBackMenu";
 
 function IconsBanner(props: any) {
     const pickRemoveIcon = useCallback(() => {
@@ -50,7 +52,6 @@ type TBanner = {
     invitation: () => {} | any,
     block: () => {} | any,
     remove: () => {} | any,
-    backToMenu: () => {} | any
 }
 
 export default function Banner({ ...props }: TBanner) {
@@ -76,42 +77,12 @@ export default function Banner({ ...props }: TBanner) {
             setChannel(currentChannel)
     }, [currentChannel])
 
-    const pickRemoveIcon = useCallback(() => {
-        if (channel) {
-            if (channel.type === "WHISPER")
-                return (
-                    <Icon icon="person_remove" onClick={props.remove} description="Remove" />
-                )
-            else {
-                if (channel.ownerId === user.id)
-                    return (
-                        <Icon icon="delete_forever" onClick={props.remove} description="Delete" />
-                    )
-                else
-                    return (
-                        < Icon icon="logout" onClick={props.remove} description="Leave" />
-                    )
-            }
-        }
-    }, [channel])
-
-
     console.log(isMobileDisplay)
 
     return (
         <div className="banner">
             <div className="flex-center">
-                {
-                    isMobileDisplay &&
-                    <div className="flex-center banner-menu-back">
-                        <Icon
-                            icon="arrow_back"
-                            description="friends"
-                            onClick={props.backToMenu}
-                        />
-                    </div>
-                }
-
+                <ArrowBackMenu/>
                 {
                     channel && channel.type === "WHISPER" ?
                         <UserInfos

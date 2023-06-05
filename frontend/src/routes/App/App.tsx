@@ -20,7 +20,6 @@ import {
 import './App.css';
 import { CurrentUserProvider } from '../../contexts/CurrentUserContext';
 
-
 export async function loader() {
   const token = extractCookie("access_token");
   if (token) {

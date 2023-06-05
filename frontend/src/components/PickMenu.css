@@ -2,4 +2,7 @@
 {
     padding: 0 5px;
     cursor: pointer;
+    border: 1px solid black;
+    border-radius: 5px;
 }
+
