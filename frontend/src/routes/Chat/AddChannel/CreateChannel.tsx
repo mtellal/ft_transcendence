@@ -31,6 +31,7 @@ export function CreateChannel() {
         if (!name || !type)
             return;
 
+        console.log(members)
         await createChannel({
             name,
             type: type.toUpperCase(),

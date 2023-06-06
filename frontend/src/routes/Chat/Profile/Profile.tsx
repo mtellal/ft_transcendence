@@ -9,6 +9,8 @@ import PickMenu from "../../../components/PickMenu";
 import { TUserInfos, UserInfos } from "../../../components/users/UserInfos";
 import Icon from "../../../components/Icon";
 import useKickUser from "../../../hooks/usekickUser";
+import useBanUser from "../../../hooks/useBanUser";
+import useAdinistrators from "../../../hooks/useAdministrators";
 
 export const PofileChannelContext = createContext({});
 
@@ -18,13 +20,13 @@ function ChannelUserLabel(props: any) {
 
     const { user } = useCurrentUser();
     const { kickUser } = useKickUser();
+    const { banUser } = useBanUser();
 
     const {
         setUserOperation,
         setConfirmView,
         adminUser,
         muteUser,
-        banUser,
         isAdmin,
         isOwner
     }: any = useContext(PofileChannelContext)
@@ -129,7 +131,8 @@ function ChannelProfile(props: any) {
 
     const { socket } = useChatSocket();
     const { user } = useCurrentUser();
-    const { channels, getAdministrators, getOwner } = useChannels();
+    const { channels, getOwner } = useChannels();
+    const { getAdministrators } = useAdinistrators();
 
     const [name, setName]: any = useState(props.channel && props.channel.name);
     const [password, setPassword] = useState("");
@@ -144,16 +147,26 @@ function ChannelProfile(props: any) {
 
     const [userOperation, setUserOperation] = useState(null)
 
+    const { getUsersBanned } = useBanUser();
 
-    useEffect(() => {
+
+    async function init() {
         if (props.members && props.members.length) {
             const administrators = getAdministrators(props.channel);
             if (administrators && administrators.length) {
                 setAdmins(administrators)
             }
+
             const owner = getOwner(props.channel);
             setOwner(owner)
+
+            const bans = await getUsersBanned(props.channel);
+            setBanned(bans)
         }
+    }
+
+    useEffect(() => {
+        init();
     }, [props.members, channels])
 
 
@@ -256,6 +269,12 @@ function ChannelProfile(props: any) {
                         isAdmin={isAdmin}
                         currentUser={user}
                     />
+                    <CollectionUsers
+                        title="Banned"
+                        users={banned}
+                        isAdmin={isAdmin}
+                        currentUser={user}
+                    />
                 </div>
                 {
                     confirmView && userOperation &&
@@ -272,8 +291,7 @@ function ChannelProfile(props: any) {
 }
 
 
-function FriendProfile(props : any)
-{
+function FriendProfile(props: any) {
     return (
         <div className="reset flex-column profilepage">
             <h2>Historic</h2>
@@ -285,12 +303,12 @@ function FriendProfile(props : any)
 
 export default function Profile() {
     const { currentFriend } = useFriends();
-    const { currentChannel} = useChannels();
+    const { currentChannel } = useChannels();
 
     return (
         <div className="scroll">
             {
-                currentChannel && currentChannel.users && currentChannel.type !== "WHISPER" && 
+                currentChannel && currentChannel.users && currentChannel.type !== "WHISPER" &&
                 <ChannelProfile
                     name={currentChannel && currentChannel.name}
                     members={currentChannel && currentChannel.users}
@@ -298,7 +316,7 @@ export default function Profile() {
                 />
             }
             {
-                currentChannel && currentChannel.users && currentChannel.type === "WHISPER" && 
+                currentChannel && currentChannel.users && currentChannel.type === "WHISPER" &&
                 <FriendProfile
                     currentFriend={currentFriend}
                 />

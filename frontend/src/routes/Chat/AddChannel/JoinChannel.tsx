@@ -28,11 +28,13 @@ import defaultUserPP from '../../../assets/user.png'
 import './JoinChannel.css'
 import { useWindow } from "../../../hooks/useWindow";
 import ArrowBackMenu from "../components/ArrowBackMenu";
+import useBanUser from "../../../hooks/useBanUser";
 
 type TChannelSearch = {
     name: string,
     members: any[],
     isJoin: boolean,
+    isBanned: boolean | any,
     join: () => {} | any
 }
 
@@ -40,50 +42,60 @@ function ChannelSearch(props: TChannelSearch) {
 
     const [members, setMembers] = useState([]);
 
-    async function loadUsersProfilePicter() {
+    async function loadUsersProfilePicture() {
         const rawProfilePictures = await Promise.all(props.members.map(async (id: any, i: number) =>
             i < 5 ? await getUserProfilePictrue(id).then(res => res.data) : null
         ))
         const images = rawProfilePictures.map((i: any) =>
             i ? window.URL.createObjectURL(new Blob([i])) : defaultUserPP
         )
+        console.log(images)
         setMembers(images.map((url: any) =>
             <div key={url} className="channelsearch-pp-container">
-                <ProfilePicture key={url} image={url} />
+                <ProfilePicture image={url} />
             </div>
         ))
     }
 
     useEffect(() => {
         if (props.members)
-            loadUsersProfilePicter();
+            loadUsersProfilePicture();
     }, [props.members])
 
     return (
         <div className="flex-ai channelsearch-container">
             <h3 className="no-wrap">{props.name} - </h3>
             <p className="channelsearch-members gray-c flex-center no-wrap">{props.members.length} members</p>
-            <div className="channelsearch-pps flex-center hidden">
+            <div className="channelsearch-pps flex-center">
                 {members}
             </div>
             {
-                props.isJoin &&
+                props.isJoin && !props.isBanned && 
                 <div style={{ marginLeft: 'auto' }}>
                     <Icon icon="login" description="Join" onClick={props.join} />
                 </div>
             }
+            {
+                props.isBanned && 
+                <div style={{ marginLeft: 'auto' }}>
+                    <p className="red-c">Banned</p>
+                </div>
+            }
+            
         </div>
     )
 }
 
 export default function JoinChannel() {
 
+    const { user } = useCurrentUser();
     const [prevValue, setPrevValue] = React.useState("");
     const [value, setValue] = React.useState("");
     const [error, setError] = React.useState(false);
 
     const [matchChannels, setMatchChannels] = useState([]);
     const [renderChannels, setRenderChannels] = useState([]);
+    const { isUserBanned } = useBanUser();
 
     const {isMobileDisplay} = useWindow();
 
@@ -131,6 +143,7 @@ export default function JoinChannel() {
                         members={c.members}
                         isJoin={!channelAlreadyExists(c)}
                         join={() => addChannel(c)}
+                        isBanned={isUserBanned(user, c)}
                     />)
             )
         }
