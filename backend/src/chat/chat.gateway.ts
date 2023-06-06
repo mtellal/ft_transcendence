@@ -165,7 +165,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         const message = await this.chatService.createNotif(notif);
         this.server.to(channel.id.toString()).emit('message', message);
-        this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
         this.server.to(channel.id.toString()).emit('joinedChannel', {
           channelId: channel.id,
           userId: user.id
@@ -235,12 +234,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const updatedChannel = await this.chatService.addUsertoChannel(channel, usertoAdd);
       const socketId = this.connectedUsers.get(usertoAdd.id);
       if (socketId) {
-        const socket = this.server.sockets.sockets.get(socketId);
         //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
-        socket.join(channel.id.toString());
-        this.server.to(socketId).emit('addedtoChannel', {channelId: channel.id});
-        const messages = await this.chatService.getMessage(channel.id);
-        this.server.to(socketId).emit('message', messages);
+        this.server.to(socketId).emit('addedtoChannel', {
+          channelId: channel.id,
+          userId: usertoAdd.id
+        });
       }
       const notif: MessageDto = {
         channelId: channel.id,
@@ -249,7 +247,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const message = await this.chatService.createNotif(notif);
       this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+      this.server.to(channel.id.toString()).emit('addedtoChannel', {
+        channelId: channel.id,
+        userId: usertoAdd.id
+      });
     }
     catch(error) {
       console.log(error);
@@ -308,13 +309,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log(updatedChannel);
         const message = await this.chatService.createNotif(leaveNotif);
         this.server.to(updatedChannel.id.toString()).emit('message', message);
-        this.server.to(updatedChannel.id.toString()).emit('updatedChannel', updatedChannel);
         this.server.to(updatedChannel.id.toString()).emit('leftChannel', {
           channelId: channel.id,
           userId: user.id
         });
         if (channel.ownerId !== updatedChannel.ownerId) {
-          this.server.to(updatedChannel.id.toString()).emit('ownerChaned', {
+          this.server.to(updatedChannel.id.toString()).emit('ownerChanged', {
             channelId: channel.id,
             userId: updatedChannel.ownerId
           })
@@ -373,16 +373,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(usertoKick.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't kick another administrator`)
       const updatedChannel = await this.chatService.kickUserfromChannel(channel, usertoKick);
+      this.server.to(channel.id.toString()).emit('kickedUser', 'kickedUser', {
+        channelId: channel.id,
+        userId: dto.userId
+      });
       const socketId = this.connectedUsers.get(usertoKick.id);
       if (socketId) {
         const socket = this.server.sockets.sockets.get(socketId);
-        if (socket.rooms.has(channel.id.toString())) {
-          this.server.to(socketId).emit('kickedUser', {
-            channelId: channel.id,
-            userId: dto.userId
-          })
+        if (socket.rooms.has(channel.id.toString()))
           socket.leave(channel.id.toString());
-        }
       }
       let kickMessage = `${usertoKick.username} was kicked by ${user.username}.`;
       if (dto.reason)
@@ -394,7 +393,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const message = await this.chatService.createNotif(kickNotif);
       this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
     }
     catch(error) {
       throw new WsException(error)
@@ -455,12 +453,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const message = await this.chatService.createNotif(notif);
       this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
-      const socketId = this.connectedUsers.get(usertoMute.id);
-      this.server.to(socketId).emit('mutedUser', {
+      this.server.to(channel.id.toString()).emit('mutedUser', {
         channelId: channel.id,
         userId: usertoMute.id
-      })
+      });
     }
     catch(error) {
       throw new WsException(error)
@@ -511,13 +507,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(usertoBan.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't ban another administrator`)
       const updatedChannel = await this.chatService.banUser(channel, usertoBan);
+      this.server.to(channel.id.toString()).emit('bannedUser', {
+        channelId: channel.id,
+        userId: usertoBan.id
+      });
       const socketId = this.connectedUsers.get(usertoBan.id);
       if (socketId) {
         const socket = this.server.sockets.sockets.get(socketId);
-        this.server.to(socketId).emit('bannedUser', {
-          channelId: channel.id,
-          userId: usertoBan.id
-        });
         if (socket.rooms.has(channel.id.toString()))
           socket.leave(channel.id.toString());
       }
@@ -531,9 +527,76 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const message = await this.chatService.createNotif(notif);
       this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
     }
     catch(error) {
+      throw new WsException(error)
+    }
+  }
+
+  @SubscribeMessage('unbanUser')
+  async unbanUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+    console.log("/////////////////////////////// EVENT UNBANUSER ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT UNBANUSER ///////////////////////////////")
+      return ;
+    }
+    try {
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      if (!channel.administrators.includes(user.id))
+        throw new ForbiddenException(`You do not have the permissions on that channel to unban another user`);
+      if (dto.userId === user.id)
+        throw new ForbiddenException(`You can't unban yourself`);
+      const usertoUnban = await this.userService.findOne(dto.userId);
+      if (!usertoUnban)
+        throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+      if (!channel.banList.includes(usertoUnban.id)) 
+        throw new NotFoundException(`${usertoUnban.username} is not banned on this channel`);
+      const updatedChannel = await this.chatService.unbanUser(channel, usertoUnban);
+      this.server.to(channel.id.toString()).emit('unbannedUser', {
+        channelId: channel.id,
+        userId: usertoUnban.id
+      });
+      const socketId = this.connectedUsers.get(usertoUnban.id);
+      if (socketId) {
+        this.server.to(socketId).emit('unbannedUser', {
+          channelId: channel.id,
+          userId: usertoUnban.id
+        });
+      }
+      let unbanNotif = `${usertoUnban.username}'s ban was lifted by ${user.username}.`;
+      const notif: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: unbanNotif
+      }
+      const message = await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', message);
+    }
+    catch(error) {
+      console.log(error);
       throw new WsException(error)
     }
   }
@@ -582,8 +645,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(newAdmin.id))
         throw new ForbiddenException(`${newAdmin.username} is already an administrator`)
       const updatedChannel = await this.chatService.makeAdmin(channel, newAdmin);
-      const socketId = this.connectedUsers.get(newAdmin.id);
-      this.server.to(socketId).emit('madeAdmin', {
+      this.server.to(channel.id.toString()).emit('madeAdmin', {
         channelId: channel.id,
         userId: newAdmin.id
       })
@@ -595,7 +657,68 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const message = await this.chatService.createNotif(notif);
       this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+    }
+    catch(error) {
+      throw new WsException(error)
+    }
+  }
+
+  @SubscribeMessage('removeAdmin')
+  async removeAdmin(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+    console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
+      return ;
+    }
+    try {
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel)
+        throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+      if (channel.ownerId !== user.id)
+        throw new ForbiddenException(`Only the owner can demote another user`);
+      if (dto.userId === user.id)
+        throw new ForbiddenException(`You are the owner`);
+      const removedAdmin = await this.userService.findOne(dto.userId);
+      if (!removedAdmin)
+        throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+      if (!removedAdmin.channelList.includes(channel.id)) 
+        throw new NotFoundException(`${removedAdmin.username} is not on this channel`);
+      if (!channel.administrators.includes(removedAdmin.id))
+        throw new ForbiddenException(`${removedAdmin.username} is not an administrator`)
+      const updatedChannel = await this.chatService.makeAdmin(channel, removedAdmin);
+      this.server.to(channel.id.toString()).emit('removedAdmin', {
+        channelId: channel.id,
+        userId: removedAdmin.id
+      })
+      let demoteNotif = `${removedAdmin.username} was removed from administrator by ${user.username}.`;
+      const notif: MessageDto = {
+        channelId: channel.id,
+        type: MessageType.NOTIF,
+        content: demoteNotif
+      }
+      const message = await this.chatService.createNotif(notif);
+      this.server.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
