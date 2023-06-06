@@ -6,6 +6,14 @@ const back = process.env.REACT_APP_BACK;
 //                     C H A T        R E Q U E S T S                  //
 /////////////////////////////////////////////////////////////////////////
 
+export async function getChannel(id: number) {
+    return (
+        axios.get(`${back}/chat/${id}`)
+            .then(res => res)
+            .catch(err => err)
+    )
+}
+
 export async function getChannelByName(name: string) {
     return (
         axios.get(`${back}/chat?name=${name}`)

@@ -275,10 +275,11 @@ export function ChannelsProvider({ children }: any) {
     //                       C H A N N E L S                      //
     ////////////////////////////////////////////////////////////////
 
-    const addChannel = useCallback(async (channel: any) => {
+    const addChannel = useCallback(async (channel: any, includeCurrentUser : boolean ) => {
         if (socket) {
             if (!channel.users || !channel.users.length && channel.members) {
-                channel.members = [...channel.members, user.id]
+                if (includeCurrentUser)
+                    channel.members = [...channel.members, user.id]
                 const users = await fetchUsers(channel.members)
                 if (users)
                     channel = { ...channel, users }
