@@ -12,10 +12,10 @@ export default function useAdinistrators() {
     const navigate = useNavigate();
     const { fetchUsers } = useFetchUsers();
 
-    const madeAdmin = useCallback((user: any, channel: any) => {
+    const makeAdmin = useCallback((user: any, channel: any) => {
         console.log("make admin user ", user);
         if (socket && channel && user) {
-            socket.emit('madeAdmin', {
+            socket.emit('makeAdmin', {
                 channelId: channel.id,
                 userId: user.id
             })
@@ -47,7 +47,7 @@ export default function useAdinistrators() {
 
     return (
         {
-            madeAdmin,
+            makeAdmin,
             isUserAdministrators,
             getAdministrators
         }

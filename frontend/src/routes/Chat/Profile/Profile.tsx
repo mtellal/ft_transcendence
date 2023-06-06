@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 import './Profile.css'
 import { useChannels, useFriends, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
-import UserLabel from "../../../components/users/UserLabel";
+import UserLabel, { UserLabelSearch } from "../../../components/users/UserLabel";
 import { CollectionElement } from "../components/Menu/MenuElement";
 import InfoInput from "../../../components/Input/InfoInput";
 import PickMenu from "../../../components/PickMenu";
@@ -12,6 +12,8 @@ import useKickUser from "../../../hooks/usekickUser";
 import useBanUser from "../../../hooks/useBanUser";
 import useAdinistrators from "../../../hooks/useAdministrators";
 import useUserAccess from "../../../hooks/useUserAccess";
+import useFetchUsers from "../../../hooks/useFetchUsers";
+import useMembers from "../../../hooks/useMembers";
 
 export const PofileChannelContext = createContext({});
 
@@ -19,17 +21,75 @@ export const PofileChannelContext = createContext({});
 function ChannelUserLabel(props: any) {
 
     const { user } = useCurrentUser();
+    const { makeAdmin } = useAdinistrators();
     const { kickUser } = useKickUser();
     const { banUser } = useBanUser();
+    const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
+    const { isUserMember, isUserOwner, addMember } = useMembers();
+
+    const { currentChannel } = useChannels();
 
     const {
         setUserOperation,
         setConfirmView,
-        adminUser,
         muteUser,
-        isAdmin,
-        isOwner
     }: any = useContext(PofileChannelContext)
+
+    console.log(isCurrentUserAdmin, isCurrentUserOwner)
+
+    function functionalities() {
+        if (props.user && isCurrentUserAdmin &&
+            props.user.username !== (user && user.username) && currentChannel.ownerId !== props.user.id) {
+            if (props.bannedUsers) {
+                return (
+                    <Icon
+                        icon="lock_open"
+                        description="Unban"
+                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: banUser, type: "unban" }) }}
+                    />
+                )
+            }
+            else if (!isUserMember(props.user) && !props.bannedUsers) {
+                return (
+                    <Icon
+                        icon="add"
+                        description="Add"
+                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: addMember, type: "add" }) }}
+                    />
+                )
+            }
+            else {
+                return (
+                    <div className="flex-center fill">
+                        {
+                            isCurrentUserOwner &&
+                            <Icon
+                                icon="shield_person"
+                                description="Admin"
+                                onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: makeAdmin, type: "make admin" }) }}
+                            />
+                        }
+                        <Icon
+                            icon="logout"
+                            description="Kick"
+                            onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: kickUser, type: "kick" }) }}
+                        />
+                        <Icon
+                            icon="schedule_send"
+                            description="Mute"
+                            onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: muteUser, type: "mute" }) }}
+                        />
+                        <Icon
+                            icon="person_off"
+                            description="Ban"
+                            onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: banUser, type: "ban" }) }}
+                        />
+                    </div>
+                )
+            }
+        }
+    }
+
 
     return (
         <div className="friend-element">
@@ -39,44 +99,66 @@ function ChannelUserLabel(props: any) {
                 userStatus={props.user.userStatus}
             />
             {
-                isAdmin && props.user.username !== (user && user.username) && !props.bannedUsers &&
-                <div className="flex-center fill">
-
-                    {
-                        isOwner &&
-                        <Icon
-                            icon="shield_person"
-                            description="Admin"
-                            onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: adminUser, type: "make admin" }) }}
-                        />
-                    }
-                    <Icon
-                        icon="logout"
-                        description="Kick"
-                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: kickUser, type: "kick" }) }}
-                    />
-                    <Icon
-                        icon="schedule_send"
-                        description="Mute"
-                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: muteUser, type: "mute" }) }}
-                    />
-                    <Icon
-                        icon="person_off"
-                        description="Ban"
-                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: banUser, type: "ban" }) }}
-                    />
-                </div>
-            }
-            {
-                props.bannedUsers &&
-                <Icon
-                    icon="lock_open"
-                    description="Unban"
-                    onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: banUser, type: "ban" }) }}
-                />
+                functionalities()
             }
 
         </div>
+    )
+}
+
+type TSearchChannelUser = {
+    title: string
+    inputTitle: string,
+    members: any[],
+    bannedUsers?: any[]
+}
+
+function SearchChannelUser(props: TSearchChannelUser) {
+
+    const [searchUserValue, setSearchUserValue]: any = useState("");
+    const [searchUser, setSearchUser]: any = useState();
+    const [error, setError] = useState("");
+
+    const { fetchUserByUsername } = useFetchUsers();
+
+
+    async function search() {
+        let user;
+        if (props.members && props.members.length) {
+            user = props.members.find((u: any) => u.username === searchUserValue.trim());
+        }
+        if (!user)
+            user = await fetchUserByUsername(searchUserValue);
+        if (user) {
+            setSearchUser(user);
+            setError("");
+        }
+        else {
+            setError("User not found")
+            setSearchUser(null);
+        }
+    }
+
+    return (
+        <>
+            <hr />
+            <h2>{props.title}</h2>
+            <InfoInput
+                id={props.inputTitle}
+                label={props.inputTitle}
+                value={searchUserValue}
+                setValue={setSearchUserValue}
+                submit={() => search()}
+            />
+            {error && <p className="red-c">{error}</p>}
+            {
+                searchUser &&
+                <ChannelUserLabel
+                    user={searchUser}
+                    bannedUsers={props.bannedUsers}
+                />
+            }
+        </>
     )
 }
 
@@ -90,7 +172,7 @@ function CollectionUsers(props: any) {
                 <ChannelUserLabel
                     key={`${props.title}-${user.id}`}
                     user={user}
-                    bannedUsers={props.bannedUsers || false}
+                    bannedUsers={props.bannedUsers}
                 />
             ))
     }, [props.users, props.isAdmin, props.currentUser, channels])
@@ -150,7 +232,6 @@ function ChannelProfile(props: any) {
     const [admins, setAdmins] = useState([]);
     const [banned, setBanned] = useState([])
 
-    const [isAdmin, setIsAdmin] = useState(false);
     const [owner, setOwner] = useState(false);
 
     const [confirmView, setConfirmView] = useState(false);
@@ -158,12 +239,6 @@ function ChannelProfile(props: any) {
     const [userOperation, setUserOperation] = useState(null)
 
     const { getUsersBanned } = useBanUser();
-
-    const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
-
-
-    console.log(isCurrentUserAdmin, isCurrentUserOwner, props.channel)
-
 
     async function init() {
         if (props.members && props.members.length) {
@@ -184,14 +259,6 @@ function ChannelProfile(props: any) {
         init();
     }, [props.members, channels])
 
-
-    useEffect(() => {
-        if (admins && admins.length) {
-            if (admins.find((u: any) => u.id === user.id)) {
-                setIsAdmin(true)
-            }
-        }
-    }, [admins])
 
     function adminUser(user: any) {
         console.log("admin user ", user);
@@ -234,7 +301,6 @@ function ChannelProfile(props: any) {
                 banUser,
                 setConfirmView,
                 setUserOperation,
-                isAdmin,
                 owner
             }}
         >
@@ -268,10 +334,14 @@ function ChannelProfile(props: any) {
                             />
                         </>
                     }
-                    <CollectionUsers
-                        title="Owner"
-                        users={[owner]}
-                        currentUser={user}
+                    <SearchChannelUser
+                        title="Search"
+                        inputTitle="Search user"
+                        members={props.members}
+                    />
+                    <h2>Owner</h2>
+                    <ChannelUserLabel
+                        user={owner}
                     />
                     <CollectionUsers
                         title="Administrators"
@@ -281,13 +351,11 @@ function ChannelProfile(props: any) {
                     <CollectionUsers
                         title="Members"
                         users={props.members}
-                        isAdmin={isAdmin}
                         currentUser={user}
                     />
                     <CollectionUsers
                         title="Banned"
                         users={banned}
-                        isAdmin={isAdmin}
                         currentUser={user}
                         bannedUsers={true}
                     />
