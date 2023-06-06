@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getSocket } from '../../utils/socket';
+import { initializeSocket, getSocket } from '../../utils/socket';
 import s from './style.module.css';
 import { BackApi } from '../../api/back';
 export function CreateGroup() {
@@ -38,25 +38,9 @@ export function CreateGroup() {
                 password: target.password.value
             }, selector.token);
         }
-        // if ((e.target as HTMLFormElement).privacy.value === 'Public') {
-        // 		Asocket.emit('createChannel', {
-        // 		name: target.name.value,
-        // 		type: "PUBLIC",
-        // 	})
-        // } else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
-        // 		Asocket.emit('createChannel', {
-        // 			name: target.name.value,
-        // 			type: "PRIVATE",
-        // 		})
-        // } else {
-        // 	Asocket.emit('createChannel', {
-        // 		name: target.name.value,
-        // 		type: "PROTECTED",
-        // 		password: (e.target as HTMLFormElement).password.value
-        // 	})
-        // }
     }
     useEffect(() => {
+        initializeSocket(selector.token);
         AsetSocket(getSocket());
     }, []);
     return (React.createElement("div", null,

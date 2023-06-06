@@ -48,27 +48,10 @@ export function CreateGroup() {
 				password: target.password.value
 			}, selector.token);
 		}
-
-		// if ((e.target as HTMLFormElement).privacy.value === 'Public') {
-		// 		Asocket.emit('createChannel', {
-		// 		name: target.name.value,
-		// 		type: "PUBLIC",
-		// 	})
-		// } else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
-		// 		Asocket.emit('createChannel', {
-		// 			name: target.name.value,
-		// 			type: "PRIVATE",
-		// 		})
-		// } else {
-		// 	Asocket.emit('createChannel', {
-		// 		name: target.name.value,
-		// 		type: "PROTECTED",
-		// 		password: (e.target as HTMLFormElement).password.value
-		// 	})
-		// }
 	}
 
 	useEffect(() => {
+		initializeSocket(selector.token);
 		AsetSocket(getSocket());
 	}, [])
 
