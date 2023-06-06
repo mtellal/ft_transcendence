@@ -61,6 +61,10 @@ export class ChatController {
     console.log("REQUEST => ", req.user)
     const user: User = req.user
     const channel = await this.chatService.createChannel(createChannelDto, user);
+    const member = channel.members.filter((id) => id !== channel.ownerId);
+    for (const memberId of member) {
+      this.chatGateway.server.to(this.chatGateway.getSocketId(memberId)).emit('newChannel', channel);
+    }
     return channel;
   }
 
