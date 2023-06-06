@@ -70,7 +70,7 @@ export function Chat() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id, friendRequest]);
-    console.log('idchanselected', idChannelSelected);
+    // console.log('idchanselected', idChannelSelected);
     return (React.createElement("div", { className: s.container },
         React.createElement("div", { className: s.item },
             React.createElement("div", { className: s.menu },

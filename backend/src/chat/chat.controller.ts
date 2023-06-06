@@ -60,6 +60,10 @@ export class ChatController {
   async create(@Body() createChannelDto: CreateChannelDto, @Req() req) {
     const user: User = req.user
     const channel = await this.chatService.createChannel(createChannelDto, user);
+    const member = channel.members.filter((id) => id !== channel.ownerId);
+    for (const memberId of member) {
+      this.chatGateway.server.to(this.chatGateway.getSocketId(memberId)).emit('newChannel', channel);
+    }
     return channel;
   }
 
@@ -77,6 +81,7 @@ export class ChatController {
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
     const updateChanneldto: UpdateChannelDto = {
       channelId: id,
+      name: dto.name,
       type: dto.type,
       password: dto.password
     };
@@ -93,6 +98,12 @@ export class ChatController {
     }
     const message = await this.chatService.createNotif(notif);
     this.chatGateway.server.to(channel.id.toString()).emit('message', message);
+    if (dto.name) {
+      this.chatGateway.server.to(channel.id.toString()).emit('updateChannelName', {
+        channelId: channel.id,
+        name: dto.name
+      });
+    }
     this.chatGateway.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
     return updatedChannel;
   }

@@ -26,6 +26,10 @@ export function FriendsList({ friend, delFriend, setIdFriendSelected }) {
             }
         }
     }
+    async function blockUser() {
+        const rep = await BackApi.blockUserById(friend.id, selector.token);
+        console.log('TEST', rep.status);
+    }
     useEffect(() => {
         if (friend.id) {
             getAvatar();
@@ -38,6 +42,7 @@ export function FriendsList({ friend, delFriend, setIdFriendSelected }) {
         friend.username,
         showActionFriend && (React.createElement("ul", { className: s.menu },
             React.createElement("li", { onClick: removeFriend }, "Remove friend"),
+            React.createElement("li", { onClick: blockUser }, "Block friend"),
             React.createElement("li", null, "Play game"),
             React.createElement("li", { onClick: () => setIdFriendSelected(friend.id) }, "Chat")))));
 }

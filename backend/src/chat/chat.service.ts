@@ -140,6 +140,7 @@ export class ChatService {
       const updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
+          name: dto.name,
           type: dto.type,
           password: dto.password
         }
@@ -152,6 +153,7 @@ export class ChatService {
         const updatedChannel= await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
+          name: dto.name,
           type: dto.type,
           password: null
         }
@@ -284,11 +286,29 @@ export class ChatService {
     })
   }
 
+  async unbanUser(channel: Channel, usertoUnban: User) {
+    return await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        banList: channel.banList.filter((id) => id !== usertoUnban.id)
+      }
+    })
+  }
+
   async makeAdmin(channel: Channel, newAdmin: User) {
     return await this.prisma.channel.update({
       where: {id: channel.id},
       data: {
         administrators: {push: newAdmin.id }
+      }
+    })
+  }
+
+  async removeAdmin(channel: Channel, admin: User) {
+    return await this.prisma.channel.update({
+      where: {id: channel.id},
+      data: {
+        administrators: channel.administrators.filter((id) => id !== admin.id)
       }
     })
   }

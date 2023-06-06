@@ -214,4 +214,16 @@ export class BackApi {
             .catch(error => error);
         return response;
     }
+    static async blockUserById(idFriend, token) {
+        console.log('idFriend', idFriend);
+        console.log('token', token);
+        return (axios.post(`${BASE_URL}/users/block/${idFriend}`, {}, {
+            headers: {
+                'Accept': '*/*',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => res)
+            .catch(err => err));
+    }
 }

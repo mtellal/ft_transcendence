@@ -41,6 +41,11 @@ export function FriendsList( { friend, delFriend, setIdFriendSelected }: FriendL
         }
 	}
 
+	async function blockUser() {
+		const rep = await BackApi.blockUserById(friend.id, selector.token);
+		console.log('TEST', rep.status);
+	}
+
     useEffect(() => {
 		if (friend.id) {
 			getAvatar();
@@ -61,6 +66,7 @@ export function FriendsList( { friend, delFriend, setIdFriendSelected }: FriendL
             {showActionFriend && (
                     <ul className={s.menu}>
                         <li onClick={removeFriend}>Remove friend</li>
+                        <li onClick={blockUser}>Block friend</li>
                         <li>Play game</li>
                         <li onClick={() => setIdFriendSelected(friend.id)}>Chat</li>
                     </ul>

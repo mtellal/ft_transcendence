@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import s from './style.module.css';
 export function Messages({ messages, id }) {
-    return (React.createElement("div", { className: s.container }, messages.map((message) => {
+    const messagesContainerRef = useRef(null);
+    useEffect(() => {
+        const messageContainer = messagesContainerRef.current;
+        if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+    }, [messages]);
+    return (React.createElement("div", { className: s.container, ref: messagesContainerRef }, messages.map((message) => {
         return (React.createElement("div", { className: s.boxMessage, key: message.id, style: {
                 textAlign: message.sendBy === id ? 'right' : 'left',
             } },

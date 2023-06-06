@@ -3,6 +3,7 @@
 	border-radius: 20px 20px 0 0;
 	padding-top: 7px;
 	background-color: rgba(0, 0, 0, 0.1);
+	overflow-y: auto;
 }
 
 .boxMessage {

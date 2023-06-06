@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react';
+import React, { FormEvent, useState } from 'react';
 import logo_user from "../../assets/logo_identifiant.png"
 import logo_password from "../../assets/logo_mdp.png"
 import avatar_default from "../../assets/alpaga.jpg"
@@ -13,13 +13,11 @@ export function Signup() {
 
 	const navigate = useNavigate();
     const dispatch = useDispatch();
+	const [errPassword, setErrPassword] = useState(false);
 
     async function setDefualtProfilePicture(token: string, id: number) {
         const img = await fetch(avatar_default);
         const blob = await img.blob();
-		// console.log('img', img);
-		// console.log('blob', blob);
-        // await BackApi.updateProfilePicture(img, token, 'file');
         await BackApi.updateProfilePicture(blob, token);
         let rep = await BackApi.getProfilePictureById(id);
         dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
@@ -29,12 +27,18 @@ export function Signup() {
 		e.preventDefault();
 		const username = e.currentTarget.username.value;
 		const password = e.currentTarget.password.value;
-		const response = await BackApi.authSignupUser(username, password);
-        const id = parseJwt(response.data.access_token).id;
-		if (response.status === 201) {
-			createCookie("access_token", response.data.access_token);
-            setDefualtProfilePicture(response.data.access_token, id);
-            navigate('/signin');
+		const confPassword = e.currentTarget.confirm_password.value;
+
+		if (password !== confPassword || password === '') {
+			setErrPassword(true);
+		} else {
+			const response = await BackApi.authSignupUser(username, password);
+			const id = parseJwt(response.data.access_token).id;
+			if (response.status === 201) {
+				createCookie("access_token", response.data.access_token);
+				setDefualtProfilePicture(response.data.access_token, id);
+				navigate('/signin');
+			}
         }
 	}
 
@@ -54,6 +58,9 @@ export function Signup() {
                     <img className={s.logo} src={logo_password} alt="logo password"></img>
                     <input type="password" name="confirm_password" placeholder="Confirm Password" className={s.input_field}></input>
                 </div>
+				<div className={s.errPassword}>
+					{errPassword && 'Err : Saisir 2 mot de passe identiques'}
+				</div>
                 <button className={s.signinButton} type="submit">Submit</button>
             </form>
 			<button className={s.btnSignin} onClick={() => navigate('/signin')}>Signin</button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo_user from "../../assets/logo_identifiant.png";
 import logo_password from "../../assets/logo_mdp.png";
 import avatar_default from "../../assets/alpaga.jpg";
@@ -11,12 +11,10 @@ import s from "./style.module.css";
 export function Signup() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [errPassword, setErrPassword] = useState(false);
     async function setDefualtProfilePicture(token, id) {
         const img = await fetch(avatar_default);
         const blob = await img.blob();
-        // console.log('img', img);
-        // console.log('blob', blob);
-        // await BackApi.updateProfilePicture(img, token, 'file');
         await BackApi.updateProfilePicture(blob, token);
         let rep = await BackApi.getProfilePictureById(id);
         dispatch(setAvatar(URL.createObjectURL(new Blob([rep.data]))));
@@ -25,12 +23,18 @@ export function Signup() {
         e.preventDefault();
         const username = e.currentTarget.username.value;
         const password = e.currentTarget.password.value;
-        const response = await BackApi.authSignupUser(username, password);
-        const id = parseJwt(response.data.access_token).id;
-        if (response.status === 201) {
-            createCookie("access_token", response.data.access_token);
-            setDefualtProfilePicture(response.data.access_token, id);
-            navigate('/signin');
+        const confPassword = e.currentTarget.confirm_password.value;
+        if (password !== confPassword || password === '') {
+            setErrPassword(true);
+        }
+        else {
+            const response = await BackApi.authSignupUser(username, password);
+            const id = parseJwt(response.data.access_token).id;
+            if (response.status === 201) {
+                createCookie("access_token", response.data.access_token);
+                setDefualtProfilePicture(response.data.access_token, id);
+                navigate('/signin');
+            }
         }
     }
     return (React.createElement("div", { className: s.signup },
@@ -45,6 +49,7 @@ export function Signup() {
             React.createElement("div", { className: s.form_group },
                 React.createElement("img", { className: s.logo, src: logo_password, alt: "logo password" }),
                 React.createElement("input", { type: "password", name: "confirm_password", placeholder: "Confirm Password", className: s.input_field })),
+            React.createElement("div", { className: s.errPassword }, errPassword && 'Err : Saisir 2 mot de passe identiques'),
             React.createElement("button", { className: s.signinButton, type: "submit" }, "Submit")),
         React.createElement("button", { className: s.btnSignin, onClick: () => navigate('/signin') }, "Signin")));
 }

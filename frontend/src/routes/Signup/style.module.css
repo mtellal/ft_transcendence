@@ -63,3 +63,8 @@
     margin-left: 125px;
 	cursor: pointer;
 }
+
+.errPassword {
+	color: rgb(182, 38, 46);
+	margin-bottom: 10px;
+}
