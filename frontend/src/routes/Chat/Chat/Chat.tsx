@@ -134,14 +134,6 @@ function ChatInterface() {
                 }
             })
 
-            socket.on('updatedChannel',(channel : any) => {
-                if (channel)
-                {
-                    // console.log("UPDATED CHANNEL", channel.name)
-                    //channelsDispatch({type: 'updateChannel', channel})
-                }
-            })
-
         }
 
     }, [socket])

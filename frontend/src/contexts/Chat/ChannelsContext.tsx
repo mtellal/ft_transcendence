@@ -84,19 +84,6 @@ function reducer(channels: any, action: any) {
             }
             return (action.channels);
         }
-        case ('updateChannel'): {
-            if (action.channel) {
-                if (channels.length) {
-                    return (channels.map((c: any) => {
-                        if (action.channel && c.id === action.channel.id)
-                            return ({ ...c, ...action.channel })
-                        return (c)
-                    }))
-                }
-                else
-                    return ([formatChannel(action.channel)])
-            }
-        }
         case ('addChannel'): {
             if (!channels.length)
                 return ([formatChannel(action.channel)])
@@ -107,6 +94,44 @@ function reducer(channels: any, action: any) {
         case ('removeChannel'): {
             if (channels.length && action.channelId) {
                 return (channels.filter((c: any) => c.id !== action.channelId))
+            }
+        }
+        case('addAdministrators'): {
+            if (channels.length && action.channelId && action.userId) {
+                return (channels.map((c: Channel) => {
+                    if (c.id === action.channelId)
+                        c.administrators.push(action.userId);
+                    return (c);
+                }
+                ))
+            }
+        }
+        case ('removeAdministrators'): {
+            if (channels.length && action.channelId && action.userId) {
+                return (channels.map((c: Channel) =>
+                    c.id === action.channelId ?
+                        { ...c, administrators: c.administrators.filter((id: number) => id !== action.userId) } :
+                        c
+                ))
+            }
+        }
+        case ('addBanList'): {
+            if (channels.length && action.channelId && action.userId) {
+                return (channels.map((c: Channel) => {
+                    if (c.id === action.channelId)
+                        c.banList.push(action.userId);
+                    return (c);
+                }
+                ))
+            }
+        }
+        case ('removeBanList'): {
+            if (channels.length && action.channelId && action.userId) {
+                return (channels.map((c: Channel) =>
+                    c.id === action.channelId ?
+                        { ...c, banList: c.banList.filter((id: number) => id !== action.userId) } :
+                        c
+                ))
             }
         }
         case ('addMember'): {
@@ -131,7 +156,6 @@ function reducer(channels: any, action: any) {
                         if (c.id === action.channelId) {
                             c.members = c.members.filter((id: number) => id !== action.userId);
                             c.users = c.users.filter((u: User) => u.id !== action.userId);
-                            console.log(c.users)
                         }
                         return (c)
                     })
@@ -202,7 +226,6 @@ export function ChannelsProvider({ children }: any) {
         if (socket && user) {
             socket.on('updateChannelName', (channelId: number, name: string) => {
                 console.log("UPDATE CHANNEL NAME EVENT")
-                console.log(channelId, name)
             })
 
             socket.on('joinedChannel', async (res: any) => {
@@ -222,17 +245,27 @@ export function ChannelsProvider({ children }: any) {
     }, [socket, user])
 
 
+    function forceToLeaveChannel(res: any) {
+        channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
+        if (res.userId === user.id)
+            channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
+        if (currentChannel && res.channelId === currentChannel.id)
+            navigate("/chat");
+    }
+
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on('kickedUser', async (res: any) => {
                 console.log("KICKED CHANNEL EVENT")
-                channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
-                if (res.userId === user.id)
-                    channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
-                if (currentChannel && res.channelId === currentChannel.id)
-                    navigate("/chat");
+                forceToLeaveChannel(res)
             })
+
+            socket.on('bannedUser', async (res: any) => {
+                console.log("BANNED CHANNEL EVENT")
+                forceToLeaveChannel(res)
+            })
+
+
         }
         return () => socket && socket.off('kickedUser')
     }, [socket, currentChannel])
@@ -266,7 +299,7 @@ export function ChannelsProvider({ children }: any) {
 
     const leaveChannel = useCallback((channel: any) => {
         if (channel && channel.id && socket) {
-            channelsDispatch({ type: 'removeChannel', channel })
+            channelsDispatch({ type: 'removeChannel', channelId: channel.id })
             socket.emit('leaveChannel', {
                 channelId: channel.id
             })
@@ -293,21 +326,6 @@ export function ChannelsProvider({ children }: any) {
         return ([]);
     }, [channels])
 
-    const getAdministrators = useCallback((channel: Channel) => {
-        if (channel && channels && channels.length) {
-
-            let admins = channel.administrators;
-            let users = channel.users;
-
-            if (admins.length && users.length) {
-                let userAdmins = admins.map((id: number) => users.find((u: User) => u.id === id))
-                userAdmins = userAdmins.filter((u: User) => u)
-                return (userAdmins)
-            }
-        }
-        return ([]);
-    }, [channels])
-
     const getOwner = useCallback((channel: Channel) => {
         if (channel && channels && channels.length) {
 
@@ -322,20 +340,6 @@ export function ChannelsProvider({ children }: any) {
         return ([]);
     }, [channels])
 
-    const getBanned = useCallback((channel: Channel) => {
-        if (channel && channels && channels.length) {
-
-            let banned = channel.banList;
-            let users = channel.users;
-
-            if (banned.length && users.length) {
-                let userAdmins = banned.map((id: number) => users.find((u: User) => u.id === id))
-                userAdmins = userAdmins.filter((u: User) => u)
-                return (userAdmins)
-            }
-        }
-        return ([]);
-    }, [channels])
 
     const getMuted = useCallback((channel: Channel) => {
         if (channel && channels && channels.length) {
@@ -404,7 +408,6 @@ export function ChannelsProvider({ children }: any) {
             leaveChannel,
             channelAlreadyExists,
             getOwner,
-            getAdministrators,
             getMembers,
         }}>
             {children}

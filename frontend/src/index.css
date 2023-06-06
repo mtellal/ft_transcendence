@@ -83,6 +83,21 @@ code {
  background-color: rgb(255, 220, 220);
 }
 
+.lightred-c
+{
+  color: rgb(255, 220, 220);
+}
+
+.red
+{
+  background-color: rgb(255, 78, 78);
+}
+
+.red-c
+{
+  color: red;
+}
+
 .gray-c
 {
   color: gray
@@ -93,10 +108,6 @@ code {
   color: black;
 }
 
-.red
-{
-  background-color: rgb(255, 78, 78);
-}
 
 .white
 {
