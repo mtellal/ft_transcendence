@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { getUser, getUserProfilePictrue } from "../requests/user";
+import { getUser, getUserByUsername, getUserProfilePictrue } from "../requests/user";
 import { useCurrentUser } from "./Hooks";
 
 
@@ -30,6 +30,19 @@ export default function useFetchUsers()
         )
     }, [])
 
+    const fetchUserByUsername = useCallback(async (username: string) => {
+        return (
+            await getUserByUsername(username)
+                .then(async (res: any) => {
+                    if (res.status === 200 && res.statusText === "OK") {
+                        let user = res.data;
+                        let url = await fetchUserProfilePicture(user.id);
+                        return ({ ...user, url })
+                    }
+                })
+        )
+    }, [])
+
     const fetchUsers = useCallback(async (usersId: number[]) => {
         if (usersId && usersId.length) {
             const users = await Promise.all(
@@ -48,6 +61,7 @@ export default function useFetchUsers()
     return (
         {
             fetchUser,
+            fetchUserByUsername,
             fetchUsers,
             fetchUserProfilePicture
         }

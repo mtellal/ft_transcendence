@@ -20,7 +20,6 @@ export default function InfoInput(props: TInfoInput) {
     function handleKeyDown(e: any) {
         if (e.key === 'Enter' && props.value) {
             props.submit()
-            inputRef.current.blur();
         }
     }
 

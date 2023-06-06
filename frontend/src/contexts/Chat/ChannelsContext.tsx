@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { getChannels, removeChannel } from "../../requests/chat";
+import { getChannel, getChannels, removeChannel } from "../../requests/chat";
 import { useChatSocket, useFriends, useCurrentUser } from "../../hooks/Hooks";
 import {
     getUser, getUserProfilePictrue
@@ -88,6 +88,7 @@ function reducer(channels: any, action: any) {
             if (!channels.length)
                 return ([formatChannel(action.channel)])
             if (action.channel && !channels.find((c: any) => c.id === action.channel.id)) {
+                console.log(action.channel, " ADDED")
                 return ([...channels, formatChannel(action.channel)])
             }
         }
@@ -96,11 +97,12 @@ function reducer(channels: any, action: any) {
                 return (channels.filter((c: any) => c.id !== action.channelId))
             }
         }
-        case('addAdministrators'): {
+        case ('addAdministrators'): {
             if (channels.length && action.channelId && action.userId) {
                 return (channels.map((c: Channel) => {
                     if (c.id === action.channelId)
-                        c.administrators.push(action.userId);
+                        if (!c.administrators.find((id: number) => id === action.userId))
+                            c.administrators.push(action.userId);
                     return (c);
                 }
                 ))
@@ -239,6 +241,20 @@ export function ChannelsProvider({ children }: any) {
                 channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
             })
 
+            socket.on('addedtoChannel', async (res: any) => {
+                console.log("ADDED CHANNEL EVENT")
+                if (res && res.channelId) {
+                    const channel = await getChannel(res.channelId).then(res => res.data);
+                    if (channel) {
+                        const users = await fetchUsers(channel.members)
+                        channelsDispatch({ type: 'addChannel', channel: { ...channel, users } });
+                        joinChannel(channel)
+                    }
+                }
+            })
+            
+            socket.on('exception', (e : any) => console.log("exception =>", e))
+
             if (user)
                 loadChannels();
         }
@@ -253,6 +269,8 @@ export function ChannelsProvider({ children }: any) {
             navigate("/chat");
     }
 
+    console.log(currentChannel)
+
     useEffect(() => {
         if (socket) {
             socket.on('kickedUser', async (res: any) => {
@@ -265,7 +283,12 @@ export function ChannelsProvider({ children }: any) {
                 forceToLeaveChannel(res)
             })
 
-
+            socket.on('madeAdmin', (res: any) => {
+                console.log("MADE ADMIN CHANNEL EVENT");
+                if (res && res.channelId && res.userId) {
+                    channelsDispatch({ type: 'addAdministrators', channelId: res.channelId, userId: res.userId })
+                }
+            })
         }
         return () => socket && socket.off('kickedUser')
     }, [socket, currentChannel])
@@ -275,7 +298,7 @@ export function ChannelsProvider({ children }: any) {
     //                       C H A N N E L S                      //
     ////////////////////////////////////////////////////////////////
 
-    const addChannel = useCallback(async (channel: any, includeCurrentUser : boolean ) => {
+    const addChannel = useCallback(async (channel: any, includeCurrentUser: boolean) => {
         if (socket) {
             if (!channel.users || !channel.users.length && channel.members) {
                 if (includeCurrentUser)
