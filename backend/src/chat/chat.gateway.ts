@@ -53,7 +53,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!client.rooms.has(channel.id.toString())) {
         throw new ForbiddenException('User not on that channel');
       }
-      await this.chatService.checkMute(channel, user);
+      if (await this.chatService.checkMute(channel, user)) {
+        throw new ForbiddenException('You have been muted');
+      }
       const message = await this.chatService.createMessage(messageDto, user);
       console.log(message);
       this.server.to(channel.id.toString()).emit('message', message);
@@ -373,7 +375,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(usertoKick.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't kick another administrator`)
       const updatedChannel = await this.chatService.kickUserfromChannel(channel, usertoKick);
-      this.server.to(channel.id.toString()).emit('kickedUser', 'kickedUser', {
+      this.server.to(channel.id.toString()).emit('kickedUser', {
         channelId: channel.id,
         userId: dto.userId
       });
@@ -442,6 +444,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException(`${usertoMute.username} is not on this channel`);
       if (channel.administrators.includes(usertoMute.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't mute another administrator`)
+      if (await this.chatService.checkMute(channel, usertoMute))
+        throw new ForbiddenException(`${usertoMute.username} is already muted`)
       const updatedChannel = await this.chatService.muteUser(dto, usertoMute);
       let muteNotif = `${usertoMute.username} was muted by ${user.username} for ${dto.duration}\".`;
       if (dto.reason)
@@ -461,6 +465,63 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch(error) {
       throw new WsException(error)
     }
+  }
+
+  @SubscribeMessage('unmuteUser')
+  async unmuteUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log("user => ", user);
+    }
+    catch(error) {
+      console.error("error => ", error);
+      client.disconnect();
+      return ;
+    }
+    const channel = await this.chatService.findOne(dto.channelId);
+    if (!channel)
+      throw new NotFoundException(`Channel with id of ${dto.channelId} does not exist`);
+    if (!channel.administrators.includes(user.id))
+      throw new ForbiddenException(`You do not have the permissions on that channel to mute another user`);
+    if (dto.userId === user.id)
+      throw new ForbiddenException(`You can't mute yourself`);
+    const usertoUnmute = await this.userService.findOne(dto.userId);
+    if (!usertoUnmute)
+      throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
+    if (!usertoUnmute.channelList.includes(channel.id))
+      throw new NotFoundException(`${usertoUnmute.username} is not on this channel`);
+    if (channel.administrators.includes(usertoUnmute.id) && channel.ownerId !== user.id)
+      throw new ForbiddenException(`Only the owner can unmute another administrator`);
+    if (!await this.chatService.checkMute(channel, usertoUnmute))
+      throw new ForbiddenException(`${usertoUnmute.username} is not muted`);
+    await this.chatService.unmuteUser(dto, usertoUnmute);
+    let unmuteNotif = `${usertoUnmute.username} mute was lifted by ${user.username}.`;
+    const notif: MessageDto = {
+      channelId: channel.id,
+      type: MessageType.NOTIF,
+      content: unmuteNotif
+    }
+    const message = await this.chatService.createNotif(notif);
+    this.server.to(channel.id.toString()).emit('message', message);
+    this.server.to(channel.id.toString()).emit('unmutedUser', {
+      channelId: channel.id,
+      userId: usertoUnmute.id
+    });
   }
 
   @SubscribeMessage('banUser')
@@ -725,7 +786,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-/*   @SubscribeMessage('updateChannel')
+
+  //Change name to add
+  @SubscribeMessage('updateChannel')
   async updateChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: UpdateChannelDto) {
     console.log("/////////////////////////////// EVENT UPDATECHANNEL ///////////////////////////////")
     let user: User;
@@ -737,7 +800,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
-      Temporary to test with postman, will need to be changed depending on the way the front sends the info
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
       const authToken = token
       if (!authToken)
         throw new UnauthorizedException();
@@ -759,11 +822,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (channel.ownerId !== user.id)
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
     const updatedChannel = await this.chatService.updateChannel(dto, channel);
+    this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
     let updateNotif = `${user.id} updated the channel:`;
+    if (dto.name)
+      updateNotif += ` ${channel.name} is now named ${updatedChannel.name}`
     if (dto.password)
-      updateNotif += ` ${channel.name} is now protected by a password.`
+      updateNotif += ` ${updatedChannel.name} is now protected by a password.`
     if (dto.type && !dto.password)
-      updateNotif += ` ${channel.name} is now ${dto.type.toLowerCase()}.`
+      updateNotif += ` ${updatedChannel.name} is now ${dto.type.toLowerCase()}.`
     const notif: MessageDto = {
       channelId: channel.id,
       type: MessageType.NOTIF,
@@ -771,7 +837,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     const message = await this.chatService.createNotif(notif);
     this.server.to(channel.id.toString()).emit('message', message);
-  } */
+  }
 
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
