@@ -129,10 +129,11 @@ function reducer(channels: any, action: any) {
         }
         case ('removeBanList'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) =>
-                    c.id === action.channelId ?
-                        { ...c, banList: c.banList.filter((id: number) => id !== action.userId) } :
-                        c
+                return (channels.map((c: Channel) => {
+                    if (c.id === action.channelId && c.banList && c.banList.length)
+                        c.banList = c.banList.filter((id: number) => id !== action.userId)
+                    return (c)
+                }
                 ))
             }
         }
@@ -252,8 +253,14 @@ export function ChannelsProvider({ children }: any) {
                     }
                 }
             })
-            
-            socket.on('exception', (e : any) => console.log("exception =>", e))
+
+            socket.on('unbannedUser', (res: any) => {
+                console.log("UNBANNED CHANNEL EVENT")
+                if (res && res.channelId && res.userId)
+                    channelsDispatch({ type: 'removeBanlist', channelId: res.channelId, userId: res.userId })
+            })
+
+            // socket.on('exception', (e : any) => console.log("exception =>", e))
 
             if (user)
                 loadChannels();
@@ -265,14 +272,12 @@ export function ChannelsProvider({ children }: any) {
         channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
         if (res.userId === user.id)
             channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
-        if (currentChannel && res.channelId === currentChannel.id)
+        if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
             navigate("/chat");
     }
 
-    console.log(currentChannel)
-
     useEffect(() => {
-        if (socket) {
+        if (socket && user) {
             socket.on('kickedUser', async (res: any) => {
                 console.log("KICKED CHANNEL EVENT")
                 forceToLeaveChannel(res)
@@ -291,7 +296,7 @@ export function ChannelsProvider({ children }: any) {
             })
         }
         return () => socket && socket.off('kickedUser')
-    }, [socket, currentChannel])
+    }, [socket, currentChannel, user])
 
 
     ////////////////////////////////////////////////////////////////
