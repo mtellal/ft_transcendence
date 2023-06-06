@@ -65,7 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
   }
 
-  @SubscribeMessage('createChannel')
+/*   @SubscribeMessage('createChannel')
   @UsePipes(new ValidationPipe())
   async createChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: CreateChannelDto)
   {
@@ -80,7 +80,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       token = token.split('=')[1];
     }
     try {
-      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
       const authToken = token;
       if (!authToken)
         throw new UnauthorizedException();
@@ -114,7 +113,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     console.log("!!!!!!!!!! SUCCEED in creating channel !!!!!!!!!!")
     console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
-  }
+  } */
 
   @SubscribeMessage('joinChannel')
   @UsePipes(new ValidationPipe())
