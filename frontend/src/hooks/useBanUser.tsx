@@ -22,7 +22,18 @@ export default function useBanUser() {
             channelsDispatch({ type: 'removeMember', channelId: channel.id, userId: user.id });
             channelsDispatch({ type: 'addBanList', channelId: channel.id, userId: user.id });
         }
-    }, [socket])
+    }, [socket, channels, currentChannel])
+
+    const unbanUser = useCallback((user: any, channel: any) => {
+        console.log("unban user ", user, channel);
+        if (socket && channel && user) {
+            socket.emit('unbanUser', {
+                channelId: channel.id,
+                userId: user.id
+            })
+            channelsDispatch({ type: 'removeBanList', channelId: channel.id, userId: user.id })
+        }
+    }, [socket, channels, currentChannel])
 
     const isUserBanned = useCallback((user: any, channel: any) => {
         if (channel && channel.banList && channel.banList.length)
@@ -46,6 +57,7 @@ export default function useBanUser() {
     return (
         {
             banUser,
+            unbanUser,
             isUserBanned,
             getUsersBanned
         }

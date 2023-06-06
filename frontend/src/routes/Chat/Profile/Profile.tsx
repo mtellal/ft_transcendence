@@ -23,7 +23,7 @@ function ChannelUserLabel(props: any) {
     const { user } = useCurrentUser();
     const { makeAdmin } = useAdinistrators();
     const { kickUser } = useKickUser();
-    const { banUser } = useBanUser();
+    const { banUser, unbanUser } = useBanUser();
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
     const { isUserMember, isUserOwner, addMember } = useMembers();
 
@@ -35,8 +35,6 @@ function ChannelUserLabel(props: any) {
         muteUser,
     }: any = useContext(PofileChannelContext)
 
-    console.log(isCurrentUserAdmin, isCurrentUserOwner)
-
     function functionalities() {
         if (props.user && isCurrentUserAdmin &&
             props.user.username !== (user && user.username) && currentChannel.ownerId !== props.user.id) {
@@ -45,7 +43,7 @@ function ChannelUserLabel(props: any) {
                     <Icon
                         icon="lock_open"
                         description="Unban"
-                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: banUser, type: "unban" }) }}
+                        onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: unbanUser, type: "unban" }) }}
                     />
                 )
             }
@@ -163,11 +161,12 @@ function SearchChannelUser(props: TSearchChannelUser) {
 }
 
 function CollectionUsers(props: any) {
-    const [renderUsers, setRenderUsers] = useState();
+    const [renderUsers, setRenderUsers] = useState([]);
     const { channels } = useChannels();
 
     useEffect(() => {
-        if (props.users && props.users)
+        setRenderUsers([]);
+        if (props.users)
             setRenderUsers(props.users.map((user: any) =>
                 <ChannelUserLabel
                     key={`${props.title}-${user.id}`}
@@ -240,6 +239,8 @@ function ChannelProfile(props: any) {
 
     const { getUsersBanned } = useBanUser();
 
+    // console.log("Profile => ", props.channel)
+
     async function init() {
         if (props.members && props.members.length) {
             const administrators = getAdministrators(props.channel);
@@ -251,6 +252,7 @@ function ChannelProfile(props: any) {
             setOwner(owner)
 
             const bans = await getUsersBanned(props.channel);
+            console.log("bans members => ", bans, props.channel)
             setBanned(bans)
         }
     }
