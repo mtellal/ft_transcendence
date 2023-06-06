@@ -11,9 +11,9 @@ import Icon from "../../../components/Icon";
 import useKickUser from "../../../hooks/usekickUser";
 import useBanUser from "../../../hooks/useBanUser";
 import useAdinistrators from "../../../hooks/useAdministrators";
+import useUserAccess from "../../../hooks/useUserAccess";
 
 export const PofileChannelContext = createContext({});
-
 
 
 function ChannelUserLabel(props: any) {
@@ -39,7 +39,7 @@ function ChannelUserLabel(props: any) {
                 userStatus={props.user.userStatus}
             />
             {
-                isAdmin && props.user.username !== (user && user.username) &&
+                isAdmin && props.user.username !== (user && user.username) && !props.bannedUsers &&
                 <div className="flex-center fill">
 
                     {
@@ -67,6 +67,15 @@ function ChannelUserLabel(props: any) {
                     />
                 </div>
             }
+            {
+                props.bannedUsers &&
+                <Icon
+                    icon="lock_open"
+                    description="Unban"
+                    onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: banUser, type: "ban" }) }}
+                />
+            }
+
         </div>
     )
 }
@@ -81,6 +90,7 @@ function CollectionUsers(props: any) {
                 <ChannelUserLabel
                     key={`${props.title}-${user.id}`}
                     user={user}
+                    bannedUsers={props.bannedUsers || false}
                 />
             ))
     }, [props.users, props.isAdmin, props.currentUser, channels])
@@ -148,6 +158,11 @@ function ChannelProfile(props: any) {
     const [userOperation, setUserOperation] = useState(null)
 
     const { getUsersBanned } = useBanUser();
+
+    const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
+
+
+    console.log(isCurrentUserAdmin, isCurrentUserOwner, props.channel)
 
 
     async function init() {
@@ -274,6 +289,7 @@ function ChannelProfile(props: any) {
                         users={banned}
                         isAdmin={isAdmin}
                         currentUser={user}
+                        bannedUsers={true}
                     />
                 </div>
                 {

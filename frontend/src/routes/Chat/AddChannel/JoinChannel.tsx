@@ -142,7 +142,7 @@ export default function JoinChannel() {
                         name={c.name}
                         members={c.members}
                         isJoin={!channelAlreadyExists(c)}
-                        join={() => addChannel(c)}
+                        join={() => addChannel(c, true)}
                         isBanned={isUserBanned(user, c)}
                     />)
             )
