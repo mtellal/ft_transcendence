@@ -4,25 +4,11 @@
 	margin-left: 10px;
 	margin-right: 10px;
 	border-radius: 20px;
-
-
-
-	/* background-color: white; */
 }
-
-/* .messages { */
-	/* height: 50%; */
-	/* border-radius: 20px 20px 0 0; */
-	/* border-radius: 20px; */
-
-	/* background-color: rgba(0, 0, 0, 0.1); */
-/* } */
 
 .inputBox {
 	height: 10%;
-	/* display: flex; */
 	border-radius: 0 0 20px 20px;
-	/* border-top: solid 1px grey; */
 	background-color: rgba(0, 0, 0, 0.1);
 }
 

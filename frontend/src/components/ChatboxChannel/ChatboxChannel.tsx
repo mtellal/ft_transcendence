@@ -11,8 +11,6 @@ import s from './style.module.css'
 
 export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number}) {
 
-	console.log('id select friend', idChannelSelected);
-
 	const selector = useSelector((store: RootState) => store.user.user);
 	const [Asocket, AsetSocket] = useState<any>(null);
     const [messages, setMessages] = useState([]);

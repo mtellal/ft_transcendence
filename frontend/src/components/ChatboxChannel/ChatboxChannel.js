@@ -6,7 +6,6 @@ import { Messages } from '../Messages/Messages';
 import { getSocket } from '../../utils/socket';
 import s from './style.module.css';
 export function ChatboxChannel({ idChannelSelected }) {
-    console.log('id select friend', idChannelSelected);
     const selector = useSelector((store) => store.user.user);
     const [Asocket, AsetSocket] = useState(null);
     const [messages, setMessages] = useState([]);
