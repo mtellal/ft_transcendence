@@ -31,20 +31,20 @@ export function CreateGroup() {
 			const rep = await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PUBLIC',
-				members: [selector.id],
+				// members: [selector.id],
 			}, selector.token);
 		} else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
 			const rep = await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PRIVATE',
-				members: [selector.id],
+				// members: [selector.id],
 			}, selector.token);
 		} else {
 			console.log('TEST', target.password.value);
 			const rep = await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PROTECTED',
-				members: [selector.id],
+				// members: [selector.id],
 				password: target.password.value
 			}, selector.token);
 		}
