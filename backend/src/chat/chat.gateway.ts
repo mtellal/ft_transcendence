@@ -699,6 +699,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (dto.userId === user.id)
         throw new ForbiddenException(`You're already the owner/administrator`);
       const newAdmin = await this.userService.findOne(dto.userId);
+      console.log(newAdmin);
       if (!newAdmin)
         throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
       if (!newAdmin.channelList.includes(channel.id)) 
@@ -767,7 +768,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException(`${removedAdmin.username} is not on this channel`);
       if (!channel.administrators.includes(removedAdmin.id))
         throw new ForbiddenException(`${removedAdmin.username} is not an administrator`)
-      const updatedChannel = await this.chatService.makeAdmin(channel, removedAdmin);
+      const updatedChannel = await this.chatService.removeAdmin(channel, removedAdmin);
       this.server.to(channel.id.toString()).emit('removedAdmin', {
         channelId: channel.id,
         userId: removedAdmin.id
