@@ -31,12 +31,34 @@ export default function useUserAccess() {
         return (false);
     }, [])
 
+    const getCurrentUserAccess = useCallback(() => {
+        if (isCurrentUserOwner)
+            return (1)
+        if (isCurrentUserAdmin)
+            return (2);
+        return (0)
+    }, [isCurrentUserAdmin, isCurrentUserOwner])
+
+    const getUserAccess = useCallback((user : any) => {
+        if (currentChannel && channels)
+        {
+            if (isUserOwner(currentChannel, user))
+                return (1)
+            if (isUserAdmin(currentChannel, user))
+                return (2);
+            return (0)
+        }
+    }, [currentChannel, channels])
+
+
     return (
         {
             isCurrentUserOwner,
             isCurrentUserAdmin,
             isUserOwner,
             isUserAdmin,
+            getUserAccess,
+            getCurrentUserAccess
         }
     )
 }

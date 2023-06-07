@@ -19,16 +19,26 @@ export default function useAdinistrators() {
                 channelId: channel.id,
                 userId: user.id
             })
-            /* channelsDispatch({ type: 'removeMember', channelId: channel.id, userId: user.id });
-            channelsDispatch({ type: 'addBanList', channelId: channel.id, userId: user.id }); */
+            channelsDispatch({ type: 'addAdministrators', channelId: channel.id, userId: user.id });
         }
     }, [socket])
 
-    const isUserAdministrators = useCallback((user: any, channel: any) => {
-        if (channel && channel.administrators && channel.administrators.length)
-            return (channel.administrators.find((id: number) => id === user.id))
+    const removeAdmin = useCallback((user: any, channel: any) => {
+        console.log("remove admin user ", user);
+        if (socket && channel && user) {
+            socket.emit('removeAdmin', {
+                channelId: channel.id,
+                userId: user.id
+            })
+            channelsDispatch({ type: 'removeAdministrators', channelId: channel.id, userId: user.id });
+        }
+    }, [socket])
+
+    const isUserAdministrators = useCallback((user: any) => {
+        if (channels && currentChannel && currentChannel.administrators && currentChannel.administrators.length)
+            return (currentChannel.administrators.find((id: number) => id === user.id))
         return (false);
-    }, [])
+    }, [channels, currentChannel])
 
     const getAdministrators = useCallback((channel: any) => {
         if (channel && channels && channels.length) {
@@ -48,6 +58,7 @@ export default function useAdinistrators() {
     return (
         {
             makeAdmin,
+            removeAdmin,
             isUserAdministrators,
             getAdministrators
         }
