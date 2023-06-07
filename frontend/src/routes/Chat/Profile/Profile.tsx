@@ -127,9 +127,9 @@ function ChannelUserLabel(props: any) {
             />
             {
                 props.showChannelStatus ?
-                showChannelStatus()
-                :
-                functionalities()
+                    showChannelStatus()
+                    :
+                    functionalities()
             }
         </div>
     )
@@ -277,7 +277,8 @@ function ChannelProfile(props: any) {
 
     //console.log(props.channel)
 
-    async function init() {
+    const init = useCallback(async () => {
+
         if (props.members && props.members.length) {
             const administrators = getAdministrators(props.channel);
             if (administrators && administrators.length) {
@@ -288,37 +289,13 @@ function ChannelProfile(props: any) {
             setOwner(owner)
 
             const bans = await getUsersBanned(props.channel);
-            console.log("bans members => ", bans, props.channel)
             setBanned(bans)
         }
-    }
+    }, [channels, props.members])
 
     useEffect(() => {
         init();
     }, [props.members, channels])
-
-
-    function adminUser(user: any) {
-        console.log("admin user ", user);
-    }
-
-    /* const kickUser = useCallback((user: any) => {
-        console.log("kick user ", user);
-        if (socket && props.channel && user) {
-            socket.emit('kickUser', {
-                channelId: props.channel.id,
-                userId: user.id
-            })
-        }
-    }, [socket, props.channel]) */
-
-    function muteUser(user: any) {
-        console.log("mute user ", user);
-    }
-
-    function banUser(user: any) {
-        console.log("ban user ", user);
-    }
 
 
     function cancelOperation() {
@@ -334,12 +311,8 @@ function ChannelProfile(props: any) {
     return (
         <PofileChannelContext.Provider
             value={{
-                adminUser,
-                muteUser,
-                banUser,
-                setConfirmView,
                 setUserOperation,
-                owner
+                setConfirmView,
             }}
         >
             <div className="">

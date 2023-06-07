@@ -120,7 +120,7 @@ function reducer(channels: any, action: any) {
         case ('addBanList'): {
             if (channels.length && action.channelId && action.userId) {
                 return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId)
+                    if (c.id === action.channelId && !c.banList.find((id: number) => id === action.userId))
                         c.banList.push(action.userId);
                     return (c);
                 }
@@ -130,8 +130,10 @@ function reducer(channels: any, action: any) {
         case ('removeBanList'): {
             if (channels.length && action.channelId && action.userId) {
                 return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && c.banList && c.banList.length)
+                    if (c.id === action.channelId &&
+                        c.banList && c.banList.length) {
                         c.banList = c.banList.filter((id: number) => id !== action.userId)
+                    }
                     return (c)
                 }
                 ))
@@ -226,7 +228,18 @@ export function ChannelsProvider({ children }: any) {
     }, [user, socket])
 
     useEffect(() => {
+        if (user)
+            loadChannels();
+    }, [socket, user])
+
+
+    useEffect(() => {
         if (socket && user) {
+
+            socket.on('newChannel', (res: any) => {
+                console.log(res)
+            })
+
             socket.on('updateChannelName', (channelId: number, name: string) => {
                 console.log("UPDATE CHANNEL NAME EVENT")
             })
@@ -240,11 +253,9 @@ export function ChannelsProvider({ children }: any) {
             socket.on('leftChannel', async (res: any) => {
                 console.log("LEFT CHANNEL EVENT")
                 channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
+                channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
             })
 
-            socket.on('newChannel', (res: any) => {
-                console.log(res)
-            })
 
             socket.on('addedtoChannel', async (res: any) => {
                 console.log("ADDED CHANNEL EVENT")
@@ -265,40 +276,7 @@ export function ChannelsProvider({ children }: any) {
                 }
             })
 
-            socket.on('unbannedUser', (res: any) => {
-                console.log("UNBANNED CHANNEL EVENT")
-                if (res && res.channelId && res.userId)
-                    channelsDispatch({ type: 'removeBanlist', channelId: res.channelId, userId: res.userId })
-            })
-
             // socket.on('exception', (e : any) => console.log("exception =>", e))
-
-            if (user)
-                loadChannels();
-        }
-    }, [socket, user])
-
-    function forceToLeaveChannel(res: any) {
-        channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
-        if (res.userId === user.id)
-            channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
-        if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
-            navigate("/chat");
-    }
-
-    useEffect(() => {
-        if (socket && user) {
-
-            socket.on('kickedUser', async (res: any) => {
-                console.log("KICKED CHANNEL EVENT")
-                forceToLeaveChannel(res)
-            })
-
-            socket.on('bannedUser', async (res: any) => {
-                console.log("BANNED CHANNEL EVENT")
-                forceToLeaveChannel(res)
-            })
-
 
             socket.on('madeAdmin', (res: any) => {
                 console.log("MADE ADMIN CHANNEL EVENT");
@@ -313,9 +291,56 @@ export function ChannelsProvider({ children }: any) {
                     channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
                 }
             })
+
+            socket.on('kickedUser', async (res: any) => {
+                console.log("KICKED CHANNEL EVENT")
+                forceToLeaveChannel(res)
+            })
+
+            socket.on('bannedUser', async (res: any) => {
+                console.log("BANNED CHANNEL EVENT")
+                if (res && res.channelId && res.userId) {
+                    channelsDispatch({ type: 'addBanList', channelId: res.channelId, userId: res.userId });
+                    forceToLeaveChannel(res)
+                }
+            })
+
+            socket.on('unbannedUser', (res: any) => {
+                console.log("UNBANNED CHANNEL EVENT")
+                if (res && res.channelId && res.userId) {
+                    console.log("res => ", res, channels)
+                    channelsDispatch({ type: 'removeBanList', channelId: res.channelId, userId: res.userId })
+                }
+            })
+
+
+            return () => {
+                if (socket) {
+                    socket.off('newChannel')
+                    socket.off('updateChannelName')
+                    socket.off('joinedChannel')
+                    socket.off('leftChannel')
+                    socket.off('addedtoChannel')
+                    socket.off('madeAdmin')
+                    socket.off('removedAdmin')
+                    socket.off('kickedUser')
+                    socket.off('bannedUser')
+                    socket.off('unbannedUser')
+                }
+            }
+
         }
-        return () => socket && socket.off('kickedUser')
-    }, [socket, currentChannel, user])
+    }, [socket, channels, user])
+
+
+    function forceToLeaveChannel(res: any) {
+        channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId });
+        channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId });
+        if (res.userId === user.id)
+            channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
+        if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
+            navigate("/chat");
+    }
 
 
     ////////////////////////////////////////////////////////////////
