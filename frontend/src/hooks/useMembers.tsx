@@ -25,6 +25,15 @@ export default function useMembers()
         }
     }, [currentChannel, channels])
 
+    const isUserBanned = useCallback((user: any) => {
+        if (user && channels && currentChannel)
+        {
+            if (currentChannel.banList.find((id : number) => id === user.id))
+                return (true)
+            return (false)
+        }
+    }, [currentChannel, channels])
+
 
     const addMember = useCallback((user: any, channel : any) => {
         if (socket && channels && channel && user)
@@ -41,6 +50,7 @@ export default function useMembers()
         {
             isUserMember,
             isUserOwner,
+            isUserBanned,
             addMember
         }
     )
