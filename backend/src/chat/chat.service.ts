@@ -10,18 +10,22 @@ export class ChatService {
   constructor(private prisma: PrismaService, private userService: UsersService) {}
 
   async findAll() {
-    return await this.prisma.channel.findMany()
+    return await this.prisma.channel.findMany({
+      include: { muteList: true }
+    })
   }
 
   async findOne(id: number) {
     return await this.prisma.channel.findUnique({
-      where: { id }
+      where: { id },
+      include: { muteList: true }
     });
   }
 
   async findbyName(name: string) {
     return await this.prisma.channel.findMany({
-      where: {name}
+      where: {name},
+      include: { muteList: true }
     })
   }
 
@@ -242,26 +246,38 @@ export class ChatService {
     })
   }
 
+  async unmuteUser(dto: AdminActionDto, usertoUnmute: User) {
+    return await this.prisma.mutedUser.deleteMany({
+      where: {
+        channelId: dto.channelId,
+        userId: usertoUnmute.id
+      }
+    });
+  }
+
   async checkMute (channel: Channel, user: User) {
     const mutedUser = await this.prisma.mutedUser.findFirst({
       where: {
         channelId: channel.id,
         userId: user.id
       },
-      orderBy: {
-        duration: 'desc',
-      }
+      orderBy: {duration: 'desc'}
     })
-    if (!mutedUser)
-      return ;
-    console.log(mutedUser);
+    if (!mutedUser) {
+      return false;
+    }
     const currentTime = new Date
-    if (mutedUser.duration > currentTime)
-      throw new BadRequestException('You have been muted');
+    if (mutedUser.duration > currentTime) {
+      return true;
+    }
     if (mutedUser.duration <= currentTime) {
-      await this.prisma.mutedUser.delete({
-        where: {id: mutedUser.id}
+      await this.prisma.mutedUser.deleteMany({
+        where: {
+          channelId: channel.id,
+          userId: user.id
+        }
       })
+      return false;
     }
   }
 
