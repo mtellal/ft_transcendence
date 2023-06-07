@@ -20,6 +20,7 @@ export default function useBanUser() {
                 userId: user.id
             })
             channelsDispatch({ type: 'removeMember', channelId: channel.id, userId: user.id });
+            channelsDispatch({ type: 'removeAdministrators', channelId: channel.id, userId: user.id })
             channelsDispatch({ type: 'addBanList', channelId: channel.id, userId: user.id });
         }
     }, [socket, channels, currentChannel])
