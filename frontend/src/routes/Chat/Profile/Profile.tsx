@@ -21,7 +21,7 @@ export const PofileChannelContext = createContext({});
 function ChannelUserLabel(props: any) {
 
     const { user } = useCurrentUser();
-    const { makeAdmin } = useAdinistrators();
+    const { makeAdmin, removeAdmin, isUserAdministrators } = useAdinistrators();
     const { kickUser } = useKickUser();
     const { banUser, unbanUser } = useBanUser();
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
@@ -36,7 +36,7 @@ function ChannelUserLabel(props: any) {
     }: any = useContext(PofileChannelContext)
 
     function functionalities() {
-        if (props.user && isCurrentUserAdmin &&
+        if (props.user && (isCurrentUserAdmin || isCurrentUserOwner) &&
             props.user.username !== (user && user.username) && currentChannel.ownerId !== props.user.id) {
             if (props.bannedUsers) {
                 return (
@@ -60,11 +60,19 @@ function ChannelUserLabel(props: any) {
                 return (
                     <div className="flex-center fill">
                         {
-                            isCurrentUserOwner &&
+                            (isCurrentUserOwner || isCurrentUserAdmin) && !isUserAdministrators(props.user) &&
                             <Icon
-                                icon="shield_person"
-                                description="Admin"
+                                icon="add_moderator"
+                                description="make admin"
                                 onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: makeAdmin, type: "make admin" }) }}
+                            />
+                        }
+                        {
+                            (isCurrentUserOwner || isCurrentUserAdmin) && isUserAdministrators(props.user) &&
+                            <Icon
+                                icon="remove_moderator"
+                                description="remove admin"
+                                onClick={() => { setConfirmView(true); setUserOperation({ user: props.user, function: removeAdmin, type: "make admin" }) }}
                             />
                         }
                         <Icon
@@ -89,6 +97,27 @@ function ChannelUserLabel(props: any) {
     }
 
 
+    function showChannelStatus() {
+        if (props.showChannelStatus) {
+            return (
+                <>
+                    {
+                        isUserAdministrators(props.user) &&
+                        <span className="material-symbols-outlined">
+                            shield_person
+                        </span>
+                    }
+                    {
+                        isUserOwner(props.user) &&
+                        <span className="material-symbols-outlined">
+                            location_away
+                        </span>
+                    }
+                </>
+            )
+        }
+    }
+
     return (
         <div className="friend-element">
             <UserInfos
@@ -97,9 +126,11 @@ function ChannelUserLabel(props: any) {
                 userStatus={props.user.userStatus}
             />
             {
+                props.showChannelStatus ?
+                showChannelStatus()
+                :
                 functionalities()
             }
-
         </div>
     )
 }
@@ -116,9 +147,10 @@ function SearchChannelUser(props: TSearchChannelUser) {
     const [searchUserValue, setSearchUserValue]: any = useState("");
     const [searchUser, setSearchUser]: any = useState();
     const [error, setError] = useState("");
+    const { isUserMember } = useMembers();
 
     const { fetchUserByUsername } = useFetchUsers();
-
+    const { isCurrentUserAdmin, getUserAccess } = useUserAccess();
 
     async function search() {
         let user;
@@ -127,7 +159,7 @@ function SearchChannelUser(props: TSearchChannelUser) {
         }
         if (!user)
             user = await fetchUserByUsername(searchUserValue);
-        if (user) {
+        if (user && (isUserMember(user) || isCurrentUserAdmin)) {
             setSearchUser(user);
             setError("");
         }
@@ -154,6 +186,7 @@ function SearchChannelUser(props: TSearchChannelUser) {
                 <ChannelUserLabel
                     user={searchUser}
                     bannedUsers={props.bannedUsers}
+                    showChannelStatus={!isCurrentUserAdmin && getUserAccess(searchUser)}
                 />
             }
         </>
@@ -240,6 +273,9 @@ function ChannelProfile(props: any) {
     const { getUsersBanned } = useBanUser();
 
     // console.log("Profile => ", props.channel)
+
+
+    console.log(props.channel)
 
     async function init() {
         if (props.members && props.members.length) {

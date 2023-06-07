@@ -109,10 +109,11 @@ function reducer(channels: any, action: any) {
         }
         case ('removeAdministrators'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) =>
-                    c.id === action.channelId ?
-                        { ...c, administrators: c.administrators.filter((id: number) => id !== action.userId) } :
-                        c
+                return (channels.map((c: Channel) => {
+                    if (c.id === action.channelId && c.administrators && c.administrators.length)
+                        c.administrators = c.administrators.filter((id: number) => id !== action.userId)
+                    return (c)
+                }
                 ))
             }
         }
@@ -241,14 +242,24 @@ export function ChannelsProvider({ children }: any) {
                 channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
             })
 
+            socket.on('newChannel', (res: any) => {
+                console.log(res)
+            })
+
             socket.on('addedtoChannel', async (res: any) => {
                 console.log("ADDED CHANNEL EVENT")
                 if (res && res.channelId) {
-                    const channel = await getChannel(res.channelId).then(res => res.data);
-                    if (channel) {
-                        const users = await fetchUsers(channel.members)
-                        channelsDispatch({ type: 'addChannel', channel: { ...channel, users } });
-                        joinChannel(channel)
+
+                    if (res.userId === user.id) {
+                        const channel = await getChannel(res.channelId).then(res => res.data);
+                        if (channel) {
+                            const users = await fetchUsers(channel.members)
+                            channelsDispatch({ type: 'addChannel', channel: { ...channel, users } });
+                            joinChannel(channel)
+                        }
+                    }
+                    else {
+
                     }
                 }
             })
@@ -276,6 +287,7 @@ export function ChannelsProvider({ children }: any) {
 
     useEffect(() => {
         if (socket && user) {
+
             socket.on('kickedUser', async (res: any) => {
                 console.log("KICKED CHANNEL EVENT")
                 forceToLeaveChannel(res)
@@ -286,10 +298,18 @@ export function ChannelsProvider({ children }: any) {
                 forceToLeaveChannel(res)
             })
 
+
             socket.on('madeAdmin', (res: any) => {
                 console.log("MADE ADMIN CHANNEL EVENT");
                 if (res && res.channelId && res.userId) {
                     channelsDispatch({ type: 'addAdministrators', channelId: res.channelId, userId: res.userId })
+                }
+            })
+
+            socket.on('removedAdmin', async (res: any) => {
+                console.log("REMOVED ADMIN CHANNEL EVENT")
+                if (res && res.channelId && res.userId) {
+                    channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
                 }
             })
         }
@@ -395,9 +415,8 @@ export function ChannelsProvider({ children }: any) {
     }, [channels])
 
     const isLocalChannel = useCallback((channel: Channel) => {
-        if (channels && channels.length && channel)
-        {
-            return (channels.find((c : Channel) => channel.id === c.id))
+        if (channels && channels.length && channel) {
+            return (channels.find((c: Channel) => channel.id === c.id))
         }
         return (false);
     }, [channels])

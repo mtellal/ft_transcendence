@@ -29,6 +29,7 @@ import './JoinChannel.css'
 import { useWindow } from "../../../hooks/useWindow";
 import ArrowBackMenu from "../components/ArrowBackMenu";
 import useBanUser from "../../../hooks/useBanUser";
+import ResizeContainer from "../../../components/ResizeContainer";
 
 type TChannelSearch = {
     name: string,
@@ -49,10 +50,11 @@ function ChannelSearch(props: TChannelSearch) {
         const images = rawProfilePictures.map((i: any) =>
             i ? window.URL.createObjectURL(new Blob([i])) : defaultUserPP
         )
-        console.log(images)
         setMembers(images.map((url: any) =>
-            <div key={url} className="channelsearch-pp-container">
-                <ProfilePicture image={url} />
+            <div key={url} className="channelsearch-pp-container flex-center">
+                <ResizeContainer height="40%">
+                    <ProfilePicture image={url} />
+                </ResizeContainer>
             </div>
         ))
     }
@@ -151,10 +153,10 @@ export default function JoinChannel() {
 
 
     console.log("rerender")
-    
+
     const renderChannelsSelected = useCallback(async () => {
         if (matchChannels && matchChannels.length) {
-            
+
             const updatedChannels = await updateChannelsDisplayed();
 
             if (updatedChannels) {
