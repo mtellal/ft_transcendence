@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     validFriendRequest,
     refuseFriendRequest,
@@ -70,18 +70,18 @@ function ChannelSearch(props: TChannelSearch) {
                 {members}
             </div>
             {
-                props.isJoin && !props.isBanned && 
+                props.isJoin && !props.isBanned &&
                 <div style={{ marginLeft: 'auto' }}>
                     <Icon icon="login" description="Join" onClick={props.join} />
                 </div>
             }
             {
-                props.isBanned && 
+                props.isBanned &&
                 <div style={{ marginLeft: 'auto' }}>
                     <p className="red-c">Banned</p>
                 </div>
             }
-            
+
         </div>
     )
 }
@@ -97,12 +97,12 @@ export default function JoinChannel() {
     const [renderChannels, setRenderChannels] = useState([]);
     const { isUserBanned } = useBanUser();
 
-    const {isMobileDisplay} = useWindow();
+    const { isMobileDisplay } = useWindow();
 
     const {
         channels,
         channelAlreadyExists,
-        addChannel
+        addChannel,
     } = useChannels();
 
     function fetchError() {
@@ -132,21 +132,49 @@ export default function JoinChannel() {
         setPrevValue(value);
     }
 
-    useEffect(() => {
-        if (matchChannels && matchChannels.length) {
-
-            setRenderChannels(
-                matchChannels.map((c: any) =>
-                    <ChannelSearch
-                        key={c.id}
-                        name={c.name}
-                        members={c.members}
-                        isJoin={!channelAlreadyExists(c)}
-                        join={() => addChannel(c, true)}
-                        isBanned={isUserBanned(user, c)}
-                    />)
+    const updateChannelsDisplayed = useCallback(async () => {
+        return (
+            await Promise.all(
+                await getChannelByName(value)
+                    .then(res => {
+                        if (res.status === 200 && res.statusText === "OK") {
+                            let channels: any[];
+                            if (res.data.length)
+                                channels = res.data.filter((c: any) => c.type !== "WHISPER");
+                            if (channels.length)
+                                return (channels);
+                        }
+                    })
             )
+        )
+    }, [channels, matchChannels])
+
+
+    console.log("rerender")
+    
+    const renderChannelsSelected = useCallback(async () => {
+        if (matchChannels && matchChannels.length) {
+            
+            const updatedChannels = await updateChannelsDisplayed();
+
+            if (updatedChannels) {
+                setRenderChannels(
+                    updatedChannels.map((c: any) =>
+                        <ChannelSearch
+                            key={c.id}
+                            name={c.name}
+                            members={c.members}
+                            isJoin={!channelAlreadyExists(c)}
+                            join={() => addChannel(c, true)}
+                            isBanned={isUserBanned(user, c)}
+                        />)
+                )
+            }
         }
+    }, [channels, matchChannels])
+
+    useEffect(() => {
+        renderChannelsSelected();
     }, [matchChannels, channels])
 
     return (
@@ -154,7 +182,7 @@ export default function JoinChannel() {
             {
                 isMobileDisplay &&
                 <div className="flex">
-                    <ArrowBackMenu 
+                    <ArrowBackMenu
                         title="Channel"
                         path="/chat/add-group"
                     />

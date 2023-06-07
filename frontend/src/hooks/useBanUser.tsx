@@ -36,6 +36,7 @@ export default function useBanUser() {
     }, [socket, channels, currentChannel])
 
     const isUserBanned = useCallback((user: any, channel: any) => {
+        console.log("isUserBanned ", user, channel)
         if (channel && channel.banList && channel.banList.length)
             return (channel.banList.find((id: number) => id === user.id))
         return (false);

@@ -88,7 +88,6 @@ function reducer(channels: any, action: any) {
             if (!channels.length)
                 return ([formatChannel(action.channel)])
             if (action.channel && !channels.find((c: any) => c.id === action.channel.id)) {
-                console.log(action.channel, " ADDED")
                 return ([...channels, formatChannel(action.channel)])
             }
         }
@@ -267,7 +266,6 @@ export function ChannelsProvider({ children }: any) {
         }
     }, [socket, user])
 
-
     function forceToLeaveChannel(res: any) {
         channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
         if (res.userId === user.id)
@@ -396,6 +394,14 @@ export function ChannelsProvider({ children }: any) {
         return (false)
     }, [channels])
 
+    const isLocalChannel = useCallback((channel: Channel) => {
+        if (channels && channels.length && channel)
+        {
+            return (channels.find((c : Channel) => channel.id === c.id))
+        }
+        return (false);
+    }, [channels])
+
 
     ////////////////////////////////////////////////////////////////
     //               C U R R E N T    C H A N N E L               //
@@ -438,6 +444,7 @@ export function ChannelsProvider({ children }: any) {
             channelAlreadyExists,
             getOwner,
             getMembers,
+            isLocalChannel
         }}>
             {children}
         </ChannelsContext.Provider>
