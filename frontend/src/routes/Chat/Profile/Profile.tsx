@@ -25,7 +25,7 @@ function ChannelUserLabel(props: any) {
     const { kickUser } = useKickUser();
     const { banUser, unbanUser } = useBanUser();
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
-    const { isUserMember, isUserOwner, addMember } = useMembers();
+    const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers();
 
     const { currentChannel } = useChannels();
 
@@ -36,9 +36,9 @@ function ChannelUserLabel(props: any) {
     }: any = useContext(PofileChannelContext)
 
     function functionalities() {
-        if (props.user && (isCurrentUserAdmin || isCurrentUserOwner) &&
-            props.user.username !== (user && user.username) && currentChannel.ownerId !== props.user.id) {
-            if (props.bannedUsers) {
+        if (props.user && isCurrentUserAdmin && props.user.username !== (user && user.username) && 
+            currentChannel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
+            if (isUserBanned(props.user)) {
                 return (
                     <Icon
                         icon="lock_open"
@@ -47,7 +47,7 @@ function ChannelUserLabel(props: any) {
                     />
                 )
             }
-            else if (!isUserMember(props.user) && !props.bannedUsers) {
+            else if (!isUserMember(props.user)) {
                 return (
                     <Icon
                         icon="add"
@@ -271,11 +271,6 @@ function ChannelProfile(props: any) {
     const [userOperation, setUserOperation] = useState(null)
 
     const { getUsersBanned } = useBanUser();
-
-    // console.log("Profile => ", props.channel)
-
-
-    //console.log(props.channel)
 
     const init = useCallback(async () => {
 
