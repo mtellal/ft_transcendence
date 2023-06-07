@@ -259,7 +259,8 @@ export function ChannelsProvider({ children }: any) {
                         }
                     }
                     else {
-
+                        const user = await fetchUser(res.userId);
+                        channelsDispatch({ type: 'addMember', channelId: res.channelId, user: user })
                     }
                 }
             })

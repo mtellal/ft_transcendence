@@ -275,7 +275,7 @@ function ChannelProfile(props: any) {
     // console.log("Profile => ", props.channel)
 
 
-    console.log(props.channel)
+    //console.log(props.channel)
 
     async function init() {
         if (props.members && props.members.length) {
