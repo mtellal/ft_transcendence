@@ -1,17 +1,18 @@
 .container {
-    width: 100px;
+    width: 85px;
     height: 125px;
-    margin-left: 10px;
-    position: relative;
     display: inline-block;
 	font-weight: 900;
+	position: relative;
+	text-align: center;
+	margin-right: 10px;
 }
 
 .image {
-    height: 100px;
+    height: 75px;
+	width: 75px;
     border-radius: 50%;
     display: block;
-    width: 100%;
 }
 
 .menu {
@@ -23,12 +24,11 @@
     list-style: none;
     padding: 10px;
     margin: 0px;
-    z-index: 1;
 }
 
 .menu li {
-    width: 100px;
-    margin-left: -10px;
+    width: 90px;
+    margin-left: -15px;
     margin-bottom: 5px;
     padding-bottom: 1px;
     border-radius: 10px;
