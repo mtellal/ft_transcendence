@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useOutlet, useOutletContext, useParams } from "react-router-dom";
 
 import UserLabel from "../../../../components/users/UserLabel";
-import { useChannels, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
+import { useChannelsContext, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
 import { createChannel } from "../../../../requests/chat";
 import { useWindow } from "../../../../hooks/useWindow";
 
@@ -99,7 +99,7 @@ export default function MenuElement({ ...props }) {
         setCurrentChannel,
         addChannel,
         currentChannel
-    } = useChannels();
+    } = useChannelsContext();
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);

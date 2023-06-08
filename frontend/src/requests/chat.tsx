@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useCurrentUser } from "../hooks/Hooks";
 
 const back = process.env.REACT_APP_BACK;
 
@@ -9,6 +10,24 @@ const back = process.env.REACT_APP_BACK;
 export async function getChannel(id: number) {
     return (
         axios.get(`${back}/chat/${id}`)
+            .then(res => res)
+            .catch(err => err)
+    )
+}
+
+
+export async function getChannelProtected(channelId: number, password: string, token: string) {
+    return (
+        axios.post(`${back}/chat/`, {
+            channelId,
+            password
+        },
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        )
             .then(res => res)
             .catch(err => err)
     )

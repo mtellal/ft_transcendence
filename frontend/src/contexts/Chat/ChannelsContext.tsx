@@ -223,6 +223,7 @@ export function ChannelsProvider({ children }: any) {
 
     const [channelsLoading, setChannelsLoading] = useState(false);
 
+
     const loadChannels = useCallback(async () => {
         setChannelsLoading(true)
         let channelList = await getChannels(user.id)
@@ -416,6 +417,22 @@ export function ChannelsProvider({ children }: any) {
     }, [socket])
 
 
+    const addChannelProtected = useCallback(async (channel: any, password: string, includeCurrentUser: boolean) => {
+        if (socket) {
+            console.log("channel => ", channel)
+            if (!channel.users || !channel.users.length && channel.members) {
+                if (includeCurrentUser)
+                    channel.members = [...channel.members, user.id]
+                const users = await fetchUsers(channel.members)
+                if (users)
+                    channel = { ...channel, users }
+            }
+            channelsDispatch({ type: 'addChannel', channel });
+            joinChannelProtected(channel.id, password);
+        }
+    }, [socket])
+
+
     const joinChannel = useCallback((channel: any) => {
         if (socket) {
             socket.emit('joinChannel', {
@@ -423,6 +440,16 @@ export function ChannelsProvider({ children }: any) {
             })
         }
     }, [socket])
+
+    const joinChannelProtected = useCallback((channelId : number, password: string) => {
+        if (socket) {
+            socket.emit('joinChannel', {
+                channelId, 
+                password
+            })
+        }
+    }, [socket])
+
 
     const leaveChannel = useCallback((channel: any) => {
         if (channel && channel.id && socket) {
@@ -538,6 +565,7 @@ export function ChannelsProvider({ children }: any) {
             currentChannel,
             setCurrentChannel,
             addChannel,
+            addChannelProtected,
             joinChannel,
             leaveChannel,
             channelAlreadyExists,

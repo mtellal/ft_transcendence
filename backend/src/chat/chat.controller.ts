@@ -77,6 +77,7 @@ export class ChatController {
   async accessProtectedChannel(@Body() joinChannelDto: JoinChannelDto, @Req() req) {
     const user: User = req.user
     const channel = await this.chatService.findOne(joinChannelDto.channelId);
+    console.log(channel)
     if (!channel)
       throw new NotFoundException(`Channel with id of ${joinChannelDto.channelId} not found`)
     if (channel.type !== 'PROTECTED')

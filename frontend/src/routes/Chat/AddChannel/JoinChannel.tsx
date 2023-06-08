@@ -1,11 +1,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
-import {
-    validFriendRequest,
-    refuseFriendRequest,
-} from '../../../requests/friendsRequest'
 
-import { getChannelByName } from '../../../requests/chat'
+import { getChannelByName, getChannelProtected } from '../../../requests/chat'
 
 import {
     getUser,
@@ -13,15 +9,12 @@ import {
 
 } from '../../../requests/user'
 
-import { UserLabelSearch } from "../../../components/users/UserLabel";
 
 import IconInput from "../../../components/Input/IconInput";
-import { useOutletContext } from "react-router-dom";
-import { CollectionElement } from "../components/Menu/MenuElement";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 import ProfilePicture from "../../../components/users/ProfilePicture";
-import Icon from "../../../components/Icon";
+import Icon, { RawIcon } from "../../../components/Icon";
 
 import defaultUserPP from '../../../assets/user.png'
 
@@ -31,17 +24,19 @@ import ArrowBackMenu from "../components/ArrowBackMenu";
 import useBanUser from "../../../hooks/Chat/useBanUser";
 import ResizeContainer from "../../../components/ResizeContainer";
 import useChannelAccess from "../../../hooks/Chat/useChannelAccess";
+import InfoInput from "../../../components/Input/InfoInput";
+import useChannelInfos from "../../../hooks/Chat/useChannelInfos";
 
 type TChannelSearch = {
     channel: any,
-    setJoinChannelProtectedView?: (x: boolean) => {} | any,
+    setJoinChannelProtectedView?: (x: {}) => {} | any,
     join: () => {} | any
 }
 
 function ChannelSearch({ channel, ...props }: TChannelSearch) {
 
     const { user } = useCurrentUser();
-    const { channelAlreadyExists } = useChannels();
+    const { channelAlreadyExists } = useChannelsContext();
     const { isChannelProtected, isChannelPrivate } = useChannelAccess();
     const { isUserBanned } = useBanUser()
 
@@ -73,8 +68,8 @@ function ChannelSearch({ channel, ...props }: TChannelSearch) {
 
 
     function joinChannel() {
-        if (isChannelPrivate(channel)) {
-            props.setJoinChannelProtectedView(true);
+        if (isChannelProtected(channel)) {
+            props.setJoinChannelProtectedView({ display: true, channel });
         }
         else
             props.join();
@@ -88,7 +83,7 @@ function ChannelSearch({ channel, ...props }: TChannelSearch) {
                 </div>
             )
         }
-        else if (!channelAlreadyExists(channel) && !isChannelProtected(channel)) {
+        else if (!channelAlreadyExists(channel) && !isChannelPrivate(channel)) {
             return (
                 <div style={{ marginLeft: 'auto' }}>
                     <Icon icon="login" description="Join" onClick={() => joinChannel()} />
@@ -100,6 +95,14 @@ function ChannelSearch({ channel, ...props }: TChannelSearch) {
     return (
         <div className="flex-ai channelsearch-container">
             <h3 className="no-wrap">{channel.name} - </h3>
+            {
+                isChannelPrivate(channel) && 
+                <RawIcon icon="lock" />
+            }
+            {
+                isChannelProtected(channel) && 
+                <RawIcon icon="shield" />
+            }
             <p className="channelsearch-members gray-c flex-center no-wrap">{channel.members.length} members</p>
             <div className="channelsearch-pps flex-center">
                 {members}
@@ -114,7 +117,6 @@ function ChannelSearch({ channel, ...props }: TChannelSearch) {
 
 export default function JoinChannel() {
 
-    const { user } = useCurrentUser();
     const [prevValue, setPrevValue] = React.useState("");
     const [value, setValue] = React.useState("");
     const [error, setError] = React.useState(false);
@@ -122,17 +124,14 @@ export default function JoinChannel() {
     const [matchChannels, setMatchChannels] = useState([]);
     const [renderChannels, setRenderChannels] = useState([]);
 
-    const [joinChannelProtectedView, setJoinChannelProtectedView] = useState(false);
-
-    const { isUserBanned } = useBanUser();
+    const [joinChannelProtectedView, setJoinChannelProtectedView]: any = useState({ display: false });
 
     const { isMobileDisplay } = useWindow();
 
     const {
         channels,
-        channelAlreadyExists,
         addChannel,
-    } = useChannels();
+    } = useChannelsContext();
 
     function fetchError() {
         setError(true);
@@ -157,7 +156,7 @@ export default function JoinChannel() {
                 else
                     fetchError();
             })
-            .catch(err => fetchError())
+            .catch(() => fetchError())
         setPrevValue(value);
     }
 
@@ -202,6 +201,7 @@ export default function JoinChannel() {
         renderChannelsSelected();
     }, [matchChannels, channels])
 
+
     return (
         <div className="relative fill flex-column">
 
@@ -238,12 +238,11 @@ export default function JoinChannel() {
                 </div>
             </div>
             {
-                joinChannelProtectedView &&
-                <div className=" absolute fill red">
-                    <div>
-                        PASSWORD REQUIRED
-                    </div>
-                </div>
+                joinChannelProtectedView.display &&
+                <ProtectedChannelPassword
+                    channel={joinChannelProtectedView.channel}
+                    setJoinChannelProtectedView={setJoinChannelProtectedView}
+                />
 
             }
         </div>
@@ -251,3 +250,54 @@ export default function JoinChannel() {
 }
 
 
+function ProtectedChannelPassword(props: any) {
+
+    const { token } = useCurrentUser();
+    const [passwordValue, setPasswordValue]: any = useState("");
+    const { addChannelProtected } = useChannelsContext();
+    const [error, setError] = useState("")
+
+    async function submitPassword() {
+        
+        if (passwordValue.trim()) {
+            await getChannelProtected(props.channel.id, passwordValue.trim(), token)
+            .then(res => {
+                if (res.data)
+                {
+                    props.setJoinChannelProtectedView(false);
+                    addChannelProtected(props.channel, passwordValue, true );
+                    setError("");
+                }
+                else
+                    setError("Wrong password")
+            })
+        }
+    }
+
+    return (
+        <ConfirmView>
+            <div className="joinchannel-cornfirmview-container flex-column">
+                <h3>Channel protected</h3>
+                {error && <p className="red-c">{error}</p>}
+                <InfoInput
+                    id="joinchannel-confirmview"
+                    label="Password"
+                    value={passwordValue}
+                    setValue={setPasswordValue}
+                    submit={() => submitPassword()}
+                />
+            </div>
+        </ConfirmView>
+    )
+
+
+}
+
+
+function ConfirmView({ children }: any) {
+    return (
+        <div className="absolute fill confirm-background flex-center" >
+            {children}
+        </div>
+    )
+}

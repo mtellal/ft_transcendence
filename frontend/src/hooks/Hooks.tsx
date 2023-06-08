@@ -19,7 +19,7 @@ export function useChatSocket()
     return (useContext(ChatSocketContext))
 }
 
-export function useChannels()
+export function useChannelsContext()
 {
     return (useContext(ChannelsContext));
 }

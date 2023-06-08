@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
-import { useChannels, useChatSocket } from "../Hooks";
+import { useChannelsContext, useChatSocket } from "../Hooks";
 
 export default function useMembers()
 {
-    const { currentChannel, channels, channelsDispatch} = useChannels();
+    const { currentChannel, channels, channelsDispatch} = useChannelsContext();
     const { socket } = useChatSocket();
 
     const isUserMember = useCallback((user: any) => {

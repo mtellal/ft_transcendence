@@ -1,12 +1,12 @@
 import React, { useCallback, useContext } from "react";
-import { useChannels, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
+import { useChannelsContext, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
 
 
 export default function useAdinistrators() {
     const { socket } = useChatSocket();
-    const { channelsDispatch, currentChannel, channels } = useChannels();
+    const { channelsDispatch, currentChannel, channels } = useChannelsContext();
     const { friends } = useFriends();
     const { user } = useCurrentUser();
     const navigate = useNavigate();

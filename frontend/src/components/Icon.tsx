@@ -10,13 +10,22 @@ type TIcon = {
 
 export default function Icon(props: TIcon) {
     return (
-        <div className="flex-center icon-container hover-fill-grey" 
+        <div className="flex-center icon-container hover-fill-grey"
             onClick={props.onClick}
         >
-                <span className="material-symbols-outlined">
-                    {props.icon}
-                </span>
+            <span className="material-symbols-outlined">
+                {props.icon}
+            </span>
             {props.description && <div className="description">{props.description}</div>}
         </div>
+    )
+}
+
+
+export function RawIcon({ icon }: any) {
+    return (
+        <span className="material-symbols-outlined">
+            {icon}
+        </span>
     )
 }

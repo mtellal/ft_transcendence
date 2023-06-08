@@ -1,19 +1,19 @@
 import React, { useCallback, useContext } from "react";
-import { useChannels, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
+import { useChannelsContext, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
 
 
 export default function useBanUser() {
     const { socket } = useChatSocket();
-    const { channelsDispatch, currentChannel, channels } = useChannels();
+    const { channelsDispatch, currentChannel, channels } = useChannelsContext();
     const { friends } = useFriends();
     const { user } = useCurrentUser();
     const navigate = useNavigate();
     const { fetchUsers } = useFetchUsers();
 
     const banUser = useCallback((user: any, channel: any) => {
-        console.log("ban user ", user);
+        console.log("ban user ");
         if (socket && channel && user) {
             socket.emit('banUser', {
                 channelId: channel.id,
@@ -26,7 +26,7 @@ export default function useBanUser() {
     }, [socket, channels, currentChannel])
 
     const unbanUser = useCallback((user: any, channel: any) => {
-        console.log("unban user ", user, channel);
+        console.log("unban user ");
         if (socket && channel && user) {
             socket.emit('unbanUser', {
                 channelId: channel.id,
@@ -37,7 +37,7 @@ export default function useBanUser() {
     }, [socket, channels, currentChannel])
 
     const isUserBanned = useCallback((user: any, channel: any) => {
-        console.log("isUserBanned ", user, channel)
+        console.log("isUserBanned ")
         if (channel && channel.banList && channel.banList.length)
             return (channel.banList.find((id: number) => id === user.id))
         return (false);

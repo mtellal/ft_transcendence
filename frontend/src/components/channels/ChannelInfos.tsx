@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { useChannels, useCurrentUser } from "../../hooks/Hooks";
+import { useChannelsContext, useCurrentUser } from "../../hooks/Hooks";
 import { getUserProfilePictrue } from "../../requests/user";
 import ProfilePicture from "../../components/users/ProfilePicture";
 
@@ -12,7 +12,7 @@ type TChannelInfos = {
 
 export default function ChannelInfos(props: TChannelInfos) {
 
-    const {getMembers, channels } = useChannels();
+    const {getMembers, channels } = useChannelsContext();
 
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 

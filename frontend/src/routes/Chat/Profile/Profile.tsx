@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
 
 import './Profile.css'
-import { useChannels, useFriends, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
+import { useChannelsContext, useFriends, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
 import UserLabel, { UserLabelSearch } from "../../../components/users/UserLabel";
 import { CollectionElement } from "../components/Menu/MenuElement";
 import InfoInput from "../../../components/Input/InfoInput";
@@ -28,7 +28,7 @@ function ChannelUserLabel(props: any) {
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
     const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers();
 
-    const { currentChannel } = useChannels();
+    const { currentChannel } = useChannelsContext();
 
     const {
         setUserOperation,
@@ -196,7 +196,7 @@ function SearchChannelUser(props: TSearchChannelUser) {
 
 function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState([]);
-    const { channels } = useChannels();
+    const { channels } = useChannelsContext();
 
     useEffect(() => {
         setRenderUsers([]);
@@ -254,9 +254,8 @@ export function ConfirmView(props: any) {
 
 function ChannelProfile(props: any) {
 
-    const { socket } = useChatSocket();
     const { user } = useCurrentUser();
-    const { channels, getOwner } = useChannels();
+    const { channels, getOwner } = useChannelsContext();
     const { getAdministrators } = useAdinistrators();
 
     const [name, setName]: any = useState(props.channel && props.channel.name);
@@ -318,11 +317,9 @@ function ChannelProfile(props: any) {
     function submitPassword() {
         let newPassword = password && password.trim();
         if (newPassword) {
-            updateChannelPassword({ ...props.channel, password: newPassword })
+            updateChannelPassword(props.channel.id, newPassword, props.channel.type)
         }
     }
-
-
 
     return (
         <PofileChannelContext.Provider
@@ -331,7 +328,7 @@ function ChannelProfile(props: any) {
                 setConfirmView,
             }}
         >
-            <div className="">
+            <div>
                 <div className="profilepage">
                     <h2>Name</h2>
                     <InfoInput
@@ -341,26 +338,25 @@ function ChannelProfile(props: any) {
                         setValue={setName}
                         submit={() => submitName()}
                     />
-                    <hr />
+                    {
+                        props.channel.type === "PROTECTED" &&
+                        <>
+                            <h2>Password</h2>
+                            <InfoInput
+                                id="password"
+                                label="Set new password"
+                                value={password}
+                                setValue={setPassword}
+                                submit={() => submitPassword()}
+                            />
+                        </>
+                    }
                     <PickMenu
                         title="Access"
                         collection={["public", "protected", "private"]}
                         selected={access}
                         setSelected={setAccess}
                     />
-                    {
-                        props.channel.type !== "PUBLIC" &&
-                        <>
-                            <h2>Password</h2>
-                            <InfoInput
-                                id="name"
-                                label="Name"
-                                value={name}
-                                setValue={setName}
-                                submit={null}
-                            />
-                        </>
-                    }
                     <SearchChannelUser
                         title="Search"
                         inputTitle="Search user"
@@ -370,6 +366,7 @@ function ChannelProfile(props: any) {
                     <ChannelUserLabel
                         user={owner}
                     />
+
                     <CollectionUsers
                         title="Administrators"
                         users={admins}
@@ -414,7 +411,7 @@ function FriendProfile(props: any) {
 
 export default function Profile() {
     const { currentFriend } = useFriends();
-    const { currentChannel } = useChannels();
+    const { currentChannel } = useChannelsContext();
 
     return (
         <div className="scroll">

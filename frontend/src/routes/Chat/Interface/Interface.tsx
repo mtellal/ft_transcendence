@@ -5,7 +5,7 @@ import Banner from "../components/Banner/Banner";
 import Profile from "../Profile/Profile";
 import Messenger from "../components/Messenger/Messenger";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
 import RemoveView from "../components/RemoveElement.tsx/RemoveView";
 import { removeUserFriend } from '../../../requests/friends'
@@ -35,7 +35,7 @@ export default function Interface() {
         setCurrentChannel,
         leaveChannel,
         channels
-    } = useChannels();
+    } = useChannelsContext();
 
     const {
         friends,

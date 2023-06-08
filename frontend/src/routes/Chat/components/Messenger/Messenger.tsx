@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 import {
-    useChannels,
+    useChannelsContext,
     useChatSocket,
     useFriends,
     useCurrentUser
@@ -167,7 +167,7 @@ export default function Messenger({
     const [value, setValue] = React.useState("");
     const [renderMessages, setRenderMessages]: any = useState([]);
 
-    const { currentChannel, channels, getMembers } = useChannels();
+    const { currentChannel, channels, getMembers } = useChannelsContext();
     const { currentFriend, friends } = useFriends();
     const { fetchUser } = useFetchUsers();
 

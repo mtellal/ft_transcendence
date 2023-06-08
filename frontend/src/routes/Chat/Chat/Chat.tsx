@@ -6,7 +6,7 @@ import {
     getUserInvitations,
 } from "../../../requests/friendsRequest";
 
-import { useChannels, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
 
 import { FriendsProvider } from "../../../contexts/Chat/FriendsContext";
 import { SocketProvider } from "../../../contexts/Chat/ChatSocketContext";
@@ -30,7 +30,7 @@ function ChatInterface() {
         channels,
         channelsDispatch,
         currentChannel,
-    }: any = useChannels();
+    }: any = useChannelsContext();
 
     const [friendInvitations, setFriendInvitations]: [any, any] = useState([]);
     const [notifInvitation, setNotifInvitation]: [any, any] = useState(false);

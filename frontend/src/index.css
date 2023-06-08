@@ -103,6 +103,16 @@ code {
   color: gray
 }
 
+.gray
+{
+  background-color: rgba(128, 128, 128, 0.342)
+}
+
+.confirm-background
+{
+  background-color: rgba(0, 0, 0, 0.384);
+}
+
 .black-c
 {
   color: black;

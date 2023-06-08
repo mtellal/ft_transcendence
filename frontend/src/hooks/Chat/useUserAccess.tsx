@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useChannels, useCurrentUser } from "../Hooks";
+import { useChannelsContext, useCurrentUser } from "../Hooks";
 
 
 export default function useUserAccess() {
 
     const { user } = useCurrentUser();
-    const { channels, currentChannel } = useChannels();
+    const { channels, currentChannel } = useChannelsContext();
     const [ isCurrentUserOwner, setIsCurrentUserOwner] = useState(false);
     const [ isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
 

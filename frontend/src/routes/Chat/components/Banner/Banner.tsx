@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Icon from "../../../../components/Icon";
 import { UserInfos } from "../../../../components/users/UserInfos";
 import ChannelInfos from "../../../../components/channels/ChannelInfos";
-import { useChannels, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
+import { useChannelsContext, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
 
 import './Banner.css'
 import { useWindow } from "../../../../hooks/useWindow";
@@ -58,7 +58,7 @@ export default function Banner({ ...props }: TBanner) {
 
     const { user } = useCurrentUser();
     const { currentFriend } = useFriends();
-    const { currentChannel } = useChannels();
+    const { currentChannel } = useChannelsContext();
     const { isMobileDisplay } = useWindow();
 
     return (

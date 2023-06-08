@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useChannels, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useCurrentUser } from "../../../hooks/Hooks";
 import InfoInput from "../../../components/Input/InfoInput";
 import { createChannel } from "../../../requests/chat";
 import UsersCollection from "../../../components/collections/UsersCollection";
@@ -23,7 +23,7 @@ export function CreateChannel() {
 
     const { token } = useCurrentUser();
 
-    const { channels, channelsDispatch, setCurrentChannel, addChannel } = useChannels();
+    const { channels, channelsDispatch, setCurrentChannel, addChannel } = useChannelsContext();
 
     const navigate = useNavigate();
 
