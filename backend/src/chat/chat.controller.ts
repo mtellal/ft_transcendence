@@ -1,10 +1,11 @@
-import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, Patch, Body, UseGuards, Req, ForbiddenException, UsePipes, ValidationPipe, Query, Put } from '@nestjs/common';
+import { Controller, Get, Delete, NotFoundException, Param, ParseIntPipe, Post, Patch, Body, UseGuards, Req, ForbiddenException, UsePipes, ValidationPipe, Query, Put, UnauthorizedException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { JwtGuard } from 'src/auth/guard';
-import { CreateChannelDto, MessageDto, PatchChannelDto, UpdateChannelDto } from './dto/channel.dto';
+import { CreateChannelDto, JoinChannelDto, MessageDto, PatchChannelDto, UpdateChannelDto } from './dto/channel.dto';
 import { MessageType, User } from '@prisma/client';
 import { ChatGateway } from './chat.gateway';
+import * as argon from 'argon2';
 
 @Controller('chat')
 @ApiTags('chat')
@@ -66,6 +67,27 @@ export class ChatController {
       this.chatGateway.server.to(this.chatGateway.getSocketId(memberId)).emit('newChannel', channel);
     }
     return channel;
+  }
+
+  @Post()
+  @UseGuards(JwtGuard)
+  @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
+  @ApiOperation({summary: 'Check access to a protected channel'})
+  async accessProtectedChannel(@Body() joinChannelDto: JoinChannelDto, @Req() req) {
+    const user: User = req.user
+    const channel = await this.chatService.findOne(joinChannelDto.channelId);
+    if (!channel)
+      throw new NotFoundException(`Channel with id of ${joinChannelDto.channelId} not found`)
+    if (channel.type !== 'PROTECTED')
+      throw new ForbiddenException(`Channel is not protected`);
+    if (!joinChannelDto.password)
+      throw new UnauthorizedException(`No password provided`);
+    const pwMatches = await argon.verify(channel.password, joinChannelDto.password)
+    if (!pwMatches)
+      throw new UnauthorizedException('Password incorrect');
+    else
+      return channel;
   }
 
   @Patch(':id')
