@@ -208,7 +208,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     catch (error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
+      console.log("/////////////////////////////// EVENT ADDTOCHANNEL ///////////////////////////////")
       return ;
     }
 

@@ -49,9 +49,11 @@ export class CreateChannelDto {
 
 export class JoinChannelDto {
 
+  @ApiProperty()
   @IsNumber()
   channelId: number
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   password?: string
