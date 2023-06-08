@@ -12,8 +12,6 @@ interface ChannelUserListProps {
 
 export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 
-	// console.log('TEST', user)
-
 	const [userInfo, setUserInfo] = useState(null);
 	const [userAvatar, setUserAvatar] = useState<any>();
     const [showActionUser, setShowActionUser] = useState(false);
@@ -40,26 +38,16 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 		setShowActionUser(!showActionUser);
 	}
 
-	function kickUser() {
-		console.log('kick User');
+	function banUser() {
+		// console.log('kick User');
 		// console.log('idChannelSelected', idChannelSelected);
-		console.log('userId', user);
-		console.log('dataChannel.id', dataChannel.id);
-		socket.emit('kickUser', {
+		// console.log('userId', user);
+		// console.log('dataChannel.id', dataChannel.id);
+		socket.emit('banUser', {
 			channelId: dataChannel.id,
 			userId: user
 		})
 	}
-
-	// useEffect(() => {
-	// 	if (selector.id && socket) {
-	// 		socket.on('message', messageListener);
-	// 		return () => {
-	// 			socket.off('message', messageListener)
-	// 		}
-	// 	}
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [selector.id, socket])
 
 	useEffect(() => {
 		getUserInfos();
@@ -81,7 +69,7 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 			{userInfo && userInfo.username}
 			{ showActionUser && userIsAdmin() && (
 				<ul className={s.menu}>
-					<li onClick={kickUser}>Kick user</li>
+					<li onClick={banUser}>Ban user</li>
 					<li>Set admin</li>
 				</ul>
 			)}
