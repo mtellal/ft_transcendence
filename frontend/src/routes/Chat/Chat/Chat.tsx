@@ -16,8 +16,6 @@ import './Chat.css'
 
 function ChatInterface() {
 
-    const params: any = useParams();
-
     const navigate = useNavigate();
 
     const {
@@ -62,49 +60,6 @@ function ChatInterface() {
     /////////////////////////////////////////////////////////////////////////
     //                            C H A N N E L                            //
     /////////////////////////////////////////////////////////////////////////
-
-
-
-    /*
-        when messenger (chat/friends/username/id) is refreshed then 
-            we need to set manually the current friend  
-    */
-    /* useEffect(() => {
-        if (friends && friends.length &&
-            params && params.id) {
-            getUser(params.id)
-                .then(res => selectCurrentElement(res.data, "friend"))
-        }
-    }, [friends]) */
-
-
-    /*
-        when a channel is picked we add it in conversations state and join it 
-    */
-    useEffect(() => {
-
-        if (socket && user) {
-
-            socket.on('message', (m: any) => {
-                // console.log("message recieved")
-                if (m.length) {
-                    channelsDispatch({ type: 'initMessages', messages: m });
-                }
-                if (m.content) {
-                    /* if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
-                        friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
-                    } */
-                    channelsDispatch({ type: 'addMessage', message: m });
-                }
-            });
-        }
-
-        return () => {
-            if (socket)
-                socket.off('message');
-        }
-    }, [user, socket])
-
 
     /////////////////////////////////////////////////////////////////////////
     //                       U S E    E F F E C T S                        //

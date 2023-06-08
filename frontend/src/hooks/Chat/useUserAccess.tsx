@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useChannels, useCurrentUser } from "./Hooks";
+import { useChannels, useCurrentUser } from "../Hooks";
 
 
 export default function useUserAccess() {

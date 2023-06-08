@@ -10,11 +10,8 @@ import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
 import RemoveView from "../components/RemoveElement.tsx/RemoveView";
 import { removeUserFriend } from '../../../requests/friends'
 import './Interface.css'
+import { getChannel, getChannelByName } from "../../../requests/chat";
  
-export function loader({ params }: any) {
-    return ({})
-}
-
 /*
     - MessagesElement is the rigth side of Chat interface,
     - reclaim an item, which is Friend or Group object, and display messages from this item if they exist,
@@ -23,6 +20,7 @@ export function loader({ params }: any) {
 */
 
 export default function Interface() {
+    const params: any = useParams();
 
     const { socket } = useChatSocket();
     const navigate = useNavigate();
@@ -34,7 +32,9 @@ export default function Interface() {
 
     const {
         currentChannel,
+        setCurrentChannel,
         leaveChannel,
+        channels
     } = useChannels();
 
     const {
@@ -48,6 +48,33 @@ export default function Interface() {
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
     const { setBackToMenu, backToMenu } : any = useOutletContext();
+
+
+    async function refreshPageAndLoadChannel(name : string)
+    {
+        const channelArray = await getChannelByName(name).then(res => res.data);
+        if (channelArray && channelArray.length)
+        {
+            const channel = channelArray.find((c: any) => c.members.find((id : number) => user.id === id))
+            setCurrentChannel(channel);
+        }
+
+    }
+
+    useEffect(() => {
+        if (!currentChannel)
+        {
+            if (params.channelName)
+            {
+                // console.log(channels)
+                refreshPageAndLoadChannel(params.channelName);
+            }
+            else if (params.username)
+            {
+
+            }
+        }
+    }, [currentChannel])
 
     function block() {
         if (!blocked) {

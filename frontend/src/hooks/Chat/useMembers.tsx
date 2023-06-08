@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useChannels, useChatSocket } from "./Hooks";
+import { useChannels, useChatSocket } from "../Hooks";
 
 export default function useMembers()
 {

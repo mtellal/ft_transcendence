@@ -125,7 +125,6 @@ export default function MenuElement({ ...props }) {
                 )
             }
             if (!channelSelected) {
-                console.log("channel not found and created")
                 await createChannel({
                     name: "privateMessage",
                     type: "WHISPER",

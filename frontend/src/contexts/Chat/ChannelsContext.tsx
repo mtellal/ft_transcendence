@@ -6,7 +6,7 @@ import {
 } from '../../requests/user'
 import useFetchUsers from "../../hooks/useFetchUsers";
 import { useNavigate } from "react-router-dom";
-import useKickUser from "../../hooks/usekickUser";
+import useKickUser from "../../hooks/Chat/usekickUser";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 
@@ -70,8 +70,8 @@ function formatChannel(channel: Channel) {
     return (
         {
             ...channel,
-            messages: channel.messages && channel.messages.length ? channel.messages : [],
-            users: channel.users && channel.users.length ? channel.users : []
+            messages: channel.messages || [],
+            users: channel.users || []
         }
     )
 }
@@ -94,6 +94,23 @@ function reducer(channels: any, action: any) {
         case ('removeChannel'): {
             if (channels.length && action.channelId) {
                 return (channels.filter((c: any) => c.id !== action.channelId))
+            }
+        }
+        case ('updateChannelInfos'): {
+            if (channels && channels.length && action.channelId && action.infos) {
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId) {
+                            if (action.infos.name)
+                                c.name = action.infos.name;
+                            if (action.infos.password)
+                                c.password = action.infos.password;
+                            if (action.infos.type)
+                                c.type = action.infos.type;
+                        }
+                        return (c)
+                    })
+                )
             }
         }
         case ('addAdministrators'): {
@@ -201,12 +218,13 @@ export function ChannelsProvider({ children }: any) {
     const { socket } = useChatSocket();
     const [channels, channelsDispatch] = useReducer(reducer, []);
     const [currentChannel, setCurrentChannelLocal]: any = useState();
-    const { friends } = useFriends();
     const { fetchUser, fetchUsers } = useFetchUsers();
     const navigate = useNavigate();
 
+    const [channelsLoading, setChannelsLoading] = useState(false);
 
     const loadChannels = useCallback(async () => {
+        setChannelsLoading(true)
         let channelList = await getChannels(user.id)
             .then(res => {
                 if (res.status === 200 && res.statusText === "OK") {
@@ -221,27 +239,43 @@ export function ChannelsProvider({ children }: any) {
                 return ({ ...c, users })
             }
         }))
-        // console.log("channelList => ", channelList)
         channelsDispatch({ type: 'initChannels', channels: channelList });
         channelList.forEach(joinChannel);
         // channelList.map(async (c : any) => await removeChannel(c.id))
+        setChannelsLoading(false)
     }, [user, socket])
 
     useEffect(() => {
-        if (user)
+        if (user && socket && !channelsLoading)
             loadChannels();
     }, [socket, user])
-
 
     useEffect(() => {
         if (socket && user) {
 
-            socket.on('newChannel', (res: any) => {
-                console.log(res)
+            socket.on('newChannel', async (channel: any) => {
+                console.log("NEW CHANNEL EVENT")
+                if (channel) {
+                    const users = await fetchUsers(channel.members)
+                    channelsDispatch({ type: 'addChannel', channel: { ...channel, users } });
+                    joinChannel(channel)
+                }
             })
 
-            socket.on('updateChannelName', (channelId: number, name: string) => {
-                console.log("UPDATE CHANNEL NAME EVENT")
+            socket.on('updatedChannel', (channel: any) => {
+                console.log("UPDATED CHANNEL EVENT")
+                // name / password / type
+                if (channel) {
+                    channelsDispatch({
+                        type: 'updateChannelInfos',
+                        channelId: channel.id,
+                        infos: {
+                            name: channel.name, 
+                            password: channel.password, 
+                            type: channel.type
+                        }
+                    })
+                }
             })
 
             socket.on('joinedChannel', async (res: any) => {
@@ -254,6 +288,11 @@ export function ChannelsProvider({ children }: any) {
                 console.log("LEFT CHANNEL EVENT")
                 channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
                 channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
+            })
+
+            socket.on('ownerChanged', (channelId: number, name: string) => {
+                console.log("UPDATED CHANNEL EVENT")
+                // name / password / type
             })
 
 
@@ -314,10 +353,25 @@ export function ChannelsProvider({ children }: any) {
             })
 
 
+            if (channels && channels.length) {
+                socket.on('message', (m: any) => {
+                    console.log("message recieved")
+                    if (m.length) {
+                        channelsDispatch({ type: 'initMessages', messages: m });
+                    }
+                    if (m.content) {
+                        /* if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
+                            friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
+                        } */
+                        channelsDispatch({ type: 'addMessage', message: m });
+                    }
+                });
+            }
+
             return () => {
                 if (socket) {
                     socket.off('newChannel')
-                    socket.off('updateChannelName')
+                    socket.off('updatedChannel')
                     socket.off('joinedChannel')
                     socket.off('leftChannel')
                     socket.off('addedtoChannel')
@@ -326,9 +380,9 @@ export function ChannelsProvider({ children }: any) {
                     socket.off('kickedUser')
                     socket.off('bannedUser')
                     socket.off('unbannedUser')
+                    socket.off('message')
                 }
             }
-
         }
     }, [socket, channels, user])
 
