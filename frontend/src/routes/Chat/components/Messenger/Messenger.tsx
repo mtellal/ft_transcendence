@@ -188,16 +188,15 @@ export default function Messenger({
 
 
     // check if a user is in the user blockedList and filter messages from block timestamp
-    function filterMessages(messages: any[]) {
+    const filterMessages = useCallback((messages: any[]) => {
         let blockObj: any;
         if (currentChannel.type === "WHISPER" && user.blockedList.length &&
             (blockObj = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
             messages = currentChannel.messages.filter((m: any) => m.createdAt < blockObj.createdAt)
         }
         return (messages)
-    }
+    }, [currentChannel, user])
 
-    // console.log("currentChannel => ", currentChannel)
 
     const formatMessages = useCallback(async (messages: any[], members: any[]) => {
         let author: any;

@@ -8,12 +8,13 @@ import InfoInput from "../../../components/Input/InfoInput";
 import PickMenu from "../../../components/PickMenu";
 import { TUserInfos, UserInfos } from "../../../components/users/UserInfos";
 import Icon from "../../../components/Icon";
-import useKickUser from "../../../hooks/usekickUser";
-import useBanUser from "../../../hooks/useBanUser";
-import useAdinistrators from "../../../hooks/useAdministrators";
-import useUserAccess from "../../../hooks/useUserAccess";
+import useKickUser from "../../../hooks/Chat/usekickUser";
+import useBanUser from "../../../hooks/Chat/useBanUser";
+import useAdinistrators from "../../../hooks/Chat/useAdministrators";
+import useUserAccess from "../../../hooks/Chat/useUserAccess";
 import useFetchUsers from "../../../hooks/useFetchUsers";
-import useMembers from "../../../hooks/useMembers";
+import useMembers from "../../../hooks/Chat/useMembers";
+import useChannelInfos from "../../../hooks/Chat/useChannelInfos";
 
 export const PofileChannelContext = createContext({});
 
@@ -36,7 +37,7 @@ function ChannelUserLabel(props: any) {
     }: any = useContext(PofileChannelContext)
 
     function functionalities() {
-        if (props.user && isCurrentUserAdmin && props.user.username !== (user && user.username) && 
+        if (props.user && isCurrentUserAdmin && props.user.username !== (user && user.username) &&
             currentChannel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
             if (isUserBanned(props.user)) {
                 return (
@@ -259,7 +260,7 @@ function ChannelProfile(props: any) {
     const { getAdministrators } = useAdinistrators();
 
     const [name, setName]: any = useState(props.channel && props.channel.name);
-    const [password, setPassword] = useState("");
+    const [password, setPassword]: any = useState("");
     const [access, setAccess] = useState(props.channel && props.channel.type.toLowerCase());
     const [admins, setAdmins] = useState([]);
     const [banned, setBanned] = useState([])
@@ -269,6 +270,9 @@ function ChannelProfile(props: any) {
     const [confirmView, setConfirmView] = useState(false);
 
     const [userOperation, setUserOperation] = useState(null)
+
+
+    const { updateChannelName, updateChannelPassword, updateChannelType } = useChannelInfos();
 
     const { getUsersBanned } = useBanUser();
 
@@ -303,6 +307,23 @@ function ChannelProfile(props: any) {
         userOperation.function(userOperation.user, props.channel);
     }
 
+
+    function submitName() {
+        let newName = name && name.trim();
+        if (newName) {
+            updateChannelName({ channelId: props.channel.id, name: newName })
+        }
+    }
+
+    function submitPassword() {
+        let newPassword = password && password.trim();
+        if (newPassword) {
+            updateChannelPassword({ ...props.channel, password: newPassword })
+        }
+    }
+
+
+
     return (
         <PofileChannelContext.Provider
             value={{
@@ -318,7 +339,7 @@ function ChannelProfile(props: any) {
                         label="Name"
                         value={name}
                         setValue={setName}
-                        submit={null}
+                        submit={() => submitName()}
                     />
                     <hr />
                     <PickMenu

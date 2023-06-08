@@ -14,7 +14,7 @@ import History from './routes/History/History';
 
 
 import AddFriend from "./routes/Chat/AddFriend/AddFriend";
-import Interface, { loader as interfaceLoader} from './routes/Chat/Interface/Interface';
+import Interface from './routes/Chat/Interface/Interface';
 import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
 
@@ -82,14 +82,12 @@ const router = createBrowserRouter([
                         element:  <CreateChannel />
                     },
                     {
-                        path: "groups/:groupid",
-                        loader: interfaceLoader,
+                        path: "groups/:channelName",
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <Interface />
                     },
                     {
                         path: "friends/:username/:id",
-                        loader: interfaceLoader,
                         errorElement: <Navigate to="/chat" replace/>,
                         element: <Interface />
                     }

@@ -7,7 +7,7 @@ type TInfoInput = {
     label: number | any,
     value: string,
     setValue: (s : string) => {},
-    submit?: () => {}
+    submit?: () => {} | any
 }
 
 export default function InfoInput(props: TInfoInput) {

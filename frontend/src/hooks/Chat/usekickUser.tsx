@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import { useChannels, useChatSocket, useCurrentUser, useFriends } from "./Hooks";
+import { useChannels, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useUserAccess from "./useUserAccess";
 

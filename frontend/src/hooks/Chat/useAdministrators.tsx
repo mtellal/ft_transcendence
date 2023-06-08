@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from "react";
-import { useChannels, useChatSocket, useCurrentUser, useFriends } from "./Hooks";
+import { useChannels, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
 import { useNavigate } from "react-router-dom";
-import useFetchUsers from "./useFetchUsers";
+import useFetchUsers from "../useFetchUsers";
 
 
 export default function useAdinistrators() {

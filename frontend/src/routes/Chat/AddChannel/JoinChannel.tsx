@@ -28,23 +28,30 @@ import defaultUserPP from '../../../assets/user.png'
 import './JoinChannel.css'
 import { useWindow } from "../../../hooks/useWindow";
 import ArrowBackMenu from "../components/ArrowBackMenu";
-import useBanUser from "../../../hooks/useBanUser";
+import useBanUser from "../../../hooks/Chat/useBanUser";
 import ResizeContainer from "../../../components/ResizeContainer";
+import useChannelAccess from "../../../hooks/Chat/useChannelAccess";
 
 type TChannelSearch = {
-    name: string,
-    members: any[],
-    isJoin: boolean,
-    isBanned: boolean | any,
+    channel: any,
+    setJoinChannelProtectedView?: (x: boolean) => {} | any,
     join: () => {} | any
 }
 
-function ChannelSearch(props: TChannelSearch) {
+function ChannelSearch({ channel, ...props }: TChannelSearch) {
+
+    const { user } = useCurrentUser();
+    const { channelAlreadyExists } = useChannels();
+    const { isChannelProtected, isChannelPrivate } = useChannelAccess();
+    const { isUserBanned } = useBanUser()
 
     const [members, setMembers] = useState([]);
 
+    const [channelPasswordView, setChannelPasswordView] = useState(false);
+
+
     async function loadUsersProfilePicture() {
-        const rawProfilePictures = await Promise.all(props.members.map(async (id: any, i: number) =>
+        const rawProfilePictures = await Promise.all(channel.members.map(async (id: any, i: number) =>
             i < 5 ? await getUserProfilePictrue(id).then(res => res.data) : null
         ))
         const images = rawProfilePictures.map((i: any) =>
@@ -60,28 +67,45 @@ function ChannelSearch(props: TChannelSearch) {
     }
 
     useEffect(() => {
-        if (props.members)
+        if (channel.members)
             loadUsersProfilePicture();
-    }, [props.members])
+    }, [channel.members])
+
+
+    function joinChannel() {
+        if (isChannelPrivate(channel)) {
+            props.setJoinChannelProtectedView(true);
+        }
+        else
+            props.join();
+    }
+
+    function renderIcon() {
+        if (isUserBanned(user, channel)) {
+            return (
+                <div style={{ marginLeft: 'auto' }}>
+                    <p className="red-c">Banned</p>
+                </div>
+            )
+        }
+        else if (!channelAlreadyExists(channel) && !isChannelProtected(channel)) {
+            return (
+                <div style={{ marginLeft: 'auto' }}>
+                    <Icon icon="login" description="Join" onClick={() => joinChannel()} />
+                </div>
+            )
+        }
+    }
 
     return (
         <div className="flex-ai channelsearch-container">
-            <h3 className="no-wrap">{props.name} - </h3>
-            <p className="channelsearch-members gray-c flex-center no-wrap">{props.members.length} members</p>
+            <h3 className="no-wrap">{channel.name} - </h3>
+            <p className="channelsearch-members gray-c flex-center no-wrap">{channel.members.length} members</p>
             <div className="channelsearch-pps flex-center">
                 {members}
             </div>
             {
-                props.isJoin && !props.isBanned &&
-                <div style={{ marginLeft: 'auto' }}>
-                    <Icon icon="login" description="Join" onClick={props.join} />
-                </div>
-            }
-            {
-                props.isBanned &&
-                <div style={{ marginLeft: 'auto' }}>
-                    <p className="red-c">Banned</p>
-                </div>
+                renderIcon()
             }
 
         </div>
@@ -97,6 +121,9 @@ export default function JoinChannel() {
 
     const [matchChannels, setMatchChannels] = useState([]);
     const [renderChannels, setRenderChannels] = useState([]);
+
+    const [joinChannelProtectedView, setJoinChannelProtectedView] = useState(false);
+
     const { isUserBanned } = useBanUser();
 
     const { isMobileDisplay } = useWindow();
@@ -152,8 +179,6 @@ export default function JoinChannel() {
     }, [channels, matchChannels])
 
 
-    console.log("rerender")
-
     const renderChannelsSelected = useCallback(async () => {
         if (matchChannels && matchChannels.length) {
 
@@ -163,12 +188,10 @@ export default function JoinChannel() {
                 setRenderChannels(
                     updatedChannels.map((c: any) =>
                         <ChannelSearch
+                            channel={c}
                             key={c.id}
-                            name={c.name}
-                            members={c.members}
-                            isJoin={!channelAlreadyExists(c)}
+                            setJoinChannelProtectedView={setJoinChannelProtectedView}
                             join={() => addChannel(c, true)}
-                            isBanned={isUserBanned(user, c)}
                         />)
                 )
             }
@@ -180,37 +203,51 @@ export default function JoinChannel() {
     }, [matchChannels, channels])
 
     return (
-        <div className="joinchannel-container flex-column">
-            {
-                isMobileDisplay &&
-                <div className="flex">
-                    <ArrowBackMenu
-                        title="Channel"
-                        path="/chat/add-group"
-                    />
-                </div>
-            }
-            <h2>Join a Channel</h2>
-            <div className="flex-column-center">
-                <IconInput
-                    id="search"
-                    icon="search"
-                    placeholder="Channel"
-                    value={value}
-                    setValue={setValue}
-                    submit={() => value && searchChannel()}
-                />
-                <button
-                    className="button joinchannel-button"
-                    onClick={searchChannel}
-                >
-                    Search
-                </button>
-                {renderChannels}
+        <div className="relative fill flex-column">
+
+            <div className="joinchannel-container flex-column">
                 {
-                    error ? <p>Channel not found</p> : null
+                    isMobileDisplay &&
+                    <div className="flex">
+                        <ArrowBackMenu
+                            title="Channel"
+                            path="/chat/add-group"
+                        />
+                    </div>
                 }
+                <h2>Join a Channel</h2>
+                <div className="flex-column-center">
+                    <IconInput
+                        id="search"
+                        icon="search"
+                        placeholder="Channel"
+                        value={value}
+                        setValue={setValue}
+                        submit={() => value && searchChannel()}
+                    />
+                    <button
+                        className="button joinchannel-button"
+                        onClick={searchChannel}
+                    >
+                        Search
+                    </button>
+                    {renderChannels}
+                    {
+                        error ? <p>Channel not found</p> : null
+                    }
+                </div>
             </div>
+            {
+                joinChannelProtectedView &&
+                <div className=" absolute fill red">
+                    <div>
+                        PASSWORD REQUIRED
+                    </div>
+                </div>
+
+            }
         </div>
     )
 }
+
+
