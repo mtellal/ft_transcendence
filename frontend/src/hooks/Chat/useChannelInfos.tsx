@@ -26,14 +26,13 @@ export default function useChannelInfos()
         }
     }, [socket, channels])
 
-    const updateChannelPassword = useCallback((channelId: number , password: string , type: string) => {
+    const updateChannelPassword = useCallback((channelId: number , password: string) => {
         if (socket && channels && channels.length && channelId && password)
         {
             console.log("update channel password", channelId, password)
             socket.emit('updateChannel', {
                 channelId, 
                 password, 
-                type
             });
             channelsDispatch({type: 'updateChannelInfos', channelId, infos: {password}})
         }
@@ -43,10 +42,11 @@ export default function useChannelInfos()
     const updateChannelType = useCallback((channelId: number, type: string, password: string = "") => {
         if (socket && channels && channels.length && channelId && type)
         {
-            console.log("update channel type", channelId, type, password)
+            console.log("update channel type", channelId, type)
             socket.emit('updateChannel', {
                 channelId, 
                 type, 
+                password
             });
             channelsDispatch({type: 'updateChannelInfos', channelId, infos: {type}})
         }

@@ -8,6 +8,7 @@ import { createChannel } from "../../../../requests/chat";
 import { useWindow } from "../../../../hooks/useWindow";
 
 import './MenuElement.css'
+import { RawIcon } from "../../../../components/Icon";
 
 /*
     tittle
@@ -78,6 +79,10 @@ function ChannelElement(props: any) {
             <p>{props.name}</p>
             <p className="group-separator">-</p>
             <p className="group-members">{props.nbMembers} members</p>
+            <div style={{marginLeft: 'auto'}}>
+                {props.type === "PROTECTED" && <RawIcon icon="shield" />}
+                {props.type === "PRIVATE" && <RawIcon icon="lock" />}
+            </div>
         </Link>
     )
 }
@@ -158,6 +163,7 @@ export default function MenuElement({ ...props }) {
                             key={channel.id}
                             id={channel.id}
                             name={channel.name}
+                            type={channel.type}
                             nbMembers={channel.members.length}
                             click={() => selectCurrentChannel(channel, "channel")}
                             notifs={0}

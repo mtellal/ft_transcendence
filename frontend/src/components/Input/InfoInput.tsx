@@ -5,6 +5,7 @@ import './InfoInput.css'
 type TInfoInput = {
     id: number | any,
     label: number | any,
+    blur?: boolean,
     value: string,
     setValue: (s : string) => {},
     submit?: () => {} | any, 
@@ -23,6 +24,8 @@ export default function InfoInput(props: TInfoInput) {
     function handleKeyDown(e: any) {
         if (e.key === 'Enter' && props.value) {
             props.submit()
+            if (props.blur)
+                inputRef.current.blur();
         }
     }
 

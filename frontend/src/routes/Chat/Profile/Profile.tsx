@@ -341,22 +341,28 @@ function ChannelProfile(props: any) {
                         bannedUsers={true}
                     />
                 </div>
+
                 {
-                    confirmView && userOperation &&
-                    <ConfirmView
-                        type={userOperation.type}
-                        username="friend1"
-                        cancel={() => cancelOperation()}
-                        valid={() => validOperation()}
-                    />
-                }
-                {
-                    confirmViewTypeProtected &&
-                    <ConfirmViewTypeProteced
-                        channel={props.channel}
-                        display={(d: boolean) => setConfirmViewTypeProted(d)}
-                        cancel={() => setConfirmViewTypeProted(false)}
-                    />
+                    (confirmView || confirmViewTypeProtected) &&
+
+                    <ConfirmPage>
+                        {
+                            userOperation ?
+                                <ConfirmView
+                                    type={userOperation.type}
+                                    username="friend1"
+                                    cancel={() => cancelOperation()}
+                                    valid={() => validOperation()}
+                                />
+                                :
+                                <ConfirmViewTypeProteced
+                                    channel={props.channel}
+                                    display={(d: boolean) => setConfirmViewTypeProted(d)}
+                                    cancel={() => setConfirmViewTypeProted(false)}
+                                />
+                        }
+
+                    </ConfirmPage>
                 }
 
             </div>
@@ -367,14 +373,23 @@ function ChannelProfile(props: any) {
 
 function ChannelName({ channel }: any) {
     const { isCurrentUserAdmin } = useUserAccess();
-    const [name, setName]: any = useState(channel.name)
+    const [name, setName]: any = useState("")
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
     const { updateChannelName } = useChannelInfos();
 
-    const prevName: any = useRef(channel.name);
+    const prevName: any = useRef("");
+
+    
+    useEffect(() => {
+        if (channel && channel.name)
+        {
+            setName(channel.name);
+            prevName.current = channel.name;
+        }
+    }, [channel, channel.name])
 
     function submitName() {
         let newName = name && name.trim();
@@ -404,7 +419,8 @@ function ChannelName({ channel }: any) {
                         {success && <p className="green-c" >{success}</p>}
                         <InfoInput
                             id="name"
-                            label="Channel name "
+                            label="Channel name"
+                            blur={true}
                             value={name}
                             setValue={setName}
                             onChange={onChange}
@@ -436,7 +452,7 @@ function ChannelPassword({ channel }: any) {
             if (newPassword.length > 15)
                 return (setError("Maximum length of 15 letters"));
             setSuccess("Password updated")
-            updateChannelPassword(channel.id, newPassword, channel.type)
+            updateChannelPassword(channel.id, newPassword)
         }
     }
 
@@ -466,6 +482,7 @@ function ChannelPassword({ channel }: any) {
                         <InfoInput
                             id="password"
                             label="Set new password "
+                            blur={true}
                             value={password}
                             setValue={setPassword}
                             onChange={onChange}
@@ -483,14 +500,22 @@ function PickMenuAccess({ channel, protectedAccess }: any) {
     const { isCurrentUserAdmin } = useUserAccess();
     const { updateChannelType } = useChannelInfos();
 
-    const [success, setSuccess] = useState("");    
-    const [type, setType] = useState(channel.type.toLowerCase())
-    const prevType = useRef(channel.type.toLowerCase());
+    const [success, setSuccess] = useState("");
+    const [type, setType] = useState("")
+    const prevType = useRef("");
+
+    useEffect(() => {
+        if (channel && channel.type)
+        {
+            setType(channel.type.toLowerCase());
+            prevType.current = channel.type.toLowerCase();
+        }
+    }, [channel, channel.type])
 
     function select(element: any) {
-        setSuccess("Access updated")
-        setType(element);
-        if (prevType !== type) {
+        if (prevType.current !== element) {
+            setSuccess("Access updated")
+            setType(element);
             prevType.current = element;
             if (element === "protected")
                 protectedAccess()
@@ -526,7 +551,6 @@ export function ConfirmViewTypeProteced(props: any) {
     const [password, setPassword]: any = useState("")
 
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
 
     const { updateChannelType } = useChannelInfos();
 
@@ -535,7 +559,7 @@ export function ConfirmViewTypeProteced(props: any) {
         if (newPassword) {
             if (newPassword.length > 15)
                 return (setError("Password too long (15 letters max)"));
-            updateChannelType(props.channel.id, props.channel.type, newPassword)
+            updateChannelType(props.channel.id, "PROTECTED", newPassword)
             props.display(false);
         }
     }
@@ -574,6 +598,14 @@ export function ConfirmViewTypeProteced(props: any) {
                 </div>
             </div>
         </div >
+    )
+}
+
+function ConfirmPage({ children }: any) {
+    return (
+        <div className="fill confirm-background flex-center">
+            {children}
+        </div>
     )
 }
 

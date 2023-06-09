@@ -5,6 +5,7 @@ import { getUserProfilePictrue } from "../../requests/user";
 import ProfilePicture from "../../components/users/ProfilePicture";
 
 import './ChannelInfos.css'
+import { RawIcon } from "../Icon";
 
 type TChannelInfos = {
     channel: any,
@@ -37,6 +38,8 @@ export default function ChannelInfos(props: TChannelInfos) {
     return (
         <div className="flex-center">
             <h2 style={{ whiteSpace: 'nowrap' }}>{props.channel && props.channel.name} - </h2>
+            {props.channel.type === "PROTECTED" && <RawIcon icon="shield" />}
+            {props.channel.type === "PRIVATE" && <RawIcon icon="lock" />}
             <div className="flex-center channelinfos-members-container">
                 {renderMembersPP}
             </div>
