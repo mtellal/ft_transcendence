@@ -23,6 +23,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 	const [Asocket, AsetSocket] = useState<any>(null);
     const [messages, setMessages] = useState([]);
     const [dataChannel, setDataChannel] = useState(null);
+    const [rerender, setRerender] = useState(false);
 
     const send = (value: string) => {
         Asocket.emit('message', {
@@ -33,6 +34,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
     }
 
 	function joinChannel() {
+		// console.log('Join channel', idChannelSelected);
 		Asocket.emit('joinChannel', {
 			channelId: idChannelSelected
 		})
@@ -75,35 +77,36 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 	}, [Asocket, selector.id, idChannelSelected]);
 
 	const messageListener = (message: any) => {
+		console.log('MESSAGE', message);
 		if (message.channelId === idChannelSelected) {
 			if (message.length) {
 				setMessages(message);
 			} else {
 				setMessages([...messages, message]);
 			}
+			if (message.type === 'NOTIF') {
+				console.log('NOTIF');
+				setRerender(!rerender);
+			}
 		}
 	}
 
 	const kickListenner = (message: any) => {
 		// console.log('KICK');
-		console.log('KICK', message);
+		// console.log('KICK', message);
+		// console.log('DATA', idChannelSelected, selector.id);
+
 		// getDataChannel();
 
 		// channelId: 2, userId: 2
 
 		if (message.channelId === idChannelSelected &&
 			message.userId === selector.id) {
-			// navigate('/chat');
+				// console.log('Hmmmmmmmmmmmmmmmmm');
 			setidChannelSelected(null);
 		} else {
 			getDataChannel();
 		}
-		// 	if (message.length) {
-		// 		setMessages(message);
-		// 	} else {
-		// 		setMessages([...messages, message]);
-		// 	}
-		// }
 	}
 
 	async function getDataChannel() {
@@ -125,7 +128,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 	useEffect(() => {
 		AsetSocket(getSocket());
 		getDataChannel();
-	}, [idChannelSelected])
+	}, [idChannelSelected, rerender])
 
 	// console.log('idChannelSelected', idChannelSelected);
 	// console.log('dataChannel', dataChannel);

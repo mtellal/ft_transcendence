@@ -7,12 +7,18 @@ import { initializeSocket, getSocket } from '../../utils/socket';
 import io, { Socket } from 'socket.io-client'
 import s from './style.module.css'
 import { BackApi } from '../../api/back';
+import { useNavigate } from 'react-router-dom';
 
-export function CreateGroup() {
+	interface CreateGroupProps {
+		setBtnFriendsRequest: any;
+	}
+
+export function CreateGroup({ setBtnFriendsRequest }: CreateGroupProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
-	const [Asocket, AsetSocket] = useState<any>(null);
+	// const [Asocket, AsetSocket] = useState<any>(null);
 	const [privacy, setPrivacy] = useState('Public');
+	// const navigate = useNavigate();
 
 	function handlePrivacyChange(e: React.ChangeEvent<HTMLSelectElement>) {
 		setPrivacy(e.target.value);
@@ -28,31 +34,30 @@ export function CreateGroup() {
 		};
 
 		if ((e.target as HTMLFormElement).privacy.value === 'Public') {
-			const rep = await BackApi.createChannel({
+			await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PUBLIC',
-				// members: [selector.id],
 			}, selector.token);
 		} else if ((e.target as HTMLFormElement).privacy.value === 'Private') {
-			const rep = await BackApi.createChannel({
+			await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PRIVATE',
-				// members: [selector.id],
 			}, selector.token);
 		} else {
-			const rep = await BackApi.createChannel({
+			await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PROTECTED',
-				// members: [selector.id],
 				password: target.password.value
 			}, selector.token);
 		}
+		setBtnFriendsRequest('GROUP');
+		// navigate();
 	}
 
-	useEffect(() => {
-		initializeSocket(selector.token);
-		AsetSocket(getSocket());
-	}, [])
+	// useEffect(() => {
+		// initializeSocket(selector.token);
+		// AsetSocket(getSocket());
+	// }, [])
 
 	return (
 		<div>

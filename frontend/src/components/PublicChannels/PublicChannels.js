@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { PublicChannelsList } from '../PublicChannelsList/PublicChannelsList';
+import s from './style.module.css';
 export function PublicChannels({ channels, myChannels, socket }) {
     const [channelsNotJoined, setChannelsNotJoined] = useState([]);
     function setArrayChannels() {
@@ -16,8 +17,8 @@ export function PublicChannels({ channels, myChannels, socket }) {
         return (React.createElement("div", null, "Pas de channels public a rejoindre"));
     }
     return (React.createElement("div", null,
-        React.createElement("div", null, channelsNotJoined.map((channel) => {
+        React.createElement("div", { className: s.container }, channelsNotJoined.map((channel) => {
             return (React.createElement("span", { key: channel.id },
-                React.createElement(PublicChannelsList, { channel: channel, socket: socket })));
+                React.createElement(PublicChannelsList, { channel: channel, socket: socket, channelsNotJoined: channelsNotJoined, setChannelsNotJoined: setChannelsNotJoined })));
         }))));
 }

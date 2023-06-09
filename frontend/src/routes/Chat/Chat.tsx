@@ -33,12 +33,9 @@ export function Chat() {
 	}
 
 	async function getUserChannels() {
-		console.log('CHANNELS REFRESH');
 		const response = await BackApi.getChannelsByUserId(selector.id);
 		if (response.status === 200) {
-			// if (response.data.length > 0 && myChannels !== response.data) {
 				setMyChannels(response.data);
-			// }
 		}
 	}
 
@@ -83,6 +80,7 @@ export function Chat() {
 	}, [selector.id, friendRequest, idChannelSelected])
 
 	// console.log('idchanselected', idChannelSelected);
+	// console.log('LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL');
 
 	return (
 		<div className={s.container}>
@@ -127,9 +125,9 @@ export function Chat() {
 				</div>
 				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />}
 				{btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
-				{btnFriendsRequest === 'GROUP' && myChannels && <Group myChannels={myChannels} setidChannelSelected={setidChannelSelected} />}
-				{btnFriendsRequest === 'CREATE_GROUP' && myChannels && <CreateGroup />}
-				{btnFriendsRequest === 'JOIN_GROUP' && myChannels && <JoinChannel myChannels={myChannels} />}
+				{btnFriendsRequest === 'GROUP' && myChannels && <Group idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected} id={selector.id} />}
+				{btnFriendsRequest === 'CREATE_GROUP' && myChannels && <CreateGroup setBtnFriendsRequest={setBtnFriendsRequest}/>}
+				{btnFriendsRequest === 'JOIN_GROUP' && myChannels && <JoinChannel myChannels={myChannels}/>}
 				{idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && <Chatbox idFriendSelected={idFriendSelected} />}
 				{idChannelSelected && btnFriendsRequest === 'GROUP' && <ChatboxChannel idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected}/>}
 			</div>

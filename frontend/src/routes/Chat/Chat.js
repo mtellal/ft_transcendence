@@ -28,12 +28,9 @@ export function Chat() {
         }
     }
     async function getUserChannels() {
-        console.log('CHANNELS REFRESH');
         const response = await BackApi.getChannelsByUserId(selector.id);
         if (response.status === 200) {
-            // if (response.data.length > 0 && myChannels !== response.data) {
             setMyChannels(response.data);
-            // }
         }
     }
     async function addFriend() {
@@ -72,6 +69,7 @@ export function Chat() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selector.id, friendRequest, idChannelSelected]);
     // console.log('idchanselected', idChannelSelected);
+    // console.log('LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL');
     return (React.createElement("div", { className: s.container },
         React.createElement("div", { className: s.item },
             React.createElement("div", { className: s.menu },
@@ -83,8 +81,8 @@ export function Chat() {
                 React.createElement(AddFriend, { addFriend: addFriend })),
             btnFriendsRequest === 'REQUEST' && friendRequest && React.createElement(FriendRequest, { listFriendRequest: friendRequest, setFriendRequest: setFriendRequest }),
             btnFriendsRequest === 'FRIEND' && friends && React.createElement(Friends, { friends: friends, delFriend: delFriend, setIdFriendSelected: setIdFriendSelected }),
-            btnFriendsRequest === 'GROUP' && myChannels && React.createElement(Group, { myChannels: myChannels, setidChannelSelected: setidChannelSelected }),
-            btnFriendsRequest === 'CREATE_GROUP' && myChannels && React.createElement(CreateGroup, null),
+            btnFriendsRequest === 'GROUP' && myChannels && React.createElement(Group, { idChannelSelected: idChannelSelected, setidChannelSelected: setidChannelSelected, id: selector.id }),
+            btnFriendsRequest === 'CREATE_GROUP' && myChannels && React.createElement(CreateGroup, { setBtnFriendsRequest: setBtnFriendsRequest }),
             btnFriendsRequest === 'JOIN_GROUP' && myChannels && React.createElement(JoinChannel, { myChannels: myChannels }),
             idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && React.createElement(Chatbox, { idFriendSelected: idFriendSelected }),
             idChannelSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idChannelSelected: idChannelSelected, setidChannelSelected: setidChannelSelected }))));

@@ -35,11 +35,11 @@ export function PublicChannels({ channels, myChannels, socket }: PublicChannelsP
 
 	return (
 		<div>
-			<div>
+			<div className={s.container}>
 				{channelsNotJoined.map((channel) => {
 					return (
 						<span key={channel.id}>
-							<PublicChannelsList channel={channel} socket={socket} />
+							<PublicChannelsList channel={channel} socket={socket} channelsNotJoined={channelsNotJoined} setChannelsNotJoined={setChannelsNotJoined}/>
 						</span>
 					);
 				})}

@@ -1,14 +1,13 @@
 import React from 'react';
-import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { initializeSocket, getSocket } from '../../utils/socket';
 import s from './style.module.css';
 import { BackApi } from '../../api/back';
-export function CreateGroup() {
+export function CreateGroup({ setBtnFriendsRequest }) {
     const selector = useSelector((store) => store.user.user);
-    const [Asocket, AsetSocket] = useState(null);
+    // const [Asocket, AsetSocket] = useState<any>(null);
     const [privacy, setPrivacy] = useState('Public');
+    // const navigate = useNavigate();
     function handlePrivacyChange(e) {
         setPrivacy(e.target.value);
     }
@@ -16,32 +15,31 @@ export function CreateGroup() {
         e.preventDefault();
         const target = e.target;
         if (e.target.privacy.value === 'Public') {
-            const rep = await BackApi.createChannel({
+            await BackApi.createChannel({
                 name: target.name.value,
                 type: 'PUBLIC',
-                // members: [selector.id],
             }, selector.token);
         }
         else if (e.target.privacy.value === 'Private') {
-            const rep = await BackApi.createChannel({
+            await BackApi.createChannel({
                 name: target.name.value,
                 type: 'PRIVATE',
-                // members: [selector.id],
             }, selector.token);
         }
         else {
-            const rep = await BackApi.createChannel({
+            await BackApi.createChannel({
                 name: target.name.value,
                 type: 'PROTECTED',
-                // members: [selector.id],
                 password: target.password.value
             }, selector.token);
         }
+        setBtnFriendsRequest('GROUP');
+        // navigate();
     }
-    useEffect(() => {
-        initializeSocket(selector.token);
-        AsetSocket(getSocket());
-    }, []);
+    // useEffect(() => {
+    // initializeSocket(selector.token);
+    // AsetSocket(getSocket());
+    // }, [])
     return (React.createElement("div", null,
         React.createElement("form", { className: s.container, onSubmit: handleSubmit },
             "Channel name",

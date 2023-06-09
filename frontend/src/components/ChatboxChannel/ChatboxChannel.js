@@ -13,6 +13,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }) {
     const [Asocket, AsetSocket] = useState(null);
     const [messages, setMessages] = useState([]);
     const [dataChannel, setDataChannel] = useState(null);
+    const [rerender, setRerender] = useState(false);
     const send = (value) => {
         Asocket.emit('message', {
             sendBy: selector.id,
@@ -21,6 +22,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }) {
         });
     };
     function joinChannel() {
+        // console.log('Join channel', idChannelSelected);
         Asocket.emit('joinChannel', {
             channelId: idChannelSelected
         });
@@ -59,6 +61,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [Asocket, selector.id, idChannelSelected]);
     const messageListener = (message) => {
+        console.log('MESSAGE', message);
         if (message.channelId === idChannelSelected) {
             if (message.length) {
                 setMessages(message);
@@ -66,27 +69,26 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }) {
             else {
                 setMessages([...messages, message]);
             }
+            if (message.type === 'NOTIF') {
+                console.log('NOTIF');
+                setRerender(!rerender);
+            }
         }
     };
     const kickListenner = (message) => {
         // console.log('KICK');
-        console.log('KICK', message);
+        // console.log('KICK', message);
+        // console.log('DATA', idChannelSelected, selector.id);
         // getDataChannel();
         // channelId: 2, userId: 2
         if (message.channelId === idChannelSelected &&
             message.userId === selector.id) {
-            // navigate('/chat');
+            // console.log('Hmmmmmmmmmmmmmmmmm');
             setidChannelSelected(null);
         }
         else {
             getDataChannel();
         }
-        // 	if (message.length) {
-        // 		setMessages(message);
-        // 	} else {
-        // 		setMessages([...messages, message]);
-        // 	}
-        // }
     };
     async function getDataChannel() {
         const rep = await BackApi.getChannelById(idChannelSelected);
@@ -105,7 +107,7 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }) {
     useEffect(() => {
         AsetSocket(getSocket());
         getDataChannel();
-    }, [idChannelSelected]);
+    }, [idChannelSelected, rerender]);
     // console.log('idChannelSelected', idChannelSelected);
     // console.log('dataChannel', dataChannel);
     // console.log('OKKKKK');

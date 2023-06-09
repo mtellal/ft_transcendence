@@ -10,7 +10,11 @@ import { Socket } from 'socket.io-client';
 import io from 'socket.io-client'
 import s from './style.module.css'
 
-export function JoinChannel({ myChannels }: {myChannels: any}) {
+	interface JoinChannelProps {
+		myChannels: any;
+	}
+
+export function JoinChannel({ myChannels }: JoinChannelProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
 	const [socket, setSocket] = useState<Socket | null>(null);
