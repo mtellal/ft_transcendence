@@ -824,7 +824,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
     const updatedChannel = await this.chatService.updateChannel(dto, channel);
     this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
-    let updateNotif = `${user.id} updated the channel:`;
+    let updateNotif = `${user.username} updated the channel:`;
     if (dto.name)
       updateNotif += ` ${channel.name} is now named ${updatedChannel.name}`
     if (dto.password)
