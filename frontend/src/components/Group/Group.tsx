@@ -14,6 +14,14 @@ interface GroupProps {
 
 export function Group({ myChannels, setidChannelSelected }: GroupProps) {
 
+	if (myChannels.length === 0) {
+		return (
+			<div>
+				Pas de channels
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<div className={s.list}>

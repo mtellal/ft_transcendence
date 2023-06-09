@@ -6,8 +6,10 @@ import { Messages } from '../Messages/Messages';
 import { getSocket } from '../../utils/socket';
 import s from './style.module.css';
 import { ChannelUsers } from '../ChannelUsers/ChannelUsers';
-export function ChatboxChannel({ idChannelSelected }) {
+import { useNavigate } from 'react-router-dom';
+export function ChatboxChannel({ idChannelSelected, setidChannelSelected }) {
     const selector = useSelector((store) => store.user.user);
+    const navigate = useNavigate();
     const [Asocket, AsetSocket] = useState(null);
     const [messages, setMessages] = useState([]);
     const [dataChannel, setDataChannel] = useState(null);
@@ -66,6 +68,26 @@ export function ChatboxChannel({ idChannelSelected }) {
             }
         }
     };
+    const kickListenner = (message) => {
+        // console.log('KICK');
+        console.log('KICK', message);
+        // getDataChannel();
+        // channelId: 2, userId: 2
+        if (message.channelId === idChannelSelected &&
+            message.userId === selector.id) {
+            // navigate('/chat');
+            setidChannelSelected(null);
+        }
+        else {
+            getDataChannel();
+        }
+        // 	if (message.length) {
+        // 		setMessages(message);
+        // 	} else {
+        // 		setMessages([...messages, message]);
+        // 	}
+        // }
+    };
     async function getDataChannel() {
         const rep = await BackApi.getChannelById(idChannelSelected);
         setDataChannel(rep.data);
@@ -73,6 +95,7 @@ export function ChatboxChannel({ idChannelSelected }) {
     useEffect(() => {
         if (selector.id && Asocket) {
             Asocket.on('message', messageListener);
+            Asocket.on('kickedUser', kickListenner);
             return () => {
                 Asocket.off('message', messageListener);
             };
@@ -86,11 +109,18 @@ export function ChatboxChannel({ idChannelSelected }) {
     // console.log('idChannelSelected', idChannelSelected);
     // console.log('dataChannel', dataChannel);
     // console.log('OKKKKK');
+    function leaveChannel() {
+        Asocket.emit('leaveChannel', {
+            channelId: idChannelSelected,
+        });
+    }
+    console.log('Refresh Component');
     return (React.createElement("div", { className: s.container },
         dataChannel && dataChannel.type === 'PRIVATE' && React.createElement("form", { onSubmit: invitUser },
             React.createElement("input", { name: 'invitUser', placeholder: 'Invit user' }),
             React.createElement("button", { type: 'submit' }, "Invit")),
         dataChannel && React.createElement(ChannelUsers, { dataChannel: dataChannel }),
+        React.createElement("button", { onClick: leaveChannel }, "Leave channel"),
         messages && React.createElement(Messages, { messages: messages, id: selector.id }),
         React.createElement("div", { className: s.inputBox },
             React.createElement("form", { onSubmit: handleSubmit },

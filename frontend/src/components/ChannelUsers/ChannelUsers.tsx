@@ -5,8 +5,6 @@ export function ChannelUsers({dataChannel}: {dataChannel: any}) {
 
 	const usersChan = dataChannel.members;
 
-	console.log('TEST')
-
 	return (
 		<div>
 			{usersChan.map((user: any) => {

@@ -15,23 +15,32 @@ export function ChannelUserList({ user, dataChannel }) {
         const response = await BackApi.getProfilePictureById(user);
         setUserAvatar(URL.createObjectURL(new Blob([response.data])));
     }
-    function userIsAdmin() {
+    function menuAdmin() {
         if (user === selector.id) {
             return false;
         }
         return dataChannel.administrators.includes(selector.id);
     }
+    function userIsAdmin() {
+        return dataChannel.administrators.includes(user);
+    }
+    function userIsBan() {
+        return dataChannel.banList.includes(user);
+    }
     function actionFriend() {
         setShowActionUser(!showActionUser);
     }
-    function banUser() {
-        // console.log('kick User');
-        // console.log('idChannelSelected', idChannelSelected);
-        // console.log('userId', user);
-        // console.log('dataChannel.id', dataChannel.id);
-        socket.emit('banUser', {
+    function eventSocket(event) {
+        socket.emit(event, {
             channelId: dataChannel.id,
             userId: user
+        });
+    }
+    function muteUser() {
+        socket.emit('muteUser', {
+            channelId: dataChannel.id,
+            userId: user,
+            duration: 10
         });
     }
     useEffect(() => {
@@ -39,11 +48,21 @@ export function ChannelUserList({ user, dataChannel }) {
         setSocket(getSocket());
     }, []);
     // console.log('data', dataChannel);
+    /* A ajouter:
+     leaveChannel
+     unmuteUser
+     updateChannel (pour le nom du chan)
+     
+     Pouvoir modifier le temps du mute */
     return (React.createElement("div", { className: s.container, onMouseEnter: actionFriend, onMouseLeave: actionFriend },
         userAvatar &&
-            React.createElement("img", { className: s.image, src: userAvatar, alt: "ProfilePicture", style: { opacity: showActionUser && userIsAdmin() ? '0.3' : '1' } }),
+            React.createElement("img", { className: s.image, src: userAvatar, alt: "ProfilePicture", style: { opacity: showActionUser && menuAdmin() ? '0.3' : '1' } }),
         userInfo && userInfo.username,
-        showActionUser && userIsAdmin() && (React.createElement("ul", { className: s.menu },
-            React.createElement("li", { onClick: banUser }, "Ban user"),
-            React.createElement("li", null, "Set admin")))));
+        showActionUser && menuAdmin() && (React.createElement("ul", { className: s.menu },
+            !userIsBan() && React.createElement("li", { onClick: () => eventSocket('banUser') }, "Ban user"),
+            userIsBan() && React.createElement("li", { onClick: () => eventSocket('unbanUser') }, "Unban user"),
+            React.createElement("li", { onClick: () => eventSocket('kickUser') }, "Kick user"),
+            !userIsAdmin() && React.createElement("li", { onClick: () => eventSocket('makeAdmin') }, "Set admin"),
+            userIsAdmin() && React.createElement("li", { onClick: () => eventSocket('removeAdmin') }, "Remove admin"),
+            React.createElement("li", { onClick: muteUser }, "Mute user")))));
 }

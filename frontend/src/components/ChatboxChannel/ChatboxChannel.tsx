@@ -9,10 +9,17 @@ import { initializeSocket, getSocket } from '../../utils/socket';
 import io from 'socket.io-client'
 import s from './style.module.css'
 import { ChannelUsers } from '../ChannelUsers/ChannelUsers';
+import { useNavigate } from 'react-router-dom';
 
-export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number}) {
+interface ChatboxChannelProps {
+	idChannelSelected: any;
+	setidChannelSelected: any;
+}
+
+export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: ChatboxChannelProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
+	const navigate = useNavigate();
 	const [Asocket, AsetSocket] = useState<any>(null);
     const [messages, setMessages] = useState([]);
     const [dataChannel, setDataChannel] = useState(null);
@@ -77,6 +84,28 @@ export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number
 		}
 	}
 
+	const kickListenner = (message: any) => {
+		// console.log('KICK');
+		console.log('KICK', message);
+		// getDataChannel();
+
+		// channelId: 2, userId: 2
+
+		if (message.channelId === idChannelSelected &&
+			message.userId === selector.id) {
+			// navigate('/chat');
+			setidChannelSelected(null);
+		} else {
+			getDataChannel();
+		}
+		// 	if (message.length) {
+		// 		setMessages(message);
+		// 	} else {
+		// 		setMessages([...messages, message]);
+		// 	}
+		// }
+	}
+
 	async function getDataChannel() {
 		const rep = await BackApi.getChannelById(idChannelSelected);
 		setDataChannel(rep.data);
@@ -85,6 +114,7 @@ export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number
 	useEffect(() => {
 		if (selector.id && Asocket) {
 			Asocket.on('message', messageListener);
+			Asocket.on('kickedUser', kickListenner);
 			return () => {
 				Asocket.off('message', messageListener)
 			}
@@ -101,6 +131,15 @@ export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number
 	// console.log('dataChannel', dataChannel);
 	// console.log('OKKKKK');
 
+
+	function leaveChannel() {
+		Asocket.emit('leaveChannel', {
+			channelId: idChannelSelected,
+		})
+	}
+
+	console.log('Refresh Component');
+
 	return (
 		<div className={s.container} >
 			{dataChannel && dataChannel.type === 'PRIVATE' && <form onSubmit={invitUser}>
@@ -108,6 +147,7 @@ export function ChatboxChannel({ idChannelSelected }: {idChannelSelected: number
 				<button type='submit'>Invit</button>
 			</form>}
 			{dataChannel && <ChannelUsers dataChannel={dataChannel}/>}
+			<button onClick={leaveChannel}>Leave channel</button>
 			{messages && <Messages messages={messages} id={selector.id} />}
 			<div className={s.inputBox}>
 				<form onSubmit={handleSubmit}>

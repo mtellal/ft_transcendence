@@ -111,8 +111,13 @@ export class ChatService {
         }
       }
     }
-    if (createChannelDto.password && createChannelDto.type === 'PROTECTED'){ 
+    if (createChannelDto.type === 'PROTECTED'){
+      if (!createChannelDto.password)
+        throw new ForbiddenException(`Password can't be empty`)
       createChannelDto.password = await argon.hash(createChannelDto.password);
+    }
+    if (createChannelDto.type !== 'PROTECTED' && createChannelDto.password) {
+      throw new ForbiddenException(`Only a Protected channel can have a password`);
     }
     if (createChannelDto.type == 'WHISPER' && userArray.length !== 2)
       throw new NotAcceptableException(`The other user doesn't exist`);
@@ -154,8 +159,8 @@ export class ChatService {
     if (dto.type !== channel.type) {
       if (dto.type === 'PROTECTED' && !dto.password)
         throw new ForbiddenException(`A protected channel must have a password`);
-        const updatedChannel= await this.prisma.channel.update({
-        where: {id: channel.id},
+      const updatedChannel = await this.prisma.channel.update({
+        where: { id: channel.id },
         data: {
           name: dto.name,
           type: dto.type,

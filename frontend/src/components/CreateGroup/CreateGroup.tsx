@@ -40,7 +40,6 @@ export function CreateGroup() {
 				// members: [selector.id],
 			}, selector.token);
 		} else {
-			console.log('TEST', target.password.value);
 			const rep = await BackApi.createChannel({
 				name: target.name.value,
 				type: 'PROTECTED',

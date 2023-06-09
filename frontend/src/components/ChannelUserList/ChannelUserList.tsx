@@ -27,25 +27,37 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 		setUserAvatar(URL.createObjectURL(new Blob([response.data])));
 	}
 
-	function userIsAdmin() {
+	function menuAdmin() {
 		if (user === selector.id) {
 			return false;
 		}
 		return dataChannel.administrators.includes(selector.id);
 	}
 
+	function userIsAdmin() {
+		return dataChannel.administrators.includes(user);
+	}
+
+	function userIsBan() {
+		return dataChannel.banList.includes(user);
+	}
+
 	function actionFriend() {
 		setShowActionUser(!showActionUser);
 	}
 
-	function banUser() {
-		// console.log('kick User');
-		// console.log('idChannelSelected', idChannelSelected);
-		// console.log('userId', user);
-		// console.log('dataChannel.id', dataChannel.id);
-		socket.emit('banUser', {
+	function eventSocket(event: string) {
+		socket.emit(event, {
 			channelId: dataChannel.id,
 			userId: user
+		})
+	}
+
+	function muteUser() {
+		socket.emit('muteUser', {
+			channelId: dataChannel.id,
+			userId: user,
+			duration: 10
 		})
 	}
 
@@ -56,6 +68,13 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 
 	// console.log('data', dataChannel);
 
+	/* A ajouter:
+	 leaveChannel
+	 unmuteUser
+	 updateChannel (pour le nom du chan) 
+	 
+	 Pouvoir modifier le temps du mute */
+
 	return (
 		<div className={s.container} onMouseEnter={actionFriend} onMouseLeave={actionFriend}>
 			{userAvatar &&
@@ -63,14 +82,18 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 					className={s.image}
 					src={userAvatar}
 					alt="ProfilePicture"
-					style={{ opacity: showActionUser && userIsAdmin() ? '0.3' : '1' }}
+					style={{ opacity: showActionUser && menuAdmin() ? '0.3' : '1' }}
 				/>
 			}
 			{userInfo && userInfo.username}
-			{ showActionUser && userIsAdmin() && (
+			{ showActionUser && menuAdmin() && (
 				<ul className={s.menu}>
-					<li onClick={banUser}>Ban user</li>
-					<li>Set admin</li>
+					{!userIsBan() && <li onClick={() => eventSocket('banUser')}>Ban user</li>}
+					{userIsBan() && <li onClick={() => eventSocket('unbanUser')}>Unban user</li>}
+					<li onClick={() => eventSocket('kickUser')}>Kick user</li>
+					{!userIsAdmin() && <li onClick={() => eventSocket('makeAdmin')}>Set admin</li>}
+					{userIsAdmin() && <li onClick={() => eventSocket('removeAdmin')}>Remove admin</li>}
+					{<li onClick={muteUser}>Mute user</li>}
 				</ul>
 			)}
 		</div>

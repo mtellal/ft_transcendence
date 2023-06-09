@@ -28,11 +28,12 @@ export function Chat() {
         }
     }
     async function getUserChannels() {
+        console.log('CHANNELS REFRESH');
         const response = await BackApi.getChannelsByUserId(selector.id);
         if (response.status === 200) {
-            if (response.data.length > 0 && myChannels !== response.data) {
-                setMyChannels(response.data);
-            }
+            // if (response.data.length > 0 && myChannels !== response.data) {
+            setMyChannels(response.data);
+            // }
         }
     }
     async function addFriend() {
@@ -69,7 +70,7 @@ export function Chat() {
             getUserChannels();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selector.id, friendRequest]);
+    }, [selector.id, friendRequest, idChannelSelected]);
     // console.log('idchanselected', idChannelSelected);
     return (React.createElement("div", { className: s.container },
         React.createElement("div", { className: s.item },
@@ -86,5 +87,5 @@ export function Chat() {
             btnFriendsRequest === 'CREATE_GROUP' && myChannels && React.createElement(CreateGroup, null),
             btnFriendsRequest === 'JOIN_GROUP' && myChannels && React.createElement(JoinChannel, { myChannels: myChannels }),
             idFriendSelected && btnFriendsRequest !== 'GROUP' && btnFriendsRequest !== 'CREATE_GROUP' && btnFriendsRequest !== 'JOIN_GROUP' && React.createElement(Chatbox, { idFriendSelected: idFriendSelected }),
-            idChannelSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idChannelSelected: idChannelSelected }))));
+            idChannelSelected && btnFriendsRequest === 'GROUP' && React.createElement(ChatboxChannel, { idChannelSelected: idChannelSelected, setidChannelSelected: setidChannelSelected }))));
 }
