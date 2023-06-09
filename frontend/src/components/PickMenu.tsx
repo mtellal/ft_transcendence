@@ -1,20 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import './PickMenu.css'
 
 type TPickMenu = {
-    title: string,
+    title?: string,
     selected: boolean | string, 
     collection: any[],
     setSelected: (option?: any) => {} | any,
+    picking?: () => {} | any
 }
 
 export default function PickMenu(props: TPickMenu) {
     const [show, setShow] = useState(false);
 
+    useEffect(() => {
+        if (show && props.picking)
+            props.picking();
+    }, [show])
+
     return (
         <div>
-            <h2>{props.title}</h2>
             <div className="flex-column" onClick={() => setShow(p => !p)}>
                 {
                     <div className="pickmenu-option">

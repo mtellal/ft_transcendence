@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 import './Profile.css'
 import { useChannelsContext, useFriends, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
@@ -258,20 +258,16 @@ function ChannelProfile(props: any) {
     const { channels, getOwner } = useChannelsContext();
     const { getAdministrators } = useAdinistrators();
 
-    const [name, setName]: any = useState(props.channel && props.channel.name);
-    const [password, setPassword]: any = useState("");
-    const [access, setAccess] = useState(props.channel && props.channel.type.toLowerCase());
     const [admins, setAdmins] = useState([]);
     const [banned, setBanned] = useState([])
 
     const [owner, setOwner] = useState(false);
 
     const [confirmView, setConfirmView] = useState(false);
+    const [confirmViewTypeProtected, setConfirmViewTypeProted] = useState(false);
+
 
     const [userOperation, setUserOperation] = useState(null)
-
-
-    const { updateChannelName, updateChannelPassword, updateChannelType } = useChannelInfos();
 
     const { getUsersBanned } = useBanUser();
 
@@ -298,27 +294,12 @@ function ChannelProfile(props: any) {
 
     function cancelOperation() {
         setConfirmView(p => !p);
-
+        setUserOperation(null)
     }
 
     function validOperation() {
         setConfirmView(p => !p);
         userOperation.function(userOperation.user, props.channel);
-    }
-
-
-    function submitName() {
-        let newName = name && name.trim();
-        if (newName) {
-            updateChannelName({ channelId: props.channel.id, name: newName })
-        }
-    }
-
-    function submitPassword() {
-        let newPassword = password && password.trim();
-        if (newPassword) {
-            updateChannelPassword(props.channel.id, newPassword, props.channel.type)
-        }
     }
 
     return (
@@ -330,33 +311,9 @@ function ChannelProfile(props: any) {
         >
             <div>
                 <div className="profilepage">
-                    <h2>Name</h2>
-                    <InfoInput
-                        id="name"
-                        label="Name"
-                        value={name}
-                        setValue={setName}
-                        submit={() => submitName()}
-                    />
-                    {
-                        props.channel.type === "PROTECTED" &&
-                        <>
-                            <h2>Password</h2>
-                            <InfoInput
-                                id="password"
-                                label="Set new password"
-                                value={password}
-                                setValue={setPassword}
-                                submit={() => submitPassword()}
-                            />
-                        </>
-                    }
-                    <PickMenu
-                        title="Access"
-                        collection={["public", "protected", "private"]}
-                        selected={access}
-                        setSelected={setAccess}
-                    />
+                    <ChannelName channel={props.channel} />
+                    <ChannelPassword channel={props.channel} />
+                    <PickMenuAccess channel={props.channel} protectedAccess={() => setConfirmViewTypeProted(true)} />
                     <SearchChannelUser
                         title="Search"
                         inputTitle="Search user"
@@ -393,8 +350,230 @@ function ChannelProfile(props: any) {
                         valid={() => validOperation()}
                     />
                 }
+                {
+                    confirmViewTypeProtected &&
+                    <ConfirmViewTypeProteced
+                        channel={props.channel}
+                        display={(d: boolean) => setConfirmViewTypeProted(d)}
+                        cancel={() => setConfirmViewTypeProted(false)}
+                    />
+                }
+
             </div>
         </PofileChannelContext.Provider>
+    )
+}
+
+
+function ChannelName({ channel }: any) {
+    const { isCurrentUserAdmin } = useUserAccess();
+    const [name, setName]: any = useState(channel.name)
+
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const { updateChannelName } = useChannelInfos();
+
+    const prevName: any = useRef(channel.name);
+
+    function submitName() {
+        let newName = name && name.trim();
+        if (newName) {
+            if (newName.length > 15)
+                return (setError("Maximum length of 15 letters"));
+            if (newName === prevName.current)
+                return;
+            prevName.current = newName;
+            setSuccess("Name updated")
+            updateChannelName(channel.id, newName)
+        }
+    }
+
+    function onChange() {
+        setError("");
+        setSuccess("");
+    }
+
+    return (
+        <>
+            <h2>Name</h2>
+            {
+                isCurrentUserAdmin ?
+                    <>
+                        {error && <p className="red-c" >{error}</p>}
+                        {success && <p className="green-c" >{success}</p>}
+                        <InfoInput
+                            id="name"
+                            label="Channel name "
+                            value={name}
+                            setValue={setName}
+                            onChange={onChange}
+                            submit={() => submitName()}
+                        />
+                    </>
+                    :
+
+                    <p>{name}</p>
+            }
+        </>
+    )
+}
+
+
+
+function ChannelPassword({ channel }: any) {
+    const { isCurrentUserAdmin } = useUserAccess();
+    const [password, setPassword]: any = useState("")
+
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const { updateChannelPassword } = useChannelInfos();
+
+    function submitName() {
+        let newPassword: string = password && password.trim();
+        if (newPassword) {
+            if (newPassword.length > 15)
+                return (setError("Maximum length of 15 letters"));
+            setSuccess("Password updated")
+            updateChannelPassword(channel.id, newPassword, channel.type)
+        }
+    }
+
+    function onChange(e: any) {
+        setError("");
+        setSuccess("");
+    }
+
+    function passwordInformation() {
+        if (channel.type === "PROTECTED")
+            return (<p>This channel is protected by a password</p>)
+        else if (channel.type === "PRIVATE")
+            return (<p>This channel is private, no password required</p>)
+        else
+            return (<p>No password required</p>)
+    }
+
+    return (
+        <>
+            <h2>Password</h2>
+            {
+                channel.type === "PROTECTED" && isCurrentUserAdmin ?
+                    <>
+                        {error && <p className="red-c" >{error}</p>}
+                        {success && <p className="green-c" >{success}</p>}
+
+                        <InfoInput
+                            id="password"
+                            label="Set new password "
+                            value={password}
+                            setValue={setPassword}
+                            onChange={onChange}
+                            submit={() => submitName()}
+                        />
+                    </>
+                    :
+                    passwordInformation()
+            }
+        </>
+    )
+}
+
+function PickMenuAccess({ channel, protectedAccess }: any) {
+    const { isCurrentUserAdmin } = useUserAccess();
+    const { updateChannelType } = useChannelInfos();
+
+    const [success, setSuccess] = useState("");    
+    const [type, setType] = useState(channel.type.toLowerCase())
+    const prevType = useRef(channel.type.toLowerCase());
+
+    function select(element: any) {
+        setSuccess("Access updated")
+        setType(element);
+        if (prevType !== type) {
+            prevType.current = element;
+            if (element === "protected")
+                protectedAccess()
+            else
+                updateChannelType(channel.id, element.toUpperCase());
+        }
+    }
+
+    return (
+        <>
+            <h2>Access</h2>
+            {success && <p className="green-c">{success}</p>}
+            {
+                isCurrentUserAdmin ?
+                    <PickMenu
+                        title="Access"
+                        collection={["public", "protected", "private"]}
+                        selected={type}
+                        setSelected={select}
+                        picking={() => { setSuccess("") }}
+                    />
+                    :
+                    <p>{type}</p>
+            }
+        </>
+    )
+}
+
+
+
+export function ConfirmViewTypeProteced(props: any) {
+
+    const [password, setPassword]: any = useState("")
+
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const { updateChannelType } = useChannelInfos();
+
+    function submit() {
+        let newPassword: string = password && password.trim();
+        if (newPassword) {
+            if (newPassword.length > 15)
+                return (setError("Password too long (15 letters max)"));
+            updateChannelType(props.channel.id, props.channel.type, newPassword)
+            props.display(false);
+        }
+    }
+
+    function onChange(e: any) {
+        setError("");
+    }
+
+    return (
+        <div className="reset absolute flex-column-center confirmview-container">
+            <div className="flex-column remove-friend-div">
+                <h3>To protect a channel you need to set a password</h3>
+                <InfoInput
+                    id="init-password"
+                    label="Set a password"
+                    value={password}
+                    setValue={setPassword}
+                    submit={() => submit()}
+                    onChange={onChange}
+                />
+                {error && <p className="red-c reset">{error}</p>}
+                <div className="remove-friend-buttons">
+
+                    <button
+                        className="button red white-color remove-friend-button"
+                        onClick={() => submit()}
+                    >
+                        Valid
+                    </button>
+                    <button
+                        className="button white remove-friend-button"
+                        onClick={props.cancel}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div >
     )
 }
 

@@ -7,7 +7,8 @@ type TInfoInput = {
     label: number | any,
     value: string,
     setValue: (s : string) => {},
-    submit?: () => {} | any
+    submit?: () => {} | any, 
+    onChange?: any
 }
 
 export default function InfoInput(props: TInfoInput) {
@@ -15,6 +16,8 @@ export default function InfoInput(props: TInfoInput) {
 
     function onChange(e: any) {
         props.setValue(e.target.value);
+        if (props.onChange)
+            props.onChange(e)
     }
 
     function handleKeyDown(e: any) {

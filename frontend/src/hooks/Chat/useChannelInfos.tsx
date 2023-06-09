@@ -14,7 +14,7 @@ export default function useChannelInfos()
     const { socket } = useChatSocket();
     const { channels, currentChannel, channelsDispatch } = useChannelsContext();
 
-    const updateChannelName = useCallback(({channelId, name}: TUpdateChannelInfos) => {
+    const updateChannelName = useCallback((channelId: number, name: string) => {
         if (socket && channels && channels.length && channelId && name)
         {
             console.log("update channel name", channelId, name)
@@ -40,13 +40,13 @@ export default function useChannelInfos()
     }, [socket, channels])
 
 
-    const updateChannelType = useCallback(({channelId, type}: TUpdateChannelInfos) => {
+    const updateChannelType = useCallback((channelId: number, type: string, password: string = "") => {
         if (socket && channels && channels.length && channelId && type)
         {
-            console.log("update channel type", channelId, type)
+            console.log("update channel type", channelId, type, password)
             socket.emit('updateChannel', {
-                channelId: channelId, 
-                type: type, 
+                channelId, 
+                type, 
             });
             channelsDispatch({type: 'updateChannelInfos', channelId, infos: {type}})
         }
