@@ -256,8 +256,14 @@ function Game(props : any)
 
 function PlayPage(props) {
     const { user, token } = useOutletContext();
+<<<<<<< HEAD
     const [socket, setSocket] = useState(null);
   
+=======
+    const [socket, setSocket] = React.useState<Socket | undefined>();
+  
+    let s: Socket;
+>>>>>>> 921604c (Butchered Game.tsx to try and work on the game)
     const handlePlayClick = () => {
       const s = io('http://localhost:3000/game', {
         transports: ['websocket'],
@@ -267,6 +273,7 @@ function PlayPage(props) {
       });
       setSocket(s);
       props.click();
+<<<<<<< HEAD
       s.emit('joinGame', '');
       console.log("Emitting event here");
     };
@@ -283,6 +290,29 @@ function PlayPage(props) {
           };
         }
       }, [socket]);
+=======
+      s.emit('test', '');
+      console.log("Emitting event here");
+    };
+  
+    const handleBeforeUnload = () => {
+      if (s) {
+        s.disconnect();
+      }
+    };
+  
+    React.useEffect(() => {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+  
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+  
+        if (s) {
+          s.disconnect();
+        }
+      };
+    }, [s]);
+>>>>>>> 921604c (Butchered Game.tsx to try and work on the game)
   
     return (
       <div className="play-page">
