@@ -208,6 +208,9 @@ export class UsersService {
         members: {
           has: id
         }
+      },
+      include: {
+        muteList: true
       }
     })
   }
