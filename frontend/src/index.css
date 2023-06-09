@@ -169,7 +169,7 @@ code {
 
 .scroll
 {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .hidden

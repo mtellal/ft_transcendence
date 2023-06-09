@@ -22,7 +22,6 @@ import { getChannel, getChannelByName } from "../../../requests/chat";
 export default function Interface() {
     const params: any = useParams();
 
-    const { socket } = useChatSocket();
     const navigate = useNavigate();
     const {
         token,
@@ -58,6 +57,8 @@ export default function Interface() {
             const channel = channelArray.find((c: any) => c.members.find((id : number) => user.id === id))
             setCurrentChannel(channel);
         }
+        else
+            navigate("/chat")
 
     }
 

@@ -134,6 +134,28 @@ function reducer(channels: any, action: any) {
                 ))
             }
         }
+        case ('addMuteList'): {
+            if (channels.length && action.channelId && action.userId) {
+                return (channels.map((c: Channel) => {
+                    if (c.id === action.channelId && !c.muteList.find((id: number) => id === action.userId))
+                        c.muteList.push(action.userId);
+                    return (c);
+                }
+                ))
+            }
+        }
+        case ('removeMuteList'): {
+            if (channels.length && action.channelId && action.userId) {
+                return (channels.map((c: Channel) => {
+                    if (c.id === action.channelId &&
+                        c.muteList && c.muteList.length) {
+                        c.muteList = c.muteList.filter((id: number) => id !== action.userId)
+                    }
+                    return (c)
+                }
+                ))
+            }
+        }
         case ('addBanList'): {
             if (channels.length && action.channelId && action.userId) {
                 return (channels.map((c: Channel) => {
@@ -337,6 +359,11 @@ export function ChannelsProvider({ children }: any) {
                 forceToLeaveChannel(res)
             })
 
+            socket.on('mutedUser', async (res: any) => {
+                console.log("MUTED USER CHANNEL EVENT")
+                console.log(res)
+            })
+
             socket.on('bannedUser', async (res: any) => {
                 console.log("BANNED CHANNEL EVENT")
                 if (res && res.channelId && res.userId) {
@@ -382,11 +409,14 @@ export function ChannelsProvider({ children }: any) {
                     socket.off('bannedUser')
                     socket.off('unbannedUser')
                     socket.off('message')
+                    socket.off('mutedUser')
                 }
             }
         }
     }, [socket, channels, user])
 
+
+    console.log(channels)
 
     function forceToLeaveChannel(res: any) {
         channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId });
