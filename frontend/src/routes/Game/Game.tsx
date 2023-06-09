@@ -18,6 +18,36 @@ function Game(props : any)
 
     const [scores, setScores] = React.useState({p1:0, p2:0})
 
+    function drawGameState(gameState) {
+        const context = canvasRef.current.getContext('2d');
+
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+        const { player1, player2, ball, scores } = gameState;
+
+        context.beginPath();
+        context.fillRect(player1.x, player1.y, player1.width, player1.height);
+        context.fillRect(player2.x, player2.y, player2.width, player2.height);
+
+        context.beginPath();
+        context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        context.fill();
+
+        context.beginPath();
+        context.arc(canvasRef.current.width / 2, canvasRef.current.height / 2, 50, 0, Math.PI * 2);
+        context.fillStyle = '#FFD8B8';
+        context.fill();
+        context.stroke();
+        context.fillStyle = 'black';
+        context.fillRect(canvasRef.current.width / 2, 0, 1, canvasRef.current.height);
+
+        // Render scores
+        context.fillStyle = 'black';
+        context.font = '24px Arial';
+        context.fillText(`P1: ${scores.p1}`, 20, 40);
+        context.fillText(`P2: ${scores.p2}`, canvasRef.current.width - 80, 40);
+    }
+
     function initPlayers(canvasHeight : any , canvasWidth : any )
     {
         const player1 = player1Ref.current;
@@ -256,14 +286,8 @@ function Game(props : any)
 
 function PlayPage(props) {
     const { user, token } = useOutletContext();
-<<<<<<< HEAD
     const [socket, setSocket] = useState(null);
   
-=======
-    const [socket, setSocket] = React.useState<Socket | undefined>();
-  
-    let s: Socket;
->>>>>>> 921604c (Butchered Game.tsx to try and work on the game)
     const handlePlayClick = () => {
       const s = io('http://localhost:3000/game', {
         transports: ['websocket'],
@@ -273,7 +297,6 @@ function PlayPage(props) {
       });
       setSocket(s);
       props.click();
-<<<<<<< HEAD
       s.emit('joinGame', '');
       console.log("Emitting event here");
     };
@@ -290,29 +313,6 @@ function PlayPage(props) {
           };
         }
       }, [socket]);
-=======
-      s.emit('test', '');
-      console.log("Emitting event here");
-    };
-  
-    const handleBeforeUnload = () => {
-      if (s) {
-        s.disconnect();
-      }
-    };
-  
-    React.useEffect(() => {
-      window.addEventListener('beforeunload', handleBeforeUnload);
-  
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-  
-        if (s) {
-          s.disconnect();
-        }
-      };
-    }, [s]);
->>>>>>> 921604c (Butchered Game.tsx to try and work on the game)
   
     return (
       <div className="play-page">
