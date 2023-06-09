@@ -30,7 +30,7 @@ export const UserPayload = createParamDecorator(
 		const req = context.switchToWs().getClient();
 		const token = req.handshake.headers.cookie.split('=')[1];
 		
-		console.log(`USERPAYLOAD= ${token}`);
-		return jwtService.decode(token);
+		const decoded = jwtService.decode(token);
+		return decoded;
 	}
 );
