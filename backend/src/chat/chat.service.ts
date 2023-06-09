@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AdminActionDto, CreateChannelDto, JoinChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
-import { Channel, User, Message } from '@prisma/client';
+import { Channel, User, Message, ChannelType } from '@prisma/client';
 import * as argon from 'argon2';
 import { UsersService } from 'src/users/users.service';
 
@@ -142,27 +142,34 @@ export class ChatService {
   }
 
   async updateChannel(dto: UpdateChannelDto, channel: Channel) {
+    if (dto.name) {
+      if (dto.name === channel.name)
+        throw new ForbiddenException(`Name is identical to the current channel name`)
+      const updatedChannel = await this.prisma.channel.update({
+        where: {id: channel.id},
+        data: {
+          name: dto.name
+        }
+      })
+      return updatedChannel;
+    }
     if (dto.password) {
-      if (dto.type !== 'PROTECTED')
-        throw new ForbiddenException('Only a protected channel can have a password');
       dto.password = await argon.hash(dto.password);
       const updatedChannel = await this.prisma.channel.update({
         where: {id: channel.id},
         data: {
-          name: dto.name,
-          type: dto.type,
+          type: ChannelType.PROTECTED,
           password: dto.password
         }
       })
       return updatedChannel;
     }
-    if (dto.type !== channel.type) {
+    if (dto.type) {
       if (dto.type === 'PROTECTED' && !dto.password)
         throw new ForbiddenException(`A protected channel must have a password`);
       const updatedChannel = await this.prisma.channel.update({
         where: { id: channel.id },
         data: {
-          name: dto.name,
           type: dto.type,
           password: null
         }
