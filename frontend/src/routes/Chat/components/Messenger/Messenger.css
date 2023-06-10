@@ -52,14 +52,14 @@
 
 .message-infos
 {
-    padding: 0 5px;
+    padding: 0 35px;
     max-width: 70%;
+    margin-right: auto;
 }
 
 .message
 {
     margin: 2px 0;
-    width: auto;
     background-color: rgb(255, 255, 255);
     border: 1px solid black;
     padding: 5px 5px;

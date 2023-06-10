@@ -11,6 +11,11 @@ import './Messenger.css'
 import ProfilePicture from "../../../../components/users/ProfilePicture";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
+import { RawIcon } from "../../../../components/Icon";
+import ResizeContainer from "../../../../components/ResizeContainer";
+import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
+import useUserAccess from "../../../../hooks/Chat/useUserAccess";
+import useMembers from "../../../../hooks/Chat/useMembers";
 
 function BlockMessage({ username }: any) {
     return (
@@ -59,90 +64,126 @@ function MessageDisplay(props: any) {
     return (
         <div>
             {
-                props.type === "NOTIF" && 
-                    <MessageNotification content={props.content} />
-            }        
+                props.type === "NOTIF" &&
+                <MessageNotification content={props.content} />
+            }
             {
-                props.type !== "NOTIF" && props.type !== "INVITATION" && 
+                props.type !== "NOTIF" && props.type !== "INVITATION" &&
                 <Message {...props} />
             }
         </div>
     )
 }
 
+type TMessengerUserLabel = {
+    url: string,
+    username: string,
+    owner?: boolean,
+    admin?: boolean
+}
 
-function Message(props: any) {
+function MessengerUserLabel(props: TMessengerUserLabel) {
+    return (
+        <div className="flex-column absolute" style={{ bottom: '-20px' }}>
+            <ResizeContainer height="30px" width="30px">
+                <ProfilePicture image={props.url} />
+            </ResizeContainer>
+            <div className="flex" style={{ alignItems: 'flex-end' }}>
+                <p className="message-author">{props.username}</p>
+                <ResizeContainer height="20px">
+                    {props.owner && <RawIcon icon="location_away" />}
+                    {props.admin && <RawIcon icon="shield_person" />}
+                </ResizeContainer>
+            </div>
+        </div>
+    )
+}
+
+type TMessengerCurrentUserLabel = {
+    url: string,
+    username: string,
+    owner?: boolean,
+    admin?: boolean
+}
+
+function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
+    return (
+        <div className="flex-column absolute" style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end' }} >
+            <ResizeContainer height="30px" width="30px">
+                <ProfilePicture image={props.url} />
+            </ResizeContainer>
+            <div className="flex" style={{ alignItems: 'flex-end' }}>
+                <ResizeContainer height="20px">
+                    {props.owner && <RawIcon icon="location_away" />}
+                    {props.admin && <RawIcon icon="shield_person" />}
+                </ResizeContainer>
+                <p className="message-author">{props.username}</p>
+            </div>
+        </div>
+    )
+}
+
+
+type TMessage = {
+    id: number, 
+    content: string, 
+    sendBy: number,
+    author: any,
+    username:string, 
+    currentUser: any,
+    admin:boolean, 
+    owner: boolean
+}
+
+
+function Message(props: TMessage) {
+
     function addStyle() {
-        if (props.sendBy === props.userId)
+        if (props.currentUser && props.sendBy === props.currentUser.id)
             return ({ backgroundColor: '#FFF5DD' });
-    }
-
-    function pickProfilePicture() {
-        if (props.sendBy === props.userId)
-            return (props.userImage)
-        else if (props.author)
-            return (props.author.url)
-    }
-
-    function pickName() {
-        if (props.sendBy === props.userId)
-            return (props.currentUsername)
-        else if (props.author)
-            return (props.author.username)
     }
 
     function pickMessageStyle() {
         let style = {};
         if (props.author)
-            style = { marginBottom: '15px' }
-        if (props.sendBy === props.userId)
-            style = { ...style, justifyContent: 'right', flexDirection: 'row-reverse' }
+            style = { marginBottom: '30px' }
+        if (props.currentUser && props.sendBy === props.currentUser.id)
+            style = { ...style, justifyContent: 'right', flexDirection: 'rowreverse' }
         return (style)
     }
 
     return (
         <div>
-
-            <div className="message-div"
+            <div className="message-div relative"
                 style={pickMessageStyle()}
             >
-                <div className="message-resize-pp">
-                    {props.author && <ProfilePicture image={pickProfilePicture()} />}
-                </div>
-
-                <div className="message-infos">
-
-                    <div className="flex-center" style={{ justifyContent: 'flex-end' }}>
+                <div className="flex-column" >
+                    <div className="message-infos">
                         <p className="message" style={addStyle()} >
                             {props.content}
                         </p>
                     </div>
-
                     {
-                        props.author ?
-
-                            <div
-                                className="flex-center"
-                                style={
-                                    props.sendBy === props.userId ?
-                                        { justifyContent: 'flex-end' } : { justifyContent: 'flex-end', flexDirection: 'row-reverse' }
-                                }
-                            >
-                                {
-                                    props.ownerId && <span className="material-symbols-outlined">
-                                        location_away
-                                    </span>
-                                }
-                                {
-                                    props.admin && <span className="material-symbols-outlined">
-                                        shield_person
-                                    </span>
-                                }
-                                <p className="message-author" style={props.userId === props.sendBy ? { textAlign: 'right' } : {}}>{pickName()}</p>
-                            </div>
-
-                            : null
+                        props.author &&
+                        <>
+                            {
+                                props.currentUser && props.currentUser.id !== props.sendBy ?
+                                    <MessengerUserLabel
+                                        url={props.author && props.author.url}
+                                        username={props.username}
+                                        owner={props.owner}
+                                        admin={props.admin}
+                                    /> :
+                                    <MessengerCurrentUserLabel
+                                        url={props.author && props.author.url}
+                                        username={props.username}
+                                        owner={props.owner}
+                                        admin={props.admin}
+                                    />
+                            }
+                        </>
                     }
+
                 </div>
             </div>
         </div>
@@ -172,12 +213,16 @@ export default function Messenger({
     const { currentFriend, friends } = useFriends();
     const { fetchUser } = useFetchUsers();
 
+    const { isUserAdministrators } = useAdinistrators();
+    const { isUserAdmin, isUserOwner } = useUserAccess();
+
+    const { getMemberById } = useMembers();
 
     function handleChange(e: any) {
         setValue(e.target.value)
     }
 
-    const submit = useCallback((e : any) => {
+    const submit = useCallback((e: any) => {
         if (e.key === "Enter" && value && !blocked && currentChannel && socket) {
             socket.emit('message', {
                 channelId: currentChannel.id,
@@ -201,68 +246,56 @@ export default function Messenger({
 
     const formatMessages = useCallback(async (messages: any[], members: any[]) => {
         let author: any;
-        let admin: boolean;
-        messages = messages.map( async (m: any, index: number) => {
-            admin = false;
+        messages = messages.map(async (m: any, index: number) => {
             author = null;
             if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
-                if (m.sendBy === user.id)
-                    author = user;
-                else if (m.sendBy)
-                {
-                    author = members.find((u: any) => u.id === m.sendBy)
-                    if (!author)
-                        author = await fetchUser(m.sendBy);
-                }
+                author = getMemberById(m.sendBy);
             }
-            if (author && currentChannel.type !== "WHISPER" &&
-                currentChannel.administrators.find((id: number) => id === author.id))
-                admin = true;
-
-            return (
-                <MessageDisplay
-                    key={m.id}
-                    id={m.id}
-                    content={m.content}
-                    sendBy={m.sendBy}
-                    type={m.type}
-                    author={author}
-                    admin={admin}
-                    userId={user.id}
-                    userImage={user.url}
-                    currentUsername={user.username}
-                    currentChannel={currentChannel}
-                    ownerId={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
-                />
-            )
+            
+            if (m.type === "NOTIF")
+                return (<MessageNotification key={m.id} content={m.content} />)
+            else if (m.type !== "NOTIF") {
+                return (
+                    <Message
+                        key={m.id}
+                        id={m.id}
+                        content={m.content}
+                        sendBy={m.sendBy}
+                        author={author}
+                        username={author && author.username}
+                        admin={author && isUserAdministrators(author)}
+                        currentUser={user}
+                        owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
+                    />
+                )
+            }
         })
         return (messages)
-    }, [currentChannel, channels, user])
+    }, [currentChannel && currentChannel.messages, user])
 
 
     const initMessages = useCallback(async () => {
-            const members = getMembers(currentChannel.id);
-                let messages: any = currentChannel && currentChannel.messages;
-                if (messages && messages.length && members && members.length) {
-                    messages = filterMessages(messages);
-                    messages = await Promise.all(await formatMessages(messages, members));
-                    setRenderMessages(messages)
-                }
-    }, [currentChannel, channels, user])
+        const members = getMembers(currentChannel.id);
+        let messages: any = currentChannel && currentChannel.messages;
+        if (messages && messages.length && members && members.length) {
+            messages = filterMessages(messages);
+            messages = await Promise.all(await formatMessages(messages, members));
+            setRenderMessages(messages)
+        }
+    }, [currentChannel && currentChannel.messages, user])
 
     useEffect(() => {
         setRenderMessages([]);
         if (currentChannel) {
             initMessages();
         }
-    }, [channels, currentChannel, user])
+    }, [currentChannel && currentChannel.messages, user])
 
     React.useEffect(() => {
         lastMessageRef.current.scrollIntoView();
     }, [currentChannel, blocked, renderMessages])
 
-    function canSendMessages()
-    {
+    function canSendMessages() {
         if (blocked)
             return ("User blocked")
         return ("Write your message")

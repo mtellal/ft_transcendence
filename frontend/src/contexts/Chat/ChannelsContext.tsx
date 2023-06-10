@@ -379,7 +379,7 @@ export function ChannelsProvider({ children }: any) {
                 console.log("UNMUTED USER CHANNEL EVENT", res)
                 if (res && res.channelId && res.userId)
                 {
-                    channelsDispatch({type: 'removeMuteList', channelId: res.channelId, userId: res.userId, mute: res.mute})
+                    channelsDispatch({type: 'removeMuteList', channelId: res.channelId, userId: res.userId})
                 }
             })
 

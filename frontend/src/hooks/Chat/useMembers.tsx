@@ -46,12 +46,33 @@ export default function useMembers()
         }
     }, [channels, socket])
 
+
+    const getMemberById = useCallback((id: number) => {
+        if (channels && channels.length && currentChannel && currentChannel.users && currentChannel.users.length)
+        {
+            return (currentChannel.users.find((u: any) => u.id === id))
+        }
+    }, [channels, currentChannel])
+
+
+    const getMembersById = useCallback((userIds : number[]) => {
+        if (channels && channels.length && userIds && userIds.length && 
+                currentChannel && currentChannel.users && currentChannel.users.length)
+        {
+            let members = userIds.map((id: number) => currentChannel.users.find((u: any) => u.id === id))
+            members = members.filter(u => u);
+            return (members)
+        }
+    }, [channels, currentChannel])
+
     return (
         {
             isUserMember,
             isUserOwner,
             isUserBanned,
-            addMember
+            addMember,
+            getMemberById,
+            getMembersById
         }
     )
 }

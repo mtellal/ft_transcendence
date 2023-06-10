@@ -53,9 +53,14 @@ export function ChannelUserLabel(props: any) {
 
     const { setUserAction, setConfirmView }: any = useContext(PofileChannelContext)
 
+    const [mutedUser, setMutedUser] = useState(false);
+
+    useEffect(() => {
+        setMutedUser(isUserMuted(props.user, currentChannel));
+    }, [currentChannel && currentChannel.muteList])
 
     function mutedIcon() {
-        if (isUserMuted(props.user, currentChannel))
+        if (mutedUser)
             return (
 
                 <Icon
@@ -137,7 +142,7 @@ export function ChannelUserLabel(props: any) {
                 return (
                     <div className="flex-center fill">
                         {
-                            (isCurrentUserOwner || isCurrentUserAdmin) && !isUserAdministrators(props.user) &&
+                            isCurrentUserOwner && !isUserAdministrators(props.user) &&
                             <Icon
                                 icon="add_moderator"
                                 description="make admin"
@@ -154,7 +159,7 @@ export function ChannelUserLabel(props: any) {
                             />
                         }
                         {
-                            (isCurrentUserOwner || isCurrentUserAdmin) && isUserAdministrators(props.user) &&
+                            isCurrentUserOwner && isUserAdministrators(props.user) &&
                             <Icon
                                 icon="remove_moderator"
                                 description="remove admin"

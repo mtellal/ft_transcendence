@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
 import useFetchUsers from "../useFetchUsers";
+import useMembers from "./useMembers";
 
 
 export default function useMuteUser() {
@@ -9,6 +10,8 @@ export default function useMuteUser() {
     const { channels, channelsDispatch, currentChannel } = useChannelsContext();
     const { fetchUsers } = useFetchUsers();
     const [isCurrentUserMuted, setIsCurrentUserMuted] = useState(false);
+
+    const { getMembersById } = useMembers(); 
 
     useEffect(() => {
         const muted = isUserMuted(user, currentChannel);
@@ -34,10 +37,10 @@ export default function useMuteUser() {
     const getUsersMuted = useCallback( async (channel: any) => {
         if (channel && channel.muteList && channel.muteList.length)
         {
-            const muted = channel.muteList.map((o: any) => o.userId);
-            if (muted && muted.length)
-                return (await Promise.all(await fetchUsers(muted)))
+            const mutedIds = channel.muteList.map((o: any) => o.userId); 
+            return (getMembersById(mutedIds))
         }
+        console.log("empty")
         return ([]);
     }, [])
 

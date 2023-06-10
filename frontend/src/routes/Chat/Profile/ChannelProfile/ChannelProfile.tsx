@@ -18,7 +18,7 @@ export const PofileChannelContext = createContext({});
 export default function ChannelProfile(props: any) {
 
     const { user } = useCurrentUser();
-    const { channels, getOwner } = useChannelsContext();
+    const { channels, currentChannel, getOwner } = useChannelsContext();
 
     const { getUsersBanned } = useBanUser();
     const { getAdministrators } = useAdinistrators();
@@ -41,13 +41,16 @@ export default function ChannelProfile(props: any) {
             if (owner)
                 setOwner(owner);
 
+            console.log("init muteList from props.channel =>", props.channel && props.channel.muteList)
+
             const mutedUsers = await getUsersMuted(props.channel);
+            console.log("after getMuted => ", mutedUsers)
             setMuted(mutedUsers);
 
             const bannesUsers = await getUsersBanned(props.channel);
             setBanned(bannesUsers)
         }
-    }, [channels, props.members])
+    }, [props.channel && props.channel.muteList, props.members])
 
     useEffect(() => {
         init();
