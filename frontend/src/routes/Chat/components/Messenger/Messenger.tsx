@@ -10,6 +10,7 @@ import {
 import './Messenger.css'
 import ProfilePicture from "../../../../components/users/ProfilePicture";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
+import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 
 function BlockMessage({ username }: any) {
     return (
@@ -177,7 +178,7 @@ export default function Messenger({
     }
 
     const submit = useCallback((e : any) => {
-        if (e.key === "Enter" && value !== "" && !blocked && currentChannel && socket) {
+        if (e.key === "Enter" && value && !blocked && currentChannel && socket) {
             socket.emit('message', {
                 channelId: currentChannel.id,
                 content: value
@@ -260,6 +261,13 @@ export default function Messenger({
         lastMessageRef.current.scrollIntoView();
     }, [currentChannel, blocked, renderMessages])
 
+    function canSendMessages()
+    {
+        if (blocked)
+            return ("User blocked")
+        return ("Write your message")
+    }
+
     return (
         <>
             <div className="messages-display">
@@ -276,7 +284,7 @@ export default function Messenger({
                     className="messenger-input"
                     value={value}
                     onChange={handleChange}
-                    placeholder={blocked ? "User blocked" : "Write your message"}
+                    placeholder={canSendMessages()}
                     onKeyDown={submit}
                     disabled={blocked}
                 />

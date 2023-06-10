@@ -86,7 +86,7 @@ export function ConfirmViewMuteAction(props: any) {
         if (newSeconds && /^\d+$/.test(newSeconds)) {
             if (newSeconds.length > 5)
                 return (setError("Mute too long (seconds < 100 000)"));
-            muteUser(props.user, props.channel, newSeconds);
+            muteUser(props.user, props.channel, Number(newSeconds));
             props.setConfirmView(false);
         }
         else

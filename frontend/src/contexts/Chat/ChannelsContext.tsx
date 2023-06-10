@@ -135,10 +135,17 @@ function reducer(channels: any, action: any) {
             }
         }
         case ('addMuteList'): {
-            if (channels.length && action.channelId && action.userId) {
+            if (channels.length && action.channelId && action.userId && action.mute) {
                 return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && !c.muteList.find((o: any) => o.userId === action.userId))
-                        c.muteList.push({userId: action.userId});
+                    if (c.id === action.channelId && c.muteList)
+                    {
+                        if (c.muteList.length && c.muteList.find((o: any) => o.userId === action.userId))
+                        {
+                            c.muteList = c.muteList.map((o : any) => o.userId === action.userId ? action.mute : o)    
+                        }
+                        else
+                            c.muteList.push(action.mute);
+                    }
                     return (c);
                 }
                 ))
@@ -150,6 +157,7 @@ function reducer(channels: any, action: any) {
                     if (c.id === action.channelId &&
                         c.muteList && c.muteList.length) {
                         c.muteList = c.muteList.filter((o: any) => o.userId !== action.userId);
+                        console.log("removeMuteList =>", c.muteList)
                     }
                     return (c)
                 }
@@ -360,18 +368,18 @@ export function ChannelsProvider({ children }: any) {
             })
 
             socket.on('mutedUser', async (res: any) => {
-                console.log("MUTED USER CHANNEL EVENT")
-                if (res && res.channelId && res.userId)
+                console.log("MUTED USER CHANNEL EVENT", res)
+                if (res && res.channelId && res.userId && res.mute)
                 {
-                    channelsDispatch({type: 'addMuteList', channelId: res.channelId, userId: res.userId})
+                    channelsDispatch({type: 'addMuteList', channelId: res.channelId, userId: res.userId, mute: res.mute})
                 }
             })
 
             socket.on('unmutedUser', async (res: any) => {
-                console.log("UNMUTED USER CHANNEL EVENT")
+                console.log("UNMUTED USER CHANNEL EVENT", res)
                 if (res && res.channelId && res.userId)
                 {
-                    channelsDispatch({type: 'removeMuteList', channelId: res.channelId, userId: res.userId})
+                    channelsDispatch({type: 'removeMuteList', channelId: res.channelId, userId: res.userId, mute: res.mute})
                 }
             })
 
@@ -421,6 +429,7 @@ export function ChannelsProvider({ children }: any) {
                     socket.off('unbannedUser')
                     socket.off('message')
                     socket.off('mutedUser')
+                    socket.off('unmutedUser')
                 }
             }
         }

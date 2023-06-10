@@ -42,7 +42,7 @@ export function CollectionUsers(props: any) {
 export function ChannelUserLabel(props: any) {
 
     const { user } = useCurrentUser();
-    const { currentChannel } = useChannelsContext();
+    const { currentChannel, channels } = useChannelsContext();
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
 
     const { kickUser } = useKickUser();
@@ -52,6 +52,46 @@ export function ChannelUserLabel(props: any) {
     const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers();
 
     const { setUserAction, setConfirmView }: any = useContext(PofileChannelContext)
+
+
+    function mutedIcon() {
+        if (isUserMuted(props.user, currentChannel))
+            return (
+
+                <Icon
+                    icon="cancel_schedule_send"
+                    description="Unmute"
+                    onClick={() => {
+                        setConfirmView(true);
+                        setUserAction(
+                            {
+                                user: props.user,
+                                function: unmuteUser,
+                                type: "unmute"
+                            }
+                        )
+                    }}
+                />
+            )
+        else
+            return (
+
+                <Icon
+                    icon="schedule_send"
+                    description="Mute"
+                    onClick={() => {
+                        setConfirmView(true);
+                        setUserAction(
+                            {
+                                user: props.user,
+                                function: muteUser,
+                                type: "mute"
+                            }
+                        )
+                    }}
+                />
+            )
+    }
 
 
     function functionalities() {
@@ -145,36 +185,7 @@ export function ChannelUserLabel(props: any) {
                             }}
                         />
                         {
-                            isUserMuted(props.user) ?
-                                <Icon
-                                    icon="cancel_schedule_send"
-                                    description="Unmute"
-                                    onClick={() => {
-                                        setConfirmView(true);
-                                        setUserAction(
-                                            {
-                                                user: props.user,
-                                                function: unmuteUser,
-                                                type: "unmute"
-                                            }
-                                        )
-                                    }}
-                                />
-                                :
-                                <Icon
-                                    icon="schedule_send"
-                                    description="Mute"
-                                    onClick={() => {
-                                        setConfirmView(true);
-                                        setUserAction(
-                                            {
-                                                user: props.user,
-                                                function: muteUser,
-                                                type: "mute"
-                                            }
-                                        )
-                                    }}
-                                />
+                            mutedIcon()
                         }
                         <Icon
                             icon="person_off"
