@@ -250,12 +250,13 @@ export class ChatService {
         duration: mutedDuration,
       }
     })
-    return await this.prisma.channel.update({
+    await this.prisma.channel.update({
       where: {id: dto.channelId},
       data: {
         muteList: {connect: {id: newMute.id}}
       }
     })
+    return newMute;
   }
 
   async unmuteUser(dto: AdminActionDto, usertoUnmute: User) {
