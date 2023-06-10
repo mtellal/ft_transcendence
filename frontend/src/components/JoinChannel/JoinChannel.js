@@ -1,13 +1,12 @@
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import { BackApi } from '../../api/back';
 import { PublicChannels } from '../PublicChannels/PublicChannels';
 import { ProtectedChannels } from '../ProtectedChannels/ProtectedChannels';
-import io from 'socket.io-client';
+import { getSocket } from '../../utils/socket';
+import s from './style.module.css';
 export function JoinChannel({ myChannels }) {
-    const selector = useSelector((store) => store.user.user);
     const [socket, setSocket] = useState(null);
     const [channels, setChannels] = useState();
     async function getAllChannels() {
@@ -17,22 +16,15 @@ export function JoinChannel({ myChannels }) {
         }
     }
     useEffect(() => {
-        if (selector.token) {
-            const newSocket = io('http://localhost:3000', {
-                transports: ['websocket'],
-                extraHeaders: {
-                    'Authorization': `Bearer ${selector.token}`
-                }
-            });
-            setSocket(newSocket);
-        }
-    }, [setSocket, selector.token]);
-    useEffect(() => {
         getAllChannels();
+        setSocket(getSocket());
     }, []);
-    return (React.createElement("div", null,
+    if (!socket) {
+        return (React.createElement("div", null, "NULL"));
+    }
+    return (React.createElement("div", { className: s.container },
         "Public channels",
-        channels && React.createElement(PublicChannels, { channels: channels, myChannels: myChannels, socket: socket }),
+        React.createElement("div", { className: s.pubChan }, channels && React.createElement(PublicChannels, { channels: channels, myChannels: myChannels, socket: socket })),
         "Protected channels",
         channels && React.createElement(ProtectedChannels, { channels: channels, myChannels: myChannels, socket: socket }),
         "Channel invitation"));

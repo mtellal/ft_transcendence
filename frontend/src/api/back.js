@@ -144,7 +144,6 @@ export class BackApi {
         return response;
     }
     static async getWhispers(id, idFriend) {
-        // console.log('id select friend', idFriend);
         const response = await axios.get(`${BASE_URL}/users/whispers`, {
             params: {
                 id: id,

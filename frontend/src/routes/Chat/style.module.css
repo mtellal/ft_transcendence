@@ -2,13 +2,11 @@
     height: 100vh;
     display: flex;
     justify-content: center;
-	/* margin-top: 100px; */
 }
 
 .item {
 	display: flex;
 	flex-direction: column;
-	/* flex-wrap: wrap; */
 	width: 850px;
 	height: 670px;
 	background-color: rgba(0,0,0,0.1);
@@ -19,25 +17,14 @@
 .menu {
 	display: flex;
 	flex-direction: row;
-	/* font-size: 10px; */
-	/* justify-content: space-between; */
 }
 
 .button {
 	font-size: 12px;
-	/* display: flex; */
-	/* width: 120px; */
 	height: 30px;
-	/* position: absolute; */
 	margin-top: 10px;
 	margin-left: 20px;
-	/* background-color: rgba(0,0,0,0.1); */
 	border: none;
 	border-radius: 50px;
 	cursor: pointer;
-	/* display: flex; */
-
-
-
-	/* background-color: black; */
 }

@@ -1,13 +1,11 @@
 import React from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import s from './style.module.css';
 import { BackApi } from '../../api/back';
+import s from './style.module.css';
 export function CreateGroup({ setBtnFriendsRequest }) {
     const selector = useSelector((store) => store.user.user);
-    // const [Asocket, AsetSocket] = useState<any>(null);
     const [privacy, setPrivacy] = useState('Public');
-    // const navigate = useNavigate();
     function handlePrivacyChange(e) {
         setPrivacy(e.target.value);
     }
@@ -33,13 +31,7 @@ export function CreateGroup({ setBtnFriendsRequest }) {
                 password: target.password.value
             }, selector.token);
         }
-        setBtnFriendsRequest('GROUP');
-        // navigate();
     }
-    // useEffect(() => {
-    // initializeSocket(selector.token);
-    // AsetSocket(getSocket());
-    // }, [])
     return (React.createElement("div", null,
         React.createElement("form", { className: s.container, onSubmit: handleSubmit },
             "Channel name",

@@ -12,7 +12,6 @@ interface PublicChannelsListProps {
 export function PublicChannelsList({ channel, socket,channelsNotJoined, setChannelsNotJoined }: PublicChannelsListProps) {
 
 	function joinChannel() {
-		// console.log('Join channel', channel.id);
 		socket.emit('joinChannel', {
 			channelId: channel.id
 		})
@@ -22,7 +21,7 @@ export function PublicChannelsList({ channel, socket,channelsNotJoined, setChann
 	}
 
 	return (
-		<div>
+		<div className={s.container}>
 			<button onClick={joinChannel}>{channel.name}</button>
 		</div>
 	);

@@ -13,7 +13,7 @@ export function GroupList({ channel, setidChannelSelected }:  GroupListProps) {
 	}
 
 	return (
-        <div>
+        <div className={s.container}>
 			<button onClick={setIdChannel}>{channel.name ? channel.name : channel.id}</button>
         </div>
 	);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackApi } from '../../api/back';
-import { GroupList } from '../GroupList/GroupList';
+import { GroupList } from '../ChannelList/ChannelList';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -26,12 +26,9 @@ interface GroupProps {
 		}
 	}
 
-	// console.log('REFRESH TESTTTT');
-
-
 	useEffect(() => {
-		// console.log('REFRESH TESTTTT');
 		getUserChannels();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id, idChannelSelected])
 
 	if (myChannels.length === 0) {
@@ -43,7 +40,6 @@ interface GroupProps {
 	}
 
 	return (
-		<div>
 			<div className={s.list}>
 				{myChannels.map((channel: any) => {
 					if (channel.type !== 'WHISPER') {
@@ -56,6 +52,5 @@ interface GroupProps {
 					return null;
 				})}
 			</div>
-		</div>
 	);
 }

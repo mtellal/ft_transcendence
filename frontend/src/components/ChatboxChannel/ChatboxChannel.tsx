@@ -19,7 +19,6 @@ interface ChatboxChannelProps {
 export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: ChatboxChannelProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
-	const navigate = useNavigate();
 	const [Asocket, AsetSocket] = useState<any>(null);
     const [messages, setMessages] = useState([]);
     const [dataChannel, setDataChannel] = useState(null);
@@ -34,7 +33,6 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
     }
 
 	function joinChannel() {
-		// console.log('Join channel', idChannelSelected);
 		Asocket.emit('joinChannel', {
 			channelId: idChannelSelected
 		})
@@ -65,17 +63,6 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 		}
 	}
 
-	useEffect(() => {
-		if (selector.id && Asocket) {
-			const fetchData = async () => {
-				joinChannel();
-				await getMessages(idChannelSelected);
-			};
-			fetchData();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [Asocket, selector.id, idChannelSelected]);
-
 	const messageListener = (message: any) => {
 		console.log('MESSAGE', message);
 		if (message.channelId === idChannelSelected) {
@@ -92,17 +79,8 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 	}
 
 	const kickListenner = (message: any) => {
-		// console.log('KICK');
-		// console.log('KICK', message);
-		// console.log('DATA', idChannelSelected, selector.id);
-
-		// getDataChannel();
-
-		// channelId: 2, userId: 2
-
 		if (message.channelId === idChannelSelected &&
 			message.userId === selector.id) {
-				// console.log('Hmmmmmmmmmmmmmmmmm');
 			setidChannelSelected(null);
 		} else {
 			getDataChannel();
@@ -113,6 +91,24 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 		const rep = await BackApi.getChannelById(idChannelSelected);
 		setDataChannel(rep.data);
 	}
+
+	function leaveChannel() {
+		Asocket.emit('leaveChannel', {
+			channelId: idChannelSelected,
+		})
+		setidChannelSelected(null);
+	}
+
+	useEffect(() => {
+		if (selector.id && Asocket) {
+			const fetchData = async () => {
+				joinChannel();
+				await getMessages(idChannelSelected);
+			};
+			fetchData();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [Asocket, selector.id, idChannelSelected]);
 
 	useEffect(() => {
 		if (selector.id && Asocket) {
@@ -128,20 +124,8 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 	useEffect(() => {
 		AsetSocket(getSocket());
 		getDataChannel();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [idChannelSelected, rerender])
-
-	// console.log('idChannelSelected', idChannelSelected);
-	// console.log('dataChannel', dataChannel);
-	// console.log('OKKKKK');
-
-
-	function leaveChannel() {
-		Asocket.emit('leaveChannel', {
-			channelId: idChannelSelected,
-		})
-	}
-
-	console.log('Refresh Component');
 
 	return (
 		<div className={s.container} >

@@ -1,13 +1,9 @@
 import React from 'react';
-import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { initializeSocket, getSocket } from '../../utils/socket';
-import io, { Socket } from 'socket.io-client'
-import s from './style.module.css'
 import { BackApi } from '../../api/back';
-import { useNavigate } from 'react-router-dom';
+import s from './style.module.css'
 
 	interface CreateGroupProps {
 		setBtnFriendsRequest: any;
@@ -16,9 +12,7 @@ import { useNavigate } from 'react-router-dom';
 export function CreateGroup({ setBtnFriendsRequest }: CreateGroupProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
-	// const [Asocket, AsetSocket] = useState<any>(null);
 	const [privacy, setPrivacy] = useState('Public');
-	// const navigate = useNavigate();
 
 	function handlePrivacyChange(e: React.ChangeEvent<HTMLSelectElement>) {
 		setPrivacy(e.target.value);
@@ -50,14 +44,7 @@ export function CreateGroup({ setBtnFriendsRequest }: CreateGroupProps) {
 				password: target.password.value
 			}, selector.token);
 		}
-		setBtnFriendsRequest('GROUP');
-		// navigate();
 	}
-
-	// useEffect(() => {
-		// initializeSocket(selector.token);
-		// AsetSocket(getSocket());
-	// }, [])
 
 	return (
 		<div>

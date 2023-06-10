@@ -64,9 +64,8 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 	useEffect(() => {
 		getUserInfos();
 		setSocket(getSocket());
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-
-	// console.log('data', dataChannel);
 
 	/* A ajouter:
 	 leaveChannel
