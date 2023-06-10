@@ -1,11 +1,10 @@
 import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { GamesService } from './games.service';
 import { Socket, Server } from 'socket.io';
-import { ExecutionContext, ForbiddenException, UnauthorizedException, UseGuards, createParamDecorator } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtWsGuard, UserPayload } from '../auth/guard/jwt.ws.guard';
-import { JwtGuard } from '../auth/guard';
 import { JwtPayloadDto } from '../auth/dto';
 
 @WebSocketGateway({ namespace: 'game' })
@@ -29,6 +28,13 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 
     console.log(`ID:${decoded.id} USER:${decoded.username} has connected to game socket`);
+
+    //will need to delete
+    const game = await this.gamesService.findOngoingGame(decoded);
+    if (game) {
+      console.log('ONGOING GAME FOUND!');
+      client.join(`room-${game.id}`);
+    }
   }
 
   async handleDisconnect(client: Socket) {
@@ -42,13 +48,12 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const token = cookie.split('=')[1];
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 
-    this.gamesService.deleteUnfinishedGame(decoded)
+    await this.gamesService.deleteUnfinishedGame(decoded);
     console.log(`ID:${decoded.id} USER:${decoded.username} has disconnected to game socket`);
   }
 
   @SubscribeMessage('up')
   async handleUp(@ConnectedSocket() client: any) {
-
   }
 
   @SubscribeMessage('down')
@@ -60,20 +65,29 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('cancel')
   @UseGuards(JwtWsGuard)
   async handleCancel(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto) {
+    client.leave();
     this.gamesService.deleteMatchmakingGame(payload);
   }
 
-  @SubscribeMessage('joinGame')
+  @SubscribeMessage('join')
   @UseGuards(JwtWsGuard)
   async HandleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto) {
     const room = await this.gamesService.findPendingGame(payload);
     if (!room) {
-      await this.gamesService.createGame(payload);
-      client.emit('joinWait', {message: 'waiting for another player'});
+      const new_game = await this.gamesService.createGame(payload);
+      client.emit('joinWait', {message: 'waiting for another player', roomId: new_game.id });
+      client.join(`room-${new_game.id}`);
     } else {
-      client.emit('joinSuccess', {message: 'Joining a game'});
+      client.emit('joinSuccess', {message: 'Joining a game', roomId: room.id});
+      client.join(`room-${room.id}`);
+      this.server.to(`room-${room.id}`).emit('GameStart', {message: 'Game is going to start in 5s'});
+
+      setTimeout(()=> {
+        this.gamesService.startGame(room.id, this.server);
+      }, 5000);
     }
     return 'Join success';
   }
+
 
 }

@@ -74,12 +74,28 @@ export class GamesService {
           status: GameStatus.ONGOING,
         },
       });
-      return 'success';
+      return pending;
     } catch (e) {
-      return 'error';
+      return null;
     }
   }
 
+  async findOngoingGame(payload: JwtPayloadDto) {
+    try {
+      const game = await this.prisma.game.findFirst({
+        where: {
+          status: GameStatus.ONGOING,
+          OR: [ 
+            { player1Id: payload.id},
+            { player2Id: payload.id},
+          ]
+        }
+      })
+      return game; 
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   //Have to add logic to get the ongoing games and disconnect the opponent from that game as well as giving him the win
   async deleteUnfinishedGame(payload: JwtPayloadDto) {
@@ -130,5 +146,8 @@ export class GamesService {
     } catch(e) {
       console.log(e);
     }
+  }
+
+  startGame(roomId: number, server: any) {
   }
 }
