@@ -20,7 +20,7 @@ export function CollectionUsers(props: any) {
 
     useEffect(() => {
         setRenderUsers([]);
-        if (props.users)
+        if (props.users && props.users.length)
             setRenderUsers(props.users.map((user: any) =>
                 <ChannelUserLabel
                     key={`${props.title}-${user.id}`}

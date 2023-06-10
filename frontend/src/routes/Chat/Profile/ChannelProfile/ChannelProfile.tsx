@@ -42,12 +42,10 @@ export default function ChannelProfile(props: any) {
                 setOwner(owner);
 
             const mutedUsers = await getUsersMuted(props.channel);
-            if (mutedUsers)
-                setMuted(mutedUsers);
+            setMuted(mutedUsers);
 
             const bannesUsers = await getUsersBanned(props.channel);
-            if (bannesUsers)
-                setBanned(bannesUsers)
+            setBanned(bannesUsers)
         }
     }, [channels, props.members])
 

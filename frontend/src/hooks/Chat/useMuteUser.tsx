@@ -26,10 +26,11 @@ export default function useMuteUser() {
             if (muted && muted.length)
                 return (await Promise.all(await fetchUsers(muted)))
         }
+        return ([]);
     }, [])
 
     const muteUser = useCallback((user: any, channel: any, duration: string) => {
-        if (channels && socket && user && channel) {
+        if (channels && channels.length && socket && user && channel) {
             console.log("mute user ", user.id, channel.id, duration)
             socket.emit('muteUser', {
                 channelId: channel.id,
@@ -38,16 +39,15 @@ export default function useMuteUser() {
             })
             channelsDispatch({ type: 'addMuteList', channelId: channel.id, userId: user.id })
         }
-    }, [socket])
+    }, [socket, channels])
 
 
-    const unmuteUser = useCallback((user: any, channel: any, duration: string) => {
-        if (channels && socket && user && channel) {
-            console.log("unmute user ", user.id, channel.id, duration)
+    const unmuteUser = useCallback((user: any, channel: any) => {
+        if (channels && channels.length && socket && user && channel) {
+            console.log("unmute user ", user.id, channel.id)
             socket.emit('unmuteUser', {
                 channelId: channel.id,
                 userId: user.id,
-                duration
             })
             channelsDispatch({ type: 'removeMuteList', channelId: channel.id, userId: user.id })
         }

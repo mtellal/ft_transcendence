@@ -137,8 +137,8 @@ function reducer(channels: any, action: any) {
         case ('addMuteList'): {
             if (channels.length && action.channelId && action.userId) {
                 return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && !c.muteList.find((id: number) => id === action.userId))
-                        c.muteList.push(action.userId);
+                    if (c.id === action.channelId && !c.muteList.find((o: any) => o.userId === action.userId))
+                        c.muteList.push({userId: action.userId});
                     return (c);
                 }
                 ))
@@ -149,7 +149,7 @@ function reducer(channels: any, action: any) {
                 return (channels.map((c: Channel) => {
                     if (c.id === action.channelId &&
                         c.muteList && c.muteList.length) {
-                        c.muteList = c.muteList.filter((id: number) => id !== action.userId)
+                        c.muteList = c.muteList.filter((o: any) => o.userId !== action.userId);
                     }
                     return (c)
                 }
@@ -361,7 +361,18 @@ export function ChannelsProvider({ children }: any) {
 
             socket.on('mutedUser', async (res: any) => {
                 console.log("MUTED USER CHANNEL EVENT")
-                console.log(res)
+                if (res && res.channelId && res.userId)
+                {
+                    channelsDispatch({type: 'addMuteList', channelId: res.channelId, userId: res.userId})
+                }
+            })
+
+            socket.on('unmutedUser', async (res: any) => {
+                console.log("UNMUTED USER CHANNEL EVENT")
+                if (res && res.channelId && res.userId)
+                {
+                    channelsDispatch({type: 'removeMuteList', channelId: res.channelId, userId: res.userId})
+                }
             })
 
             socket.on('bannedUser', async (res: any) => {
@@ -414,9 +425,6 @@ export function ChannelsProvider({ children }: any) {
             }
         }
     }, [socket, channels, user])
-
-
-    console.log(channels)
 
     function forceToLeaveChannel(res: any) {
         channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId });
