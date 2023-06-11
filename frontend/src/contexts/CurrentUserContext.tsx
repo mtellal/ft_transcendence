@@ -31,13 +31,14 @@ function reducer(user: any, action: any) {
             if (user && user.blockList && action.block)
             {
                 user.blockList.push(action.block);
+                console.log("addBlokcList", user.blockList)
             }
             return (user);
         }
         case('removeBlockList'): {
-            if (user && user.blockList && action.block)
+            if (user && user.blockList && user.blockList.length && action.userId)
             {
-                user.blockList = user.blockList.filter((obj: any) => obj.blockedId !== action.friendId)
+                user.blockList = user.blockList.filter((obj: any) => obj.userId !== action.userId)
             }
             return (user)
         }
@@ -72,6 +73,8 @@ export function CurrentUserProvider({ children, ...props }: any) {
     const updateCurrentUser = useCallback((user: any) => {
         userDispatch({ type: 'updateUser', user })
     }, [user])
+
+    console.log("user context", user && user.blockList)
 
     return (
         <CurrentUserContext.Provider

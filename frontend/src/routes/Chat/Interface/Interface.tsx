@@ -116,7 +116,7 @@ export default function Interface() {
         setRemoveView(false);
         if (currentFriend && user) {
             if (user.blockList.length) {
-                if (user.blockList.find((obj: any) => currentFriend.id === obj.blockedId))
+                if (user.blockList.find((obj: any) => currentFriend.id === obj.userId))
                     setBlocked(true);
                 else
                     setBlocked(false)
@@ -138,10 +138,7 @@ export default function Interface() {
                         {
                             profile ?
                                 <Profile /> :
-                                <Messenger
-                                    currentChannel={currentChannel}
-                                    blocked={blocked}
-                                />
+                                <Messenger />
                         }
 
                         {

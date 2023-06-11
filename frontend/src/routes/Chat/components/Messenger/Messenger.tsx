@@ -1,5 +1,5 @@
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import {
     useChannelsContext,
@@ -82,14 +82,14 @@ function MessageDisplay(props: any) {
 
 type TUserManu = {
     user: any,
-    setShowMenu: any
+    setShowUserMenu: any
 }
 
 
 function UserMenu(props: TUserManu) {
 
     const { setUserAction } = useContext(MessengerContext);
-    const { blockUser, unblockUser,  isUserBlocked } = useBlock();
+    const { blockUser, unblockUser, isUserBlocked } = useBlock();
 
     function profile() {
         console.log("profile");
@@ -99,8 +99,7 @@ function UserMenu(props: TUserManu) {
         setUserAction({ type: 'block', user: props.user, function: blockUser });
     }
 
-    function unblock()
-    {
+    function unblock() {
         setUserAction({ type: 'unblock', user: props.user, function: unblockUser });
     }
 
@@ -111,7 +110,7 @@ function UserMenu(props: TUserManu) {
             <div
                 className="fill pointer relative flex-center messenger-usermenu-option"
                 style={{ borderBottom: '1px solid black' }}
-                onClick={() => { profile(); props.setShowMenu((p: boolean) => !p) }}
+                onClick={() => { profile(); props.setShowUserMenu((p: boolean) => !p) }}
             >
                 <p>profile</p>
             </div>
@@ -119,14 +118,14 @@ function UserMenu(props: TUserManu) {
                 isUserBlocked(props.user) ?
                     <div
                         className="fill pointer flex-center relative messenger-usermenu-option"
-                        onClick={() => { unblock(); props.setShowMenu((p: boolean) => !p) }}
+                        onClick={() => { unblock(); props.setShowUserMenu((p: boolean) => !p) }}
                     >
                         <p>unblock</p>
                     </div>
                     :
                     <div
                         className="fill pointer flex-center relative messenger-usermenu-option"
-                        onClick={() => { block(); props.setShowMenu((p: boolean) => !p) }}
+                        onClick={() => { block(); props.setShowUserMenu((p: boolean) => !p) }}
                     >
                         <p>block</p>
                     </div>
@@ -137,30 +136,40 @@ function UserMenu(props: TUserManu) {
 
 
 type TMessengerUserLabel = {
+    id: number,
     user: any,
     url: string,
     username: string,
     owner?: boolean,
     admin?: boolean,
-    showMenu: boolean,
-    setShowMenu: any
 }
 
 function MessengerUserLabel(props: TMessengerUserLabel) {
+
+    const { showUserMenu, setShowUserMenu } = useContext(MessengerContext);
 
     return (
         <div
             className="flex-column absolute"
             style={{ bottom: '-20px' }}
         >
-            <ResizeContainer height="30px" width="30px"
-                className="pointer"
-                onClick={() => props.setShowMenu((p: boolean) => !p)}
-            >
-                <ProfilePicture image={props.url} />
-            </ResizeContainer>
+            <div>
+                <ResizeContainer height="30px" width="30px"
+                    className="pointer"
+                    onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
+                >
+                    <ProfilePicture image={props.url} />
+                </ResizeContainer>
+                {
+                    showUserMenu && showUserMenu.show && showUserMenu.id === props.id &&
+                    <UserMenu
+                        setShowUserMenu={setShowUserMenu}
+                        user={props.user}
+                    />
+                }
+            </div>
             <div className="flex pointer" style={{ alignItems: 'flex-end' }}
-                onClick={() => props.setShowMenu((p: boolean) => !p)}
+                onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
             >
                 <p className="message-author">{props.username}</p>
                 <ResizeContainer height="20px">
@@ -168,13 +177,6 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
                     {props.admin && <RawIcon icon="shield_person" />}
                 </ResizeContainer>
             </div>
-            {
-                props.showMenu &&
-                <UserMenu
-                    setShowMenu={props.setShowMenu}
-                    user={props.user}
-                />
-            }
         </div>
     )
 }
@@ -222,8 +224,6 @@ type TMessage = {
 
 function Message(props: TMessage) {
 
-    const [showMenu, setShowMenu] = useState(false);
-
 
     function addStyle() {
         if (props.currentUser && props.sendBy === props.currentUser.id)
@@ -256,13 +256,12 @@ function Message(props: TMessage) {
                             {
                                 props.currentUser && props.currentUser.id !== props.sendBy ?
                                     <MessengerUserLabel
+                                        id={props.id}
                                         user={props.author}
                                         url={props.author && props.author.url}
                                         username={props.username}
                                         owner={props.owner}
                                         admin={props.admin}
-                                        showMenu={showMenu}
-                                        setShowMenu={setShowMenu}
                                     /> :
                                     <MessengerCurrentUserLabel
                                         url={props.author && props.author.url}
@@ -289,55 +288,45 @@ function MessageNotification(props: any) {
 }
 
 
-export default function Messenger({
-    blocked,
-}: any) {
+export default function Messenger() {
 
     const { user, image } = useCurrentUser();
     const { socket } = useChatSocket();
-    const lastMessageRef: any = React.useRef(null);
-    const [value, setValue] = React.useState("");
-    const [renderMessages, setRenderMessages]: any = useState([]);
 
     const { currentChannel, channels, getMembers } = useChannelsContext();
+
     const { currentFriend, friends } = useFriends();
-    const { fetchUser } = useFetchUsers();
-
     const { isUserAdministrators } = useAdinistrators();
-    const { isUserAdmin, isUserOwner } = useUserAccess();
-
     const { getMemberById } = useMembers();
 
-    const [confirmAction, setConfirmAction] = useState(false);
+    const { isUserBlocked } = useBlock();
+
+
     const [userAction, setUserAction]: any = useState();
 
-    function handleChange(e: any) {
-        setValue(e.target.value)
-    }
+    const [messages, setMessages] = useState([]);
 
-    const submit = useCallback((e: any) => {
-        if (e.key === "Enter" && value && !blocked && currentChannel && socket) {
-            socket.emit('message', {
-                channelId: currentChannel.id,
-                content: value
-            })
-            setValue("")
-        }
-    }, [value, currentChannel, socket])
+
+    const [showUserMenu, setShowUserMenu] = useState({ show: false });
+
+
+    let rendMessages: any[] = [];
 
 
     // check if a user is in the user blockList and filter messages from block timestamp
-    const filterMessages = useCallback((messages: any[]) => {
-        let blockObj: any;
-        if (currentChannel.type === "WHISPER" && user.blockList.length &&
-            (blockObj = user.blockList.find((o: any) => o.blockedId === currentFriend.id))) {
-            messages = currentChannel.messages.filter((m: any) => m.createdAt < blockObj.createdAt)
+    const filterMessages = useCallback((messages: any[], members: any[]) => {
+        if (user.blockList.length) {
+            messages = messages.filter((m: any) => {
+                let blockObject = user.blockList.find((o: any) => o.userId === m.sendBy);
+                if (!blockObject || (blockObject && new Date(m.createdAt) < new Date(blockObject.createdAt)))
+                    return (m)
+            })
         }
         return (messages)
     }, [currentChannel, user])
 
 
-    const formatMessages = useCallback(async (messages: any[], members: any[]) => {
+    const formatMessages = useCallback(async (messages: any[]) => {
         let author: any;
         messages = messages.map(async (m: any, index: number) => {
             author = null;
@@ -371,63 +360,52 @@ export default function Messenger({
         const members = getMembers(currentChannel.id);
         let messages: any = currentChannel && currentChannel.messages;
         if (messages && messages.length && members && members.length) {
-            messages = filterMessages(messages);
-            messages = await Promise.all(await formatMessages(messages, members));
-            setRenderMessages(messages)
+            messages = filterMessages(messages, members);
+            setMessages(messages);
         }
     }, [currentChannel && currentChannel.messages, user])
 
+
+
     useEffect(() => {
-        setRenderMessages([]);
         if (currentChannel) {
             initMessages();
         }
-    }, [currentChannel && currentChannel.messages, user])
+    }, [currentChannel && currentChannel.messages, user, user.blockList])
 
-    React.useEffect(() => {
-        lastMessageRef.current.scrollIntoView();
-    }, [currentChannel, blocked, renderMessages])
 
-    function canSendMessages() {
-        if (blocked)
-            return ("User blocked")
-        return ("Write your message")
+    async function loadConversation() {
+        rendMessages = await Promise.all(await formatMessages(messages));
     }
+
+    useEffect(() => {
+        if (messages && messages.length) {
+            loadConversation();
+        }
+    }, [currentChannel])
+
+
 
     return (
         <MessengerContext.Provider value={
             {
-                setConfirmAction,
-                setUserAction
+                setUserAction,
+                showUserMenu,
+                setShowUserMenu,
             }
         }
         >
-            <div className="messages-display">
-                {
-                    renderMessages.length ?
-                        renderMessages : <NoMessages />
-                }
-                {blocked && <BlockMessage username={currentFriend.username || currentChannel.name} />}
-                <div ref={lastMessageRef}></div>
-            </div>
-            <div className="messages-input"
-            >
-                <input
-                    className="messenger-input"
-                    value={value}
-                    onChange={handleChange}
-                    placeholder={canSendMessages()}
-                    onKeyDown={submit}
-                    disabled={blocked}
-                />
-            </div>
+            <MessengerConversation 
+                messages={messages} 
+            />
+            <MessengerInput />
             {
                 userAction && userAction.user && userAction.function &&
                 <ConfirmPage>
                     <ConfirmView
                         type={userAction.type}
                         username={userAction.user && userAction.user.username}
-                        valid={() => { userAction.function(userAction.user); setUserAction(null) }}
+                        valid={async () => { await userAction.function(userAction.user); setUserAction(null) }}
                         cancel={() => setUserAction(null)}
                     />
                 </ConfirmPage>
@@ -436,3 +414,127 @@ export default function Messenger({
     )
 }
 
+
+function MessengerConversation({ messages }: any) {
+    const [render, setRender] = useState(false);
+
+    const { user } = useCurrentUser();
+    const { currentFriend } = useFriends();
+
+    const { currentChannel } = useChannelsContext();
+
+    const { isUserAdministrators } = useAdinistrators();
+    const { getMemberById } = useMembers();
+    const { isUserBlocked } = useBlock();
+
+
+    let renderMessages: any = useRef(null);
+    const lastMessageRef: any = React.useRef(null);
+
+
+    async function rendMessages() {
+        if (!messages) {
+            renderMessages.current = <NoMessages />
+            setRender((p: boolean) => !p);
+        }
+        else {
+
+            let author: any;
+            renderMessages.current =
+                await Promise.all(messages.map(async (m: any, index: number) => {
+                    author = null;
+                    if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
+                        author = getMemberById(m.sendBy);
+                    }
+
+                    if (m.type === "NOTIF")
+                        return (<MessageNotification key={m.id} content={m.content} />)
+                    else if (m.type !== "NOTIF") {
+                        return (
+                            <Message
+                                key={m.id}
+                                id={m.id}
+                                content={m.content}
+                                sendBy={m.sendBy}
+                                author={author}
+                                username={author && author.username}
+                                admin={author && isUserAdministrators(author)}
+                                currentUser={user}
+                                owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
+                            />
+                        )
+                    }
+                }))
+            setRender((p: boolean) => !p);
+        }
+    }
+
+    useEffect(() => {
+        rendMessages();
+    }, [messages])
+
+
+    React.useEffect(() => {
+        lastMessageRef.current.scrollIntoView();
+    }, [currentChannel, render])
+
+    return (
+        <div className="messages-display">
+
+            {
+                renderMessages.current
+            }
+            {
+                isUserBlocked(currentFriend) && currentChannel.type === "WHISPER" &&
+                <BlockMessage username={currentFriend.username || currentChannel.name} />
+            }
+            <div ref={lastMessageRef}></div>
+        </div>
+    )
+}
+
+
+function MessengerInput() {
+    const { user } = useCurrentUser();
+    const { socket } = useChatSocket();
+    const { currentChannel } = useChannelsContext();
+    const { currentFriend } = useFriends();
+    const { isUserBlocked } = useBlock();
+
+    const [value, setValue] = React.useState("");
+
+
+    function handleChange(e: any) {
+        setValue(e.target.value)
+    }
+
+    function canSendMessages() {
+        if (isUserBlocked(currentFriend))
+            return ("User blocked")
+        return ("Write your message")
+    }
+
+    const submit = useCallback((e: any) => {
+        if (e.key === "Enter" && value && !isUserBlocked(user) && currentChannel && socket) {
+            socket.emit('message', {
+                channelId: currentChannel.id,
+                content: value
+            })
+            setValue("")
+        }
+    }, [value, currentChannel, socket])
+
+    return (
+        <div className="messages-input"
+        >
+            <input
+                className="messenger-input"
+                value={value}
+                onChange={handleChange}
+                placeholder={canSendMessages()}
+                onKeyDown={submit}
+                disabled={isUserBlocked(currentFriend)}
+            />
+        </div>
+    )
+}
