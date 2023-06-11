@@ -109,6 +109,7 @@ export class GamesService {
           AND: [ 
             { OR: [
               { status: GameStatus.MATCHMAKING },
+              { status: GameStatus.INVITE },
               { status: GameStatus.ONGOING },
           ]},
             { OR: [
@@ -121,6 +122,22 @@ export class GamesService {
       for (const game of games) {
         const ongoingGame = this.games.get(game.id);
         ongoingGame.status = Status.FORFEIT;
+        if (game.status === GameStatus.MATCHMAKING || game.status === GameStatus.INVITE) {
+          await this.prisma.game.delete({
+            where: {id: game.id}
+          });
+        }
+        if (game.status === GameStatus.ONGOING) {
+          if (game.player1Id === payload.id) {
+            await this.prisma.game.update({
+              where: {id: game.id},
+              data: {
+                wonBy: game.player2Id,
+                status: GameStatus.FINISHED,
+              }
+            })
+          }
+        }
       }
     } catch (e) {
       console.log(e);
@@ -168,10 +185,11 @@ export class GamesService {
     const gameLoopInterval = setInterval(() => {
       this.gameLoop(game);
       //server.to(`room-${room.id}`).emit(game);
-      console.log(game);
+      /* console.log(game); */
       if (this.isGameOver(game))
         clearInterval(gameLoopInterval);
     }, tickRate);
+    //Update in case of forfeit is in deleteUnfinishedGame
 /*     while (1) {
       this.gameLoop(game);
       console.log(game);
@@ -241,6 +259,14 @@ export class GamesService {
   isGameOver(game: GameState) {
     if (game.status === Status.FORFEIT)
       return (true);
+    if (game.score.player1Score >= game.score.winScore) {
+      game.status = Status.P1WIN;
+      return (true);
+    }
+    if (game.score.player2Score >= game.score.winScore) {
+      game.status = Status.P2WIN;
+      return (true);
+    }
     return (false);
   }
 }

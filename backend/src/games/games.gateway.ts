@@ -1,4 +1,4 @@
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { GamesService } from './games.service';
 import { Socket, Server } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
@@ -69,6 +69,12 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gamesService.deleteMatchmakingGame(payload);
   }
 
+  @SubscribeMessage('test')
+  async handleTest(@ConnectedSocket() client: any, @MessageBody() content: any) {
+    console.log('Here');
+    console.log(content);
+  }
+
   @SubscribeMessage('join')
   @UseGuards(JwtWsGuard)
   async HandleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto) {
@@ -79,6 +85,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       room = await this.gamesService.createGame(payload);
       client.emit('joinWait', {message: 'waiting for another player', roomId: room.id });
       client.join(`room-${room.id}`);
+      this.server.to(`room-${room.id}`).emit('joinedGame', room);
       this.gamesService.startGame(room, this.server);
     } else {
       client.emit('joinSuccess', {message: 'Joining a game', roomId: room.id});

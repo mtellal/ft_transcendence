@@ -2,7 +2,9 @@ export enum Status {
   ONGOING,
   PAUSED,
   CANCELLED,
-  FORFEIT
+  FORFEIT,
+  P1WIN,
+  P2WIN
 }
 
 export class GameState {

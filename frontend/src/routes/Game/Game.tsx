@@ -8,7 +8,7 @@ let up : boolean;
 let down : boolean;
 
 
-function Game(props : any)
+function Game({launch, socket})
 {
     const canvasRef : any  = React.useRef();
     const animationID = React.useRef(0);
@@ -260,7 +260,7 @@ function Game(props : any)
                 
         }
 
-        if (props.launch)
+        if (launch)
             game();
 
         return (() => {
@@ -268,7 +268,7 @@ function Game(props : any)
             window.removeEventListener('resize', resizeEvent);
         })
 
-    }, [props.launch])
+    }, [launch])
 
 
     return (
@@ -329,10 +329,11 @@ function PlayPage(props) {
 export default function LaunchGame()
 {
     const [play, setPlay] = React.useState(false);
+    const [socket, setSocket] = React.useState(false);
 
     return (
         <div className="launchgame relative">
-            <Game launch={play}/>
+            <Game launch={play} socket={socket}/>
             {!play && <PlayPage click={() => setPlay(true)} />}
         </div>
     )
