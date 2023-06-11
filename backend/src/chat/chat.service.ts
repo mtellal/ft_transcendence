@@ -227,6 +227,12 @@ export class ChatService {
         channelList: usertoKick.channelList.filter((num) => num !== channel.id)
       }
     })
+    await this.prisma.mutedUser.deleteMany({
+      where: {
+        channelId: channel.id,
+        userId: usertoKick.id
+      }
+    });
     const updatedMember = channel.members.filter((id) => id !== usertoKick.id);
     let updatedAdmin = channel.administrators;
     if (channel.administrators.includes(usertoKick.id))
@@ -301,6 +307,12 @@ export class ChatService {
         channelList: usertoBan.channelList.filter((num) => num !== channel.id)
       }
     })
+    await this.prisma.mutedUser.deleteMany({
+      where: {
+        channelId: channel.id,
+        userId: usertoBan.id
+      }
+    });
     const updatedMember = channel.members.filter((id) => id !== usertoBan.id);
     let updatedAdmin = channel.administrators;
     if (channel.administrators.includes(usertoBan.id))
