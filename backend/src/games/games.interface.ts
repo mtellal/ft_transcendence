@@ -1,3 +1,10 @@
+export enum Status {
+  ONGOING,
+  PAUSED,
+  CANCELLED,
+  FORFEIT
+}
+
 export class GameState {
   player1: {
     x: number;
@@ -26,6 +33,7 @@ export class GameState {
   };
   width: number;
   height: number;
+  status: Status
 }
 
 export const defaultGameState: GameState = {
@@ -34,5 +42,6 @@ export const defaultGameState: GameState = {
   ball: {x: 0, y: 0, radius: 10, velX: 0, velY: 0, speed: 1},
   score: {player1Score: 0, player2Score: 0, winScore: 10},
   width: 1600,
-  height: 800
+  height: 800,
+  status: Status.PAUSED
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Game, GameStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtPayloadDto } from '../auth/dto';
-import { GameState, defaultGameState } from './games.interface';
+import { GameState, Status, defaultGameState } from './games.interface';
 
 @Injectable()
 export class GamesService {
@@ -104,7 +104,7 @@ export class GamesService {
   async deleteUnfinishedGame(payload: JwtPayloadDto) {
     //have to seperate 
     try {
-      await this.prisma.game.deleteMany({
+      const games = await this.prisma.game.findMany({
         where: {
           AND: [ 
             { OR: [
@@ -118,6 +118,10 @@ export class GamesService {
           ],
         }
       })
+      for (const game of games) {
+        const ongoingGame = this.games.get(game.id);
+        ongoingGame.status = Status.FORFEIT;
+      }
     } catch (e) {
       console.log(e);
     }
@@ -154,6 +158,7 @@ export class GamesService {
   startGame(room: Game, server: any) {
     const game = new GameState();
     Object.assign(game, defaultGameState);
+    this.games.set(room.id, game);
     console.log(game);
     this.initPlayer(game);
     this.initBall(game);
@@ -164,6 +169,8 @@ export class GamesService {
       this.gameLoop(game);
       //server.to(`room-${room.id}`).emit(game);
       console.log(game);
+      if (this.isGameOver(game))
+        clearInterval(gameLoopInterval);
     }, tickRate);
 /*     while (1) {
       this.gameLoop(game);
@@ -225,5 +232,15 @@ export class GamesService {
             game.ball.y += game.ball.velY;
         }
         return (0)
+  }
+
+  getGameState(gameId: number) {
+    return this.games.get(gameId);
+  }
+
+  isGameOver(game: GameState) {
+    if (game.status === Status.FORFEIT)
+      return (true);
+    return (false);
   }
 }
