@@ -402,6 +402,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('muteUser')
+  @UsePipes(new ValidationPipe())
   async muteUser(@ConnectedSocket() client: Socket, @MessageBody() dto: MuteDto) {
     console.log("/////////////////////////////// EVENT MUTEUSER ///////////////////////////////")
     let user: User;
@@ -446,7 +447,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new ForbiddenException(`You can't mute another administrator`)
       if (await this.chatService.checkMute(channel, usertoMute))
         throw new ForbiddenException(`${usertoMute.username} is already muted`)
-      const updatedChannel = await this.chatService.muteUser(dto, usertoMute);
+      const newMute = await this.chatService.muteUser(dto, usertoMute);
       let muteNotif = `${usertoMute.username} was muted by ${user.username} for ${dto.duration}\".`;
       if (dto.reason)
         muteNotif += ` Reason: ${dto.reason}`;
@@ -459,7 +460,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(channel.id.toString()).emit('message', message);
       this.server.to(channel.id.toString()).emit('mutedUser', {
         channelId: channel.id,
-        userId: usertoMute.id
+        userId: usertoMute.id,
+        mute: newMute
       });
     }
     catch(error) {

@@ -42,9 +42,9 @@ model User {
 
 model BlockedUser {
   id        Int      @id @default(autoincrement())
+  blockedBy Int
+  User      User     @relation(fields: [blockedBy], references: [id])
   userId    Int
-  User      User     @relation(fields: [userId], references: [id])
-  blockedId Int
   createdAt DateTime @default(now())
 }
 
