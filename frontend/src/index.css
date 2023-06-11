@@ -195,3 +195,7 @@ code {
   outline: none;
   text-decoration: none;
 }
+
+.pointer {
+  cursor: pointer;
+}

@@ -6,7 +6,7 @@ const back = process.env.REACT_APP_BACK;
 //                     B L O C K     R E Q U E S T S                   //
 /////////////////////////////////////////////////////////////////////////
 
-export async function getBlockedList(id: number | string, token: string) {
+export async function getBlockList(id: number | string, token: string) {
     return (
         axios.get(`${back}/users/${id}/blockList`)
             .then(res => res)

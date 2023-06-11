@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import {
     useChannelsContext,
@@ -16,6 +16,11 @@ import ResizeContainer from "../../../../components/ResizeContainer";
 import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import useMembers from "../../../../hooks/Chat/useMembers";
+import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
+import { useBlock } from "../../../../hooks/Chat/useBlock";
+
+const MessengerContext: React.Context<any> = createContext(null);
+
 
 function BlockMessage({ username }: any) {
     return (
@@ -75,26 +80,101 @@ function MessageDisplay(props: any) {
     )
 }
 
+type TUserManu = {
+    user: any,
+    setShowMenu: any
+}
+
+
+function UserMenu(props: TUserManu) {
+
+    const { setUserAction } = useContext(MessengerContext);
+    const { blockUser, unblockUser,  isUserBlocked } = useBlock();
+
+    function profile() {
+        console.log("profile");
+    }
+
+    function block() {
+        setUserAction({ type: 'block', user: props.user, function: blockUser });
+    }
+
+    function unblock()
+    {
+        setUserAction({ type: 'unblock', user: props.user, function: unblockUser });
+    }
+
+    return (
+        <div className="flex-column messenger-usermenu"
+            style={{ zIndex: 1 }}
+        >
+            <div
+                className="fill pointer relative flex-center messenger-usermenu-option"
+                style={{ borderBottom: '1px solid black' }}
+                onClick={() => { profile(); props.setShowMenu((p: boolean) => !p) }}
+            >
+                <p>profile</p>
+            </div>
+            {
+                isUserBlocked(props.user) ?
+                    <div
+                        className="fill pointer flex-center relative messenger-usermenu-option"
+                        onClick={() => { unblock(); props.setShowMenu((p: boolean) => !p) }}
+                    >
+                        <p>unblock</p>
+                    </div>
+                    :
+                    <div
+                        className="fill pointer flex-center relative messenger-usermenu-option"
+                        onClick={() => { block(); props.setShowMenu((p: boolean) => !p) }}
+                    >
+                        <p>block</p>
+                    </div>
+            }
+        </div>
+    )
+}
+
+
 type TMessengerUserLabel = {
+    user: any,
     url: string,
     username: string,
     owner?: boolean,
-    admin?: boolean
+    admin?: boolean,
+    showMenu: boolean,
+    setShowMenu: any
 }
 
 function MessengerUserLabel(props: TMessengerUserLabel) {
+
     return (
-        <div className="flex-column absolute" style={{ bottom: '-20px' }}>
-            <ResizeContainer height="30px" width="30px">
+        <div
+            className="flex-column absolute"
+            style={{ bottom: '-20px' }}
+        >
+            <ResizeContainer height="30px" width="30px"
+                className="pointer"
+                onClick={() => props.setShowMenu((p: boolean) => !p)}
+            >
                 <ProfilePicture image={props.url} />
             </ResizeContainer>
-            <div className="flex" style={{ alignItems: 'flex-end' }}>
+            <div className="flex pointer" style={{ alignItems: 'flex-end' }}
+                onClick={() => props.setShowMenu((p: boolean) => !p)}
+            >
                 <p className="message-author">{props.username}</p>
                 <ResizeContainer height="20px">
                     {props.owner && <RawIcon icon="location_away" />}
                     {props.admin && <RawIcon icon="shield_person" />}
                 </ResizeContainer>
             </div>
+            {
+                props.showMenu &&
+                <UserMenu
+                    setShowMenu={props.setShowMenu}
+                    user={props.user}
+                />
+            }
         </div>
     )
 }
@@ -107,8 +187,12 @@ type TMessengerCurrentUserLabel = {
 }
 
 function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
+
     return (
-        <div className="flex-column absolute" style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end' }} >
+        <div
+            className="flex-column absolute"
+            style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end' }}
+        >
             <ResizeContainer height="30px" width="30px">
                 <ProfilePicture image={props.url} />
             </ResizeContainer>
@@ -125,18 +209,21 @@ function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
 
 
 type TMessage = {
-    id: number, 
-    content: string, 
+    id: number,
+    content: string,
     sendBy: number,
     author: any,
-    username:string, 
+    username: string,
     currentUser: any,
-    admin:boolean, 
+    admin: boolean,
     owner: boolean
 }
 
 
 function Message(props: TMessage) {
+
+    const [showMenu, setShowMenu] = useState(false);
+
 
     function addStyle() {
         if (props.currentUser && props.sendBy === props.currentUser.id)
@@ -169,10 +256,13 @@ function Message(props: TMessage) {
                             {
                                 props.currentUser && props.currentUser.id !== props.sendBy ?
                                     <MessengerUserLabel
+                                        user={props.author}
                                         url={props.author && props.author.url}
                                         username={props.username}
                                         owner={props.owner}
                                         admin={props.admin}
+                                        showMenu={showMenu}
+                                        setShowMenu={setShowMenu}
                                     /> :
                                     <MessengerCurrentUserLabel
                                         url={props.author && props.author.url}
@@ -218,6 +308,9 @@ export default function Messenger({
 
     const { getMemberById } = useMembers();
 
+    const [confirmAction, setConfirmAction] = useState(false);
+    const [userAction, setUserAction]: any = useState();
+
     function handleChange(e: any) {
         setValue(e.target.value)
     }
@@ -233,11 +326,11 @@ export default function Messenger({
     }, [value, currentChannel, socket])
 
 
-    // check if a user is in the user blockedList and filter messages from block timestamp
+    // check if a user is in the user blockList and filter messages from block timestamp
     const filterMessages = useCallback((messages: any[]) => {
         let blockObj: any;
-        if (currentChannel.type === "WHISPER" && user.blockedList.length &&
-            (blockObj = user.blockedList.find((o: any) => o.blockedId === currentFriend.id))) {
+        if (currentChannel.type === "WHISPER" && user.blockList.length &&
+            (blockObj = user.blockList.find((o: any) => o.blockedId === currentFriend.id))) {
             messages = currentChannel.messages.filter((m: any) => m.createdAt < blockObj.createdAt)
         }
         return (messages)
@@ -251,7 +344,7 @@ export default function Messenger({
             if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
                 author = getMemberById(m.sendBy);
             }
-            
+
             if (m.type === "NOTIF")
                 return (<MessageNotification key={m.id} content={m.content} />)
             else if (m.type !== "NOTIF") {
@@ -302,7 +395,13 @@ export default function Messenger({
     }
 
     return (
-        <>
+        <MessengerContext.Provider value={
+            {
+                setConfirmAction,
+                setUserAction
+            }
+        }
+        >
             <div className="messages-display">
                 {
                     renderMessages.length ?
@@ -322,6 +421,18 @@ export default function Messenger({
                     disabled={blocked}
                 />
             </div>
-        </>
+            {
+                userAction && userAction.user && userAction.function &&
+                <ConfirmPage>
+                    <ConfirmView
+                        type={userAction.type}
+                        username={userAction.user && userAction.user.username}
+                        valid={() => { userAction.function(userAction.user); setUserAction(null) }}
+                        cancel={() => setUserAction(null)}
+                    />
+                </ConfirmPage>
+            }
+        </MessengerContext.Provider>
     )
 }
+

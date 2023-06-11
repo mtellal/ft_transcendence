@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import Banner from "../components/Banner/Banner";
@@ -11,7 +11,7 @@ import RemoveView from "../components/RemoveElement.tsx/RemoveView";
 import { removeUserFriend } from '../../../requests/friends'
 import './Interface.css'
 import { getChannel, getChannelByName } from "../../../requests/chat";
- 
+
 /*
     - MessagesElement is the rigth side of Chat interface,
     - reclaim an item, which is Friend or Group object, and display messages from this item if they exist,
@@ -39,43 +39,42 @@ export default function Interface() {
     const {
         friends,
         friendsDispatch,
-        currentFriend
+        currentFriend,
+        setCurrentFriend
     }: any = useFriends();
 
     const [profile, setProfile] = React.useState(false);
     const [removeView, setRemoveView] = React.useState(false);
     const [blocked, setBlocked]: [any, any] = React.useState(false);
 
-    const { setBackToMenu, backToMenu } : any = useOutletContext();
+    const { setBackToMenu, backToMenu }: any = useOutletContext();
 
 
-    async function refreshPageAndLoadChannel(name : string)
-    {
-        const channelArray = await getChannelByName(name).then(res => res.data);
-        if (channelArray && channelArray.length)
-        {
-            const channel = channelArray.find((c: any) => c.members.find((id : number) => user.id === id))
-            setCurrentChannel(channel);
-        }
-        else
-            navigate("/chat")
-
-    }
 
     useEffect(() => {
-        if (!currentChannel)
-        {
-            if (params.channelName)
-            {
-                // console.log(channels)
-                refreshPageAndLoadChannel(params.channelName);
+        if (!currentChannel && channels && channels.length) {
+            if (params.channelName) {
+                const channel = channels.find((c: any) => c.name === params.channelName)
+                if (channel)
+                    setCurrentChannel(channel);
+                else
+                    navigate("/chat")
             }
-            else if (params.username)
-            {
+            else if (params.username && friends && friends.length) {
+                const friend = friends.find((f: any) => f.username === params.username);
+                if (friend) {
+                    setCurrentFriend(friend)
+                    const whispersChannel = channels.filter((c: any) => c.type === "WHISPER");
+                    const channel = whispersChannel.find((c: any) =>
+                        c.members.length === 2 && c.members.find((id: number) => id === user.id)
+                        && c.members.find((id: number) => id === friend.id))
+                    if (channel)
+                        setCurrentChannel(channel)
+                }
 
             }
         }
-    }, [currentChannel])
+    }, [currentChannel, channels, friends])
 
     function block() {
         if (!blocked) {
@@ -104,9 +103,8 @@ export default function Interface() {
     }
 
 
-    function validLeaveChannel()
-    {
-        leaveChannel(currentChannel); 
+    function validLeaveChannel() {
+        leaveChannel(currentChannel);
         setRemoveView(false);
         navigate("/chat");
     }
@@ -117,8 +115,8 @@ export default function Interface() {
         setProfile(false);
         setRemoveView(false);
         if (currentFriend && user) {
-            if (user.blockedList.length) {
-                if (user.blockedList.find((obj: any) => currentFriend.id === obj.blockedId))
+            if (user.blockList.length) {
+                if (user.blockList.find((obj: any) => currentFriend.id === obj.blockedId))
                     setBlocked(true);
                 else
                     setBlocked(false)

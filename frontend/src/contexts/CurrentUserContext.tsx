@@ -1,14 +1,15 @@
 import React, { useReducer, createContext, useState, useCallback } from "react";
-import { getBlockedList } from "../requests/block";
-import { login, logout, updateUser } from "../requests/user";
+import { getBlockList } from "../requests/block";
+import { login, logout } from "../requests/user";
+
 
 function reducer(user: any, action: any) {
     switch (action.type) {
         case ('login'): {
-            return ({ ...user, userStatus: "ONLINE", blockedList: [] })
+            return ({ ...user, userStatus: "ONLINE", blockList: [] })
         }
         case ('logout'): {
-            return ({ ...user, userStatus: "OFFLINE", blockedList: [] })
+            return ({ ...user, userStatus: "OFFLINE", blockList: [] })
         }
         case ('updateUser'): {
             if (action.user)
@@ -23,27 +24,22 @@ function reducer(user: any, action: any) {
             if (user && action.url)
                 return ({ ...user, url: action.url })
         }
-        case ('setblockedList'): {
-            return ({ ...user, blockedList: action.blockedList });
+        case ('initblockList'): {
+            return ({ ...user, blockList: action.blockList });
         }
-        case ('blockUser'): {
-            return ({
-                ...user,
-                blockedList: [
-                    ...user.blockedList,
-                    {
-                        blockedId: action.friendId,
-                        createdAt: new Date().toISOString()
-                    }
-                ]
-            })
+        case ('addBlockList'): {
+            if (user && user.blockList && action.block)
+            {
+                user.blockList.push(action.block);
+            }
+            return (user);
         }
-        case ('unblockUser'): {
-            return ({
-                ...user,
-                blockedList: user.blockedList.filter((obj: any) =>
-                    obj.blockedId !== action.friendId)
-            })
+        case('removeBlockList'): {
+            if (user && user.blockList && action.block)
+            {
+                user.blockList = user.blockList.filter((obj: any) => obj.blockedId !== action.friendId)
+            }
+            return (user)
         }
         default: return (user);
     }
@@ -58,9 +54,9 @@ export function CurrentUserProvider({ children, ...props }: any) {
         userDispatch({ type: 'login' })
         login(user);
 
-        getBlockedList(user.id, props.token)
+        getBlockList(user.id, props.token)
             .then(res => {
-                userDispatch({ type: 'setblockedList', blockedList: res.data })
+                userDispatch({ type: 'initblockList', blockList: res.data })
             })
 
         return () => {
@@ -68,7 +64,6 @@ export function CurrentUserProvider({ children, ...props }: any) {
             userDispatch({ type: 'logout' })
         }
     }, [])
-
 
     const updateCurrentProfilePicture = useCallback((url: string) => {
         userDispatch({ type: 'updateProfilePicture', url })

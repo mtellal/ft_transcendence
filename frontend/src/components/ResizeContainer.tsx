@@ -1,20 +1,24 @@
 import React from "react";
 
 
+
+
 export default function ResizeContainer({children, ...props} : any)
 {
     function style()
     {
-        let style = {};
+        let style : any = {};
+        if (props.style)
+            style = {...props.style}
         if (props.height)
-            style = {height: props.height}
+            style = {...style, height: props.height}
         if (props.width)
             style = {...style, width: props.width}
         return (style)
     }
 
     return (
-        <div style={style()}>
+        <div style={style()} {...props} >
             {children}
         </div>
     )

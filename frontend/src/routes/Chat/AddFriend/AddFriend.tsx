@@ -20,6 +20,8 @@ import { CollectionElement } from "../components/Menu/MenuElement";
 import { useFriends, useCurrentUser } from "../../../hooks/Hooks";
 
 import './AddFriend.css'
+import ArrowBackMenu from "../components/ArrowBackMenu";
+import { useWindow } from "../../../hooks/useWindow";
 
 
 export default function AddFriend() {
@@ -36,6 +38,8 @@ export default function AddFriend() {
     const { friends, updateFriend }: any = useFriends();
 
     const { friendInvitations, removeFriendRequest }: any = useOutletContext();
+    const { isMobileDisplay } = useWindow();
+
 
     function validFriend() {
         return (friends.every((user: any) => friend.id !== user.id) && friend.id !== user.id)
@@ -139,6 +143,17 @@ export default function AddFriend() {
 
     return (
         <div className="add-container">
+            <div className="flex">
+                {
+                    isMobileDisplay &&
+                    <div className="flex">
+                        <ArrowBackMenu
+                            title="Menu"
+                            path="/chat"
+                        />
+                    </div>
+                }
+            </div>
             <div className="flex-column-center">
                 <h2>Add a Friend</h2>
                 <IconInput
@@ -147,7 +162,7 @@ export default function AddFriend() {
                     placeholder="Username"
                     value={value}
                     setValue={setValue}
-                    submit={() => {value && searchUser()}}
+                    submit={() => { value && searchUser() }}
                 />
                 {
                     friend ?

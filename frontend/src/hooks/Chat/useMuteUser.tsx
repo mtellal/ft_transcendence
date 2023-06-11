@@ -40,7 +40,6 @@ export default function useMuteUser() {
             const mutedIds = channel.muteList.map((o: any) => o.userId); 
             return (getMembersById(mutedIds))
         }
-        console.log("empty")
         return ([]);
     }, [])
 

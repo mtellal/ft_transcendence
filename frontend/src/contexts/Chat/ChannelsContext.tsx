@@ -24,7 +24,7 @@ id              Int             @id @default(autoincrement())
   userStatus      Status          @default(OFFLINE)
   friendRequest   FriendRequest[]
   friendList      Int[]           @default([])
-  blockedList     BlockedUser[]
+  blockList     BlockedUser[]
   channelList     Int[]           @default([])
   createdAt       DateTime        @default(now())
 */
@@ -38,7 +38,7 @@ type User = {
     userStatus?: any[],
     friendRequest?: any[],
     friendList: number[],
-    blockedList: number[],
+    blockList: number[],
     channelList: number[],
     createdAt?: string,
 
@@ -243,6 +243,7 @@ function reducer(channels: any, action: any) {
     }
 }
 
+
 export function ChannelsProvider({ children }: any) {
     const { user } = useCurrentUser();
     const { socket } = useChatSocket();
@@ -280,6 +281,7 @@ export function ChannelsProvider({ children }: any) {
         if (user && socket && !channelsLoading)
             loadChannels();
     }, [socket, user])
+
 
     useEffect(() => {
         if (socket && user) {

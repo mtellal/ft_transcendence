@@ -149,3 +149,32 @@
 @media screen and (max-width: 700px) {
 
 }
+
+
+
+
+/* //////////////////////////////////////////////// */
+
+
+.messenger-usermenu
+{
+    height: auto; 
+    width: 70px; 
+    position: absolute; 
+    right: -50px;
+    padding: 5px; 
+    border-radius: 5px;
+    box-shadow: 0 0 5px black;
+    background-color: white;
+}
+
+.messenger-usermenu-option
+{
+
+}
+
+.messenger-usermenu-option:hover
+{
+
+    background-color: #ECECEC;
+}

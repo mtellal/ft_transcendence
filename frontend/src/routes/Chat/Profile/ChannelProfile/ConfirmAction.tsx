@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import InfoInput from "../../../../components/Input/InfoInput";
 import useChannelInfos from "../../../../hooks/Chat/useChannelInfos";
 
@@ -76,7 +76,7 @@ export function ConfirmView(props: any) {
 export function ConfirmViewMuteAction(props: any) {
 
     const { muteUser } = useMuteUser();
-    
+
     const [seconds, setSeconds]: any = useState("")
     const [error, setError] = useState("");
 
@@ -174,7 +174,7 @@ export function ConfirmViewTypeProteced(props: any) {
 }
 
 
-function ConfirmViewButtons(props: any) {
+export function ConfirmViewButtons(props: any) {
     return (
         <div className="fill flex" style={{ justifyContent: 'space-around' }}>
             <button
@@ -193,10 +193,20 @@ function ConfirmViewButtons(props: any) {
     )
 }
 
-function ConfirmPage({ children }: any) {
+export function ConfirmPage({ children }: any) {
     return (
         <div className="fill absolute confirm-background flex-center" style={{ top: '0', left: '0' }}>
             {children}
         </div>
+    )
+}
+
+function MessengerConfirmBlockAction(props: any) {
+    return (
+        <ConfirmPage>
+            <div className="red">
+                <p>wdipfjwb</p>
+            </div>
+        </ConfirmPage>
     )
 }
