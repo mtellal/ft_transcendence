@@ -72,18 +72,21 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join')
   @UseGuards(JwtWsGuard)
   async HandleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto) {
-    const room = await this.gamesService.findPendingGame(payload);
+    // let room only used to test with one player, in the future, the game will not start without two players
+    let room = await this.gamesService.findPendingGame(payload);
+    console.log("event received");
     if (!room) {
-      const new_game = await this.gamesService.createGame(payload);
-      client.emit('joinWait', {message: 'waiting for another player', roomId: new_game.id });
-      client.join(`room-${new_game.id}`);
+      room = await this.gamesService.createGame(payload);
+      client.emit('joinWait', {message: 'waiting for another player', roomId: room.id });
+      client.join(`room-${room.id}`);
+      this.gamesService.startGame(room, this.server);
     } else {
       client.emit('joinSuccess', {message: 'Joining a game', roomId: room.id});
       client.join(`room-${room.id}`);
       this.server.to(`room-${room.id}`).emit('GameStart', {message: 'Game is going to start in 5s'});
 
       setTimeout(()=> {
-        this.gamesService.startGame(room.id, this.server);
+        this.gamesService.startGame(room, this.server);
       }, 5000);
     }
     return 'Join success';
