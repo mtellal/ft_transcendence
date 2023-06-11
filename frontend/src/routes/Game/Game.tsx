@@ -18,7 +18,7 @@ function Game(props : any)
 
     const [scores, setScores] = React.useState({p1:0, p2:0})
 
-    function drawGameState(gameState) {
+/*     function drawGameState(gameState) {
         const context = canvasRef.current.getContext('2d');
 
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -46,7 +46,7 @@ function Game(props : any)
         context.font = '24px Arial';
         context.fillText(`P1: ${scores.p1}`, 20, 40);
         context.fillText(`P2: ${scores.p2}`, canvasRef.current.width - 80, 40);
-    }
+    } */
 
     function initPlayers(canvasHeight : any , canvasWidth : any )
     {
@@ -111,12 +111,14 @@ function Game(props : any)
         context.stroke();
         context.fillStyle = 'black'
         context.fillRect(canvas.width / 2, 0, 1, canvas.height)
+        
     }
 
 
     function draw(context : any )
     {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+        console.log(canvasRef.current.width, canvasRef.current.height);
         drawPlayground(context)
         drawPlayers(context);
         drawBall(context);
@@ -219,8 +221,8 @@ function Game(props : any)
 
     function initGame(canvas : any, context : any)
     {
-        canvas.height = canvas.parentNode.offsetHeight;
-        canvas.width = canvas.parentNode.offsetWidth;
+        canvas.height = 800;
+        canvas.width = 1600;
 
         initPlayers(canvas.height, canvas.width);
         initBall(canvas.height, canvas.width);
@@ -285,7 +287,7 @@ function Game(props : any)
 }
 
 function PlayPage(props) {
-    const { user, token } = useOutletContext();
+    const token =  useOutletContext();
     const [socket, setSocket] = useState(null);
   
     const handlePlayClick = () => {
@@ -297,7 +299,7 @@ function PlayPage(props) {
       });
       setSocket(s);
       props.click();
-      s.emit('joinGame', '');
+      s.emit('join', '');
       console.log("Emitting event here");
     };
   
