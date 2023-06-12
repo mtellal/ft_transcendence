@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import { useChannelsContext, useChatSocket, useCurrentUser, useFriends } from "../Hooks";
+import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
 
@@ -7,7 +7,7 @@ import useFetchUsers from "../useFetchUsers";
 export default function useBanUser() {
     const { socket } = useChatSocket();
     const { channelsDispatch, currentChannel, channels } = useChannelsContext();
-    const { friends } = useFriends();
+    const { friends } = useFriendsContext();
     const { user } = useCurrentUser();
     const navigate = useNavigate();
     const { fetchUsers } = useFetchUsers();

@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 import './Profile.css'
-import { useChannelsContext, useFriends, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
+import { useChannelsContext, useFriendsContext, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
 import ChannelProfile from "./ChannelProfile/ChannelProfile";
 
 
@@ -15,7 +15,7 @@ function FriendProfile(props: any) {
 }
 
 export default function Profile() {
-    const { currentFriend } = useFriends();
+    const { currentFriend } = useFriendsContext();
     const { currentChannel } = useChannelsContext();
 
     return (

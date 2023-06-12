@@ -74,8 +74,6 @@ export function CurrentUserProvider({ children, ...props }: any) {
         userDispatch({ type: 'updateUser', user })
     }, [user])
 
-    console.log("user context", user && user.blockList)
-
     return (
         <CurrentUserContext.Provider
             value={{

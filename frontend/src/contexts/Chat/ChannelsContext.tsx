@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { getChannel, getChannels, removeChannel } from "../../requests/chat";
-import { useChatSocket, useFriends, useCurrentUser } from "../../hooks/Hooks";
+import { useChatSocket, useFriendsContext, useCurrentUser } from "../../hooks/Hooks";
 import {
     getUser, getUserProfilePictrue
 } from '../../requests/user'

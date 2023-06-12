@@ -1,9 +1,9 @@
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useOutlet, useOutletContext, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import UserLabel from "../../../../components/users/UserLabel";
-import { useChannelsContext, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
+import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../../hooks/Hooks";
 import { createChannel } from "../../../../requests/chat";
 import { useWindow } from "../../../../hooks/useWindow";
 
@@ -19,7 +19,13 @@ import { RawIcon } from "../../../../components/Icon";
     collection
 */
 
+
+
+
 export function CollectionElement(props: any) {
+
+    const { friendInvitations } = useFriendsContext();
+
     return (
         <div className="collection">
             <div className="collection-label">
@@ -32,12 +38,8 @@ export function CollectionElement(props: any) {
                             onClick={props.removeNotif}
                         >
                             {
-                                props.notification ?
-                                    <div
-                                        className="collection-element-notif"
-                                    >
-
-                                    </div> : null
+                                props.friend && friendInvitations && friendInvitations.length ?
+                                    <div className="collection-element-notif"></div> : null
                             }
                             {
                                 props.title === "Friends" ?
@@ -79,7 +81,7 @@ function ChannelElement(props: any) {
             <p>{props.name}</p>
             <p className="group-separator">-</p>
             <p className="group-members">{props.nbMembers} members</p>
-            <div style={{marginLeft: 'auto'}}>
+            <div style={{ marginLeft: 'auto' }}>
                 {props.type === "PROTECTED" && <RawIcon icon="shield" />}
                 {props.type === "PRIVATE" && <RawIcon icon="lock" />}
             </div>
@@ -93,12 +95,12 @@ function ChannelElement(props: any) {
     1 setXXX in parent and called in child (parent will be updated as child)
 */
 
-export default function MenuElement({ ...props }) {
+export default function MenuElement() {
 
     const location = useLocation();
 
     const { token } = useCurrentUser();
-    const { friends, friendsDispatch, setCurrentFriend } = useFriends();
+    const { friends, friendsDispatch, setCurrentFriend } = useFriendsContext();
     const {
         channels,
         setCurrentChannel,
@@ -203,8 +205,7 @@ export default function MenuElement({ ...props }) {
                 title="Friends"
                 collection={friendsList}
                 add={true}
-                notification={props.notification}
-                removeNotif={props.removeNotif}
+                friend={true}
             />
         </div>
     )

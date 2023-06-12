@@ -12,7 +12,7 @@ import {
 
 import IconInput from "../../../components/Input/IconInput";
 
-import { useChannelsContext, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 import ProfilePicture from "../../../components/users/ProfilePicture";
 import Icon, { RawIcon } from "../../../components/Icon";
 

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Icon from "../../../../components/Icon";
 import { UserInfos } from "../../../../components/users/UserInfos";
 import ChannelInfos from "../../../../components/channels/ChannelInfos";
-import { useChannelsContext, useFriends, useCurrentUser } from "../../../../hooks/Hooks";
+import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../../hooks/Hooks";
 
 import './Banner.css'
 import { useWindow } from "../../../../hooks/useWindow";
@@ -11,6 +11,9 @@ import { Link, NavLink } from "react-router-dom";
 import ArrowBackMenu from "../ArrowBackMenu";
 
 function IconsBanner(props: any) {
+
+
+
     const pickRemoveIcon = useCallback(() => {
         if (props.channel) {
             if (props.channel.type === "WHISPER")
@@ -57,7 +60,7 @@ type TBanner = {
 export default function Banner({ ...props }: TBanner) {
 
     const { user } = useCurrentUser();
-    const { currentFriend } = useFriends();
+    const { currentFriend } = useFriendsContext();
     const { currentChannel } = useChannelsContext();
     const { isMobileDisplay } = useWindow();
 

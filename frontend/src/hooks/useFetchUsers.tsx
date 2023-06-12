@@ -1,22 +1,23 @@
-import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback } from "react";
 import { getUser, getUserByUsername, getUserProfilePictrue } from "../requests/user";
 import { useCurrentUser } from "./Hooks";
 
+import defaultPP from '../assets/user.png'
 
-export default function useFetchUsers()
-{
+export default function useFetchUsers() {
     const { user } = useCurrentUser();
 
     const fetchUserProfilePicture = useCallback(async (userId: number) => {
-        return (
-            await getUserProfilePictrue(userId)
-                .then(res => {
-                    if (res.status === 200 && res.statusText === "OK")
-                        return (window.URL.createObjectURL(new Blob([res.data])))
-                })
-        )
+        let path = await getUserProfilePictrue(userId)
+            .then(res => {
+                if (res.status === 200 && res.statusText === "OK")
+                    return (window.URL.createObjectURL(new Blob([res.data])))
+            })
+        if (!path)
+            path = defaultPP;
+        return (path);
     }, [])
-    
+
     const fetchUser = useCallback(async (userId: number) => {
         return (
             await getUser(userId)
@@ -51,11 +52,12 @@ export default function useFetchUsers()
                         return (user)
                     else
                         return (await fetchUser(id))
-    
+
                 })
             )
             return (users)
         }
+        return ([]);
     }, [user])
 
     return (

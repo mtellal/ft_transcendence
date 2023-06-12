@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
-import { useChannelsContext, useFriends, useCurrentUser, } from "../../../../hooks/Hooks"
+import { useChannelsContext, useFriendsContext, useCurrentUser, } from "../../../../hooks/Hooks"
 
 import { TUserInfos, UserInfos } from "../../../../components/users/UserInfos";
 import Icon from "../../../../components/Icon";

@@ -5,12 +5,11 @@ import Banner from "../components/Banner/Banner";
 import Profile from "../Profile/Profile";
 import Messenger from "../components/Messenger/Messenger";
 
-import { useChannelsContext, useChatSocket, useFriends, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
 import RemoveView from "../components/RemoveElement.tsx/RemoveView";
 import { removeUserFriend } from '../../../requests/friends'
 import './Interface.css'
-import { getChannel, getChannelByName } from "../../../requests/chat";
 
 /*
     - MessagesElement is the rigth side of Chat interface,
@@ -41,13 +40,11 @@ export default function Interface() {
         friendsDispatch,
         currentFriend,
         setCurrentFriend
-    }: any = useFriends();
+    }: any = useFriendsContext();
 
     const [profile, setProfile] = React.useState(false);
     const [removeView, setRemoveView] = React.useState(false);
     const [blocked, setBlocked]: [any, any] = React.useState(false);
-
-    const { setBackToMenu, backToMenu }: any = useOutletContext();
 
 
 
@@ -56,9 +53,7 @@ export default function Interface() {
             if (params.channelName) {
                 const channel = channels.find((c: any) => c.name === params.channelName)
                 if (channel)
-                    setCurrentChannel(channel);
-                else
-                    navigate("/chat")
+                    return (setCurrentChannel(channel));
             }
             else if (params.username && friends && friends.length) {
                 const friend = friends.find((f: any) => f.username === params.username);
@@ -69,10 +64,10 @@ export default function Interface() {
                         c.members.length === 2 && c.members.find((id: number) => id === user.id)
                         && c.members.find((id: number) => id === friend.id))
                     if (channel)
-                        setCurrentChannel(channel)
+                        return (setCurrentChannel(channel));
                 }
-
             }
+            navigate("/chat")
         }
     }, [currentChannel, channels, friends])
 
@@ -128,7 +123,7 @@ export default function Interface() {
         <>
             {
                 currentChannel ?
-                    <div className={backToMenu ? "flex-column relative interface-container hidden" : "flex-column relative interface-container visible"}>
+                    <div className={"flex-column relative interface-container visible"}>
                         <Banner
                             profile={() => setProfile(prev => !prev)}
                             invitation={() => { }}

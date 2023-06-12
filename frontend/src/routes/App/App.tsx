@@ -17,8 +17,10 @@ import {
   updateUser,
 } from '../../requests/user'
 
-import './App.css';
 import { CurrentUserProvider } from '../../contexts/CurrentUserContext';
+import defaultPP from '../../assets/user.png'
+import './App.css';
+
 
 export async function loader() {
   const token = extractCookie("access_token");
@@ -33,7 +35,7 @@ export async function loader() {
     if (image.status === 200 && image.statusText === "OK")
       image = window.URL.createObjectURL(new Blob([image.data]))
     else
-      image = './assets/user.png';
+      image = defaultPP;
 
     return ({ user: { ...user.data, url: image }, token })
   }

@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
-import { useChannelsContext, useFriends, useCurrentUser, useChatSocket } from "../../../../hooks/Hooks"
+import { useChannelsContext, useFriendsContext, useCurrentUser, useChatSocket } from "../../../../hooks/Hooks"
 
 import useBanUser from "../../../../hooks/Chat/useBanUser";
 import useAdinistrators from "../../../../hooks/Chat/useAdministrators";

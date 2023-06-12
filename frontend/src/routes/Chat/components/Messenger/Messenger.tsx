@@ -4,17 +4,14 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import {
     useChannelsContext,
     useChatSocket,
-    useFriends,
+    useFriendsContext,
     useCurrentUser
 } from "../../../../hooks/Hooks";
 import './Messenger.css'
 import ProfilePicture from "../../../../components/users/ProfilePicture";
-import useFetchUsers from "../../../../hooks/useFetchUsers";
-import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import { RawIcon } from "../../../../components/Icon";
 import ResizeContainer from "../../../../components/ResizeContainer";
 import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
-import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { useBlock } from "../../../../hooks/Chat/useBlock";
@@ -60,25 +57,6 @@ function GameInvitation(props: any) {
     )
 }
 
-/*
-    style and display one single message
-*/
-
-function MessageDisplay(props: any) {
-
-    return (
-        <div>
-            {
-                props.type === "NOTIF" &&
-                <MessageNotification content={props.content} />
-            }
-            {
-                props.type !== "NOTIF" && props.type !== "INVITATION" &&
-                <Message {...props} />
-            }
-        </div>
-    )
-}
 
 type TUserManu = {
     user: any,
@@ -140,6 +118,7 @@ type TMessengerUserLabel = {
     user: any,
     url: string,
     username: string,
+    type: string,
     owner?: boolean,
     admin?: boolean,
 }
@@ -172,10 +151,13 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
                 onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
             >
                 <p className="message-author">{props.username}</p>
-                <ResizeContainer height="20px">
-                    {props.owner && <RawIcon icon="location_away" />}
-                    {props.admin && <RawIcon icon="shield_person" />}
-                </ResizeContainer>
+                {
+                    props.type !== "WHISPER" &&
+                    <ResizeContainer height="20px">
+                        {props.owner && <RawIcon icon="location_away" />}
+                        {props.admin && <RawIcon icon="shield_person" />}
+                    </ResizeContainer>
+                }
             </div>
         </div>
     )
@@ -184,6 +166,7 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
 type TMessengerCurrentUserLabel = {
     url: string,
     username: string,
+    type: string,
     owner?: boolean,
     admin?: boolean
 }
@@ -199,10 +182,13 @@ function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
                 <ProfilePicture image={props.url} />
             </ResizeContainer>
             <div className="flex" style={{ alignItems: 'flex-end' }}>
-                <ResizeContainer height="20px">
-                    {props.owner && <RawIcon icon="location_away" />}
-                    {props.admin && <RawIcon icon="shield_person" />}
-                </ResizeContainer>
+                {
+                    props.type !== "WHISPER" &&
+                    <ResizeContainer height="20px">
+                        {props.owner && <RawIcon icon="location_away" />}
+                        {props.admin && <RawIcon icon="shield_person" />}
+                    </ResizeContainer>
+                }
                 <p className="message-author">{props.username}</p>
             </div>
         </div>
@@ -217,6 +203,7 @@ type TMessage = {
     author: any,
     username: string,
     currentUser: any,
+    type: string,
     admin: boolean,
     owner: boolean
 }
@@ -262,12 +249,14 @@ function Message(props: TMessage) {
                                         username={props.username}
                                         owner={props.owner}
                                         admin={props.admin}
+                                        type={props.type}
                                     /> :
                                     <MessengerCurrentUserLabel
                                         url={props.author && props.author.url}
                                         username={props.username}
                                         owner={props.owner}
                                         admin={props.admin}
+                                        type={props.type}
                                     />
                             }
                         </>
@@ -290,27 +279,16 @@ function MessageNotification(props: any) {
 
 export default function Messenger() {
 
-    const { user, image } = useCurrentUser();
-    const { socket } = useChatSocket();
+    const { user } = useCurrentUser();
 
-    const { currentChannel, channels, getMembers } = useChannelsContext();
-
-    const { currentFriend, friends } = useFriends();
-    const { isUserAdministrators } = useAdinistrators();
-    const { getMemberById } = useMembers();
-
-    const { isUserBlocked } = useBlock();
-
+    const { currentChannel, getMembers } = useChannelsContext();
 
     const [userAction, setUserAction]: any = useState();
 
     const [messages, setMessages] = useState([]);
 
-
     const [showUserMenu, setShowUserMenu] = useState({ show: false });
 
-
-    let rendMessages: any[] = [];
 
 
     // check if a user is in the user blockList and filter messages from block timestamp
@@ -324,36 +302,6 @@ export default function Messenger() {
         }
         return (messages)
     }, [currentChannel, user])
-
-
-    const formatMessages = useCallback(async (messages: any[]) => {
-        let author: any;
-        messages = messages.map(async (m: any, index: number) => {
-            author = null;
-            if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
-                author = getMemberById(m.sendBy);
-            }
-
-            if (m.type === "NOTIF")
-                return (<MessageNotification key={m.id} content={m.content} />)
-            else if (m.type !== "NOTIF") {
-                return (
-                    <Message
-                        key={m.id}
-                        id={m.id}
-                        content={m.content}
-                        sendBy={m.sendBy}
-                        author={author}
-                        username={author && author.username}
-                        admin={author && isUserAdministrators(author)}
-                        currentUser={user}
-                        owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
-                    />
-                )
-            }
-        })
-        return (messages)
-    }, [currentChannel && currentChannel.messages, user])
 
 
     const initMessages = useCallback(async () => {
@@ -371,20 +319,7 @@ export default function Messenger() {
         if (currentChannel) {
             initMessages();
         }
-    }, [currentChannel && currentChannel.messages, user, user.blockList])
-
-
-    async function loadConversation() {
-        rendMessages = await Promise.all(await formatMessages(messages));
-    }
-
-    useEffect(() => {
-        if (messages && messages.length) {
-            loadConversation();
-        }
-    }, [currentChannel])
-
-
+    }, [currentChannel.messages, user.blockList])
 
     return (
         <MessengerContext.Provider value={
@@ -395,8 +330,8 @@ export default function Messenger() {
             }
         }
         >
-            <MessengerConversation 
-                messages={messages} 
+            <MessengerConversation
+                messages={messages}
             />
             <MessengerInput />
             {
@@ -419,7 +354,7 @@ function MessengerConversation({ messages }: any) {
     const [render, setRender] = useState(false);
 
     const { user } = useCurrentUser();
-    const { currentFriend } = useFriends();
+    const { currentFriend } = useFriendsContext();
 
     const { currentChannel } = useChannelsContext();
 
@@ -433,7 +368,7 @@ function MessengerConversation({ messages }: any) {
 
 
     async function rendMessages() {
-        if (!messages) {
+        if (!messages || !messages.length) {
             renderMessages.current = <NoMessages />
             setRender((p: boolean) => !p);
         }
@@ -458,8 +393,9 @@ function MessengerConversation({ messages }: any) {
                                 sendBy={m.sendBy}
                                 author={author}
                                 username={author && author.username}
-                                admin={author && isUserAdministrators(author)}
                                 currentUser={user}
+                                type={currentChannel.type}
+                                admin={author && isUserAdministrators(author)}
                                 owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
                             />
                         )
@@ -498,7 +434,7 @@ function MessengerInput() {
     const { user } = useCurrentUser();
     const { socket } = useChatSocket();
     const { currentChannel } = useChannelsContext();
-    const { currentFriend } = useFriends();
+    const { currentFriend } = useFriendsContext();
     const { isUserBlocked } = useBlock();
 
     const [value, setValue] = React.useState("");

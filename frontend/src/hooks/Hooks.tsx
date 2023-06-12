@@ -9,7 +9,7 @@ export function useCurrentUser()
     return (useContext(CurrentUserContext));
 }
 
-export function useFriends()
+export function useFriendsContext()
 {
     return (useContext(FriendsContext));
 }

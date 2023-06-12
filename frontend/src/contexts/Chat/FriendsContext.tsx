@@ -1,12 +1,15 @@
-import React, { createContext, useEffect, useReducer, useState } from "react";
+import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { isEqual } from "../../utils";
-import { useCurrentUser } from "../../hooks/Hooks";
-import { getFriendList } from "../../requests/friends";
+import { useChatSocket, useCurrentUser } from "../../hooks/Hooks";
+import { getFriendList, removeUserFriend } from "../../requests/friends";
 import { getUserProfilePictrue } from '../../requests/user'
+import { useNavigate } from "react-router-dom";
+import { getUserInvitations } from "../../requests/friendsRequest";
+import useFetchUsers from "../../hooks/useFetchUsers";
 
 export const FriendsContext: React.Context<any> = createContext([]);
 
-function newFriend(friend: any) {
+function fromatFriend(friend: any) {
     return (
         {
             ...friend,
@@ -19,26 +22,18 @@ function reducer(friends: any, action: any) {
     switch (action.type) {
         case ('setFriendList'): {
             if (action.friendList && action.friendList.length) {
-                const nfriends = action.friendList.map((f: any) => newFriend(f))
+                const nfriends = action.friendList.map((f: any) => fromatFriend(f))
                 return (isEqual(friends, nfriends) ? friends : nfriends)
             }
             else return (friends);
         }
         case ('updateFriend'): {
-            const friend = action.friend;
-            if (friends.length && friend &&
-                friends.find((u: any) => u.id === friend.id)) {
-                return (
-                    friends.map((u: any) => {
-                        if (u.id === friend.id) {
-                            return (friend)
-                        }
-                        return (u);
-                    })
-                )
+            if (friends.length && action.friend &&
+                friends.find((u: any) => u.id === action.friend.id)) {
+                return (friends.map((f: any) => f.id === action.friend.id ? action.friend : f))
             }
             else
-                return ([...friends, newFriend(friend)]);
+                return ([...friends, fromatFriend(action.friend)]);
         }
         case ('removeFriend'): {
             if (friends.length)
@@ -73,36 +68,53 @@ function reducer(friends: any, action: any) {
 }
 
 
+type TFriendRequest = {
+    id: number,
+    sendBy: number,
+    status: boolean,
+    userId: number,
+    createdAt: string
+}
+
+
 export function FriendsProvider({ children }: any) {
-    const { user }: any = useCurrentUser();
+
+    const navigate = useNavigate();
+
+    const { user, token }: any = useCurrentUser();
+    const { socket } = useChatSocket();
+    const { fetchUsers, fetchUserProfilePicture } = useFetchUsers();
+    
     const [friends, friendsDispatch]: any = useReducer(reducer, []);
-    const [currentFriend, setCurrentFriendLocal] = useState();
+    const [currentFriend, setCurrentFriendLocal]: any = useState();
+    const [friendInvitations, setFriendInvitations]: [TFriendRequest[], any] = useState([]);
 
     async function loadFriendList() {
-        let friendList: any = await getFriendList(user.id)
-            .then(res =>
-                res.data.sort((a: any, b: any) => a.username > b.username ? 1 : -1)
-            )
-
-        friendList = await Promise.all(friendList.map(async (u: any) => {
-            const url = await getUserProfilePictrue(u.id)
-                .then(res => window.URL.createObjectURL(new Blob([res.data])))
-            return ({ ...u, url })
+        if (user.friendList) {
+            let friendList = await fetchUsers(user.friendList);
+            if (friendList && friendList.length) {
+                friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1);
+                friendsDispatch({ type: 'setFriendList', friendList })
+            }
         }
-        ))
-
-        friendsDispatch({ type: 'setFriendList', friendList })
     }
 
     useEffect(() => {
         if (user) {
             loadFriendList();
+            loadInvitations();
         }
     }, [user])
 
+
+    /////////////////////////////////////////////////////////////////////////
+    //                U P D A T E      C U R R E N T  F R I E N D          //
+    /////////////////////////////////////////////////////////////////////////
+
     function setCurrentFriend(friend: any) {
         const f = friends.find((f: any) => friend.id === f.id);
-        setCurrentFriendLocal(f);
+        if (f)
+            setCurrentFriendLocal(f);
     }
 
     useEffect(() => {
@@ -113,28 +125,77 @@ export function FriendsProvider({ children }: any) {
     }, [friends])
 
 
-    async function updateFriend(friend : any)
-    {
-        if (friend)
-        {
-            let url;
-            await getUserProfilePictrue(friend.id)
-                .then(res => {
-                    if (res.status === 200 && res.statusText)
-                        url = window.URL.createObjectURL(new Blob([res.data]))
-                } )
-            friendsDispatch({type: 'updateFriend', friend: {...friend, url}})
+    /////////////////////////////////////////////////////////////////////////
+    //                              S O C K E T                            //
+    /////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (socket) {
+
+            socket.on('receivedRequest', (request: any) => {
+                console.log("EVENT RECIEVED REQUEST => ", request)
+                if (request) {
+                    // setNotifInvitation(true);
+                    setFriendInvitations((p: TFriendRequest[]) => [...p, request])
+                }
+            })
+
+            socket.on('updatedUser', async (friend: any) => {
+                console.log("UPDATE FRIEND EVENT => ", friend)
+                if (friend) {
+                    const url = await fetchUserProfilePicture(friend.id);
+                    friendsDispatch({ type: 'updateFriend', friend: { ...friend, url } })
+                }
+            })
+
+            socket.on('removedFriend', (friend: any) => {
+                console.log("REMOVE FRIEND EVENT")
+                if (friend && friend.id) {
+                    removeUserFriend(friend.id, token);
+                    friendsDispatch({ type: 'removeFriend', friend });
+                    if (currentFriend && friend.id === currentFriend.id)
+                        navigate("/chat")
+                }
+            })
         }
-    }
+        return () => {
+            if (socket) {
+                socket.off('receivedRequest');
+                socket.off('updatedUser');
+                socket.off('removedFriend');
+            }
+        }
+    }, [socket, friends, currentFriend])
+
+
+    /////////////////////////////////////////////////////////////////////////
+    //                         I N V I T A T I O N S                       //
+    /////////////////////////////////////////////////////////////////////////
+
+
+    const loadInvitations = useCallback(async () => {
+        getUserInvitations(user.id)
+            .then(res => {
+                if (res.status === 200 &&
+                    res.statusText === "OK" && res.data.length) {
+                    // setNotifInvitation(true);
+                    console.log(res.data)
+                    setFriendInvitations(res.data);
+                }
+            })
+
+    }, [user])
+
 
 
     return (
         <FriendsContext.Provider value={{
             friends,
             friendsDispatch,
-            updateFriend,
             currentFriend,
-            setCurrentFriend
+            setCurrentFriend,
+            friendInvitations,
+            setFriendInvitations,
         }}>
             {children}
         </FriendsContext.Provider>
