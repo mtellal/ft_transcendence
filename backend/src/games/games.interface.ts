@@ -9,12 +9,14 @@ export enum Status {
 
 export class GameState {
   player1: {
+    id?: number;
     x: number;
     y: number;
     width: number;
     height: number;
   };
   player2: {
+    id?: number;
     x: number;
     y: number;
     width: number;
@@ -39,8 +41,8 @@ export class GameState {
 }
 
 export const defaultGameState: GameState = {
-  player1: {x: 0, y: 0, width: 100, height: 100},
-  player2: {x: 0, y: 0, width: 100, height: 100},
+  player1: {x: 0, y: 0, width: 10, height: 100},
+  player2: {x: 0, y: 0, width: 10, height: 100},
   ball: {x: 0, y: 0, radius: 10, velX: 0, velY: 0, speed: 1},
   score: {player1Score: 0, player2Score: 0, winScore: 10},
   width: 1600,

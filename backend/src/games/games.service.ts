@@ -138,6 +138,7 @@ export class GamesService {
             })
           }
         }
+        this.games.delete(game.id);
       }
     } catch (e) {
       console.log(e);
@@ -175,20 +176,22 @@ export class GamesService {
   startGame(room: Game, server: any) {
     const game = new GameState();
     Object.assign(game, defaultGameState);
+    this.games.delete(room.id);
     this.games.set(room.id, game);
     console.log(game);
-    this.initPlayer(game);
+    this.initPlayer(game, room);
     this.initBall(game);
     console.log(game);
+    server.to(`room-${room.id}`).emit('updatedState', game);
     const frameRate = 60; //FPS that we want
     const tickRate = 1000 / frameRate // Updates will be send at this interval
     const gameLoopInterval = setInterval(() => {
       this.gameLoop(game);
-      //server.to(`room-${room.id}`).emit(game);
-      /* console.log(game); */
+      server.to(`room-${room.id}`).emit('updatedState', game);
       if (this.isGameOver(game))
         clearInterval(gameLoopInterval);
     }, tickRate);
+    this.games.delete(room.id);
     //Update in case of forfeit is in deleteUnfinishedGame
 /*     while (1) {
       this.gameLoop(game);
@@ -197,7 +200,17 @@ export class GamesService {
   }
 
   //Init player position based on width and height of the board. In case the board dimensions need to change in the future
-  initPlayer(game: GameState) {
+  initPlayer(game: GameState, room: Game) {
+    game.player1.id = room.player1Id;
+    game.player1.x = game.width * 0.02;
+    game.player1.y = game.height / 2 - game.player1.height;
+
+    game.player2.id = room.player2Id;
+    game.player2.x = game.width - game.width * 0.03;
+    game.player2.y = game.height / 2 - game.player2.height;
+  }
+
+  resetPlayer(game: GameState) {
     game.player1.x = game.width * 0.02;
     game.player1.y = game.height / 2 - game.player1.height;
 
@@ -237,7 +250,7 @@ export class GamesService {
                 game.score.player1Score++;
 
             this.initBall(game);
-            this.initPlayer(game);
+            this.resetPlayer(game);
             return (1);
         }
         if (nextPosY < 0 || nextPosY > game.height)

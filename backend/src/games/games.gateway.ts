@@ -17,6 +17,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     
     ///Have to find a better way of doing this
+    console.log('Connection');
     const jwtService = this.jwtService;
     const cookie = client.handshake.headers?.cookie;
     if (!cookie) {
@@ -52,14 +53,16 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ID:${decoded.id} USER:${decoded.username} has disconnected to game socket`);
   }
 
-  @SubscribeMessage('up')
-  async handleUp(@ConnectedSocket() client: any) {
+  @SubscribeMessage('moveUp')
+  @UseGuards(JwtWsGuard)
+  async handleUp(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameRoom: number) {
+    console.log(`${payload.id} moved up!`)
   }
 
-  @SubscribeMessage('down')
+  @SubscribeMessage('moveDown')
   @UseGuards(JwtWsGuard)
   async handleDown(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto) {
-    return 'down success';
+    console.log(`${payload.id} moved down!`)
   }
 
   @SubscribeMessage('cancel')

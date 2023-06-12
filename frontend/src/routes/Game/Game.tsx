@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 
 import './Game.css'
 import { io, Socket } from 'socket.io-client';
@@ -8,7 +8,7 @@ let up : boolean;
 let down : boolean;
 
 
-function Game({launch, socket})
+function Game(props: any)
 {
     const canvasRef : any  = React.useRef();
     const animationID = React.useRef(0);
@@ -18,35 +18,65 @@ function Game({launch, socket})
 
     const [scores, setScores] = React.useState({p1:0, p2:0})
 
-/*     function drawGameState(gameState) {
-        const context = canvasRef.current.getContext('2d');
+    const token =  useOutletContext();
+    const [socket, setSocket] = useState(null);
+    const [gameRoom, setGameRoom] = useState(null);
+    const [gameState, setGameState] = useState(null);
 
-        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    useEffect(() => {
+        const s = io('http://localhost:3000/game', {
+            transports: ['websocket'],
+            extraHeaders: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        setSocket(s);
+        s.emit('join', '');
+        s.on('joinedGame', (joinedGame) => {
+            setGameRoom(joinedGame);
+        });
+        s.on('updatedState', (updatedGameState) => {
+            setGameState(updatedGameState);
+            console.log(updatedGameState);
+            drawGameState(updatedGameState);
+        })
+        return () => {
+            s.disconnect();
+        }
+    }, []);
+
+    function drawGameState(gameState) {
+        const context = canvasRef.current.getContext('2d');
+        canvasRef.current.width = 1600;
+        canvasRef.current.height = 800;
+
+        /* context.clearRect(0, 0, 1600, 800); */
 
         const { player1, player2, ball, scores } = gameState;
 
+        console.log(gameState);
         context.beginPath();
-        context.fillRect(player1.x, player1.y, player1.width, player1.height);
-        context.fillRect(player2.x, player2.y, player2.width, player2.height);
+        context.fillRect(gameState.player1.x, gameState.player1.y, gameState.player1.width, gameState.player1.height);
+        context.fillRect(gameState.player2.x, gameState.player2.y, gameState.player2.width, gameState.player2.height);
 
         context.beginPath();
-        context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        context.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
         context.fill();
 
         context.beginPath();
-        context.arc(canvasRef.current.width / 2, canvasRef.current.height / 2, 50, 0, Math.PI * 2);
+        context.arc(gameState.width / 2, gameState.height / 2, 50, 0, Math.PI * 2);
         context.fillStyle = '#FFD8B8';
         context.fill();
         context.stroke();
         context.fillStyle = 'black';
-        context.fillRect(canvasRef.current.width / 2, 0, 1, canvasRef.current.height);
+        context.fillRect(gameState.width / 2, 0, 1, gameState.height);
 
         // Render scores
         context.fillStyle = 'black';
         context.font = '24px Arial';
-        context.fillText(`P1: ${scores.p1}`, 20, 40);
-        context.fillText(`P2: ${scores.p2}`, canvasRef.current.width - 80, 40);
-    } */
+        context.fillText(`P1: ${gameState.score.player1Score}`, 20, 40);
+        context.fillText(`P2: ${gameState.score.player2Score}`, canvasRef.current.width - 80, 40);
+    }
 
     function initPlayers(canvasHeight : any , canvasWidth : any )
     {
@@ -144,15 +174,13 @@ function Game({launch, socket})
 
     function moveUp()
     {
-        if (player1Ref.current.y - 5 > 0)
-            player1Ref.current.y -= 5;
+        console.log(gameRoom);
+        socket.emit('moveUp', gameRoom.id);
     }
 
     function moveDown()
     {
-        const p1 = player1Ref.current;
-        if (p1.y + 5 + p1.height < canvasRef.current.height)
-            p1.y += 5;
+        socket.emit('moveDown', gameRoom.id);
     }
 
     function movePlayer()
@@ -237,30 +265,30 @@ function Game({launch, socket})
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-       initGame(canvas, context)
+        /* if (gameState)
+            drawGameState(); */
 
        const resizeEvent = () => resizeHandler(context);
 
         window.addEventListener('resize', resizeEvent);
 
         const game = () => {
-            
             movePlayer();
-            draw(context);
+/*             draw;
             newgame = moveBall();
-            if (newgame)
+            if (gameState)
             {
-                draw(context);
+                drawGameState();
                 setTimeout(() => {
                     animationID.current = window.requestAnimationFrame(game);
                 }, 1000);
             }
             else
-                animationID.current = window.requestAnimationFrame(game);
+                animationID.current = window.requestAnimationFrame(game); */
                 
         }
 
-        if (launch)
+        if (props.launch)
             game();
 
         return (() => {
@@ -268,7 +296,7 @@ function Game({launch, socket})
             window.removeEventListener('resize', resizeEvent);
         })
 
-    }, [launch])
+    }, [props.launch])
 
 
     return (
@@ -286,39 +314,11 @@ function Game({launch, socket})
     )
 }
 
-function PlayPage(props) {
-    const token =  useOutletContext();
-    const [socket, setSocket] = useState(null);
-  
-    const handlePlayClick = () => {
-      const s = io('http://localhost:3000/game', {
-        transports: ['websocket'],
-        extraHeaders: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setSocket(s);
-      props.click();
-      s.emit('join', '');
-      console.log("Emitting event here");
-    };
-  
-    useEffect(() => {
-        if (socket) {
-          // Perform any necessary socket operations here
-          console.log('Socket connected:', socket.id);
-    
-          // Clean up the socket connection when the component unmounts
-          return () => {
-            console.log('Socket disconnected:', socket.id);
-            socket.disconnect();
-          };
-        }
-      }, [socket]);
-  
+function PlayPage(props: any) {
+
     return (
       <div className="play-page">
-        <button onClick={handlePlayClick} className="play-button">
+        <button onClick={props.click} className="play-button">
           Play
         </button>
       </div>
@@ -329,11 +329,10 @@ function PlayPage(props) {
 export default function LaunchGame()
 {
     const [play, setPlay] = React.useState(false);
-    const [socket, setSocket] = React.useState(false);
 
     return (
         <div className="launchgame relative">
-            <Game launch={play} socket={socket}/>
+            <Game launch={play}/>
             {!play && <PlayPage click={() => setPlay(true)} />}
         </div>
     )
