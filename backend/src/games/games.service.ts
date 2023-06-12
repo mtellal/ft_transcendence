@@ -119,8 +119,10 @@ export class GamesService {
           ],
         }
       })
+      console.log(games);
       for (const game of games) {
         const ongoingGame = this.games.get(game.id);
+        console.log(ongoingGame);
         ongoingGame.status = Status.FORFEIT;
         if (game.status === GameStatus.MATCHMAKING || game.status === GameStatus.INVITE) {
           await this.prisma.game.delete({
@@ -138,7 +140,9 @@ export class GamesService {
             })
           }
         }
+        console.log("Deleting game");
         this.games.delete(game.id);
+        console.log(this.games);
       }
     } catch (e) {
       console.log(e);
@@ -174,11 +178,10 @@ export class GamesService {
   }
 
   startGame(room: Game, server: any) {
-    const game = new GameState();
-    Object.assign(game, defaultGameState);
-    this.games.delete(room.id);
+    let game = new GameState();
+    game = JSON.parse(JSON.stringify(defaultGameState));
+    console.log(defaultGameState);
     this.games.set(room.id, game);
-    console.log(game);
     this.initPlayer(game, room);
     this.initBall(game);
     console.log(game);
@@ -191,7 +194,7 @@ export class GamesService {
       if (this.isGameOver(game))
         clearInterval(gameLoopInterval);
     }, tickRate);
-    this.games.delete(room.id);
+    console.log(this.games);
     //Update in case of forfeit is in deleteUnfinishedGame
 /*     while (1) {
       this.gameLoop(game);
