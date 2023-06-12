@@ -57,12 +57,14 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(JwtWsGuard)
   async handleUp(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameRoom: number) {
     console.log(`${payload.id} moved up!`)
+    this.gamesService.moveUp(gameRoom, payload.id);
   }
 
   @SubscribeMessage('moveDown')
   @UseGuards(JwtWsGuard)
-  async handleDown(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto) {
+  async handleDown(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameRoom: number) {
     console.log(`${payload.id} moved down!`)
+    this.gamesService.moveDown(gameRoom, payload.id);
   }
 
   @SubscribeMessage('cancel')

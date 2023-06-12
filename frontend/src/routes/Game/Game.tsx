@@ -11,12 +11,6 @@ let down : boolean;
 function Game(props: any)
 {
     const canvasRef : any  = React.useRef();
-    const animationID = React.useRef(0);
-    const player1Ref = React.useRef({x:10, y:10, width:100, height:100})
-    const player2Ref = React.useRef({x:10, y:10, width:100, height:100})
-    const ballRef = React.useRef({x:0, y:0, velx:0, vely:0, radius:0})
-
-    const [scores, setScores] = React.useState({p1:0, p2:0})
 
     const token =  useOutletContext();
     const [socket, setSocket] = useState(null);
@@ -80,47 +74,28 @@ function Game(props: any)
 
     /* //////////   MOVEMENTS FUNCTIONS     //////////*/
 
-    function handleKeyDown(e : any)
-    {
-        if (e.key === "w")
-            up = true;
-        else if (e.key === "s")
-            down = true;
-    }
-
-    function handleKeyUp(e : any)
-    {
-        if (e.key === "w")
-            up = false;
-        else if (e.key === "s")
-            down = false;
-    }
-
-    function moveUp()
-    {
-        console.log(gameRoom);
-        socket.emit('moveUp', gameRoom.id);
-    }
-
-    function moveDown()
-    {
-        socket.emit('moveDown', gameRoom.id);
-    }
-
-    function movePlayer()
-    {
-        if (up)
-            moveUp();
-        else if (down)
-            moveDown();
-    }
+    const handleKeyDown = (e: any) => {
+        if (e.key === "w") {
+          moveUp();
+        } else if (e.key === "s") {
+          moveDown();
+        }
+      };
+    
+      const moveUp = () => {
+        socket.emit("moveUp", gameRoom?.id);
+      };
+    
+      const moveDown = () => {
+        socket.emit("moveDown", gameRoom?.id);
+      };
 
     return (
         <div className="game">
             <canvas 
                 ref={canvasRef} 
                 className="game--canvas" 
-                onKeyUp={handleKeyUp}
+                //onKeyUp={handleKeyUp}
                 onKeyDown={handleKeyDown}
                 tabIndex={0}
                 >

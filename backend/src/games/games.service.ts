@@ -177,6 +177,30 @@ export class GamesService {
     }
   }
 
+  moveUp(gameId: number, userId: number) {
+    const game = this.games.get(gameId);
+    if (game.player1.id === userId) {
+      if (game.player1.y - 5 > 0)
+        game.player1.y -= 5;
+    }
+    if (game.player2.id === userId) {
+      if (game.player2.y - 5 > 0)
+        game.player2.y -= 5;
+    }
+  }
+
+  moveDown(gameId: number, userId: number) {
+    const game = this.games.get(gameId);
+    if (game.player1.id === userId) {
+      if (game.player1.y + 5 + game.player1.height < game.height)
+        game.player1.y += 5;
+    }
+    if (game.player2.id === userId) {
+      if (game.player2.y + 5 + game.player2.height < game.height)
+        game.player2.y += 5;
+    }
+  }
+
   startGame(room: Game, server: any) {
     let game = new GameState();
     game = JSON.parse(JSON.stringify(defaultGameState));
