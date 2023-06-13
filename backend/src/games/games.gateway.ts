@@ -42,6 +42,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return ;
     }
 
+    this.userToSocket.set(decoded.id, client.id);
     console.log(`ID:${decoded.id} USER:${decoded.username} has connected to game socket`);
   }
 
