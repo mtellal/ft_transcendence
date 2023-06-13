@@ -47,5 +47,5 @@ export const defaultGameState: GameState = {
   score: {player1Score: 0, player2Score: 0, winScore: 10},
   width: 1600,
   height: 800,
-  status: Status.PAUSED
+  status: Status.ONGOING
 }

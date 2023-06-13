@@ -57,7 +57,7 @@ export class GamesService {
   //Need to add a func to cancel matchmaking which will delete the pending game
 
   async findPendingGame(payload: any) {
-    const pending = await this.prisma.game.findFirst({
+    let pending = await this.prisma.game.findFirst({
       where: {
         status: GameStatus.MATCHMAKING,
         player2Id: null,
@@ -70,7 +70,7 @@ export class GamesService {
     if (!pending)
       return (pending);
     try {
-      await this.prisma.game.update({
+      pending = await this.prisma.game.update({
         where: { id: pending.id },
         data: {
           player2Id: payload.id,
@@ -139,8 +139,17 @@ export class GamesService {
               }
             })
           }
+          if (game.player2Id === payload.id) {
+            await this.prisma.game.update({
+              where: {id: game.id},
+              data: {
+                wonBy: game.player1Id,
+                status: GameStatus.FINISHED,
+              }
+            })
+          }
         }
-        console.log("Deleting game");
+        console.log("Deleting game state");
         this.games.delete(game.id);
         console.log(this.games);
       }

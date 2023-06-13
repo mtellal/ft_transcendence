@@ -91,10 +91,13 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('joinWait', {message: 'waiting for another player', roomId: room.id });
       client.join(`room-${room.id}`);
       this.server.to(`room-${room.id}`).emit('joinedGame', room);
-      this.gamesService.startGame(room, this.server);
+      //this.gamesService.startGame(room, this.server);
     } else {
       client.emit('joinSuccess', {message: 'Joining a game', roomId: room.id});
       client.join(`room-${room.id}`);
+      this.server.to(`room-${room.id}`).emit('joinedGame', room);
+      console.log("Second player joined");
+      console.log(room);
       this.server.to(`room-${room.id}`).emit('GameStart', {message: 'Game is going to start in 5s'});
 
       setTimeout(()=> {
