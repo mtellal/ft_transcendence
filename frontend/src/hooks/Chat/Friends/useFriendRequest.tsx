@@ -7,15 +7,19 @@ import { refuseFriendRequest, sendFriendRequest, validFriendRequest } from "../.
 export function useFriendRequest() {
     const { user, token } = useCurrentUser();
     const { friends, friendInvitations, setFriendInvitations } = useFriendsContext();
-    const { addFriend } = useFriends();
+    const { updateFriend } = useFriends();
 
+    const addFriendRequest = useCallback((request: any) => {
+        if (setFriendInvitations && request)
+            setFriendInvitations((p: any[]) => [...p, request])
+    }, [setFriendInvitations])
 
     const removeFriendRequest = useCallback((request: any) => {
-        if (setFriendInvitations) {
+        if (setFriendInvitations && friendInvitations && friendInvitations.length && request) {
             setFriendInvitations((requests: any[]) =>
                 requests.filter((r: any) => r.id !== request.id))
         }
-    }, [setFriendInvitations])
+    }, [setFriendInvitations, friendInvitations])
 
     const validFriend = useCallback((friend: any) => {
         if (friends)
@@ -36,7 +40,7 @@ export function useFriendRequest() {
                 const validRes = await validFriendRequest(request.id, token);
                 if (validRes.status === 201 && validRes.statusText === "Created") {
                     removeFriendRequest(request);
-                    addFriend(user)
+                    updateFriend(user)
                 }
             }
         }
@@ -56,6 +60,8 @@ export function useFriendRequest() {
 
     return (
         {
+            addFriendRequest,
+            removeFriendRequest,
             acceptFriend,
             refuseFriend,
             sendRequest,

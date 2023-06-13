@@ -256,6 +256,7 @@ export function ChannelsProvider({ children }: any) {
 
 
     const loadChannels = useCallback(async () => {
+        console.log("////////////// load channels")
         setChannelsLoading(true)
         let channelList = await getChannels(user.id)
             .then(res => {
@@ -275,6 +276,8 @@ export function ChannelsProvider({ children }: any) {
         channelList.forEach(joinChannel);
         // channelList.map(async (c : any) => await removeChannel(c.id))
         setChannelsLoading(false)
+        console.log("load channels ////////////// ")
+
     }, [user, socket])
 
     useEffect(() => {
@@ -282,159 +285,6 @@ export function ChannelsProvider({ children }: any) {
             loadChannels();
     }, [socket, user])
 
-
-    useEffect(() => {
-        if (socket && user) {
-
-            socket.on('newChannel', async (channel: any) => {
-                console.log("NEW CHANNEL EVENT")
-                if (channel) {
-                    const users = await fetchUsers(channel.members)
-                    channelsDispatch({ type: 'addChannel', channel: { ...channel, users } });
-                    joinChannel(channel)
-                }
-            })
-
-            socket.on('updatedChannel', (channel: any) => {
-                console.log("UPDATED CHANNEL EVENT")
-                // name / password / type
-                if (channel) {
-                    channelsDispatch({
-                        type: 'updateChannelInfos',
-                        channelId: channel.id,
-                        infos: {
-                            name: channel.name, 
-                            password: channel.password, 
-                            type: channel.type
-                        }
-                    })
-                }
-            })
-
-            socket.on('joinedChannel', async (res: any) => {
-                console.log("JOINED CHANNEL EVENT")
-                const user = await fetchUser(res.userId);
-                channelsDispatch({ type: 'addMember', channelId: res.channelId, user: user })
-            })
-
-            socket.on('leftChannel', async (res: any) => {
-                console.log("LEFT CHANNEL EVENT")
-                channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
-                channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
-            })
-
-            socket.on('ownerChanged', (channelId: number, name: string) => {
-                console.log("UPDATED CHANNEL EVENT")
-                // name / password / type
-            })
-
-            socket.on('addedtoChannel', async (res: any) => {
-                console.log("ADDED CHANNEL EVENT")
-                if (res && res.channelId) {
-
-                    if (res.userId === user.id) {
-                        const channel = await getChannel(res.channelId).then(res => res.data);
-                        if (channel) {
-                            const users = await fetchUsers(channel.members)
-                            channelsDispatch({ type: 'addChannel', channel: { ...channel, users } });
-                            joinChannel(channel)
-                        }
-                    }
-                    else {
-                        const user = await fetchUser(res.userId);
-                        channelsDispatch({ type: 'addMember', channelId: res.channelId, user: user })
-                    }
-                }
-            })
-
-            // socket.on('exception', (e : any) => console.log("exception =>", e))
-
-            socket.on('madeAdmin', (res: any) => {
-                console.log("MADE ADMIN CHANNEL EVENT");
-                if (res && res.channelId && res.userId) {
-                    channelsDispatch({ type: 'addAdministrators', channelId: res.channelId, userId: res.userId })
-                }
-            })
-
-            socket.on('removedAdmin', async (res: any) => {
-                console.log("REMOVED ADMIN CHANNEL EVENT")
-                if (res && res.channelId && res.userId) {
-                    channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
-                }
-            })
-
-            socket.on('kickedUser', async (res: any) => {
-                console.log("KICKED CHANNEL EVENT")
-                forceToLeaveChannel(res)
-            })
-
-            socket.on('mutedUser', async (res: any) => {
-                console.log("MUTED USER CHANNEL EVENT", res)
-                if (res && res.channelId && res.userId && res.mute)
-                {
-                    channelsDispatch({type: 'addMuteList', channelId: res.channelId, userId: res.userId, mute: res.mute})
-                }
-            })
-
-            socket.on('unmutedUser', async (res: any) => {
-                console.log("UNMUTED USER CHANNEL EVENT", res)
-                if (res && res.channelId && res.userId)
-                {
-                    channelsDispatch({type: 'removeMuteList', channelId: res.channelId, userId: res.userId})
-                }
-            })
-
-            socket.on('bannedUser', async (res: any) => {
-                console.log("BANNED CHANNEL EVENT")
-                if (res && res.channelId && res.userId) {
-                    channelsDispatch({ type: 'addBanList', channelId: res.channelId, userId: res.userId });
-                    forceToLeaveChannel(res)
-                }
-            })
-
-            socket.on('unbannedUser', (res: any) => {
-                console.log("UNBANNED CHANNEL EVENT")
-                if (res && res.channelId && res.userId) {
-                    console.log("res => ", res, channels)
-                    channelsDispatch({ type: 'removeBanList', channelId: res.channelId, userId: res.userId })
-                }
-            })
-
-
-            if (channels && channels.length) {
-                socket.on('message', (m: any) => {
-                    console.log("message recieved")
-                    if (m.length) {
-                        channelsDispatch({ type: 'initMessages', messages: m });
-                    }
-                    if (m.content) {
-                        /* if (m.sendBy !== user.id && m.sendBy !== currentElement.id) {
-                            friendsDispatch({ type: 'addNotif', friendId: m.sendBy })
-                        } */
-                        channelsDispatch({ type: 'addMessage', message: m });
-                    }
-                });
-            }
-
-            return () => {
-                if (socket) {
-                    socket.off('newChannel')
-                    socket.off('updatedChannel')
-                    socket.off('joinedChannel')
-                    socket.off('leftChannel')
-                    socket.off('addedtoChannel')
-                    socket.off('madeAdmin')
-                    socket.off('removedAdmin')
-                    socket.off('kickedUser')
-                    socket.off('bannedUser')
-                    socket.off('unbannedUser')
-                    socket.off('message')
-                    socket.off('mutedUser')
-                    socket.off('unmutedUser')
-                }
-            }
-        }
-    }, [socket, channels, user])
 
     function forceToLeaveChannel(res: any) {
         channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId });
@@ -604,7 +454,8 @@ export function ChannelsProvider({ children }: any) {
             channelAlreadyExists,
             getOwner,
             getMembers,
-            isLocalChannel
+            isLocalChannel,
+            forceToLeaveChannel
         }}>
             {children}
         </ChannelsContext.Provider>

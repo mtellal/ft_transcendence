@@ -1,10 +1,12 @@
 import React, { useCallback } from "react";
 import { useChannelsContext, useChatSocket } from "../Hooks";
+import useFetchUsers from "../useFetchUsers";
 
 export default function useMembers()
 {
     const { currentChannel, channels, channelsDispatch} = useChannelsContext();
     const { socket } = useChatSocket();
+    const { fetchUser } = useFetchUsers();
 
     const isUserMember = useCallback((user: any) => {
         if (user && channels && currentChannel)
@@ -47,6 +49,14 @@ export default function useMembers()
     }, [channels, socket])
 
 
+    const addedMember = useCallback(async (userId: number, channelId : number) => {
+        if (channels && channels.length && channelId && userId)
+        {
+            const user = await fetchUser(userId);
+            channelsDispatch({ type: 'addMember', channelId, user })
+        }
+    }, [channels])
+
     const getMemberById = useCallback((id: number) => {
         if (channels && channels.length && currentChannel && currentChannel.users && currentChannel.users.length)
         {
@@ -71,6 +81,7 @@ export default function useMembers()
             isUserOwner,
             isUserBanned,
             addMember,
+            addedMember,
             getMemberById,
             getMembersById
         }

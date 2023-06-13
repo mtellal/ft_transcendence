@@ -4,15 +4,13 @@ import useFetchUsers from "../../useFetchUsers";
 import { removeUserFriend } from "../../../requests/friends";
 import { useNavigate } from "react-router-dom";
 
-
-
 export function useFriends() {
     const navigate = useNavigate();
     const { token } = useCurrentUser();
     const { fetchUserProfilePicture } = useFetchUsers();
     const { friends, friendsDispatch, currentFriend } = useFriendsContext();
 
-    const addFriend = useCallback(async (friend: any) => {
+    const updateFriend = useCallback(async (friend: any) => {
         if (friends && friend) {
             if (!friend.url) {
                 const url = await fetchUserProfilePicture(friend.id);
@@ -35,7 +33,7 @@ export function useFriends() {
 
     return (
         {
-            addFriend,
+            updateFriend,
             removeFriend
         }
     )

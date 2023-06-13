@@ -1,8 +1,8 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 
-import { useChannelsContext, useFriendsContext, useCurrentUser, } from "../../../../hooks/Hooks"
+import { useChannelsContext, useCurrentUser, } from "../../../../hooks/Hooks"
 
-import { TUserInfos, UserInfos } from "../../../../components/users/UserInfos";
+import { UserInfos } from "../../../../components/users/UserInfos";
 import Icon from "../../../../components/Icon";
 import useKickUser from "../../../../hooks/Chat/usekickUser";
 import useBanUser from "../../../../hooks/Chat/useBanUser";
@@ -12,7 +12,6 @@ import useMembers from "../../../../hooks/Chat/useMembers";
 import { PofileChannelContext } from '../../Profile/ChannelProfile/ChannelProfile';
 import { CollectionElement } from "../Menu/MenuElement";
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
-
 
 export function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState([]);
@@ -140,7 +139,10 @@ export function ChannelUserLabel(props: any) {
             }
             else {
                 return (
-                    <div className="flex-center fill">
+                    <div
+                        className="flex-center fill"
+                        style={{ justifyContent: 'space-around' }}
+                    >
                         {
                             isCurrentUserOwner && !isUserAdministrators(props.user) &&
                             <Icon
@@ -241,6 +243,7 @@ export function ChannelUserLabel(props: any) {
                 profilePictureURL={props.user && props.user.url}
                 userStatus={props.user && props.user.userStatus}
             />
+
             {
                 props.showChannelStatus ?
                     showChannelStatus()
