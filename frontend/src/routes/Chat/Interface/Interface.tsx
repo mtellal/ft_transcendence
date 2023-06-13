@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import Banner from "../components/Banner/Banner";
@@ -8,44 +8,33 @@ import Messenger from "../components/Messenger/Messenger";
 import { useChannelsContext, useChatSocket, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
 import RemoveView from "../components/RemoveElement.tsx/RemoveView";
-import { removeUserFriend } from '../../../requests/friends'
+import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import './Interface.css'
+import { useBlock } from "../../../hooks/Chat/useBlock";
+import { ConfirmPage, ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
 
-/*
-    - MessagesElement is the rigth side of Chat interface,
-    - reclaim an item, which is Friend or Group object, and display messages from this item if they exist,
-    - catch user messages from <Messages /> and update messages array 
 
-*/
+export const InterfaceContext: React.Context<any> = createContext(null);
 
 export default function Interface() {
     const params: any = useParams();
 
     const navigate = useNavigate();
-    const {
-        token,
-        user,
-        userDispatch
-    }: any = useCurrentUser();
+    const { token, user, userDispatch }: any = useCurrentUser();
 
-    const {
-        currentChannel,
-        setCurrentChannel,
-        leaveChannel,
-        channels
-    } = useChannelsContext();
+    const { friends, currentFriend, setCurrentFriend }: any = useFriendsContext();
+    const { removeFriend } = useFriends();
+    const { isUserBlocked, blockUser, unblockUser } = useBlock();
 
-    const {
-        friends,
-        friendsDispatch,
-        currentFriend,
-        setCurrentFriend
-    }: any = useFriendsContext();
+
+    const { currentChannel, setCurrentChannel, leaveChannel, channels } = useChannelsContext();
 
     const [profile, setProfile] = React.useState(false);
     const [removeView, setRemoveView] = React.useState(false);
-    const [blocked, setBlocked]: [any, any] = React.useState(false);
+    const [blockedFriend, setBlockedFriend]: [any, any] = React.useState(false);
 
+
+    const [action, setAction]: any = useState(null);
 
 
     useEffect(() => {
@@ -72,7 +61,7 @@ export default function Interface() {
     }, [currentChannel, channels, friends])
 
     function block() {
-        if (!blocked) {
+        if (!blockedFriend) {
             userDispatch({ type: 'blockUser', friendId: currentFriend.id })
             blockUserRequest(currentFriend.id, token)
         }
@@ -80,22 +69,18 @@ export default function Interface() {
             unblockUserRequest(currentFriend.id, token)
             userDispatch({ type: 'unblockUser', friendId: currentFriend.id })
         }
-        setBlocked((p: any) => !p)
+        setBlockedFriend((p: any) => !p)
     }
 
-
-    async function removeFriend(friend: any) {
-        if (friend) {
-            removeUserFriend(friend.id, token)
-                .then(res => {
-                    if (res.status === 200 && res.statusText === "OK") {
-                        setRemoveView(false)
-                        friendsDispatch({ type: 'removeFriend', friend })
-                        navigate("/chat");
-                    }
-                })
+    function bannerBlock() {
+        if (currentFriend) {
+            if (isUserBlocked(currentFriend))
+                unblockUser(currentFriend);
+            else
+                blockUser(currentFriend)
         }
     }
+
 
 
     function validLeaveChannel() {
@@ -112,43 +97,54 @@ export default function Interface() {
         if (currentFriend && user) {
             if (user.blockList.length) {
                 if (user.blockList.find((obj: any) => currentFriend.id === obj.userId))
-                    setBlocked(true);
+                    setBlockedFriend(true);
                 else
-                    setBlocked(false)
+                    setBlockedFriend(false)
             }
         }
     }, [currentFriend, user])
 
+
     return (
-        <>
+        <InterfaceContext.Provider value={{ setAction }}>
             {
                 currentChannel ?
                     <div className={"flex-column relative interface-container visible"}>
                         <Banner
+                            channel={currentChannel}
+                            type={currentChannel && currentChannel.type}
                             profile={() => setProfile(prev => !prev)}
                             invitation={() => { }}
-                            block={() => block()}
+                            setBlockedFriend={setBlockedFriend}
                             remove={() => setRemoveView(prev => !prev)}
                         />
                         {
                             profile ?
                                 <Profile /> :
-                                <Messenger />
+                                <Messenger
+                                    blockedFriend={blockedFriend}
+                                />
                         }
-
                         {
-                            removeView &&
-                            <RemoveView
-                                currentChannel={currentChannel}
-                                currentFriend={currentFriend}
-                                cancel={() => setRemoveView(prev => !prev)}
-                                leaveChannel={() => validLeaveChannel()}
-                                removeFriend={() => removeFriend(currentFriend)}
-                            />
+                            action && (action.user || action.channel) && action.function &&
+                            <ConfirmPage>
+                                <ConfirmView
+                                    type={action.type}
+                                    username={(action.user && action.user.username) || (action.channel && action.channel.name)}
+                                    valid={async () => {
+                                        if (action.user)
+                                            await action.function(action.user);
+                                        else if (action.channel)
+                                            await action.function(action.channel)
+                                        setAction(null)
+                                    }}
+                                    cancel={() => setAction(null)}
+                                />
+                            </ConfirmPage>
                         }
                     </div>
                     : null
             }
-        </>
+        </InterfaceContext.Provider >
     )
 }

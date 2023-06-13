@@ -84,7 +84,7 @@ export function FriendsProvider({ children }: any) {
     const { user, token }: any = useCurrentUser();
     const { socket } = useChatSocket();
     const { fetchUsers, fetchUserProfilePicture } = useFetchUsers();
-    
+
     const [friends, friendsDispatch]: any = useReducer(reducer, []);
     const [currentFriend, setCurrentFriendLocal]: any = useState();
     const [friendInvitations, setFriendInvitations]: [TFriendRequest[], any] = useState([]);
@@ -135,7 +135,6 @@ export function FriendsProvider({ children }: any) {
             socket.on('receivedRequest', (request: any) => {
                 console.log("EVENT RECIEVED REQUEST => ", request)
                 if (request) {
-                    // setNotifInvitation(true);
                     setFriendInvitations((p: TFriendRequest[]) => [...p, request])
                 }
             })

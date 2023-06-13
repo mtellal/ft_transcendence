@@ -57,7 +57,15 @@ export function ConfirmAction(props: any) {
     )
 }
 
-export function ConfirmView(props: any) {
+type TConfirmView = {
+    type: string, 
+    username: string, 
+    valid: () => {} | any, 
+    cancel: () => {} |any
+}
+
+
+export function ConfirmView(props: TConfirmView) {
     return (
         <div className="flex-column-center confirmview-container">
             <p>{`Are you sure to ${props.type} `}
@@ -193,9 +201,13 @@ export function ConfirmViewButtons(props: any) {
     )
 }
 
-export function ConfirmPage({ children }: any) {
+export function ConfirmPage({ children, ...props }: any) {
     return (
-        <div className="fill absolute confirm-background flex-center" style={{ top: '0', left: '0' }}>
+        <div 
+            className="fill absolute confirm-background flex-center" 
+            style={{ top: '0', left: '0' }}
+            {...props}
+        >
             {children}
         </div>
     )

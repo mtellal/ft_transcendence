@@ -15,6 +15,7 @@ import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { useBlock } from "../../../../hooks/Chat/useBlock";
+import { InterfaceContext } from "../../Interface/Interface";
 
 const MessengerContext: React.Context<any> = createContext(null);
 
@@ -66,7 +67,7 @@ type TUserManu = {
 
 function UserMenu(props: TUserManu) {
 
-    const { setUserAction } = useContext(MessengerContext);
+    const { setAction } = useContext(InterfaceContext);
     const { blockUser, unblockUser, isUserBlocked } = useBlock();
 
     function profile() {
@@ -74,11 +75,11 @@ function UserMenu(props: TUserManu) {
     }
 
     function block() {
-        setUserAction({ type: 'block', user: props.user, function: blockUser });
+        setAction({ type: 'block', user: props.user, function: blockUser });
     }
 
     function unblock() {
-        setUserAction({ type: 'unblock', user: props.user, function: unblockUser });
+        setAction({ type: 'unblock', user: props.user, function: unblockUser });
     }
 
     return (
@@ -134,20 +135,22 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
         >
             <div>
                 <ResizeContainer height="30px" width="30px"
-                    className="pointer"
+                    className={props.type !== "WHISPER" ? "pointer" : ""}
                     onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
                 >
                     <ProfilePicture image={props.url} />
                 </ResizeContainer>
                 {
-                    showUserMenu && showUserMenu.show && showUserMenu.id === props.id &&
+                    props.type !== "WHISPER" && showUserMenu && showUserMenu.show && showUserMenu.id === props.id &&
                     <UserMenu
                         setShowUserMenu={setShowUserMenu}
                         user={props.user}
                     />
                 }
             </div>
-            <div className="flex pointer" style={{ alignItems: 'flex-end' }}
+            <div
+                className={`flex ${props.type !== "WHISPER" ? "pointer" : ""}`}
+                style={{ alignItems: 'flex-end' }}
                 onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
             >
                 <p className="message-author">{props.username}</p>
@@ -277,19 +280,17 @@ function MessageNotification(props: any) {
 }
 
 
-export default function Messenger() {
+type TMessenger = {
+    blockedFriend: boolean
+}
+
+export default function Messenger(props: TMessenger) {
 
     const { user } = useCurrentUser();
-
     const { currentChannel, getMembers } = useChannelsContext();
 
-    const [userAction, setUserAction]: any = useState();
-
     const [messages, setMessages] = useState([]);
-
     const [showUserMenu, setShowUserMenu] = useState({ show: false });
-
-
 
     // check if a user is in the user blockList and filter messages from block timestamp
     const filterMessages = useCallback((messages: any[], members: any[]) => {
@@ -324,7 +325,6 @@ export default function Messenger() {
     return (
         <MessengerContext.Provider value={
             {
-                setUserAction,
                 showUserMenu,
                 setShowUserMenu,
             }
@@ -332,25 +332,17 @@ export default function Messenger() {
         >
             <MessengerConversation
                 messages={messages}
+                blockedFriend={props.blockedFriend}
             />
-            <MessengerInput />
-            {
-                userAction && userAction.user && userAction.function &&
-                <ConfirmPage>
-                    <ConfirmView
-                        type={userAction.type}
-                        username={userAction.user && userAction.user.username}
-                        valid={async () => { await userAction.function(userAction.user); setUserAction(null) }}
-                        cancel={() => setUserAction(null)}
-                    />
-                </ConfirmPage>
-            }
+            <MessengerInput
+                blockedFriend={props.blockedFriend}
+            />
         </MessengerContext.Provider>
     )
 }
 
 
-function MessengerConversation({ messages }: any) {
+function MessengerConversation({ messages, blockedFriend }: any) {
     const [render, setRender] = useState(false);
 
     const { user } = useCurrentUser();
@@ -360,7 +352,6 @@ function MessengerConversation({ messages }: any) {
 
     const { isUserAdministrators } = useAdinistrators();
     const { getMemberById } = useMembers();
-    const { isUserBlocked } = useBlock();
 
 
     let renderMessages: any = useRef(null);
@@ -411,47 +402,38 @@ function MessengerConversation({ messages }: any) {
 
 
     React.useEffect(() => {
-        lastMessageRef.current.scrollIntoView();
+        if (!blockedFriend)
+            lastMessageRef.current.scrollIntoView();
     }, [currentChannel, render])
 
     return (
         <div className="messages-display">
-
-            {
-                renderMessages.current
-            }
-            {
-                isUserBlocked(currentFriend) && currentChannel.type === "WHISPER" &&
-                <BlockMessage username={currentFriend.username || currentChannel.name} />
-            }
+            {renderMessages.current}
+            {blockedFriend && <BlockMessage username={currentFriend.username || currentChannel.name} />}
             <div ref={lastMessageRef}></div>
         </div>
     )
 }
 
 
-function MessengerInput() {
-    const { user } = useCurrentUser();
+function MessengerInput(props: any) {
     const { socket } = useChatSocket();
     const { currentChannel } = useChannelsContext();
-    const { currentFriend } = useFriendsContext();
-    const { isUserBlocked } = useBlock();
 
     const [value, setValue] = React.useState("");
 
-
-    function handleChange(e: any) {
+    const handleChange = useCallback((e: any) => {
         setValue(e.target.value)
-    }
+    }, []);
 
-    function canSendMessages() {
-        if (isUserBlocked(currentFriend))
+    const canSendMessages = useCallback(() =>  {
+        if (props.blockedFriend)
             return ("User blocked")
         return ("Write your message")
-    }
+    }, []);
 
     const submit = useCallback((e: any) => {
-        if (e.key === "Enter" && value && !isUserBlocked(user) && currentChannel && socket) {
+        if (e.key === "Enter" && value && !props.blockedFriend && currentChannel && socket) {
             socket.emit('message', {
                 channelId: currentChannel.id,
                 content: value
@@ -459,6 +441,7 @@ function MessengerInput() {
             setValue("")
         }
     }, [value, currentChannel, socket])
+
 
     return (
         <div className="messages-input"
@@ -469,7 +452,7 @@ function MessengerInput() {
                 onChange={handleChange}
                 placeholder={canSendMessages()}
                 onKeyDown={submit}
-                disabled={isUserBlocked(currentFriend)}
+                disabled={props.blockedFriend}
             />
         </div>
     )

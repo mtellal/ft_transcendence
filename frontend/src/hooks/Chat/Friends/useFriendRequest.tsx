@@ -11,41 +11,48 @@ export function useFriendRequest() {
 
 
     const removeFriendRequest = useCallback((request: any) => {
-        setFriendInvitations((requests: any[]) =>
-            requests.filter((r: any) => r.id !== request.id))
-    }, [friendInvitations])
+        if (setFriendInvitations) {
+            setFriendInvitations((requests: any[]) =>
+                requests.filter((r: any) => r.id !== request.id))
+        }
+    }, [setFriendInvitations])
 
+    const validFriend = useCallback((friend: any) => {
+        if (friends)
+            return (friends.every((user: any) => friend.id !== user.id) && friend.id !== user.id)
+        return (false);
+    }, [friends]);
 
-    function validFriend(friend: any) {
-        return (friends.every((user: any) => friend.id !== user.id) && friend.id !== user.id)
-    }
-
-    async function sendRequest(friend: any) {
+    const sendRequest = useCallback(async (friend: any) => {
         if (validFriend(friend)) {
             await sendFriendRequest(friend.id, token);
         }
-    }
+    }, [token]);
 
-    async function acceptFriend(user: any) {
-        const request = friendInvitations.find((r: any) => r.sendBy === user.id);
-        if (request) {
-            const validRes = await validFriendRequest(request.id, token);
-            if (validRes.status === 201 && validRes.statusText === "Created") {
-                removeFriendRequest(request);
-                addFriend(user)
+    const acceptFriend = useCallback(async (user: any) => {
+        if (friendInvitations && friendInvitations.length) {
+            const request = friendInvitations.find((r: any) => r.sendBy === user.id);
+            if (request) {
+                const validRes = await validFriendRequest(request.id, token);
+                if (validRes.status === 201 && validRes.statusText === "Created") {
+                    removeFriendRequest(request);
+                    addFriend(user)
+                }
             }
         }
-    }
+    }, [friendInvitations]);
 
-    async function refuseFriend(user: any) {
-        const request = friendInvitations.find((r: any) => r.sendBy === user.id);
-        if (request) {
-            const refuseRes = await refuseFriendRequest(request.id, token);
-            if (refuseRes.status === 200 && refuseRes.statusText === "OK") {
-                removeFriendRequest(request);
+    const refuseFriend = useCallback(async (user: any) => {
+        if (friendInvitations && friendInvitations.length) {
+            const request = friendInvitations.find((r: any) => r.sendBy === user.id);
+            if (request) {
+                const refuseRes = await refuseFriendRequest(request.id, token);
+                if (refuseRes.status === 200 && refuseRes.statusText === "OK") {
+                    removeFriendRequest(request);
+                }
             }
         }
-    }
+    }, [friendInvitations]);
 
     return (
         {

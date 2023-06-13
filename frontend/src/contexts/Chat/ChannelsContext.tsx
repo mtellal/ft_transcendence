@@ -328,7 +328,6 @@ export function ChannelsProvider({ children }: any) {
                 // name / password / type
             })
 
-
             socket.on('addedtoChannel', async (res: any) => {
                 console.log("ADDED CHANNEL EVENT")
                 if (res && res.channelId) {
@@ -506,6 +505,7 @@ export function ChannelsProvider({ children }: any) {
             socket.emit('leaveChannel', {
                 channelId: channel.id
             })
+            navigate("/chat");
         }
     }, [socket])
 
@@ -538,22 +538,6 @@ export function ChannelsProvider({ children }: any) {
             if (users.length) {
                 let owner = users.find((u: User) => u.id === ownerId)
                 return (owner)
-            }
-        }
-        return ([]);
-    }, [channels])
-
-
-    const getMuted = useCallback((channel: Channel) => {
-        if (channel && channels && channels.length) {
-
-            let banned = channel.banList;
-            let users = channel.users;
-
-            if (banned.length && users.length) {
-                let userAdmins = banned.map((id: number) => users.find((u: User) => u.id === id))
-                userAdmins = userAdmins.filter((u: User) => u)
-                return (userAdmins)
             }
         }
         return ([]);
