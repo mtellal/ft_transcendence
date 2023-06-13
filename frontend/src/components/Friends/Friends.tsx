@@ -5,8 +5,6 @@ import { getSocket } from "../../utils/socket";
 import { BackApi } from "../../api/back";
 
 interface FriendsProps {
-	// friends: any;
-	// delFriend: any;
     id: any;
 	setIdFriendSelected: any;
 }

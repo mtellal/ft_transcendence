@@ -13,35 +13,13 @@ import { JoinChannel } from '../../components/JoinChannel/JoinChannel';
 import { RootState } from '../../store';
 import s from './style.module.css'
 
-/* 
-	direct envent :
-		- Quand on accepte une demande d'ami.
-
-
-
-		pour les amis t'as: 
-	updatedUser qui renvoie un ami,  si A ajoute B, alors B recoit A, +
-		update les infos (example profile picture, status online etc..)
-	removedFriend qui renvoie l'ami qui t'as suppr, A suppr B, B recoit A
-*/
-
 export function Chat() {
 
-	// const [friends, setFriends] = useState([]);
 	const [myChannels, setMyChannels] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
 	const [idChannelSelected, setidChannelSelected] = useState();
 	const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_CHANNEL');
 	const selector = useSelector((store: RootState) => store.user.user);
-
-	// async function getFriends() {
-	// 	const response = await BackApi.getFriendsById(selector.id);
-	// 	if (response.status === 200) {
-	// 		if (response.data.length > 0 && friends !== response.data) {
-	// 			setFriends(response.data);
-	// 		}
-	// 	}
-	// }
 
 	async function getUserChannels() {
 		const response = await BackApi.getChannelsByUserId(selector.id);
@@ -50,20 +28,8 @@ export function Chat() {
 		}
 	}
 
-	async function addFriend() {
-		console.log('Ami ajoute');
-		// const response = await BackApi.getFriendsById(selector.id);
-		// setFriends(response.data);
-	}
-
-	// function delFriend(delFriendId: number) {
-	// 	const updatedFriends = friends.filter((friend) => friend.id !== delFriendId);
-	// 	setFriends(updatedFriends);
-	// }
-
 	useEffect(() => {
 		if (selector.id) {
-			// getFriends();
 			getUserChannels();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,9 +74,8 @@ export function Chat() {
 					>
 						Join channel
 					</button>
-					<AddFriend addFriend={addFriend} />
+					<AddFriend />
 				</div>
-				{/* {btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />} */}
 				{btnFriendsRequest === 'REQUEST' && <FriendRequest id={selector.id} />}
 				{btnFriendsRequest === 'FRIEND' && <Friends id={selector.id} setIdFriendSelected={setIdFriendSelected} />}
 				{btnFriendsRequest === 'CHANNEL' && myChannels && <Channels idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected} id={selector.id} />}

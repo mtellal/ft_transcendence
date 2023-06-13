@@ -4,7 +4,7 @@ import { BackApi } from "../../api/back";
 import { RootState } from "../../store";
 import s from './style.module.css'
 
-export function AddFriend( { addFriend }: { addFriend: () => Promise<void> } ) {
+export function AddFriend() {
 
 	const selector = useSelector((store: RootState) => store.user.user);
 
@@ -18,7 +18,6 @@ export function AddFriend( { addFriend }: { addFriend: () => Promise<void> } ) {
         for (let user of users) {
             if (user.username === friendUsername) {
                 const response = await BackApi.sendFriendRequest(user.id, selector.token);
-				addFriend();
                 if (response.status === 201) {
                     break ;
                 }
