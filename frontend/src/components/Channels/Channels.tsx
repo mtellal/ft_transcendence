@@ -15,14 +15,13 @@ interface GroupProps {
 }
 
 	// export function Group({ myChannels, idChannelSelected, setidChannelSelected, id }: GroupProps) {
-	export function Group({ idChannelSelected, setidChannelSelected, id }: GroupProps) {
+	export function Channels({ idChannelSelected, setidChannelSelected, id }: GroupProps) {
 
 	const [myChannels, setMyChannels] = useState([]);
 
 	async function getUserChannels() {
 		const response = await BackApi.getChannelsByUserId(id);
 		if (response.status === 200) {
-			console.log('ACT My CHANNELS');
 			setMyChannels(response.data);
 		}
 	}

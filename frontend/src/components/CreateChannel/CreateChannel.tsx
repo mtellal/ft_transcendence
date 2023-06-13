@@ -9,7 +9,7 @@ import s from './style.module.css'
 		setBtnFriendsRequest: any;
 	}
 
-export function CreateGroup({ setBtnFriendsRequest }: CreateGroupProps) {
+export function CreateChannel({ setBtnFriendsRequest }: CreateGroupProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
 	const [privacy, setPrivacy] = useState('Public');

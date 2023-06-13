@@ -6,26 +6,29 @@ import { BackApi } from '../../api/back';
 import { AddFriend } from '../../components/AddFriend/AddFriend';
 import { Chatbox } from '../../components/Chatbox/Chatbox';
 import { FriendRequest } from '../../components/FriendRequest/FriendRequest';
-import { Group } from '../../components/Channels/Channels';
+import { Channels } from '../../components/Channels/Channels';
 import { ChatboxChannel } from '../../components/ChatboxChannel/ChatboxChannel';
-import { CreateGroup } from '../../components/CreateChannel/CreateChannel';
+import { CreateChannel } from '../../components/CreateChannel/CreateChannel';
 import { JoinChannel } from '../../components/JoinChannel/JoinChannel';
 import { RootState } from '../../store';
 import s from './style.module.css'
 
 /* 
 	direct envent :
-		- Quand on accepte une demande d'ami
-		- Quand un user quitte un channel (public mais voir pour les autres) et clique sur
-		join channel pour vois les chans qui peuvent etres rejoints, il ne voit pas celui
-		qu'il vient de quitter.
+		- Quand on accepte une demande d'ami.
+
+
+
+		pour les amis t'as: 
+	receivedRequest qui renvoie une requete d'ami {id:x, userId:x, sendBy:x, createdAt:x}
+	updatedUser qui renvoie un ami,  si A ajoute B, alors B recoit A, + update les infos (example profile picture, status online etc..)
+	removedFriend qui renvoie l'ami qui t'as suppr, A suppr B, B recoit A
 */
 
 export function Chat() {
 
 	const [friends, setFriends] = useState([]);
 	const [myChannels, setMyChannels] = useState([]);
-	const [friendRequest, setFriendRequest] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
 	const [idChannelSelected, setidChannelSelected] = useState();
 	const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_CHANNEL');
@@ -57,28 +60,13 @@ export function Chat() {
 		setFriends(updatedFriends);
 	}
 
-	async function getFriendRequest() {
-		const response = await BackApi.getFriendRequest(selector.id);
-		if (response.data !== friendRequest) {
-			setFriendRequest(response.data);
-		}
-	}
-
-	useEffect(() => {
-		if (selector.id) {
-			getFriendRequest();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selector.id])
-
 	useEffect(() => {
 		if (selector.id) {
 			getFriends();
-			// setTimeout(getUserChannels, 2000);
 			getUserChannels();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selector.id, friendRequest, idChannelSelected])
+	}, [selector.id, idChannelSelected])
 
 	return (
 		<div className={s.container}>
@@ -121,12 +109,12 @@ export function Chat() {
 					</button>
 					<AddFriend addFriend={addFriend} />
 				</div>
-				{btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />}
+				{/* {btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />} */}
+				{btnFriendsRequest === 'REQUEST' && <FriendRequest id={selector.id} />}
 				{btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
-				{btnFriendsRequest === 'CHANNEL' && myChannels && <Group idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected} id={selector.id} />}
-				{/* {btnFriendsRequest === 'CHANNEL' && myChannels && <Group myChannels={myChannels} idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected} id={selector.id} />} */}
-				{btnFriendsRequest === 'CREATE_CHANNEL' && myChannels && <CreateGroup setBtnFriendsRequest={setBtnFriendsRequest}/>}
-				{btnFriendsRequest === 'JOIN_CHANNEL' && myChannels && <JoinChannel myChannels={myChannels}/>}
+				{btnFriendsRequest === 'CHANNEL' && myChannels && <Channels idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected} id={selector.id} />}
+				{btnFriendsRequest === 'CREATE_CHANNEL' && myChannels && <CreateChannel setBtnFriendsRequest={setBtnFriendsRequest}/>}
+				{btnFriendsRequest === 'JOIN_CHANNEL' && myChannels && selector.id && <JoinChannel id={selector.id}/>}
 				{idFriendSelected && btnFriendsRequest !== 'CHANNEL' && btnFriendsRequest !== 'CREATE_CHANNEL' && btnFriendsRequest !== 'JOIN_CHANNEL' && <Chatbox idFriendSelected={idFriendSelected} />}
 				{idChannelSelected && btnFriendsRequest === 'CHANNEL' && <ChatboxChannel myChannels={myChannels} setMyChannels={setMyChannels} idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected}/>}
 			</div>

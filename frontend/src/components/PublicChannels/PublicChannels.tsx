@@ -13,6 +13,8 @@ interface PublicChannelsProps {
 
 export function PublicChannels({ channels, myChannels, socket }: PublicChannelsProps) {
 
+	// console.log('A channels', channels)
+	// console.log('A myChannels', myChannels)
 	const [channelsNotJoined, setChannelsNotJoined] = useState([]);
 
 	function setArrayChannels() {
@@ -23,7 +25,7 @@ export function PublicChannels({ channels, myChannels, socket }: PublicChannelsP
 	useEffect(() => {
 		setArrayChannels();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [channels, myChannels])
 
 	if (channelsNotJoined.length === 0) {
 		return (
@@ -33,7 +35,7 @@ export function PublicChannels({ channels, myChannels, socket }: PublicChannelsP
 		);
 	}
 
-	console.log('chan not join', channelsNotJoined);
+	// console.log('chan not join', channelsNotJoined);
 
 	return (
 		<div>

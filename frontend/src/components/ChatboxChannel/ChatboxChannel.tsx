@@ -66,7 +66,6 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 	}
 
 	const messageListener = (message: any) => {
-		console.log('MESSAGE', message);
 		if (message.channelId === idChannelSelected) {
 			if (message.length) {
 				setMessages(message);
@@ -74,7 +73,6 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 				setMessages([...messages, message]);
 			}
 			if (message.type === 'NOTIF') {
-				console.log('NOTIF');
 				setRerender(!rerender);
 			}
 		}
@@ -84,8 +82,13 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 		if (message.channelId === idChannelSelected &&
 			message.userId === selector.id) {
 			setidChannelSelected(null);
-		} else {
-			getDataChannel();
+		}
+	}
+
+	const banListenner = (message: any) => {
+		if (message.channelId === idChannelSelected &&
+			message.userId === selector.id) {
+			setidChannelSelected(null);
 		}
 	}
 
@@ -98,10 +101,6 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 		Asocket.emit('leaveChannel', {
 			channelId: idChannelSelected,
 		})
-		// let arr = channels.filter((obj1: any) => !myChannels.some((obj2: any) => obj2.id === obj1.id) && obj1.type === 'PUBLIC');
-		// let arr = myChannels.filter((obj1: any) => obj1.id !== idChannelSelected);
-		// console.log('arr after leav channel', arr);
-		// setMyChannels(arr);
 		setidChannelSelected(null);
 	}
 
@@ -120,6 +119,7 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 		if (selector.id && Asocket) {
 			Asocket.on('message', messageListener);
 			Asocket.on('kickedUser', kickListenner);
+			Asocket.on('bannedUser', banListenner);
 			return () => {
 				Asocket.off('message', messageListener)
 			}

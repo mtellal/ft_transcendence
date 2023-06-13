@@ -49,7 +49,6 @@ export function FriendRequestList({ friendId, requestId, listFriendRequest, setF
 	function removeListFriendRequestById(requestId: number) {
 		let ret = listFriendRequest.filter((objet: any) => objet['id'] !== requestId);
 		setFriendRequest(ret);
-		console.log('ret', ret);
 	}
 
 	useEffect(() => {
@@ -60,8 +59,6 @@ export function FriendRequestList({ friendId, requestId, listFriendRequest, setF
 		fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-
-	console.log('Component FriendRequest LIST');
 
 	if (isLoading || !infoUser || !avatar) {
 		return (

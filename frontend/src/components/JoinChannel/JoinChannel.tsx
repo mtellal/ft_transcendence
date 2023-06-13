@@ -13,21 +13,34 @@ import s from './style.module.css'
 		myChannels: any;
 	}
 
-export function JoinChannel({ myChannels }: JoinChannelProps) {
+// export function JoinChannel({ myChannels }: JoinChannelProps) {
+export function JoinChannel({ id }: { id: number }) {
 
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [channels, setChannels] = useState();
+	const [myChannels, setMyChannels] = useState([]);
+
+
+	async function getUserChannels() {
+		const response = await BackApi.getChannelsByUserId(id);
+		if (response.status === 200) {
+			setMyChannels(response.data);
+		}
+	}
 
 	async function getAllChannels() {
 		const rep = await BackApi.getAllChannels();
 		if (rep.status === 200) {
-			setChannels(rep.data);
+			let arr = rep.data.filter((obj1: any) => !obj1.banList.includes(id));
+			setChannels(arr);
 		}
 	}
 
 	useEffect(() => {
 		getAllChannels();
+		getUserChannels();
 		setSocket(getSocket());
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	if (!socket) {

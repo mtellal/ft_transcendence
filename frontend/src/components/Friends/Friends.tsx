@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FriendsList } from "../FriendsList/FriendsList";
 import s from './style.module.css'
+import { getSocket } from "../../utils/socket";
 
 interface FriendsProps {
 	friends: any;
@@ -9,6 +10,22 @@ interface FriendsProps {
 }
 
 export function Friends( { friends, delFriend, setIdFriendSelected }: FriendsProps) {
+
+    // const [socket, setSocket] = useState(null);
+
+    // function receivedRequest() {
+    //     console.log('receivedRequest !!!');
+    // }
+
+    // useEffect(() => {
+    //     setSocket(getSocket());
+    // }, [])
+
+    // useEffect(() => {
+    //     if (socket) {
+	// 		socket.on('receivedRequest', receivedRequest);
+    //     }
+    // }, [socket])
 
 	if (friends.length === 0){
 		return (
