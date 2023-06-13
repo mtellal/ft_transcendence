@@ -20,28 +20,28 @@ import s from './style.module.css'
 
 
 		pour les amis t'as: 
-	receivedRequest qui renvoie une requete d'ami {id:x, userId:x, sendBy:x, createdAt:x}
-	updatedUser qui renvoie un ami,  si A ajoute B, alors B recoit A, + update les infos (example profile picture, status online etc..)
+	updatedUser qui renvoie un ami,  si A ajoute B, alors B recoit A, +
+		update les infos (example profile picture, status online etc..)
 	removedFriend qui renvoie l'ami qui t'as suppr, A suppr B, B recoit A
 */
 
 export function Chat() {
 
-	const [friends, setFriends] = useState([]);
+	// const [friends, setFriends] = useState([]);
 	const [myChannels, setMyChannels] = useState([]);
 	const [idFriendSelected, setIdFriendSelected] = useState();
 	const [idChannelSelected, setidChannelSelected] = useState();
 	const [btnFriendsRequest, setBtnFriendsRequest] = useState('CREATE_CHANNEL');
 	const selector = useSelector((store: RootState) => store.user.user);
 
-	async function getFriends() {
-		const response = await BackApi.getFriendsById(selector.id);
-		if (response.status === 200) {
-			if (response.data.length > 0 && friends !== response.data) {
-				setFriends(response.data);
-			}
-		}
-	}
+	// async function getFriends() {
+	// 	const response = await BackApi.getFriendsById(selector.id);
+	// 	if (response.status === 200) {
+	// 		if (response.data.length > 0 && friends !== response.data) {
+	// 			setFriends(response.data);
+	// 		}
+	// 	}
+	// }
 
 	async function getUserChannels() {
 		const response = await BackApi.getChannelsByUserId(selector.id);
@@ -51,18 +51,19 @@ export function Chat() {
 	}
 
 	async function addFriend() {
-		const response = await BackApi.getFriendsById(selector.id);
-		setFriends(response.data);
+		console.log('Ami ajoute');
+		// const response = await BackApi.getFriendsById(selector.id);
+		// setFriends(response.data);
 	}
 
-	function delFriend(delFriendId: number) {
-		const updatedFriends = friends.filter((friend) => friend.id !== delFriendId);
-		setFriends(updatedFriends);
-	}
+	// function delFriend(delFriendId: number) {
+	// 	const updatedFriends = friends.filter((friend) => friend.id !== delFriendId);
+	// 	setFriends(updatedFriends);
+	// }
 
 	useEffect(() => {
 		if (selector.id) {
-			getFriends();
+			// getFriends();
 			getUserChannels();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +112,7 @@ export function Chat() {
 				</div>
 				{/* {btnFriendsRequest === 'REQUEST' && friendRequest && <FriendRequest listFriendRequest={friendRequest} setFriendRequest={setFriendRequest} />} */}
 				{btnFriendsRequest === 'REQUEST' && <FriendRequest id={selector.id} />}
-				{btnFriendsRequest === 'FRIEND' && friends && <Friends friends={friends} delFriend={delFriend} setIdFriendSelected={setIdFriendSelected} />}
+				{btnFriendsRequest === 'FRIEND' && <Friends id={selector.id} setIdFriendSelected={setIdFriendSelected} />}
 				{btnFriendsRequest === 'CHANNEL' && myChannels && <Channels idChannelSelected={idChannelSelected} setidChannelSelected={setidChannelSelected} id={selector.id} />}
 				{btnFriendsRequest === 'CREATE_CHANNEL' && myChannels && <CreateChannel setBtnFriendsRequest={setBtnFriendsRequest}/>}
 				{btnFriendsRequest === 'JOIN_CHANNEL' && myChannels && selector.id && <JoinChannel id={selector.id}/>}

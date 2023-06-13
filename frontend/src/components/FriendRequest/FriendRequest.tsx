@@ -3,8 +3,11 @@ import { FriendRequestList } from "../FriendRequestList/FriendRequestList";
 import { getSocket } from "../../utils/socket";
 import { BackApi } from "../../api/back";
 
+interface FriendRequestProps {
+	id: number;
+}
 
-export function FriendRequest({id}: {id: number}) {
+export function FriendRequest({ id }: FriendRequestProps) {
 
 	const [socket, setSocket] = useState(null);
 	const [listFriendRequest, setFriendRequest] = useState([]);
