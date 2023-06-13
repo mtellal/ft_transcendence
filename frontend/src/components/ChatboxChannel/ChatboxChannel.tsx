@@ -12,11 +12,13 @@ import { ChannelUsers } from '../ChannelUsers/ChannelUsers';
 import { useNavigate } from 'react-router-dom';
 
 interface ChatboxChannelProps {
+	myChannels: any;
+	setMyChannels: any;
 	idChannelSelected: any;
 	setidChannelSelected: any;
 }
 
-export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: ChatboxChannelProps) {
+export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, setidChannelSelected }: ChatboxChannelProps) {
 
 	const selector = useSelector((store: RootState) => store.user.user);
 	const [Asocket, AsetSocket] = useState<any>(null);
@@ -96,6 +98,10 @@ export function ChatboxChannel({ idChannelSelected, setidChannelSelected }: Chat
 		Asocket.emit('leaveChannel', {
 			channelId: idChannelSelected,
 		})
+		// let arr = channels.filter((obj1: any) => !myChannels.some((obj2: any) => obj2.id === obj1.id) && obj1.type === 'PUBLIC');
+		// let arr = myChannels.filter((obj1: any) => obj1.id !== idChannelSelected);
+		// console.log('arr after leav channel', arr);
+		// setMyChannels(arr);
 		setidChannelSelected(null);
 	}
 

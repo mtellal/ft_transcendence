@@ -29,4 +29,10 @@
 	background-color: rgba(0, 0, 0, 0.1);
 	border: none;
 	border-radius: 50px;
+	cursor: pointer;
+}
+
+.err {
+	color: rgb(189, 37, 37);
+	margin-bottom: 5px;
 }

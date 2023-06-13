@@ -14,7 +14,7 @@ interface GroupProps {
 	id: number;
 }
 
-// export function Group({ myChannels, setidChannelSelected }: GroupProps) {
+	// export function Group({ myChannels, idChannelSelected, setidChannelSelected, id }: GroupProps) {
 	export function Group({ idChannelSelected, setidChannelSelected, id }: GroupProps) {
 
 	const [myChannels, setMyChannels] = useState([]);
@@ -22,14 +22,19 @@ interface GroupProps {
 	async function getUserChannels() {
 		const response = await BackApi.getChannelsByUserId(id);
 		if (response.status === 200) {
-				setMyChannels(response.data);
+			console.log('ACT My CHANNELS');
+			setMyChannels(response.data);
 		}
 	}
 
 	useEffect(() => {
-		getUserChannels();
+		setTimeout(getUserChannels, 20);
+
+		// getUserChannels();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id, idChannelSelected])
+
+	// console.log('my Channels', myChannels);
 
 	if (myChannels.length === 0) {
 		return (

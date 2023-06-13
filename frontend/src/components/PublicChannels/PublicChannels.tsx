@@ -33,6 +33,8 @@ export function PublicChannels({ channels, myChannels, socket }: PublicChannelsP
 		);
 	}
 
+	console.log('chan not join', channelsNotJoined);
+
 	return (
 		<div>
 			<div className={s.container}>
