@@ -24,7 +24,7 @@ model User {
   username        String          @unique
   password        String
   email           String?         @unique
-  avatar          String?
+  avatar          String          @default("./uploads/default.png")
   oauth_code      String?         @unique
   oauth_exp       DateTime?
   twoFactorSecret String?

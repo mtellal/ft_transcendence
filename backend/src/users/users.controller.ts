@@ -152,7 +152,7 @@ export class UsersController {
     if (!file)
       throw new BadRequestException('No file or empty file');
     const user: User = req.user;
-    if (req.user.avatar && path.extname(file.filename) != path.extname(user.avatar))
+    if (req.user.avatar != './uploads/default.png' && path.extname(file.filename) != path.extname(user.avatar))
       this.usersService.deleteImg(req.user.avatar);
     const updatedUser = await this.usersService.update(user.id, {
       avatar: file.path

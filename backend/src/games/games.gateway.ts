@@ -29,13 +29,6 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 
     console.log(`ID:${decoded.id} USER:${decoded.username} has connected to game socket`);
-
-    //will need to delete
-    const game = await this.gamesService.findOngoingGame(decoded);
-    if (game) {
-      console.log('ONGOING GAME FOUND!');
-      client.join(`room-${game.id}`);
-    }
   }
 
   async handleDisconnect(client: Socket) {
