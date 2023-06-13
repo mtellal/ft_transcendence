@@ -11,6 +11,8 @@ import { JwtPayloadDto } from '../auth/dto';
 export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly gamesService: GamesService, private readonly userService: UsersService, private readonly jwtService: JwtService) { }
 
+  private userToSocket = new Map<number, string>();
+
   @WebSocketServer()
   server: Server;
 
@@ -28,6 +30,18 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const token = cookie.split('=')[1];
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 
+    if (!decoded) {
+      console.log('game: decode error');
+      client.disconnect();
+      return ;
+    }
+
+    if (this.userToSocket.has(decoded.id)) {
+      console.log('game: User already connected on a socket');
+      client.disconnect();
+      return ;
+    }
+
     console.log(`ID:${decoded.id} USER:${decoded.username} has connected to game socket`);
   }
 
@@ -42,6 +56,8 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const token = cookie.split('=')[1];
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 
+    this.userToSocket.delete(decoded.id);
+    await this.gamesService.deleteMatchmakingGame(decoded);
     await this.gamesService.deleteUnfinishedGame(decoded);
     console.log(`ID:${decoded.id} USER:${decoded.username} has disconnected to game socket`);
   }
@@ -81,6 +97,8 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("event received");
     if (!room) {
       room = await this.gamesService.createGame(payload);
+      if (!room)
+        return ;
       client.emit('joinWait', {message: 'waiting for another player', roomId: room.id });
       client.join(`room-${room.id}`);
       this.server.to(`room-${room.id}`).emit('joinedGame', room);

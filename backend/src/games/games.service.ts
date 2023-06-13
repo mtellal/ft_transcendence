@@ -31,7 +31,7 @@ export class GamesService {
     })
     if (game_exist) {
       console.log('user is already in game');
-      return ;
+      return null;
     }
     try {
       const user = await this.prisma.user.findUnique({
@@ -39,6 +39,9 @@ export class GamesService {
           id: payload.id,
         }
       });
+      
+      if (!user)
+        return null;
 
       const game = await this.prisma.game.create({
         data: {
