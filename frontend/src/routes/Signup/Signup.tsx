@@ -42,6 +42,13 @@ export function Signup() {
         }
 	}
 
+    // async function test(e: any) {
+    //     e.preventDefault();
+    //     // console.log('OKKK');
+    //     const response = await BackApi.auth42();
+    //     console.log('response', response);
+    // }
+
     return (
         <div className={s.signup}>
             <div className={s.title}>Signup</div>
@@ -64,6 +71,9 @@ export function Signup() {
                 <button className={s.signinButton} type="submit">Submit</button>
             </form>
 			<button className={s.btnSignin} onClick={() => navigate('/signin')}>Signin</button>
-        </div>
+            <form action='http://localhost:3000/auth/42'>
+                <button type='submit'>TEST AUTH 42</button>
+            </form>
+       </div>
     );
 }

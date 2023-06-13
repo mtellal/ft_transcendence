@@ -57,6 +57,20 @@ export class BackApi {
 		return response;
 	}
 
+	// static async auth42() {
+	// 	const response = await axios.get(`${BASE_URL}/auth/42`, {
+	// 		headers: {
+	// 			'accept': '*/*'
+	// 		}
+	// 	})
+	// 	.then (rep => rep)
+	// 	.catch (error => error)
+
+	// 	return response;
+	// }
+
+
+
 	static async updateInfoProfile(id: number, userInfo: any) {
 		const response = await axios.patch(`${BASE_URL}/users/${id}`, {
 			...userInfo
