@@ -9,6 +9,7 @@ import { useWindow } from "../../../../hooks/useWindow";
 
 import './MenuElement.css'
 import { RawIcon } from "../../../../components/Icon";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 /*
     tittle
@@ -104,9 +105,10 @@ export default function MenuElement() {
     const {
         channels,
         setCurrentChannel,
-        addChannel,
         currentChannel
     } = useChannelsContext();
+
+    const { addChannel } = useChannels();
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
@@ -143,7 +145,7 @@ export default function MenuElement() {
                         channelSelected = res.data
                     })
                 //channelsDispatch({ type: 'addChannel', channel: channelSelected });
-                addChannel(channelSelected);
+                addChannel(channelSelected, false);
             }
             setCurrentFriend(element);
         }

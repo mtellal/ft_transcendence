@@ -27,7 +27,7 @@ export default function Interface() {
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
 
 
-    const { currentChannel, setCurrentChannel, leaveChannel, channels } = useChannelsContext();
+    const { currentChannel, setCurrentChannel, channels } = useChannelsContext();
 
     const [profile, setProfile] = React.useState(false);
     const [removeView, setRemoveView] = React.useState(false);
@@ -60,34 +60,6 @@ export default function Interface() {
         }
     }, [currentChannel, channels, friends])
 
-    function block() {
-        if (!blockedFriend) {
-            userDispatch({ type: 'blockUser', friendId: currentFriend.id })
-            blockUserRequest(currentFriend.id, token)
-        }
-        else {
-            unblockUserRequest(currentFriend.id, token)
-            userDispatch({ type: 'unblockUser', friendId: currentFriend.id })
-        }
-        setBlockedFriend((p: any) => !p)
-    }
-
-    function bannerBlock() {
-        if (currentFriend) {
-            if (isUserBlocked(currentFriend))
-                unblockUser(currentFriend);
-            else
-                blockUser(currentFriend)
-        }
-    }
-
-
-
-    function validLeaveChannel() {
-        leaveChannel(currentChannel);
-        setRemoveView(false);
-        navigate("/chat");
-    }
 
     // update current friend selected when he is picked from MenuElement
 

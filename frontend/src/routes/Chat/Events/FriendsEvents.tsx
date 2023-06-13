@@ -19,7 +19,7 @@ export default function FriendEvents({ children }: any) {
             })
 
             socket.on('updatedUser', async (friend: any) => {
-                // console.log("UPDATE FRIEND EVENT => ", friend)
+                console.log("UPDATE FRIEND EVENT => ", friend)
                 updateFriend(friend)
             })
 

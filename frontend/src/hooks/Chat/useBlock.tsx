@@ -6,7 +6,6 @@ import { blockUserRequest, unblockUserRequest } from "../../requests/block";
 
 export function useBlock()
 {
-
     const { user, userDispatch, token } = useCurrentUser();
     const { fetchUsers } = useFetchUsers();
 
@@ -34,7 +33,8 @@ export function useBlock()
     const getblockedUsers = useCallback(async () => {
         if (user && user.blockList && user.blockList.length)
         {
-            return ( await fetchUsers(user.blockList))
+            const blockIds = user.blockList.map((o: any) => o.userId)
+            return ( await fetchUsers(blockIds))
         }
     }, [user, user.blockList])
 

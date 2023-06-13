@@ -16,6 +16,7 @@ import useMembers from "../../../../hooks/Chat/useMembers";
 import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { useBlock } from "../../../../hooks/Chat/useBlock";
 import { InterfaceContext } from "../../Interface/Interface";
+import useFetchUsers from "../../../../hooks/useFetchUsers";
 
 const MessengerContext: React.Context<any> = createContext(null);
 
@@ -131,7 +132,7 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
     return (
         <div
             className="flex-column absolute"
-            style={{ bottom: '-20px' }}
+            style={{ bottom: '-20px', maxWidth: '30%'}}
         >
             <div>
                 <ResizeContainer height="30px" width="30px"
@@ -150,10 +151,11 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
             </div>
             <div
                 className={`flex ${props.type !== "WHISPER" ? "pointer" : ""}`}
-                style={{ alignItems: 'flex-end' }}
+                style={{ alignItems: 'flex-end'}}
                 onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
             >
-                <p className="message-author">{props.username}</p>
+                <p className="message-author" 
+                style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'underline' }} >{props.username}</p>
                 {
                     props.type !== "WHISPER" &&
                     <ResizeContainer height="20px">
@@ -179,12 +181,12 @@ function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
     return (
         <div
             className="flex-column absolute"
-            style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end' }}
+            style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end',  maxWidth: '40%', overflow: 'hidden' }}
         >
             <ResizeContainer height="30px" width="30px">
                 <ProfilePicture image={props.url} />
             </ResizeContainer>
-            <div className="flex" style={{ alignItems: 'flex-end' }}>
+            <div className="flex" style={{ alignItems: 'flex-end', paddingBottom: '2px' }}>
                 {
                     props.type !== "WHISPER" &&
                     <ResizeContainer height="20px">
@@ -192,7 +194,9 @@ function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
                         {props.admin && <RawIcon icon="shield_person" />}
                     </ResizeContainer>
                 }
-                <p className="message-author">{props.username}</p>
+                <p className="message-author"
+                    style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70px'}} 
+                >{props.username}</p>
             </div>
         </div>
     )
@@ -287,7 +291,7 @@ type TMessenger = {
 export default function Messenger(props: TMessenger) {
 
     const { user } = useCurrentUser();
-    const { currentChannel, getMembers } = useChannelsContext();
+    const { currentChannel } = useChannelsContext();
 
     const [messages, setMessages] = useState([]);
     const [showUserMenu, setShowUserMenu] = useState({ show: false });
@@ -306,7 +310,7 @@ export default function Messenger(props: TMessenger) {
 
 
     const initMessages = useCallback(async () => {
-        const members = getMembers(currentChannel.id);
+        const members = currentChannel.users;
         let messages: any = currentChannel && currentChannel.messages;
         if (messages && messages.length && members && members.length) {
             messages = filterMessages(messages, members);
@@ -353,6 +357,8 @@ function MessengerConversation({ messages, blockedFriend }: any) {
     const { isUserAdministrators } = useAdinistrators();
     const { getMemberById } = useMembers();
 
+    const { fetchUser } = useFetchUsers(); 
+
 
     let renderMessages: any = useRef(null);
     const lastMessageRef: any = React.useRef(null);
@@ -364,13 +370,14 @@ function MessengerConversation({ messages, blockedFriend }: any) {
             setRender((p: boolean) => !p);
         }
         else {
-
             let author: any;
             renderMessages.current =
                 await Promise.all(messages.map(async (m: any, index: number) => {
                     author = null;
                     if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
                         author = getMemberById(m.sendBy);
+                        if (!author)
+                            author = await fetchUser(m.sendBy);
                     }
 
                     if (m.type === "NOTIF")
@@ -400,7 +407,6 @@ function MessengerConversation({ messages, blockedFriend }: any) {
         rendMessages();
     }, [messages])
 
-
     React.useEffect(() => {
         if (!blockedFriend)
             lastMessageRef.current.scrollIntoView();
@@ -426,7 +432,7 @@ function MessengerInput(props: any) {
         setValue(e.target.value)
     }, []);
 
-    const canSendMessages = useCallback(() =>  {
+    const canSendMessages = useCallback(() => {
         if (props.blockedFriend)
             return ("User blocked")
         return ("Write your message")

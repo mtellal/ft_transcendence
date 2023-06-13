@@ -9,18 +9,14 @@ import useMembers from "../../../hooks/Chat/useMembers";
 
 
 export default function ChannelsEvents({ children }: any) {
-    const navigate = useNavigate();
-
     const { user, token } = useCurrentUser();
     const { socket } = useChatSocket();
-    const { fetchUserProfilePicture, fetchUser, fetchUsers } = useFetchUsers();
     const { channels, channelsDispatch } = useChannelsContext();
 
     const { addedMember } = useMembers();
 
     const {
         addChannel,
-        joinChannel,
         forceToLeaveChannel,
         updateChannelInfos
     } = useChannels();

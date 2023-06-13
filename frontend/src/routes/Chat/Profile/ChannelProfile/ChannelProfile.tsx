@@ -12,13 +12,15 @@ import SearchChannelUser from "../../components/ChannelProfile/SearchChannelUser
 import ChannelPassword from "../../components/ChannelProfile/ChannelPassword";
 import PickMenuAccess from "../../components/ChannelProfile/PickMenuAccess";
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
+import useMembers from "../../../../hooks/Chat/useMembers";
 
 export const PofileChannelContext = createContext({});
 
 export default function ChannelProfile(props: any) {
 
     const { user } = useCurrentUser();
-    const { channels, currentChannel, getOwner } = useChannelsContext();
+    const { channels, currentChannel } = useChannelsContext();
+    const { getOwner } = useMembers();
 
     const { getUsersBanned } = useBanUser();
     const { getAdministrators } = useAdinistrators();
@@ -41,10 +43,7 @@ export default function ChannelProfile(props: any) {
             if (owner)
                 setOwner(owner);
 
-            console.log("init muteList from props.channel =>", props.channel && props.channel.muteList)
-
             const mutedUsers = await getUsersMuted(props.channel);
-            console.log("after getMuted => ", mutedUsers)
             setMuted(mutedUsers);
 
             const bannesUsers = await getUsersBanned(props.channel);

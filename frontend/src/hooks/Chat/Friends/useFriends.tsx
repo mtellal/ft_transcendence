@@ -10,6 +10,10 @@ export function useFriends() {
     const { fetchUserProfilePicture } = useFetchUsers();
     const { friends, friendsDispatch, currentFriend } = useFriendsContext();
 
+    /*
+        add a friend if he doesn't exists, 
+        or update his informations (name, status, profile picture ...)
+    */
     const updateFriend = useCallback(async (friend: any) => {
         if (friends && friend) {
             if (!friend.url) {

@@ -13,15 +13,14 @@ type TChannelInfos = {
 
 export default function ChannelInfos(props: TChannelInfos) {
 
-    const {getMembers, channels } = useChannelsContext();
+    const {channels } = useChannelsContext();
 
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 
     const loadMembers = useCallback(async () => {
-        let members = getMembers(props.channel.id);
-        if (members && members.length) {
+        if (props.channel.users && props.channel.users.length) {
             setRenderMembersPP(
-                members.map((user: any) =>
+                props.channel.users.map((user: any) =>
                     <div key={user.id} className="channelinfos-pp-container">
                         <ProfilePicture image={user.url} />
                     </div>

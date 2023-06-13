@@ -1,7 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
-import { useChannelsContext, useFriendsContext, useCurrentUser, useChatSocket } from "../../../../hooks/Hooks"
-
 import useBanUser from "../../../../hooks/Chat/useBanUser";
 import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
 import { ChannelUserLabel, CollectionUsers } from "./ChannelUserLabel";
@@ -47,6 +45,11 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
             setSearchUser(null);
         }
     }
+
+    console.log(searchUser)
+
+    // !!!!!! NEED TO LOAD BLOCKLIST BECAUSE A USER THAT BLOCKED THE ADMIN CAN'T BE ADDED IN A CHANNEL
+
 
     return (
         <>

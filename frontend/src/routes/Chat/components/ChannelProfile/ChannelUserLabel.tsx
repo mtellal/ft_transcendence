@@ -97,7 +97,6 @@ export function ChannelUserLabel(props: any) {
             )
     }
 
-
     function functionalities() {
         if (props.user && isCurrentUserAdmin && props.user.username !== (user && user.username) &&
             currentChannel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
@@ -119,7 +118,8 @@ export function ChannelUserLabel(props: any) {
                     />
                 )
             }
-            else if (!isUserMember(props.user)) {
+            else if (!isUserMember(props.user) && props.user.blockList && 
+                (!props.user.blockList.length || !props.user.blockList.find((o: any) => o.userId !== user.id))) {
                 return (
                     <Icon
                         icon="add"

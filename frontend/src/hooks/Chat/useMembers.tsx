@@ -40,6 +40,7 @@ export default function useMembers()
     const addMember = useCallback((user: any, channel : any) => {
         if (socket && channels && channel && user)
         {
+            console.log("in")
             socket.emit('addtoChannel', {
                 channelId: channel.id, 
                 userId: user.id
@@ -75,6 +76,21 @@ export default function useMembers()
         }
     }, [channels, currentChannel])
 
+
+    const getOwner = useCallback((channel: any) => {
+        if (channel && channels && channels.length) {
+
+            let ownerId = channel.ownerId;
+            let users = channel.users;
+
+            if (users.length) {
+                let owner = users.find((u: any) => u.id === ownerId)
+                return (owner)
+            }
+        }
+        return ([]);
+    }, [channels])
+
     return (
         {
             isUserMember,
@@ -83,7 +99,8 @@ export default function useMembers()
             addMember,
             addedMember,
             getMemberById,
-            getMembersById
+            getMembersById,
+            getOwner
         }
     )
 }

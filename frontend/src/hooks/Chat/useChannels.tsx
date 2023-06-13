@@ -98,6 +98,23 @@ export function useChannels()
         }
     }, [channelsDispatch, channels])
 
+    const channelAlreadyExists = useCallback((channel: any) => {
+        if (channels) {
+            if (!channels.length)
+                return (false);
+            return (channels.find((c: any) => c.id === channel.id))
+        }
+        return (false)
+    }, [channels])
+
+    const isLocalChannel = useCallback((channel: any) => {
+        if (channels && channels.length && channel) {
+            return (channels.find((c: any) => channel.id === c.id))
+        }
+        return (false);
+    }, [channels])
+
+
     return (
         {
             addChannel,
@@ -106,7 +123,9 @@ export function useChannels()
             joinChannelProtected, 
             forceToLeaveChannel, 
             leaveChannel,
-            updateChannelInfos
+            updateChannelInfos,
+            channelAlreadyExists,
+            isLocalChannel
         }
     )
 }

@@ -12,13 +12,14 @@ import { useBlock } from "../../../../hooks/Chat/useBlock";
 import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { InterfaceContext } from "../../Interface/Interface";
 import { useFriends } from "../../../../hooks/Chat/Friends/useFriends";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 function IconsBanner(props: any) {
 
     const { currentFriend } = useFriendsContext();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
     const { removeFriend } = useFriends();
-    const { leaveChannel } = useChannelsContext();
+    const { leaveChannel } = useChannels();
 
     const { setAction } = useContext(InterfaceContext);
 
@@ -121,7 +122,7 @@ export default function Banner({ ...props }: TBanner) {
     return (
         <>
             <div className="banner">
-                <div className="flex-center">
+                <div className="flex-center" style={{maxWidth: '100%'}} >
                     <ArrowBackMenu />
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?

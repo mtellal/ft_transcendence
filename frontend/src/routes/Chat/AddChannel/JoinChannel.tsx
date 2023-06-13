@@ -26,6 +26,7 @@ import ResizeContainer from "../../../components/ResizeContainer";
 import useChannelAccess from "../../../hooks/Chat/useChannelAccess";
 import InfoInput from "../../../components/Input/InfoInput";
 import useChannelInfos from "../../../hooks/Chat/useChannelInfos";
+import { useChannels } from "../../../hooks/Chat/useChannels";
 
 type TChannelSearch = {
     channel: any,
@@ -36,7 +37,7 @@ type TChannelSearch = {
 function ChannelSearch({ channel, ...props }: TChannelSearch) {
 
     const { user } = useCurrentUser();
-    const { channelAlreadyExists } = useChannelsContext();
+    const { channelAlreadyExists } = useChannels();
     const { isChannelProtected, isChannelPrivate } = useChannelAccess();
     const { isUserBanned } = useBanUser()
 
@@ -130,8 +131,9 @@ export default function JoinChannel() {
 
     const {
         channels,
-        addChannel,
     } = useChannelsContext();
+
+    const { addChannel } = useChannels();
 
     function fetchError() {
         setError(true);
@@ -254,7 +256,7 @@ function ProtectedChannelPassword(props: any) {
 
     const { token } = useCurrentUser();
     const [passwordValue, setPasswordValue]: any = useState("");
-    const { addChannelProtected } = useChannelsContext();
+    const { addChannelProtected } = useChannels();
     const [error, setError] = useState("")
 
     async function submitPassword() {

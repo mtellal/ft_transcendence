@@ -10,6 +10,7 @@ import PickMenu from "../../../components/PickMenu";
 
 import './CreateChannel.css'
 import ArrowBackMenu from "../components/ArrowBackMenu";
+import { useChannels } from "../../../hooks/Chat/useChannels";
 
 
 export function CreateChannel() {
@@ -23,7 +24,9 @@ export function CreateChannel() {
 
     const { token } = useCurrentUser();
 
-    const { channels, channelsDispatch, setCurrentChannel, addChannel } = useChannelsContext();
+    const { channels, channelsDispatch, setCurrentChannel } = useChannelsContext();
+
+    const {addChannel } = useChannels();
 
     const navigate = useNavigate();
 
@@ -40,7 +43,7 @@ export function CreateChannel() {
             banList: banMembers.map((u: any) => u.id),
         }, token)
             .then(res => {
-                addChannel(res.data)
+                addChannel(res.data, false)
                 setCurrentChannel(res.data);
             })
         console.log("channelCreated")

@@ -63,6 +63,7 @@ type Channel = {
     createdAt?: string
 
     users?: User[],
+    notifs: number
 }
 
 
@@ -71,7 +72,8 @@ function formatChannel(channel: Channel) {
         {
             ...channel,
             messages: channel.messages || [],
-            users: channel.users || []
+            users: channel.users || [],
+            notifs: channel.notifs || 0
         }
     )
 }
@@ -137,11 +139,9 @@ function reducer(channels: any, action: any) {
         case ('addMuteList'): {
             if (channels.length && action.channelId && action.userId && action.mute) {
                 return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && c.muteList)
-                    {
-                        if (c.muteList.length && c.muteList.find((o: any) => o.userId === action.userId))
-                        {
-                            c.muteList = c.muteList.map((o : any) => o.userId === action.userId ? action.mute : o)    
+                    if (c.id === action.channelId && c.muteList) {
+                        if (c.muteList.length && c.muteList.find((o: any) => o.userId === action.userId)) {
+                            c.muteList = c.muteList.map((o: any) => o.userId === action.userId ? action.mute : o)
                         }
                         else
                             c.muteList.push(action.mute);
@@ -239,31 +239,49 @@ function reducer(channels: any, action: any) {
                 )
             }
         }
+        case ('addNotif'): {
+            if (channels && channels.lentgh && action.channelId) {
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId)
+                            c.notifs += 1;
+                        return (c);
+                    })
+                )
+            }
+        }
+        case ('removeNotif'): {
+            if (channels && channels.lentgh && action.channelId) {
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId)
+                            c.notifs = 0;
+                        return (c);
+                    })
+                )
+            }
+        }
         default: return (channels)
     }
 }
 
 
 export function ChannelsProvider({ children }: any) {
+
     const { user } = useCurrentUser();
     const { socket } = useChatSocket();
+    const { fetchUsers } = useFetchUsers();
+
     const [channels, channelsDispatch] = useReducer(reducer, []);
     const [currentChannel, setCurrentChannelLocal]: any = useState();
-    const { fetchUser, fetchUsers } = useFetchUsers();
-    const navigate = useNavigate();
-
     const [channelsLoading, setChannelsLoading] = useState(false);
 
 
     const loadChannels = useCallback(async () => {
         console.log("////////////// load channels")
+
         setChannelsLoading(true)
-        let channelList = await getChannels(user.id)
-            .then(res => {
-                if (res.status === 200 && res.statusText === "OK") {
-                    return (res.data)
-                }
-            })
+        let channelList = await getChannels(user.id).then(res => res.data)
 
         channelList = await Promise.all(channelList.map(async (c: any) => {
             if (c.members && c.members.length) {
@@ -273,7 +291,11 @@ export function ChannelsProvider({ children }: any) {
             }
         }))
         channelsDispatch({ type: 'initChannels', channels: channelList });
-        channelList.forEach(joinChannel);
+        channelList.forEach((channel: Channel) => {
+            socket.emit('joinChannel', {
+                channelId: channel.id
+            })
+        });
         // channelList.map(async (c : any) => await removeChannel(c.id))
         setChannelsLoading(false)
         console.log("load channels ////////////// ")
@@ -286,138 +308,11 @@ export function ChannelsProvider({ children }: any) {
     }, [socket, user])
 
 
-    function forceToLeaveChannel(res: any) {
-        channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId });
-        channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId });
-        if (res.userId === user.id)
-            channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
-        if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
-            navigate("/chat");
-    }
-
-
-    ////////////////////////////////////////////////////////////////
-    //                       C H A N N E L S                      //
-    ////////////////////////////////////////////////////////////////
-
-    const addChannel = useCallback(async (channel: any, includeCurrentUser: boolean) => {
-        if (socket) {
-            if (!channel.users || !channel.users.length && channel.members) {
-                if (includeCurrentUser)
-                    channel.members = [...channel.members, user.id]
-                const users = await fetchUsers(channel.members)
-                if (users)
-                    channel = { ...channel, users }
-            }
-            channelsDispatch({ type: 'addChannel', channel });
-            joinChannel(channel);
-        }
-    }, [socket])
-
-
-    const addChannelProtected = useCallback(async (channel: any, password: string, includeCurrentUser: boolean) => {
-        if (socket) {
-            console.log("channel => ", channel)
-            if (!channel.users || !channel.users.length && channel.members) {
-                if (includeCurrentUser)
-                    channel.members = [...channel.members, user.id]
-                const users = await fetchUsers(channel.members)
-                if (users)
-                    channel = { ...channel, users }
-            }
-            channelsDispatch({ type: 'addChannel', channel });
-            joinChannelProtected(channel.id, password);
-        }
-    }, [socket])
-
-
-    const joinChannel = useCallback((channel: any) => {
-        if (socket) {
-            socket.emit('joinChannel', {
-                channelId: channel.id
-            })
-        }
-    }, [socket])
-
-    const joinChannelProtected = useCallback((channelId : number, password: string) => {
-        if (socket) {
-            socket.emit('joinChannel', {
-                channelId, 
-                password
-            })
-        }
-    }, [socket])
-
-
-    const leaveChannel = useCallback((channel: any) => {
-        if (channel && channel.id && socket) {
-            channelsDispatch({ type: 'removeChannel', channelId: channel.id })
-            socket.emit('leaveChannel', {
-                channelId: channel.id
-            })
-            navigate("/chat");
-        }
-    }, [socket])
-
-
-    ////////////////////////////////////////////////////////////////
-    //                           U S E R S                        //
-    ////////////////////////////////////////////////////////////////
-
-    /*
-        !!!!!!!!!!! ATTENTION LES USERS DEMANDES SONT ENVOYES AVEC TOUS LEURS DETAILS, 
-            demander seulement les datas pour un ami
-    */
-
-    const getMembers = useCallback((channelId: number) => {
-        if (channelId && channels && channels.length) {
-            let fChannel = channels.find((c: Channel) => c.id === channelId)
-            if (fChannel) {
-                return (fChannel.users)
-            }
-        }
-        return ([]);
-    }, [channels])
-
-    const getOwner = useCallback((channel: Channel) => {
-        if (channel && channels && channels.length) {
-
-            let ownerId = channel.ownerId;
-            let users = channel.users;
-
-            if (users.length) {
-                let owner = users.find((u: User) => u.id === ownerId)
-                return (owner)
-            }
-        }
-        return ([]);
-    }, [channels])
-
-
-
-    const channelAlreadyExists = useCallback((channel: any) => {
-        if (channels) {
-            if (!channels.length)
-                return (false);
-            return (channels.find((c: any) => c.id === channel.id))
-        }
-        return (false)
-    }, [channels])
-
-    const isLocalChannel = useCallback((channel: Channel) => {
-        if (channels && channels.length && channel) {
-            return (channels.find((c: Channel) => channel.id === c.id))
-        }
-        return (false);
-    }, [channels])
-
 
     ////////////////////////////////////////////////////////////////
     //               C U R R E N T    C H A N N E L               //
     ////////////////////////////////////////////////////////////////
 
-
-    // pick the good channel with all messages 
     const setCurrentChannel = useCallback((channel: any) => {
         let pickChannel;
         if (!channels.length)
@@ -430,32 +325,21 @@ export function ChannelsProvider({ children }: any) {
         setCurrentChannelLocal(pickChannel);
     }, [channels])
 
-
+    /*
+        when events in channels[] are triggered currentChannel need to be updated
+    */
     useEffect(() => {
         if (channels && channels.length) {
             setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p)
         }
     }, [channels])
 
-
-
-    //console.log(channels)
-
     return (
         <ChannelsContext.Provider value={{
             channels,
             channelsDispatch,
             currentChannel,
-            setCurrentChannel,
-            addChannel,
-            addChannelProtected,
-            joinChannel,
-            leaveChannel,
-            channelAlreadyExists,
-            getOwner,
-            getMembers,
-            isLocalChannel,
-            forceToLeaveChannel
+            setCurrentChannel
         }}>
             {children}
         </ChannelsContext.Provider>

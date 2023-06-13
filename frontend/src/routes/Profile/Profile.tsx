@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateProfilePicture, updateUser } from "../../requests/user";
 
@@ -7,6 +7,8 @@ import InfoInput from "../../components/Input/InfoInput";
 import { useCurrentUser } from "../../hooks/Hooks";
 
 import './Profile.css'
+import { CollectionUsers } from "../Chat/components/ChannelProfile/ChannelUserLabel";
+import { useBlock } from "../../hooks/Chat/useBlock";
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const [username, setUsername]: [string, any] = React.useState(props.username);
@@ -125,6 +127,22 @@ export default function Profile() {
         updateCurrentUser,
         updateCurrentProfilePicture
     }: any = useCurrentUser();
+    const { getblockedUsers } = useBlock();
+
+    const [blockedUsers, setBlockedUsers] = useState([]);
+
+    async function initBlockedUsers()
+    {
+        const users = await getblockedUsers();
+        console.log(users, user.blockList)
+        if (users && users.length)
+            setBlockedUsers(users);
+    }
+
+    useEffect(() => {
+        if (user)
+            initBlockedUsers();
+    }, [user])
 
     return (
         <div className="profile">
@@ -144,3 +162,4 @@ export default function Profile() {
         </div>
     )
 }
+
