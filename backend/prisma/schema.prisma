@@ -112,6 +112,13 @@ enum GameStatus {
   FINISHED
 }
 
+//Those are just example just to pave the way
+enum GameType {
+  CLASSIC
+  SPEEDUP
+  HARDMODE
+}
+
 // For a Game, need at least the ID of the two players involved, the score, if the match is ongoing or over. Will add more.
 model Game {
   id Int @id @default(autoincrement())
@@ -126,7 +133,8 @@ model Game {
 
   wonBy Int?
 
-  status GameStatus
+  status   GameStatus
+  gametype GameType   @default(CLASSIC)
 
   createdAt DateTime @default(now())
 }
