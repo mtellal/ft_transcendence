@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useCurrentUser, useFriendsContext } from "../../Hooks";
+import { useChannelsContext, useCurrentUser, useFriendsContext } from "../../Hooks";
 import useFetchUsers from "../../useFetchUsers";
 import { removeUserFriend } from "../../../requests/friends";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,14 @@ export function useFriends() {
     const { token } = useCurrentUser();
     const { fetchUserProfilePicture } = useFetchUsers();
     const { friends, friendsDispatch, currentFriend } = useFriendsContext();
+
+    const isUserFriend = useCallback((user: any) => {
+        if (friends && friends.length)
+        {
+            return (friends.find((u: any) => u.user === user.id))
+        }
+        return (false);
+    }, [friends])
 
     /*
         add a friend if he doesn't exists, 
@@ -31,12 +39,16 @@ export function useFriends() {
             removeUserFriend(friend.id, token);
             friendsDispatch({ type: 'removeFriend', friend })
             if (currentFriend && currentFriend.id === friend.id)
+            {
+                console.log("remove friend call, currentFriend => ", currentFriend)
                 navigate("/chat");
+            }
         }
     }, [friends, currentFriend])
 
     return (
         {
+            isUserFriend,
             updateFriend,
             removeFriend
         }

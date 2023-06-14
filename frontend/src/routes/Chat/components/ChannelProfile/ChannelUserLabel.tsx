@@ -24,7 +24,8 @@ export function CollectionUsers(props: any) {
                 <ChannelUserLabel
                     key={`${props.title}-${user.id}`}
                     user={user}
-                    bannedUsers={props.bannedUsers}
+                    showChannelStatus={false}
+                    isAddable={false}
                 />
             ))
     }, [props.users, props.isAdmin, props.currentUser, channels])
@@ -37,8 +38,14 @@ export function CollectionUsers(props: any) {
     )
 }
 
+type TChannelUserLabel = {
+    user: any,
+    showChannelStatus: boolean | number,
+    isAddable: boolean,
+}
 
-export function ChannelUserLabel(props: any) {
+
+export function ChannelUserLabel(props: TChannelUserLabel) {
 
     const { user } = useCurrentUser();
     const { currentChannel, channels } = useChannelsContext();
@@ -118,26 +125,29 @@ export function ChannelUserLabel(props: any) {
                     />
                 )
             }
-            else if (!isUserMember(props.user) && props.user.blockList && 
-                (!props.user.blockList.length || !props.user.blockList.find((o: any) => o.userId !== user.id))) {
-                return (
-                    <Icon
-                        icon="add"
-                        description="Add"
-                        onClick={() => {
-                            setConfirmView(true);
-                            setUserAction(
-                                {
-                                    user: props.user,
-                                    function: addMember,
-                                    type: "add"
-                                }
-                            )
-                        }}
-                    />
-                )
+            else if (props.user && !isUserMember(props.user)) {
+                if (props.isAddable) {
+                    return (
+                        <Icon
+                            icon="add"
+                            description="Add"
+                            onClick={() => {
+                                setConfirmView(true);
+                                setUserAction(
+                                    {
+                                        user: props.user,
+                                        function: addMember,
+                                        type: "add"
+                                    }
+                                )
+                            }}
+                        />
+                    )
+                }
+                else 
+                    return (<p>Blocked</p>)
             }
-            else {
+            else if (props.user) {
                 return (
                     <div
                         className="flex-center fill"
@@ -214,9 +224,8 @@ export function ChannelUserLabel(props: any) {
         }
     }
 
-
     function showChannelStatus() {
-        if (props.showChannelStatus) {
+        if (props.showChannelStatus && props.user) {
             return (
                 <>
                     {

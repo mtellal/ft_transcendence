@@ -1,15 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 import useBanUser from "../../../../hooks/Chat/useBanUser";
-import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
 import { ChannelUserLabel, CollectionUsers } from "./ChannelUserLabel";
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
-import useChannelInfos from "../../../../hooks/Chat/useChannelInfos";
 import InfoInput from "../../../../components/Input/InfoInput";
-import PickMenu from "../../../../components/PickMenu";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
-import { ConfirmAction } from "../../Profile/ChannelProfile/ConfirmAction";
+import { getBlockList } from "../../../../requests/block";
+import { useCurrentUser } from "../../../../hooks/Hooks";
 
 
 type TSearchChannelUser = {
@@ -21,6 +19,7 @@ type TSearchChannelUser = {
 
 export default function SearchChannelUser(props: TSearchChannelUser) {
 
+    const { user, token } = useCurrentUser();
     const [searchUserValue, setSearchUserValue]: any = useState("");
     const [searchUser, setSearchUser]: any = useState();
     const [error, setError] = useState("");
@@ -29,15 +28,20 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
     const { fetchUserByUsername } = useFetchUsers();
     const { isCurrentUserAdmin, getUserAccess } = useUserAccess();
 
+    const [blockedUser, setBlockedUser] = useState(false);
+
     async function search() {
-        let user;
+        let searchedUser;
         if (props.members && props.members.length) {
-            user = props.members.find((u: any) => u.username === searchUserValue.trim());
+            searchedUser = props.members.find((u: any) => u.username === searchUserValue.trim());
         }
-        if (!user)
-            user = await fetchUserByUsername(searchUserValue);
-        if (user && (isUserMember(user) || isCurrentUserAdmin)) {
-            setSearchUser(user);
+        if (!searchedUser)
+            searchedUser = await fetchUserByUsername(searchUserValue);
+        if (searchedUser && (isUserMember(searchedUser) || isCurrentUserAdmin)) {
+            setSearchUser(searchedUser);
+            const userBlockList = await getBlockList(searchedUser.id, token).then(res => res.data);
+            if (userBlockList && userBlockList.length && userBlockList.find((o: any) => o.userId === user.id))
+                setBlockedUser(true);
             setError("");
         }
         else {
@@ -45,11 +49,6 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
             setSearchUser(null);
         }
     }
-
-    console.log(searchUser)
-
-    // !!!!!! NEED TO LOAD BLOCKLIST BECAUSE A USER THAT BLOCKED THE ADMIN CAN'T BE ADDED IN A CHANNEL
-
 
     return (
         <>
@@ -67,8 +66,8 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
                 searchUser &&
                 <ChannelUserLabel
                     user={searchUser}
-                    bannedUsers={props.bannedUsers}
                     showChannelStatus={!isCurrentUserAdmin && getUserAccess(searchUser)}
+                    isAddable={!blockedUser}
                 />
             }
         </>

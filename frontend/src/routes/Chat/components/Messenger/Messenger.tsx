@@ -17,6 +17,7 @@ import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAc
 import { useBlock } from "../../../../hooks/Chat/useBlock";
 import { InterfaceContext } from "../../Interface/Interface";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 const MessengerContext: React.Context<any> = createContext(null);
 
@@ -116,51 +117,57 @@ function UserMenu(props: TUserManu) {
 
 
 type TMessengerUserLabel = {
+    author: any,
     id: number,
-    user: any,
-    url: string,
-    username: string,
-    type: string,
     owner?: boolean,
-    admin?: boolean,
 }
 
 function MessengerUserLabel(props: TMessengerUserLabel) {
 
     const { showUserMenu, setShowUserMenu } = useContext(MessengerContext);
+    const { currentChannel } = useChannelsContext();
+
+    const [type, setType] = useState(currentChannel && currentChannel.type);
+
+    const { isUserAdministrators } = useAdinistrators();
 
     return (
         <div
             className="flex-column absolute"
-            style={{ bottom: '-20px', maxWidth: '30%'}}
+            style={{ bottom: '-20px', maxWidth: '30%' }}
         >
             <div>
                 <ResizeContainer height="30px" width="30px"
-                    className={props.type !== "WHISPER" ? "pointer" : ""}
+                    className={type !== "WHISPER" ? "pointer" : ""}
                     onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
                 >
-                    <ProfilePicture image={props.url} />
+                    <ProfilePicture image={props.author.url} />
                 </ResizeContainer>
                 {
-                    props.type !== "WHISPER" && showUserMenu && showUserMenu.show && showUserMenu.id === props.id &&
+                    type !== "WHISPER" &&
+                    showUserMenu && showUserMenu.show && showUserMenu.id === props.id &&
                     <UserMenu
                         setShowUserMenu={setShowUserMenu}
-                        user={props.user}
+                        user={props.author}
                     />
                 }
             </div>
             <div
-                className={`flex ${props.type !== "WHISPER" ? "pointer" : ""}`}
-                style={{ alignItems: 'flex-end'}}
+                className={`flex ${type !== "WHISPER" ? "pointer" : ""}`}
+                style={{ alignItems: 'flex-end' }}
                 onClick={() => setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
             >
-                <p className="message-author" 
-                style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'underline' }} >{props.username}</p>
+                <p className="message-author"
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'underline' }} >{props.author.username}</p>
                 {
-                    props.type !== "WHISPER" &&
+                    type !== "WHISPER" &&
                     <ResizeContainer height="20px">
-                        {props.owner && <RawIcon icon="location_away" />}
-                        {props.admin && <RawIcon icon="shield_person" />}
+                        {
+                            currentChannel.type !== "WHISPER" &&
+                            currentChannel.ownerId === props.author.id &&
+                            <RawIcon icon="location_away" />
+                        }
+                        {isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
                     </ResizeContainer>
                 }
             </div>
@@ -169,34 +176,38 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
 }
 
 type TMessengerCurrentUserLabel = {
-    url: string,
-    username: string,
-    type: string,
+    author: any,
     owner?: boolean,
-    admin?: boolean
 }
 
 function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
 
+    const { currentChannel } = useChannelsContext();
+    const { isUserAdministrators } = useAdinistrators();
+
     return (
         <div
             className="flex-column absolute"
-            style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end',  maxWidth: '40%', overflow: 'hidden' }}
+            style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end', maxWidth: '40%', overflow: 'hidden' }}
         >
             <ResizeContainer height="30px" width="30px">
-                <ProfilePicture image={props.url} />
+                <ProfilePicture image={props.author.url} />
             </ResizeContainer>
             <div className="flex" style={{ alignItems: 'flex-end', paddingBottom: '2px' }}>
                 {
-                    props.type !== "WHISPER" &&
+                    currentChannel && currentChannel.type !== "WHISPER" &&
                     <ResizeContainer height="20px">
-                        {props.owner && <RawIcon icon="location_away" />}
-                        {props.admin && <RawIcon icon="shield_person" />}
+                        {
+                            currentChannel.type !== "WHISPER" &&
+                            currentChannel.ownerId === props.author.id &&
+                            <RawIcon icon="location_away" />
+                        }
+                        {isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
                     </ResizeContainer>
                 }
                 <p className="message-author"
-                    style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70px'}} 
-                >{props.username}</p>
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70px' }}
+                >{props.author.username}</p>
             </div>
         </div>
     )
@@ -207,31 +218,50 @@ type TMessage = {
     id: number,
     content: string,
     sendBy: number,
-    author: any,
-    username: string,
-    currentUser: any,
-    type: string,
-    admin: boolean,
+
+    displayUser: boolean,
+
     owner: boolean
 }
 
 
 function Message(props: TMessage) {
 
+    const { user } = useCurrentUser();
+    const { fetchUser } = useFetchUsers();
+    const { getMemberById } = useMembers();
+
+    const [author, setAuthor]: any = useState();
+
+    useEffect(() => {
+        if (props.displayUser) {
+            let _author = getMemberById(props.sendBy);
+            if (_author)
+                setAuthor(_author);
+            else {
+                _author = fetchUser(props.sendBy);
+                if (_author)
+                    setAuthor(_author);
+            }
+
+        }
+        else
+            setAuthor(null)
+    }, [props.displayUser])
 
     function addStyle() {
-        if (props.currentUser && props.sendBy === props.currentUser.id)
+        if (user && props.sendBy === user.id)
             return ({ backgroundColor: '#FFF5DD' });
     }
 
-    function pickMessageStyle() {
+    const pickMessageStyle = useCallback(() => {
         let style = {};
-        if (props.author)
+        if (author)
             style = { marginBottom: '30px' }
-        if (props.currentUser && props.sendBy === props.currentUser.id)
+        if (user && props.sendBy === user.id)
             style = { ...style, justifyContent: 'right', flexDirection: 'rowreverse' }
         return (style)
-    }
+    }, [author]);
 
     return (
         <div>
@@ -245,25 +275,18 @@ function Message(props: TMessage) {
                         </p>
                     </div>
                     {
-                        props.author &&
+                        author &&
                         <>
                             {
-                                props.currentUser && props.currentUser.id !== props.sendBy ?
+                                user && user.id !== props.sendBy ?
                                     <MessengerUserLabel
                                         id={props.id}
-                                        user={props.author}
-                                        url={props.author && props.author.url}
-                                        username={props.username}
+                                        author={author}
                                         owner={props.owner}
-                                        admin={props.admin}
-                                        type={props.type}
                                     /> :
                                     <MessengerCurrentUserLabel
-                                        url={props.author && props.author.url}
-                                        username={props.username}
+                                        author={author}
                                         owner={props.owner}
-                                        admin={props.admin}
-                                        type={props.type}
                                     />
                             }
                         </>
@@ -311,19 +334,21 @@ export default function Messenger(props: TMessenger) {
 
     const initMessages = useCallback(async () => {
         const members = currentChannel.users;
-        let messages: any = currentChannel && currentChannel.messages;
+        let messages: any = currentChannel.messages;
         if (messages && messages.length && members && members.length) {
             messages = filterMessages(messages, members);
             setMessages(messages);
         }
-    }, [currentChannel && currentChannel.messages, user])
+    }, [currentChannel.messages, user])
 
 
 
     useEffect(() => {
-        if (currentChannel) {
+        if (currentChannel.messages) {
             initMessages();
         }
+        else
+            setMessages([]);
     }, [currentChannel.messages, user.blockList])
 
     return (
@@ -347,37 +372,30 @@ export default function Messenger(props: TMessenger) {
 
 
 function MessengerConversation({ messages, blockedFriend }: any) {
-    const [render, setRender] = useState(false);
-
-    const { user } = useCurrentUser();
     const { currentFriend } = useFriendsContext();
-
     const { currentChannel } = useChannelsContext();
-
-    const { isUserAdministrators } = useAdinistrators();
-    const { getMemberById } = useMembers();
-
-    const { fetchUser } = useFetchUsers(); 
-
+    
+    const [render, setRender] = useState(false);
 
     let renderMessages: any = useRef(null);
     const lastMessageRef: any = React.useRef(null);
 
 
-    async function rendMessages() {
-        if (!messages || !messages.length) {
-            renderMessages.current = <NoMessages />
+
+    const rendMessages = useCallback(async () => {
+        console.log("render messages called")
+        if (!messages.length) {
             setRender((p: boolean) => !p);
+            renderMessages.current = <NoMessages />
         }
         else {
-            let author: any;
+            setRender((p: boolean) => !p);
+            let displayUser: boolean;
             renderMessages.current =
-                await Promise.all(messages.map(async (m: any, index: number) => {
-                    author = null;
+                messages.map((m: any, index: number) => {
+                    displayUser = false;
                     if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
-                        author = getMemberById(m.sendBy);
-                        if (!author)
-                            author = await fetchUser(m.sendBy);
+                        displayUser = true;
                     }
 
                     if (m.type === "NOTIF")
@@ -389,28 +407,26 @@ function MessengerConversation({ messages, blockedFriend }: any) {
                                 id={m.id}
                                 content={m.content}
                                 sendBy={m.sendBy}
-                                author={author}
-                                username={author && author.username}
-                                currentUser={user}
-                                type={currentChannel.type}
-                                admin={author && isUserAdministrators(author)}
+                                displayUser={displayUser}
                                 owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
                             />
                         )
                     }
-                }))
-            setRender((p: boolean) => !p);
+                })
         }
-    }
+    }, [messages]);
 
     useEffect(() => {
         rendMessages();
     }, [messages])
 
+
     React.useEffect(() => {
         if (!blockedFriend)
             lastMessageRef.current.scrollIntoView();
     }, [currentChannel, render])
+
+    console.log("render Messages => ", renderMessages.current, messages)
 
     return (
         <div className="messages-display">

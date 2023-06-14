@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import MenuElement from "../components/Menu/MenuElement";
-import { Outlet } from "react-router-dom";
+import { Outlet, useSearchParams } from "react-router-dom";
 
 
 import { FriendsProvider } from "../../../contexts/Chat/FriendsContext";
@@ -11,6 +11,18 @@ import { ChannelsProvider } from "../../../contexts/Chat/ChannelsContext";
 import './Chat.css'
 import FriendEvents from "../Events/FriendsEvents";
 import ChannelsEvents from "../Events/ChannelsEvents";
+import { useChannelsContext } from "../../../hooks/Hooks";
+
+function ChatInterface() {
+    return (
+        <div className="chat">
+            <div className="chat-container">
+                <MenuElement />
+                <Outlet />
+            </div>
+        </div>
+    )
+}
 
 
 export default function Chat() {
@@ -20,12 +32,7 @@ export default function Chat() {
                 <ChannelsProvider>
                     <FriendEvents>
                         <ChannelsEvents>
-                            <div className="chat">
-                                <div className="chat-container">
-                                    <MenuElement />
-                                    <Outlet />
-                                </div>
-                            </div>
+                            <ChatInterface />
                         </ChannelsEvents>
                     </FriendEvents>
                 </ChannelsProvider>

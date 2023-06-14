@@ -82,6 +82,8 @@ export default function ChannelProfile(props: any) {
                     <h2>Owner</h2>
                     <ChannelUserLabel
                         user={owner}
+                        showChannelStatus={true}
+                        isAddable={false}
                     />
                     <CollectionUsers
                         title="Administrators"

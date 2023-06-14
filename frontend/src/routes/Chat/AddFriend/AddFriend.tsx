@@ -24,6 +24,8 @@ import { useWindow } from "../../../hooks/useWindow";
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
+import { getWhisperChannel } from "../../../requests/chat";
+import { useChannels } from "../../../hooks/Chat/useChannels";
 
 
 export default function AddFriend() {

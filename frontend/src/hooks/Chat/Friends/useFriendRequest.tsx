@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useCurrentUser, useFriendsContext } from "../../Hooks";
 import { useFriends } from "./useFriends";
 import { refuseFriendRequest, sendFriendRequest, validFriendRequest } from "../../../requests/friendsRequest";
+import { useChannels } from "../useChannels";
 
 
 export function useFriendRequest() {

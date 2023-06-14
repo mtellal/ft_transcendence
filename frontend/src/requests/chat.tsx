@@ -15,6 +15,13 @@ export async function getChannel(id: number) {
     )
 }
 
+export async function getWhisperChannel(userId: number, friendId: number) {
+    return (
+        axios.get(`${back}/users/whispers?id=${userId}&friendId=${friendId}`)
+            .then(res => res.data)
+            .catch(err => err)
+    )
+}
 
 export async function getChannelProtected(channelId: number, password: string, token: string) {
     return (
@@ -63,6 +70,14 @@ export async function removeChannel(id: number) {
     return (
         axios.delete(`${back}/chat/${id}`)
             .then(res => res)
+            .catch(err => err)
+    )
+}
+
+export async function getChannelMessages(channelId: number) {
+    return (
+        axios.get(`${back}/chat/${channelId}/messages`)
+            .then(res => res.data)
             .catch(err => err)
     )
 }

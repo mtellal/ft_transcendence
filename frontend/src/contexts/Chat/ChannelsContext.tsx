@@ -87,8 +87,9 @@ function reducer(channels: any, action: any) {
             return (action.channels);
         }
         case ('addChannel'): {
-            if (!channels.length)
+            if (!channels.length) {
                 return ([formatChannel(action.channel)])
+            }
             if (action.channel && !channels.find((c: any) => c.id === action.channel.id)) {
                 return ([...channels, formatChannel(action.channel)])
             }
@@ -219,7 +220,7 @@ function reducer(channels: any, action: any) {
             if (channels.length && messages && messages.length) {
                 return (
                     channels.map((c: any) => {
-                        if (c.id === messages[0].channelId) {
+                        if (c.id === messages[0].channelId && !c.messages.length) {
                             c.messages = messages;
                         }
                         return (c);
@@ -276,20 +277,49 @@ export function ChannelsProvider({ children }: any) {
     const [currentChannel, setCurrentChannelLocal]: any = useState();
     const [channelsLoading, setChannelsLoading] = useState(false);
 
+    const { friends, friendsLoaded } = useFriendsContext();
+
+    async function loadUsersChannels(channelList: Channel[]) {
+        let users;
+        if (channelList && channelList.length) {
+            return (
+                await Promise.all(channelList.map(async (c: any) => {
+                    if (c.members && c.members.length) {
+                        if (c.type === "WHISPER" && friends.length) {
+                            const friend = friends.find((u: any) =>
+                                c.members.find((id: number) => u.id === id));
+                            users = [user, friend];
+                        }
+                        else {
+                            users = await fetchUsers(c.members);
+                            users = users.filter((u: any) => u)
+                        }
+                        return ({ ...c, users })
+                    }
+                }))
+            )
+        }
+        return ([]);
+    }
+
+    function filterAvailableChannels(channelList: Channel[]) {
+        return (
+            channelList.filter((c: Channel) =>
+                ((c.type !== "WHISPER") ||
+                    (friends.length && c.members.find((id: number) =>
+                        friends.find((f: any) => f.id === id))))
+                    ? c : null
+            )
+        )
+    }
 
     const loadChannels = useCallback(async () => {
         console.log("////////////// load channels")
-
         setChannelsLoading(true)
-        let channelList = await getChannels(user.id).then(res => res.data)
-
-        channelList = await Promise.all(channelList.map(async (c: any) => {
-            if (c.members && c.members.length) {
-                let users = await fetchUsers(c.members)
-                users = users.filter((u: any) => u)
-                return ({ ...c, users })
-            }
-        }))
+        let channelList;
+        channelList = await getChannels(user.id).then(res => res.data);
+        channelList = filterAvailableChannels(channelList);
+        channelList = await loadUsersChannels(channelList);
         channelsDispatch({ type: 'initChannels', channels: channelList });
         channelList.forEach((channel: Channel) => {
             socket.emit('joinChannel', {
@@ -300,14 +330,16 @@ export function ChannelsProvider({ children }: any) {
         setChannelsLoading(false)
         console.log("load channels ////////////// ")
 
-    }, [user, socket])
+    }, [user, socket, friendsLoaded])
 
     useEffect(() => {
-        if (user && socket && !channelsLoading)
+        if (user && socket && !channelsLoading && friendsLoaded) {
             loadChannels();
-    }, [socket, user])
+        }
+    }, [socket, user, friends])
 
 
+    // console.log(channels)
 
     ////////////////////////////////////////////////////////////////
     //               C U R R E N T    C H A N N E L               //
@@ -317,7 +349,7 @@ export function ChannelsProvider({ children }: any) {
         let pickChannel;
         if (!channels.length)
             pickChannel = channel;
-        else {
+        else if (channel) {
             pickChannel = channels.find((c: any) => c.id === channel.id)
             if (!pickChannel)
                 pickChannel = channel
@@ -329,10 +361,14 @@ export function ChannelsProvider({ children }: any) {
         when events in channels[] are triggered currentChannel need to be updated
     */
     useEffect(() => {
-        if (channels && channels.length) {
-            setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : p)
+        if (channels) {
+            if (channels.length)
+                setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : null)
+            else
+                setCurrentChannelLocal(null)
         }
     }, [channels])
+
 
     return (
         <ChannelsContext.Provider value={{

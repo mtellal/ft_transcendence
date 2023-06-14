@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 import { useChannelsContext, useCurrentUser } from "../../hooks/Hooks";
-import { getUserProfilePictrue } from "../../requests/user";
 import ProfilePicture from "../../components/users/ProfilePicture";
 
 import './ChannelInfos.css'

@@ -1,10 +1,10 @@
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import UserLabel from "../../../../components/users/UserLabel";
 import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../../hooks/Hooks";
-import { createChannel } from "../../../../requests/chat";
+import { createChannel, getChannel, getChannels, getWhisperChannel } from "../../../../requests/chat";
 import { useWindow } from "../../../../hooks/useWindow";
 
 import './MenuElement.css'
@@ -77,7 +77,6 @@ function ChannelElement(props: any) {
     return (
         <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
             style={props.selected ? { backgroundColor: '#F4F4F4' } : {}}
-            onClick={() => props.click(props)}
         >
             <p>{props.name}</p>
             <p className="group-separator">-</p>
@@ -100,7 +99,7 @@ export default function MenuElement() {
 
     const location = useLocation();
 
-    const { token } = useCurrentUser();
+    const { user, token } = useCurrentUser();
     const { friends, friendsDispatch, setCurrentFriend } = useFriendsContext();
     const {
         channels,
@@ -116,6 +115,8 @@ export default function MenuElement() {
     const { isMobileDisplay } = useWindow();
     const [hideMenu, setHideMenu] = useState(true);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (location && location.pathname === "/chat" && isMobileDisplay)
             setHideMenu(false)
@@ -124,36 +125,21 @@ export default function MenuElement() {
     },)
 
 
-    const selectCurrentChannel = useCallback(async (element: any, type: string) => {
-        let channelSelected: any;
-        if (type == "friend") {
-            friendsDispatch({ type: 'removeNotif', friend: element });
-            if (channels.length) {
-                channelSelected = channels.find((c: any) =>
-                    c.type === "WHISPER" && c.members.find((id: number) => element.id === id)
-                )
-            }
-            if (!channelSelected) {
-                await createChannel({
-                    name: "privateMessage",
-                    type: "WHISPER",
-                    members: [
-                        element.id
-                    ],
-                }, token)
-                    .then(res => {
-                        channelSelected = res.data
-                    })
-                //channelsDispatch({ type: 'addChannel', channel: channelSelected });
-                addChannel(channelSelected, false);
-            }
-            setCurrentFriend(element);
-        }
-        else
-            channelSelected = element;
-        //joinChannel(channelSelected);
-        setCurrentChannel(channelSelected);
-    }, [channels, friends])
+    async function setFriendsLabel() {
+        setFriendsList(
+            friends.map((user: any) => (
+                <UserLabel
+                    key={user.id}
+                    id={user.id}
+                    username={user.username}
+                    profilePictureURL={user.url}
+                    userStatus={user.userStatus}
+                    onClick={() => {}}
+                    notifs={user.notifs}
+                />
+            ))
+        )
+    }
 
     React.useEffect(() => {
         setChannelsList([]);
@@ -169,7 +155,6 @@ export default function MenuElement() {
                             name={channel.name}
                             type={channel.type}
                             nbMembers={channel.members.length}
-                            click={() => selectCurrentChannel(channel, "channel")}
                             notifs={0}
                         />
                     ))
@@ -177,19 +162,7 @@ export default function MenuElement() {
         }
 
         if (friends && friends.length) {
-            setFriendsList(
-                friends.map((user: any) => (
-                    <UserLabel
-                        key={user.id}
-                        id={user.id}
-                        username={user.username}
-                        profilePictureURL={user.url}
-                        userStatus={user.userStatus}
-                        onClick={() => selectCurrentChannel(user, "friend")}
-                        notifs={user.notifs}
-                    />
-                ))
-            )
+            setFriendsLabel();
         }
 
     }, [friends, channels])

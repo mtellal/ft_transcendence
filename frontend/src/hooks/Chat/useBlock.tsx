@@ -29,7 +29,6 @@ export function useBlock()
     }, [user && user.blockList])
 
 
-
     const getblockedUsers = useCallback(async () => {
         if (user && user.blockList && user.blockList.length)
         {

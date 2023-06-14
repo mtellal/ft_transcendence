@@ -9,7 +9,6 @@ import './Banner.css'
 import { useWindow } from "../../../../hooks/useWindow";
 import ArrowBackMenu from "../ArrowBackMenu";
 import { useBlock } from "../../../../hooks/Chat/useBlock";
-import { ConfirmPage, ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { InterfaceContext } from "../../Interface/Interface";
 import { useFriends } from "../../../../hooks/Chat/Friends/useFriends";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
@@ -43,8 +42,12 @@ function IconsBanner(props: any) {
                             setAction({
                                 type: 'remove',
                                 user: currentFriend,
-                                channel: "",
-                                function: removeFriend
+                                channel: props.channel,
+                                function: (user: any, channel: any) => {
+                                    removeFriend(user);
+                                    console.log("leaveChannel called ", channel)
+                                    leaveChannel(channel);
+                                }
                             })
                         }}
                         description="Remove"
@@ -58,9 +61,10 @@ function IconsBanner(props: any) {
                             onClick={() => {
                                 setAction({
                                     type: 'delete',
-                                    user: "",
                                     channel: props.channel,
-                                    function: leaveChannel
+                                    function: (user: any, channel: any) => {
+                                        leaveChannel(channel)
+                                    }
                                 })
                             }}
                             description="Delete"
@@ -74,7 +78,9 @@ function IconsBanner(props: any) {
                                 setAction({
                                     type: 'leave',
                                     channel: props.channel,
-                                    function: leaveChannel
+                                    function: (user: any, channel: any) => { 
+                                        leaveChannel(channel);
+                                    }
                                 })
                             }}
                             description="Leave"
@@ -96,7 +102,7 @@ function IconsBanner(props: any) {
                 props.type === "WHISPER" && currentFriend &&
                 <Icon icon="block" onClick={bannerBlock} description="Block" />
             }
-            { pickRemoveIcon() }
+            {pickRemoveIcon()}
         </>
     )
 
@@ -122,7 +128,7 @@ export default function Banner({ ...props }: TBanner) {
     return (
         <>
             <div className="banner">
-                <div className="flex-center" style={{maxWidth: '100%'}} >
+                <div className="flex-center" style={{ maxWidth: '100%' }} >
                     <ArrowBackMenu />
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?

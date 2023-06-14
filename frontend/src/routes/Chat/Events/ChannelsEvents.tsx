@@ -1,10 +1,11 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useChannelsContext, useChatSocket, useCurrentUser } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../../../hooks/Hooks";
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { getChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 import useMembers from "../../../hooks/Chat/useMembers";
+import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 
 
 
@@ -13,12 +14,15 @@ export default function ChannelsEvents({ children }: any) {
     const { socket } = useChatSocket();
     const { channels, channelsDispatch } = useChannelsContext();
 
+    const { friends } = useFriendsContext();
+    const { updateFriend, isUserFriend } = useFriends();
     const { addedMember } = useMembers();
 
     const {
         addChannel,
         forceToLeaveChannel,
-        updateChannelInfos
+        updateChannelInfos,
+        addChannelFromFriend
     } = useChannels();
 
     useEffect(() => {
@@ -164,6 +168,7 @@ export default function ChannelsEvents({ children }: any) {
                 triggered when the channel is joined the first time (load all previous messages), 
                 and is triggered when a message is send 
             */
+
             if (channels && channels.length) {
                 socket.on('message', (m: any) => {
                     console.log("message recieved")
@@ -175,6 +180,16 @@ export default function ChannelsEvents({ children }: any) {
                     }
                 });
             }
+
+
+            socket.on('updatedUser', async (user: any) => {
+                console.log("UPDATE FRIEND EVENT => ", user)
+                if (user)
+                {
+                    if (isUserFriend(user))
+                        updateFriend(user);
+                }
+            })
 
             return () => {
                 if (socket) {
@@ -188,9 +203,11 @@ export default function ChannelsEvents({ children }: any) {
                     socket.off('kickedUser')
                     socket.off('bannedUser')
                     socket.off('unbannedUser')
-                    socket.off('message')
+                    if (channels && channels.length)
+                        socket.off('message')
                     socket.off('mutedUser')
                     socket.off('unmutedUser')
+                    socket.off('updatedUser')
                 }
             }
         }

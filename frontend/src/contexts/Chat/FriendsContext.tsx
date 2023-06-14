@@ -81,18 +81,22 @@ export function FriendsProvider({ children }: any) {
     const [currentFriend, setCurrentFriendLocal]: any = useState();
     const [friendInvitations, setFriendInvitations]: [TFriendRequest[], any] = useState([]);
 
+    const [friendsLoading, setFriendsLoading] = useState(false);
+    const [friendsLoaded, setFriendsLoaded] = useState(false);
+
     async function loadFriendList() {
-        if (user.friendList) {
-            let friendList = await fetchUsers(user.friendList);
-            if (friendList && friendList.length) {
-                friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1);
-                friendsDispatch({ type: 'setFriendList', friendList })
-            }
+        setFriendsLoading(true);
+        let friendList = await fetchUsers(user.friendList);
+        if (friendList && friendList.length) {
+            friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1);
+            friendsDispatch({ type: 'setFriendList', friendList })
         }
+        setFriendsLoaded(true);
+        setFriendsLoading(false);
     }
 
     useEffect(() => {
-        if (user) {
+        if (user && user.friendList && !friendsLoading) {
             loadFriendList();
             loadInvitations();
         }
@@ -103,16 +107,25 @@ export function FriendsProvider({ children }: any) {
     //                U P D A T E      C U R R E N T  F R I E N D          //
     /////////////////////////////////////////////////////////////////////////
 
-    function setCurrentFriend(friend: any) {
-        const f = friends.find((f: any) => friend.id === f.id);
-        if (f)
-            setCurrentFriendLocal(f);
-    }
+    const setCurrentFriend = useCallback((friend: any) => {
+        let pickFriend;
+        if (!friends.length)
+            pickFriend = friend;
+        else if (friend) {
+            pickFriend = friends.find((c: any) => c.id === friend.id)
+            if (!pickFriend)
+                pickFriend = friend
+        }
+        setCurrentFriendLocal(pickFriend);
+    }, [friends])
+
 
     useEffect(() => {
-        if (friends && friends.length) {
-            if (currentFriend)
-                setCurrentFriend(currentFriend)
+        if (friends) {
+            if (friends.length)
+                setCurrentFriendLocal((p: any) => p ? friends.find((c: any) => c.id == p.id) : null)
+            else
+            setCurrentFriendLocal(null)
         }
     }, [friends])
 
@@ -137,6 +150,7 @@ export function FriendsProvider({ children }: any) {
             setCurrentFriend,
             friendInvitations,
             setFriendInvitations,
+            friendsLoaded
         }}>
             {children}
         </FriendsContext.Provider>

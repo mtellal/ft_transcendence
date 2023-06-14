@@ -12,20 +12,21 @@ import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import './Interface.css'
 import { useBlock } from "../../../hooks/Chat/useBlock";
 import { ConfirmPage, ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
+import { createChannel, getWhisperChannel } from "../../../requests/chat";
+import { useChannels } from "../../../hooks/Chat/useChannels";
 
 
 export const InterfaceContext: React.Context<any> = createContext(null);
 
 export default function Interface() {
-    const params: any = useParams();
+    const p: any = useParams();
+
+    const [params, setParams] = useState(p);
 
     const navigate = useNavigate();
     const { token, user, userDispatch }: any = useCurrentUser();
 
-    const { friends, currentFriend, setCurrentFriend }: any = useFriendsContext();
-    const { removeFriend } = useFriends();
-    const { isUserBlocked, blockUser, unblockUser } = useBlock();
-
+    const { friends, friendsDispatch, currentFriend, setCurrentFriend }: any = useFriendsContext();
 
     const { currentChannel, setCurrentChannel, channels } = useChannelsContext();
 
@@ -33,12 +34,38 @@ export default function Interface() {
     const [removeView, setRemoveView] = React.useState(false);
     const [blockedFriend, setBlockedFriend]: [any, any] = React.useState(false);
 
+    const { addChannel } = useChannels();
 
     const [action, setAction]: any = useState(null);
 
+    async function loadFriendChannel(friend: any) {
+        let channel;
+        setCurrentFriend(friend)
+        friendsDispatch({ type: 'removeNotif', friend });
 
-    useEffect(() => {
-        if (!currentChannel && channels && channels.length) {
+        channel = channels.find((c: any) =>
+            c.type === "WHISPER" && c.members.find((id: number) => friend.id === id))
+        if (!channel) {
+            channel = await getWhisperChannel(user.id, friend.id).then(res => res.data);
+            if (!channel) {
+                await createChannel({
+                    name: "privateMessage",
+                    type: "WHISPER",
+                    members: [
+                        friend.id
+                    ],
+                }, token)
+                    .then(res => { channel = res.data })
+            }
+            await addChannel(channel, false);
+        }
+        setCurrentFriend(friend);
+        return (setCurrentChannel(channel));
+    }
+
+
+    async function loadInterface() {
+        if (channels && channels.length) {
             if (params.channelName) {
                 const channel = channels.find((c: any) => c.name === params.channelName)
                 if (channel)
@@ -47,19 +74,17 @@ export default function Interface() {
             else if (params.username && friends && friends.length) {
                 const friend = friends.find((f: any) => f.username === params.username);
                 if (friend) {
-                    setCurrentFriend(friend)
-                    const whispersChannel = channels.filter((c: any) => c.type === "WHISPER");
-                    const channel = whispersChannel.find((c: any) =>
-                        c.members.length === 2 && c.members.find((id: number) => id === user.id)
-                        && c.members.find((id: number) => id === friend.id))
-                    if (channel)
-                        return (setCurrentChannel(channel));
+                    return (loadFriendChannel(friend));
                 }
             }
             navigate("/chat")
         }
-    }, [currentChannel, channels, friends])
+    }
 
+
+    useEffect(() => {
+        loadInterface();
+    }, [channels, friends, params])
 
     // update current friend selected when he is picked from MenuElement
 
@@ -75,7 +100,6 @@ export default function Interface() {
             }
         }
     }, [currentFriend, user])
-
 
     return (
         <InterfaceContext.Provider value={{ setAction }}>
@@ -104,10 +128,7 @@ export default function Interface() {
                                     type={action.type}
                                     username={(action.user && action.user.username) || (action.channel && action.channel.name)}
                                     valid={async () => {
-                                        if (action.user)
-                                            await action.function(action.user);
-                                        else if (action.channel)
-                                            await action.function(action.channel)
+                                        await action.function(action.user, action.channel);
                                         setAction(null)
                                     }}
                                     cancel={() => setAction(null)}

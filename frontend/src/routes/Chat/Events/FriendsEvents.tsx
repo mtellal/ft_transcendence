@@ -1,14 +1,19 @@
 import { useEffect } from "react";
-import { useChatSocket, useFriendsContext } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useFriendsContext } from "../../../hooks/Hooks";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
+import { useChannels } from "../../../hooks/Chat/useChannels";
 
 export default function FriendEvents({ children }: any) {
     const { socket } = useChatSocket();
 
     const { friends, currentFriend } = useFriendsContext();
-    const { updateFriend, removeFriend } = useFriends();
+    const { removeFriend, isUserFriend, updateFriend } = useFriends();
     const { addFriendRequest } = useFriendRequest();
+
+    const { channels } = useChannelsContext();
+    const { getChannelFromFriendName, leaveChannel } = useChannels();
+
 
     useEffect(() => {
         if (socket) {
@@ -18,24 +23,33 @@ export default function FriendEvents({ children }: any) {
                 addFriendRequest(request)
             })
 
-            socket.on('updatedUser', async (friend: any) => {
-                console.log("UPDATE FRIEND EVENT => ", friend)
-                updateFriend(friend)
+            socket.on('addedFriend', (friend: any) => {
+                console.log("ADDED FRIEND EVENT => ")
+                if (friend && !isUserFriend(friend))
+                {
+                    updateFriend(friend);
+                }
             })
 
             socket.on('removedFriend', (friend: any) => {
                 // console.log("REMOVE FRIEND EVENT")
-                removeFriend(friend);
+                if (friend)
+                {
+                    const whisper = getChannelFromFriendName(friend);
+                    if (whisper)
+                        leaveChannel(whisper);
+                    removeFriend(friend);
+                }
             })
         }
         return () => {
             if (socket) {
                 socket.off('receivedRequest');
-                socket.off('updatedUser');
+                socket.off('addedFriend');
                 socket.off('removedFriend');
             }
         }
-    }, [socket, friends, currentFriend])
+    }, [socket, friends, currentFriend, channels])
 
     return (children)
 }
