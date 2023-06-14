@@ -140,6 +140,24 @@ export class UsersService {
     })
   }
 
+  async getMatchHistory(userId: number) {
+    return await this.prisma.game.findMany({
+      where: {
+        OR: [
+          {
+            player1Id: userId,
+          },
+          {
+            player2Id: userId,
+          }
+        ]
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+  }
+
   async checkifUserblocked(userId: number, blockedId: number) {
     const isBlocked = await this.prisma.blockedUser.findFirst({
       where: {

@@ -207,6 +207,15 @@ export class UsersController {
     return await this.usersService.getBlocklist(id);
   }
 
+  @Get(':id/matchHistory')
+  @ApiOperation({ summary: `Get a user's match history`})
+  async getMatchHistory(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return await this.usersService.getMatchHistory(id);
+  }
+
   @Post('friend')
   @ApiOperation({ summary: 'THIS METHOD IS DEPRECATED: USE FRIENDREQUEST INSTEAD!!! Makes two users add each other to their friendlist, this controller will be changed in the future to require an invite, this is only used for testing'})
   async addFriend(@Body() friendshipDto: FriendshipDto)
