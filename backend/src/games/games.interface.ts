@@ -1,3 +1,5 @@
+import { GameType } from "@prisma/client";
+
 export enum Status {
   ONGOING,
   PAUSED,
@@ -7,17 +9,11 @@ export enum Status {
   P2WIN
 }
 
-export enum Gametype {
-  CLASSIC,
-  SPEEDUP,
-  HARDMODE
-}
-
 export class GameState {
   width: number;
   height: number;
   status: Status;
-  gametype: Gametype;
+  gametype: GameType;
 
   player1: {
     id?: number;
@@ -54,7 +50,7 @@ export const defaultGameState: GameState = {
   width: 1600,
   height: 800,
   status: Status.ONGOING,
-  gametype: Gametype.CLASSIC,
+  gametype: GameType.CLASSIC,
   player1: {x: 0, y: 0, speed: 1, width: 10, height: 100},
   player2: {x: 0, y: 0, speed: 1, width: 10, height: 100},
   ball: {x: 0, y: 0, radius: 10, velX: 0, velY: 0, speed: 1},

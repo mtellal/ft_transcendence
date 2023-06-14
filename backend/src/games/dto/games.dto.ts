@@ -1,6 +1,6 @@
-import { Gametype } from "../games.interface";
+import { GameType } from "@prisma/client";
 
 export class GameDto {
   roomId: number;
-  gametype: Gametype;
+  gametype: GameType;
 }
