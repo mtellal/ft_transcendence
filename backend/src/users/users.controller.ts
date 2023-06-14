@@ -259,7 +259,7 @@ export class UsersController {
   async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
     const newFriend = await this.usersService.acceptFriendRequest(user.id, requestId);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('updatedUser', user);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('addedFriend', user);
   }
 
   @UseGuards(JwtGuard)
