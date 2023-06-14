@@ -160,6 +160,9 @@ export class UsersController {
     for (const friendId of updatedUser.friendList) {
       this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedUser', updatedUser);
     }
+    for (const channel of updatedUser.channelList) {
+      this.usersGateway.server.to(channel.toString()).emit('updatedUser', updatedUser);
+    }
   }
 
   @Get(':id/profileImage')
@@ -331,6 +334,9 @@ export class UsersController {
     const updatedUser = await this.usersService.update(id, updateUserDto);
     for (const friendId of updatedUser.friendList) {
       this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedUser', updatedUser);
+    }
+    for (const channel of updatedUser.channelList) {
+      this.usersGateway.server.to(channel.toString()).emit('updatedUser', updatedUser);
     }
     return updatedUser;
   }
