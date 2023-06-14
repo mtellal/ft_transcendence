@@ -44,7 +44,8 @@ export function Chat() {
 						onClick={() => setBtnFriendsRequest('REQUEST')}
 						style={{ backgroundColor: btnFriendsRequest === 'REQUEST' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)' }}
 					>
-						Friend Request
+						Friend equest /
+						Unblock user
 					</button>
 					<button
 						className={s.button}

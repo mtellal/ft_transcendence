@@ -2,6 +2,10 @@ export function createCookie(name: string, value: string) {
 	document.cookie = name + "=" + value + "; SameSite=None; secure; path=/";
 }
 
+export function deleteCookie(name: string) {
+	document.cookie = name + "=" + '; SameSite=None; secure; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+}
+
 export function getCookieByName(name: string) {
 	name = name + "=";
 	var list = document.cookie.split(';');

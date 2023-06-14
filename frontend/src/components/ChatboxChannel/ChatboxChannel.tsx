@@ -163,7 +163,7 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 			<div className={s.inputBox}>
 				<form onSubmit={handleSubmit}>
 					<input name='inputText' className={s.input} placeholder='Type your message...'></input>
-					<button type='submit'>Send</button>
+					<button className={s.sendMessageButton} type='submit'>Send</button>
 				</form>
 			</div>
 		</div>

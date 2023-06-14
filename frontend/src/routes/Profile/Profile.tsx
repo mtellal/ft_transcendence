@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BackApi } from "../../api/back";
 import logo_user from "../../assets/logo_identifiant.png"
@@ -9,48 +9,48 @@ import s from './style.module.css';
 
 export function Profile() {
 
-    const selector = useSelector((store: RootState) => store.user.user);
-    const dispatch = useDispatch();
+	const selector = useSelector((store: RootState) => store.user.user);
+	const dispatch = useDispatch();
 
-    async function updateProfile(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const user = e.currentTarget.username.value;
-        const passwd = e.currentTarget.password.value;
+	async function updateProfile(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const user = e.currentTarget.username.value;
+		const passwd = e.currentTarget.password.value;
 
-        let updateinfos = {userStatus: "ONLINE", username: "", password: ""};
-        if (user) {
-            updateinfos.username = user;
-        } if (passwd) {
-            updateinfos.password = passwd;
-        }
-        await BackApi.updateInfoProfile(selector.id, updateinfos)
-    }
+		let updateinfos = { userStatus: "ONLINE", username: "", password: "" };
+		if (user) {
+			updateinfos.username = user;
+		} if (passwd) {
+			updateinfos.password = passwd;
+		}
+		await BackApi.updateInfoProfile(selector.id, updateinfos)
+	}
 
 	// Tester sans la declaration de type (pas d'err ni de warn)
-    async function setProfilePicture(e: React.ChangeEvent<HTMLInputElement>) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        dispatch(setAvatar(reader.result as string));
-      };
+	async function setProfilePicture(e: React.ChangeEvent<HTMLInputElement>) {
+		const file = e.target.files[0];
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = () => {
+			dispatch(setAvatar(reader.result as string));
+		};
 
-      await BackApi.updateProfilePicture(e.target.files[0], selector.token);
-  }
+		await BackApi.updateProfilePicture(e.target.files[0], selector.token);
+	}
 
-    return (
-        <div className={s.profile}>
-            <div className={s.title}>Update profile</div>
-              <label htmlFor="file" className={s.label_file}>Choose a picture</label>
-              <input id="file" className={s.input_file} type="file" accept="image/*" name="image" onChange={setProfilePicture} />
-              {selector.avatar && <img className={s.img} src={selector.avatar} alt="profile_picture"/>}
-            <form onSubmit={updateProfile} className={s.form}>
-                <img className={s.logoUser} src={logo_user} alt="logo user"></img>
-                <input type="text" className={s.element} placeholder='Username' name="username" ></input>
-                <img className={s.logoPasswd} src={logo_password} alt="logo password"></img>
-                <input type="password" className={s.element} placeholder='Password' name="password" id="input"></input>
-                <button type='submit' className={s.element}>Update</button>
-            </form>
-        </div>
-    );
+	return (
+		<div className={s.profile}>
+			<div className={s.title}>Update profile</div>
+			<label htmlFor="file" className={s.label_file}>Choose a picture</label>
+			<input id="file" className={s.input_file} type="file" accept="image/*" name="image" onChange={setProfilePicture} />
+			{selector.avatar && <img className={s.img} src={selector.avatar} alt="profile_picture" />}
+			<form onSubmit={updateProfile} className={s.form}>
+				<img className={s.logoUser} src={logo_user} alt="logo user"></img>
+				<input type="text" className={s.element} placeholder='Username' name="username" ></input>
+				<img className={s.logoPasswd} src={logo_password} alt="logo password"></img>
+				<input type="password" className={s.element} placeholder='Password' name="password" id="input"></input>
+				<button type='submit' className={s.element}>Update</button>
+			</form>
+		</div>
+	);
 }

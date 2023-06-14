@@ -1,0 +1,27 @@
+.container {
+	width: 100px;
+	height: 125px;
+	margin-left: 10px;
+	position: relative;
+	display: inline-block;
+	font-weight: 900;
+}
+
+.image {
+	height: 100px;
+	border-radius: 50%;
+	display: block;
+	width: 100%;
+}
+
+.container button {
+	top: 40px;
+	right: 15px;
+	position: absolute;
+	border: none;
+	background-color: rgba(0, 0, 0, 0.4);
+	border-radius: 50px;
+	font-size: 16px;
+	font-weight: 1000;
+	cursor: pointer;
+}
