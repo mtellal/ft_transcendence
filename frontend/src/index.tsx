@@ -31,13 +31,12 @@ root.render(
 
 /*
 	2FA (qrcode).
-	status des joueurs (en ligne, en jeu, deconnecte).
+	Status des joueurs (en ligne, en jeu, deconnecte).
 	Mettre un mdp sur les channels (meme si il n'est pas protected).
-	Bloquer un user.
+	Bloquer un user.dans un channel
 	Si le owner du chan le quitte, transferer statut owner a un autre user,
 	si il est le dernier user, supprimer le chan.
 	Affichage (CSS) des chans a join (reste que les protected je crois).
 	Debloquer les gens d'un chan
-	Debloquer des gens
 	Ne plus voir les messages des users bannis
 */
