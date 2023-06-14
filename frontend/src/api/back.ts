@@ -57,19 +57,15 @@ export class BackApi {
 		return response;
 	}
 
-	// static async auth42() {
-	// 	const response = await axios.get(`${BASE_URL}/auth/42`, {
-	// 		headers: {
-	// 			'accept': '*/*'
-	// 		}
-	// 	})
-	// 	.then (rep => rep)
-	// 	.catch (error => error)
+	static async authTrade(oauth_code: string) {
+		const response = await axios.post(`${BASE_URL}/auth/42/trade`, {
+				oauth_code: oauth_code
+		})
+		.then (rep => rep)
+		.catch (error => error)
 
-	// 	return response;
-	// }
-
-
+		return response;
+	}
 
 	static async updateInfoProfile(id: number, userInfo: any) {
 		const response = await axios.patch(`${BASE_URL}/users/${id}`, {

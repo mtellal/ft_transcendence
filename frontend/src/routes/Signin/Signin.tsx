@@ -33,21 +33,24 @@ export function Signin() {
 		}
 	}
 
-    return (
-        <div className={s.signin}>
-            <div className={s.title}>Signin</div>
-            <form className={s.form} onSubmit={submitData}>
-                <div className={s.form_group}>
-                    <img className={s.logo} src={logo_user} alt="logo user"></img>
-                    <input type="text" name="username" placeholder="Username" className={s.input_field}></input>
-                </div>
-                <div className={s.form_group}>
-                    <img className={s.logo} src={logo_password} alt="logo password"></img>
-                    <input type="password" name="password" placeholder="Password" className={s.input_field}></input>
-                </div>
-                <button className={s.submitButton} type="submit">Submit</button>
-            </form>
+	return (
+		<div className={s.signin}>
+			<div className={s.title}>Signin</div>
+			<form className={s.form} onSubmit={submitData}>
+				<div className={s.form_group}>
+					<img className={s.logo} src={logo_user} alt="logo user"></img>
+					<input type="text" name="username" placeholder="Username" className={s.input_field}></input>
+				</div>
+				<div className={s.form_group}>
+					<img className={s.logo} src={logo_password} alt="logo password"></img>
+					<input type="password" name="password" placeholder="Password" className={s.input_field}></input>
+				</div>
+				<button className={s.submitButton} type="submit">Submit</button>
+			</form>
+			<form action='http://localhost:3000/auth/42' className={s.auth42}>
+				<button type='submit'>Auth with 42</button>
+			</form>
 			<button className={s.btnSignup} onClick={() => navigate('/signup')}>Signup</button>
-        </div>
-    );
+		</div>
+	);
 }

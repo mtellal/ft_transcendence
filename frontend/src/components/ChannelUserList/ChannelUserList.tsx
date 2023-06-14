@@ -16,6 +16,7 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 	const [userAvatar, setUserAvatar] = useState<any>();
     const [showActionUser, setShowActionUser] = useState(false);
 	const [socket, setSocket] = useState<any>(null);
+	// const [muteInput, setMuteInput] = useState(false);
 	const selector = useSelector((store: RootState) => store.user.user);
 
 
@@ -40,6 +41,10 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 
 	function userIsBan() {
 		return dataChannel.banList.includes(user);
+	}
+
+	function userIsOwner() {
+		return user === dataChannel.ownerId;
 	}
 
 	function actionFriend() {
@@ -68,7 +73,6 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 	}, [])
 
 	/* A ajouter:
-	 leaveChannel
 	 unmuteUser
 	 updateChannel (pour le nom du chan) 
 	 
@@ -87,12 +91,16 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 			{userInfo && userInfo.username}
 			{ showActionUser && menuAdmin() && (
 				<ul className={s.menu}>
-					{!userIsBan() && <li onClick={() => eventSocket('banUser')}>Ban user</li>}
+					{!userIsOwner() && !userIsBan() && <li onClick={() => eventSocket('banUser')}>Ban user</li>}
 					{userIsBan() && <li onClick={() => eventSocket('unbanUser')}>Unban user</li>}
-					<li onClick={() => eventSocket('kickUser')}>Kick user</li>
+					{!userIsOwner() && <li onClick={() => eventSocket('kickUser')}>Kick user</li>}
 					{!userIsAdmin() && <li onClick={() => eventSocket('makeAdmin')}>Set admin</li>}
-					{userIsAdmin() && <li onClick={() => eventSocket('removeAdmin')}>Remove admin</li>}
-					{<li onClick={muteUser}>Mute user</li>}
+					{!userIsOwner() && userIsAdmin() && <li onClick={() => eventSocket('removeAdmin')}>Remove admin</li>}
+					{!userIsOwner() && <li onClick={muteUser}>Mute user</li>}
+					{/* {muteInput &&
+					<form>
+						<input type="submit"/>
+					</form>} */}
 				</ul>
 			)}
 		</div>
