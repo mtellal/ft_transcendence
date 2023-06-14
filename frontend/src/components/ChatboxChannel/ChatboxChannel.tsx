@@ -92,6 +92,22 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 		}
 	}
 
+	const mutedListenner = (message: any) => {
+		console.log('mutedListenner', message);
+		// if (message.channelId === idChannelSelected &&
+			// message.userId === selector.id) {
+			// setidChannelSelected(null);
+		// }
+	}
+
+	// const unmutedListenner = (message: any) => {
+	// 	console.log('unmutedListenner', message);
+	// 	// if (message.channelId === idChannelSelected &&
+	// 		// message.userId === selector.id) {
+	// 		// setidChannelSelected(null);
+	// 	// }
+	// }
+
 	async function getDataChannel() {
 		const rep = await BackApi.getChannelById(idChannelSelected);
 		setDataChannel(rep.data);
@@ -120,11 +136,13 @@ export function ChatboxChannel({ myChannels, setMyChannels, idChannelSelected, s
 			Asocket.on('message', messageListener);
 			Asocket.on('kickedUser', kickListenner);
 			Asocket.on('bannedUser', banListenner);
+			Asocket.on('mutedUser', mutedListenner);
+			// Asocket.on('unmutedUser', unmutedListenner);
 			return () => {
 				Asocket.off('message', messageListener)
 			}
 		}
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [messageListener, idChannelSelected])
 
 	useEffect(() => {

@@ -16,7 +16,7 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 	const [userAvatar, setUserAvatar] = useState<any>();
     const [showActionUser, setShowActionUser] = useState(false);
 	const [socket, setSocket] = useState<any>(null);
-	// const [muteInput, setMuteInput] = useState(false);
+	const [muteInput, setMuteInput] = useState(false);
 	const selector = useSelector((store: RootState) => store.user.user);
 
 
@@ -58,11 +58,13 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 		})
 	}
 
-	function muteUser() {
+	function muteUser(e: any) {
+
+		e.preventDefault();
 		socket.emit('muteUser', {
 			channelId: dataChannel.id,
 			userId: user,
-			duration: 10
+			duration: Number(e.currentTarget.mute.value)
 		})
 	}
 
@@ -74,9 +76,8 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 
 	/* A ajouter:
 	 unmuteUser
-	 updateChannel (pour le nom du chan) 
-	 
-	 Pouvoir modifier le temps du mute */
+	 updateChannel (pour le nom du chan)
+	*/
 
 	return (
 		<div className={s.container} onMouseEnter={actionFriend} onMouseLeave={actionFriend}>
@@ -96,11 +97,12 @@ export function ChannelUserList({ user, dataChannel }: ChannelUserListProps) {
 					{!userIsOwner() && <li onClick={() => eventSocket('kickUser')}>Kick user</li>}
 					{!userIsAdmin() && <li onClick={() => eventSocket('makeAdmin')}>Set admin</li>}
 					{!userIsOwner() && userIsAdmin() && <li onClick={() => eventSocket('removeAdmin')}>Remove admin</li>}
-					{!userIsOwner() && <li onClick={muteUser}>Mute user</li>}
-					{/* {muteInput &&
-					<form>
-						<input type="submit"/>
-					</form>} */}
+					{!userIsOwner() && <li onClick={() => setMuteInput(!muteInput)}>Mute user</li>}
+					{muteInput &&
+					<form onSubmit={muteUser}>
+						<input placeholder="Time mute" type="number" name="mute"></input>
+						<button type="submit">Mute</button>
+					</form>}
 				</ul>
 			)}
 		</div>

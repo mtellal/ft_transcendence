@@ -1,12 +1,13 @@
 import React from "react";
 import { ChannelUserList } from "../ChannelUserList/ChannelUserList";
+import s from './style.module.css'
 
 export function ChannelUsers({dataChannel}: {dataChannel: any}) {
 
 	const usersChan = dataChannel.members;
 
 	return (
-		<div>
+		<div className={s.container}>
 			{usersChan.map((user: any) => {
 				return (
 					<span key={user}>

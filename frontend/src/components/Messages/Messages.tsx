@@ -27,7 +27,6 @@ export function Messages({ messages, id }: MessagesProps) {
 						style={{
 							textAlign: message.sendBy === id ? 'right' : 'left',
 						}}>
-						{/* {message.content} */}
 						<span className={s.message}
 							style={{
 								backgroundColor: message.sendBy === id ? 'grey' : 'white'
