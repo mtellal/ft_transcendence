@@ -25,7 +25,9 @@ function Game(props: any)
             }
         });
         setSocket(s);
-        s.emit('join', '');
+        s.emit('join', {
+          gametype: "SPEEDUP"
+        });
         s.on('joinedGame', (joinedGame) => {
             setGameRoom(joinedGame);
         });

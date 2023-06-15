@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { Game, GameStatus, User } from '@prisma/client';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Game, GameStatus, GameType, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtPayloadDto } from '../auth/dto';
 import { GameState, Status, defaultGameState } from './games.interface';
+import { GameDto } from './dto/games.dto';
 
 @Injectable()
 export class GamesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private games = new Map<number, GameState>();
 
@@ -14,35 +15,39 @@ export class GamesService {
     return await this.prisma.game.findMany({});
   }
 
-  async createGame(payload: any) {
-    const game_exist = await this.prisma.game.findFirst({
-      where: {
-        AND: [ 
-          { OR: [
-            { status: GameStatus.MATCHMAKING },
-            { status: GameStatus.ONGOING },
-            { status: GameStatus.INVITE },
-        ]},
-          { OR: [
-            { player1Id: payload.id },
-            { player2Id: payload.id },
-          ]},
-        ],
-      }
-    })
-    if (game_exist) {
-      console.log('user is already in game');
-      return null;
-    }
+  async createGame(payload: any, gameDto: GameDto) {
     try {
+      const game_exist = await this.prisma.game.findFirst({
+        where: {
+          AND: [
+            {
+              OR: [
+                { status: GameStatus.MATCHMAKING },
+                { status: GameStatus.ONGOING },
+                { status: GameStatus.INVITE },
+              ]
+            },
+            {
+              OR: [
+                { player1Id: payload.id },
+                { player2Id: payload.id },
+              ]
+            },
+          ],
+        }
+      })
+      if (game_exist) {
+        throw new ForbiddenException(`User with id of ${payload.id} is already in a game`);
+      }
+
       const user = await this.prisma.user.findUnique({
         where: {
           id: payload.id,
         }
       });
-      
+
       if (!user)
-        return null;
+        throw new NotFoundException(`User not found`);
 
       const game = await this.prisma.game.create({
         data: {
@@ -50,22 +55,25 @@ export class GamesService {
             connect: { id: user.id }
           },
           status: GameStatus.MATCHMAKING,
+          gametype: gameDto.gametype
         }
       })
       return game;
     } catch (e) {
       console.log(e);
+      throw e;
     }
   }
 
   //Need to add a func to cancel matchmaking which will delete the pending game
 
-  async findPendingGame(payload: any) {
+  async findPendingGame(payload: any, gameDto: GameDto) {
     let pending = await this.prisma.game.findFirst({
       where: {
         status: GameStatus.MATCHMAKING,
+        gametype: gameDto.gametype,
         player2Id: null,
-        NOT: { 
+        NOT: {
           player1Id: payload.id
         },
       },
@@ -83,7 +91,7 @@ export class GamesService {
       });
       return pending;
     } catch (e) {
-      return null;
+      throw e;
     }
   }
 
@@ -92,13 +100,13 @@ export class GamesService {
       const game = await this.prisma.game.findFirst({
         where: {
           status: GameStatus.ONGOING,
-          OR: [ 
-            { player1Id: payload.id},
-            { player2Id: payload.id},
+          OR: [
+            { player1Id: payload.id },
+            { player2Id: payload.id },
           ]
         }
       })
-      return game; 
+      return game;
     } catch (e) {
       console.log(e);
     }
@@ -110,55 +118,43 @@ export class GamesService {
     try {
       const games = await this.prisma.game.findMany({
         where: {
-          AND: [ 
-            { OR: [
-              { status: GameStatus.MATCHMAKING },
-              { status: GameStatus.INVITE },
-              { status: GameStatus.ONGOING },
-          ]},
-            { OR: [
-              { player1Id: payload.id },
-              { player2Id: payload.id },
-            ]},
+          AND: [
+            {
+              OR: [
+                { status: GameStatus.MATCHMAKING },
+                { status: GameStatus.INVITE },
+                { status: GameStatus.ONGOING },
+              ]
+            },
+            {
+              OR: [
+                { player1Id: payload.id },
+                { player2Id: payload.id },
+              ]
+            },
           ],
         }
       })
       console.log(games);
       for (const game of games) {
-        const ongoingGame = this.games.get(game.id);
-        console.log(ongoingGame);
-        ongoingGame.status = Status.FORFEIT;
         if (game.status === GameStatus.MATCHMAKING || game.status === GameStatus.INVITE) {
           await this.prisma.game.delete({
-            where: {id: game.id}
+            where: { id: game.id }
           });
         }
         if (game.status === GameStatus.ONGOING) {
+          const ongoingGame = this.games.get(game.id);
           if (game.player1Id === payload.id) {
-            await this.prisma.game.update({
-              where: {id: game.id},
-              data: {
-                wonBy: game.player2Id,
-                status: GameStatus.FINISHED,
-              }
-            })
+            ongoingGame.status = Status.P2WIN;
           }
           if (game.player2Id === payload.id) {
-            await this.prisma.game.update({
-              where: {id: game.id},
-              data: {
-                wonBy: game.player1Id,
-                status: GameStatus.FINISHED,
-              }
-            })
+            ongoingGame.status = Status.P1WIN;
           }
         }
-        console.log("Deleting game state");
-        this.games.delete(game.id);
-        console.log(this.games);
       }
     } catch (e) {
       console.log(e);
+      throw(e);
     }
   }
 
@@ -166,12 +162,14 @@ export class GamesService {
     try {
       await this.prisma.game.deleteMany({
         where: {
-          AND: [ 
+          AND: [
             { status: GameStatus.MATCHMAKING },
-            { OR: [
-              { player1Id: payload.id },
-              { player2Id: payload.id },
-            ]},
+            {
+              OR: [
+                { player1Id: payload.id },
+                { player2Id: payload.id },
+              ]
+            },
           ],
         }
       })
@@ -183,9 +181,9 @@ export class GamesService {
   async deleteAllGames() {
     try {
       await this.prisma.game.deleteMany({
-        
+
       });
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
   }
@@ -214,9 +212,10 @@ export class GamesService {
     }
   }
 
-  startGame(room: Game, server: any) {
+  async startGame(room: Game, server: any) {
     let game = new GameState();
     game = JSON.parse(JSON.stringify(defaultGameState));
+    game.gametype = room.gametype;
     console.log(defaultGameState);
     this.games.set(room.id, game);
     this.initPlayer(game, room);
@@ -225,17 +224,43 @@ export class GamesService {
     server.to(`room-${room.id}`).emit('updatedState', game);
     const frameRate = 60; //FPS that we want
     const tickRate = 1000 / frameRate // Updates will be send at this interval
-    const gameLoopInterval = setInterval(() => {
-      this.gameLoop(game);
-      server.to(`room-${room.id}`).emit('updatedState', game);
-      if (this.isGameOver(game))
-        clearInterval(gameLoopInterval);
-    }, tickRate);
-    //Update in case of forfeit is in deleteUnfinishedGame
-/*     while (1) {
-      this.gameLoop(game);
-      console.log(game);
-    } */
+    setTimeout(() => {
+      const gameLoopInterval = setInterval(async () => {
+        this.gameLoop(game);
+        server.to(`room-${room.id}`).emit('updatedState', game);
+        if (this.isGameOver(game)) {
+          clearInterval(gameLoopInterval);
+          const finishedGame = await this.updateGame(room, game);
+          server.to(`room-${room.id}`).emit('finishedGame', finishedGame);
+        }
+      }, tickRate);
+    }, 3000);
+  }
+
+  async updateGame(room: Game, game: GameState) {
+    if (game.status === Status.P1WIN) {
+      await this.prisma.game.update({
+        where: {id: room.id},
+        data: {
+          player1Score: game.score.player1Score,
+          player2Score: game.score.player2Score,
+          wonBy: room.player1Id,
+          status: GameStatus.FINISHED
+        }
+      })
+    }
+    if (game.status === Status.P2WIN) {
+      await this.prisma.game.update({
+        where: {id: room.id},
+        data: {
+          player1Score: game.score.player1Score,
+          player2Score: game.score.player2Score,
+          wonBy: room.player2Id,
+          status: GameStatus.FINISHED
+        }
+      })
+    }
+    this.games.delete(room.id); //Delete the gameState associated with the room;
   }
 
   //Init player position based on width and height of the board. In case the board dimensions need to change in the future
@@ -263,45 +288,44 @@ export class GamesService {
 
     game.ball.x = game.width / 2;
     game.ball.y = game.height / 2;
-    game.ball.velX = signx ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1) 
-    game.ball.velY = signy ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1) 
+    game.ball.speed = 1;
+    game.ball.velX = signx ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1)
+    game.ball.velY = signy ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1)
   }
 
   gameLoop(game: GameState) {
     let nextPosX = game.ball.x + game.ball.velX;
-        nextPosX += game.ball.velX > 0 ? game.ball.radius : -game.ball.radius; 
-        let nextPosY = game.ball.y + game.ball.velY;
-        nextPosY += game.ball.velY > 0 ? game.ball.radius : -game.ball.radius; 
+    nextPosX += game.ball.velX > 0 ? game.ball.radius : -game.ball.radius;
+    let nextPosY = game.ball.y + game.ball.velY;
+    nextPosY += game.ball.velY > 0 ? game.ball.radius : -game.ball.radius;
 
-        if ((nextPosX > game.player1.x && nextPosX < game.player1.x + game.player1.width &&
-                nextPosY > game.player1.y && nextPosY < game.player1.y + game.player1.height) || 
-                (nextPosX > game.player2.x && nextPosX < game.player2.x + game.player2.width &&
-                    nextPosY > game.player2.y && nextPosY < game.player2.y + game.player2.height))
-        {
-            game.ball.velX *= -1;
-        }
+    if ((nextPosX > game.player1.x && nextPosX < game.player1.x + game.player1.width &&
+      nextPosY > game.player1.y && nextPosY < game.player1.y + game.player1.height) ||
+      (nextPosX > game.player2.x && nextPosX < game.player2.x + game.player2.width &&
+        nextPosY > game.player2.y && nextPosY < game.player2.y + game.player2.height)) {
+      game.ball.velX *= -1;
+      if (game.gametype === GameType.SPEEDUP)
+          game.ball.speed += 1;
+    }
 
-        if (nextPosX < 0 || nextPosX > game.width)
-        {
-            if (nextPosX < 0)
-                game.score.player2Score++;
-            else if (nextPosX > game.width)
-                game.score.player1Score++;
+    if (nextPosX < 0 || nextPosX > game.width) {
+      if (nextPosX < 0)
+        game.score.player2Score++;
+      else if (nextPosX > game.width)
+        game.score.player1Score++;
 
-            this.initBall(game);
-            this.resetPlayer(game);
-            return (1);
-        }
-        if (nextPosY < 0 || nextPosY > game.height)
-        {
-            game.ball.velY *= -1;
-        }
-        else
-        {
-            game.ball.x += game.ball.velX * game.ball.speed;
-            game.ball.y += game.ball.velY * game.ball.speed;
-        }
-        return (0)
+      this.initBall(game);
+      this.resetPlayer(game);
+      return (1);
+    }
+    if (nextPosY < 0 || nextPosY > game.height) {
+      game.ball.velY *= -1;
+    }
+    else {
+      game.ball.x += game.ball.velX * game.ball.speed;
+      game.ball.y += game.ball.velY * game.ball.speed;
+    }
+    return (0)
   }
 
   getGameState(gameId: number) {
@@ -309,7 +333,7 @@ export class GamesService {
   }
 
   isGameOver(game: GameState) {
-    if (game.status === Status.FORFEIT)
+    if (game.status === Status.FORFEIT || game.status === Status.P1WIN || game.status === Status.P2WIN)
       return (true);
     if (game.score.player1Score >= game.score.winScore) {
       game.status = Status.P1WIN;

@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtWsGuard, UserPayload } from '../auth/guard/jwt.ws.guard';
 import { JwtPayloadDto } from '../auth/dto';
+import { GameDto } from './dto/games.dto';
 
 @WebSocketGateway({ namespace: 'game' })
 export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -84,39 +85,29 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gamesService.deleteMatchmakingGame(payload);
   }
 
-  @SubscribeMessage('test')
-  async handleTest(@ConnectedSocket() client: any, @MessageBody() content: any) {
-    console.log('Here');
-    console.log(content);
-  }
-
   @SubscribeMessage('join')
   @UseGuards(JwtWsGuard)
-  async HandleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto) {
-    // let room only used to test with one player, in the future, the game will not start without two players
-    let room = await this.gamesService.findPendingGame(payload);
+  async HandleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameDto: GameDto) {
+    const room = await this.gamesService.findPendingGame(payload, gameDto);
     console.log("event received");
     if (!room) {
-      room = await this.gamesService.createGame(payload);
-      if (!room)
-        return ;
-      client.emit('joinWait', {message: 'waiting for another player', roomId: room.id });
-      client.join(`room-${room.id}`);
-      this.server.to(`room-${room.id}`).emit('joinedGame', room);
+      const newRoom = await this.gamesService.createGame(payload, gameDto);
+      if (!newRoom)
+        return;
+      client.join(`room-${newRoom.id}`);
+      this.server.to(`room-${newRoom.id}`).emit('joinedGame', newRoom);
+      this.server.to(`room-${newRoom.id}`).emit('waitingforP2', newRoom);
       //this.gamesService.startGame(room, this.server);
     } else {
-      client.emit('joinSuccess', {message: 'Joining a game', roomId: room.id});
       client.join(`room-${room.id}`);
       this.server.to(`room-${room.id}`).emit('joinedGame', room);
-      console.log("Second player joined");
-      console.log(room);
-      this.server.to(`room-${room.id}`).emit('GameStart', {message: 'Game is going to start in 5s'});
-
-      setTimeout(()=> {
+      this.server.to(`room-${room.id}`).emit('foundGame', room);
+      this.server.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
+      this.gamesService.startGame(room, this.server);
+      /* setTimeout(() => {
         this.gamesService.startGame(room, this.server);
-      }, 5000);
+      }, 5000); */
     }
-    return 'Join success';
   }
 
 
