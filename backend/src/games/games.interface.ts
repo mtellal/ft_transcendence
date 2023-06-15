@@ -51,8 +51,8 @@ export const defaultGameState: GameState = {
   height: 800,
   status: Status.ONGOING,
   gametype: GameType.CLASSIC,
-  player1: {x: 0, y: 0, speed: 1, width: 10, height: 100},
-  player2: {x: 0, y: 0, speed: 1, width: 10, height: 100},
-  ball: {x: 0, y: 0, radius: 10, velX: 0, velY: 0, speed: 1},
-  score: {player1Score: 0, player2Score: 0, winScore: 10},
+  player1: {x: 0, y: 0, speed: 2, width: 10, height: 100},
+  player2: {x: 0, y: 0, speed: 2, width: 10, height: 100},
+  ball: {x: 0, y: 0, radius: 10, velX: 0, velY: 0, speed: 2},
+  score: {player1Score: 0, player2Score: 0, winScore: 11},
 }

@@ -21,6 +21,7 @@ export class GamesService {
           { OR: [
             { status: GameStatus.MATCHMAKING },
             { status: GameStatus.ONGOING },
+            { status: GameStatus.INVITE },
         ]},
           { OR: [
             { player1Id: payload.id },
@@ -193,11 +194,11 @@ export class GamesService {
     const game = this.games.get(gameId);
     if (game.player1.id === userId) {
       if (game.player1.y - 5 > 0)
-        game.player1.y -= 5;
+        game.player1.y -= 5 * game.player1.speed;
     }
     if (game.player2.id === userId) {
       if (game.player2.y - 5 > 0)
-        game.player2.y -= 5;
+        game.player2.y -= 5 * game.player2.speed;
     }
   }
 
@@ -205,11 +206,11 @@ export class GamesService {
     const game = this.games.get(gameId);
     if (game.player1.id === userId) {
       if (game.player1.y + 5 + game.player1.height < game.height)
-        game.player1.y += 5;
+        game.player1.y += 5 * game.player1.speed;
     }
     if (game.player2.id === userId) {
       if (game.player2.y + 5 + game.player2.height < game.height)
-        game.player2.y += 5;
+        game.player2.y += 5 * game.player2.speed;
     }
   }
 
@@ -230,7 +231,6 @@ export class GamesService {
       if (this.isGameOver(game))
         clearInterval(gameLoopInterval);
     }, tickRate);
-    console.log(this.games);
     //Update in case of forfeit is in deleteUnfinishedGame
 /*     while (1) {
       this.gameLoop(game);
@@ -298,8 +298,8 @@ export class GamesService {
         }
         else
         {
-            game.ball.x += game.ball.velX;
-            game.ball.y += game.ball.velY;
+            game.ball.x += game.ball.velX * game.ball.speed;
+            game.ball.y += game.ball.velY * game.ball.speed;
         }
         return (0)
   }
