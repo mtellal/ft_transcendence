@@ -8,9 +8,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import path = require('path');
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid'
 import { User, Channel } from '@prisma/client';
 import { UsersGateway } from './users.gateway';
+import { UsersAchievementsService } from './users-achievements.service';
 
 export const storage = {
   storage: diskStorage({
@@ -41,7 +41,7 @@ export const storage = {
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly usersGateway: UsersGateway) {}
+  constructor(private readonly usersService: UsersService, private readonly usersGateway: UsersGateway, private readonly userAchievementsService: UsersAchievementsService) {}
 
   @Get()
   @ApiQuery({
@@ -370,4 +370,15 @@ export class UsersController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.remove(id);
   }
+
+  @Get(':id/achievements')
+  async showAchievements(@Param('id', ParseIntPipe) id: number) {
+    return this.userAchievementsService.showAchievements(id);
+  }
+
+  // @Get('achievement/delete')
+  // async deleteAchievements() {
+  //   await this.userAchievementsService.delAchievements();
+  // }
+
 }
