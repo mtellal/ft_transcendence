@@ -31,6 +31,8 @@ export class AuthService {
 				data: {
 					username: dto.username,
 					password: hash,
+					stats: {create: {}
+				}
 				},
 			});
 			return this.signToken(user.id, user.username);
@@ -102,6 +104,9 @@ export class AuthService {
 					oauth_code: password,
 					oauth_exp: expirationTime ? new Date(expirationTime) : null,
 					avatar: './uploads/' + profile.id + '.png',
+					stats: {
+						create: {}
+					}
 				  },
 			  });
 			  return newuser.oauth_code;

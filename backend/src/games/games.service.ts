@@ -231,6 +231,7 @@ export class GamesService {
         if (this.isGameOver(game)) {
           clearInterval(gameLoopInterval);
           const finishedGame = await this.updateGame(room, game);
+          await this.updateStats(room, game);
           server.to(`room-${room.id}`).emit('finishedGame', finishedGame);
         }
       }, tickRate);
@@ -261,6 +262,79 @@ export class GamesService {
       })
     }
     this.games.delete(room.id); //Delete the gameState associated with the room;
+  }
+
+  async updateStats(room: Game, game: GameState) {
+    const oldP1Stats = await this.prisma.stats.findUnique({
+      where: {userId: room.player1Id}
+    })
+    const oldP2Stats = await this.prisma.stats.findUnique({
+      where: {userId: room.player2Id}
+    })
+    const P1Expected = this.expectedWinProbability(oldP1Stats.eloRating, oldP2Stats.eloRating);
+    const P2Expected = this.expectedWinProbability(oldP2Stats.eloRating, oldP1Stats.eloRating);
+    const kfactor = 32;
+    if (game.status === Status.P1WIN) {
+      const newRatingP1 = Math.round(oldP1Stats.eloRating + kfactor * (1 - P1Expected));
+      const newRatingP2 = Math.round(oldP2Stats.eloRating + kfactor * (0 - P2Expected));
+      await this.prisma.stats.update({
+        where: {userId: room.player1Id},
+        data: {
+          matchesPlayed: {increment: 1},
+          matchesWon: {increment: 1},
+          eloRating: newRatingP1,
+          winStreak: {increment: 1},
+          lossStreak: 0,
+          goalsScored: {increment: game.score.player1Score},
+          goalsTaken: {increment: game.score.player2Score}
+        }
+      })
+      await this.prisma.stats.update({
+        where: {userId: room.player2Id},
+        data: {
+          matchesPlayed: {increment: 1},
+          matchesLost: {increment: 1},
+          eloRating: newRatingP2,
+          winStreak: 0,
+          lossStreak: {increment: 1},
+          goalsScored: {increment: game.score.player2Score},
+          goalsTaken: {increment: game.score.player1Score},
+        }
+      })
+    }
+    if (game.status === Status.P2WIN) {
+      const newRatingP1 = Math.round(oldP1Stats.eloRating + kfactor * (0 - P1Expected));
+      const newRatingP2 = Math.round(oldP2Stats.eloRating + kfactor * (1 - P2Expected));
+      await this.prisma.stats.update({
+        where: {userId: room.player2Id},
+        data: {
+          matchesPlayed: {increment: 1},
+          matchesWon: {increment: 1},
+          eloRating: newRatingP2,
+          winStreak: {increment: 1},
+          lossStreak: 0,
+          goalsScored: {increment: game.score.player2Score},
+          goalsTaken: {increment: game.score.player1Score}
+        }
+      })
+      await this.prisma.stats.update({
+        where: {userId: room.player1Id},
+        data: {
+          matchesPlayed: {increment: 1},
+          matchesLost: {increment: 1},
+          eloRating: newRatingP1,
+          winStreak: 0,
+          lossStreak: {increment: 1},
+          goalsScored: {increment: game.score.player1Score},
+          goalsTaken: {increment: game.score.player2Score}
+        }
+      })
+    }
+  }
+
+  expectedWinProbability(playerRating: number, opponentRating: number) {
+    const exponent = (opponentRating - playerRating) / 400;
+    return (1 / (1 + Math.pow(10, exponent)));
   }
 
   //Init player position based on width and height of the board. In case the board dimensions need to change in the future
