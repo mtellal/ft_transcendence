@@ -4,10 +4,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtPayloadDto } from '../auth/dto';
 import { GameState, Status, defaultGameState } from './games.interface';
 import { GameDto } from './dto/games.dto';
+import { UsersAchievementsService } from '../users/users-achievements.service';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class GamesService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private achievement: UsersAchievementsService) { }
 
   private games = new Map<number, GameState>();
 
@@ -212,7 +214,7 @@ export class GamesService {
     }
   }
 
-  async startGame(room: Game, server: any) {
+  async startGame(room: Game, server: any, client: Socket) {
     let game = new GameState();
     game = JSON.parse(JSON.stringify(defaultGameState));
     game.gametype = room.gametype;
@@ -232,15 +234,21 @@ export class GamesService {
           clearInterval(gameLoopInterval);
           const finishedGame = await this.updateGame(room, game);
           await this.updateStats(room, game);
+          this.updateAchievement(finishedGame, client);
           server.to(`room-${room.id}`).emit('finishedGame', finishedGame);
         }
       }, tickRate);
     }, 3000);
   }
 
+  private async updateAchievement(room: Game, client: Socket) {
+    const P1Achievement = this.achievement.checkAndUnlockAchievements(room.player1Id, client);
+    const P2Achievement = this.achievement.checkAndUnlockAchievements(room.player2Id, client);
+  }
+
   async updateGame(room: Game, game: GameState) {
     if (game.status === Status.P1WIN) {
-      await this.prisma.game.update({
+      return await this.prisma.game.update({
         where: {id: room.id},
         data: {
           player1Score: game.score.player1Score,
@@ -251,7 +259,7 @@ export class GamesService {
       })
     }
     if (game.status === Status.P2WIN) {
-      await this.prisma.game.update({
+      return await this.prisma.game.update({
         where: {id: room.id},
         data: {
           player1Score: game.score.player1Score,
