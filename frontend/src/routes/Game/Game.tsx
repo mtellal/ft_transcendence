@@ -41,7 +41,7 @@ function Game(props: any)
         }
     }, []);
 
-    function drawGameState(gameState) {
+    function drawGameState(gameState: any) {
         const context = canvasRef.current.getContext('2d');
         canvasRef.current.width = 1600;
         canvasRef.current.height = 800;

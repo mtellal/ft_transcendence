@@ -67,3 +67,15 @@ export async function getUserProfilePictrue(id: number | string) {
             .catch(err => err)
     )
 }
+
+export async function getMatchHistory(id: number | string) {
+    return (
+        axios.get(`${back}/users/${id}/matchHistory`, {
+            headers: {
+                'Accept': '*/*'
+            }
+        })
+            .then(res => res)
+            .catch(err => err)
+    )
+}

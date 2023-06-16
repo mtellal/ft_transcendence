@@ -1,5 +1,6 @@
 .profile
 {
+	background-color: black;
     grid-row: 2 / span 18;
     grid-column: auto / span 20;
     margin: 0;   

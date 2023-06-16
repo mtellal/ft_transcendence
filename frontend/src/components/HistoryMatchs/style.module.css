@@ -1,0 +1,30 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 35vh;
+	width: 40vw;
+	margin-top: 4%;
+	background-color: rgb(70, 69, 182);
+	font-size: 3vh;
+	margin-left: 25%;
+	align-items: center;
+	overflow-y: auto;
+	border-radius: 25px;
+	overflow-y: auto;
+}
+
+.title {
+	margin-bottom: 15px;
+	background-color: aliceblue;
+	width: 40vw;
+	text-align: center;
+	border-bottom: 3px solid black;
+	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
+	position: fixed;
+}
+
+.list {
+	margin-top: 10%;
+	margin-bottom: 5%;
+}
