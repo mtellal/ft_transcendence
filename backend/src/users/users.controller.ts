@@ -79,6 +79,12 @@ export class UsersController {
     return channel;
   }
 
+  @Get('ladder')
+  @ApiOperation({ summary: 'Get an array of users sorted by their elo rating'})
+  async getLadder() {
+    return await this.usersService.getUsersByEloRating();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by its id'})
   @ApiOkResponse({

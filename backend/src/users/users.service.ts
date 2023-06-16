@@ -252,6 +252,32 @@ export class UsersService {
     }})
   }
 
+  async getUsersByEloRating() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        userStatus: true,
+        stats: {
+          select: {
+            eloRating: true,
+            matchesPlayed: true,
+            matchesWon: true,
+            matchesLost: true,
+            winStreak: true,
+          }
+        }
+      },
+      orderBy: {
+        stats: {
+          eloRating: 'desc',
+        }
+      }
+    })
+    return users;
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password)
       updateUserDto.password = await argon.hash(updateUserDto.password);
