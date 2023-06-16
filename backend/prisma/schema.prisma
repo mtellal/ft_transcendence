@@ -49,6 +49,7 @@ model Stats {
   matchesLost   Int  @default(0)
   eloRating     Int  @default(1000)
   winStreak     Int  @default(0)
+  lossStreak    Int  @default(0)
   goalsScored   Int  @default(0)
   goalsTaken    Int  @default(0)
 
