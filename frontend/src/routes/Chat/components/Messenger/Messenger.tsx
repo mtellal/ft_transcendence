@@ -18,6 +18,8 @@ import { useBlock } from "../../../../hooks/Chat/useBlock";
 import { InterfaceContext } from "../../Interface/Interface";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
+import { useOutletContext } from "react-router-dom";
+import userEvent from "@testing-library/user-event";
 
 const MessengerContext: React.Context<any> = createContext(null);
 
@@ -33,7 +35,7 @@ function BlockMessage({ username }: any) {
 function NoMessages() {
     return (
         <div className="no-messages-div">
-            <p key={0} className="no-messages">
+            <p className="no-messages">
                 No messages
             </p>
         </div>
@@ -114,7 +116,7 @@ function UserMenu(props: TUserManu) {
         </div>
     )
 }
-
+/* 
 
 type TMessengerUserLabel = {
     author: any,
@@ -133,8 +135,8 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
 
     return (
         <div
-            className="flex-column absolute"
-            style={{ bottom: '-20px', maxWidth: '30%' }}
+            className="flex-column gray"
+            style={{ maxWidth: '30%' }}
         >
             <div>
                 <ResizeContainer height="30px" width="30px"
@@ -173,11 +175,11 @@ function MessengerUserLabel(props: TMessengerUserLabel) {
             </div>
         </div>
     )
-}
+} */
 
 type TMessengerCurrentUserLabel = {
     author: any,
-    owner?: boolean,
+    content: string
 }
 
 function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
@@ -187,27 +189,47 @@ function MessengerCurrentUserLabel(props: TMessengerCurrentUserLabel) {
 
     return (
         <div
-            className="flex-column absolute"
-            style={{ alignSelf: 'flex-end', bottom: '-20px', alignItems: 'flex-end', maxWidth: '40%', overflow: 'hidden' }}
+            className=""
         >
-            <ResizeContainer height="30px" width="30px">
-                <ProfilePicture image={props.author.url} />
-            </ResizeContainer>
-            <div className="flex" style={{ alignItems: 'flex-end', paddingBottom: '2px' }}>
-                {
-                    currentChannel && currentChannel.type !== "WHISPER" &&
-                    <ResizeContainer height="20px">
-                        {
-                            currentChannel.type !== "WHISPER" &&
-                            currentChannel.ownerId === props.author.id &&
-                            <RawIcon icon="location_away" />
-                        }
-                        {isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
-                    </ResizeContainer>
-                }
-                <p className="message-author"
-                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70px' }}
-                >{props.author.username}</p>
+            <div className="flex-column">
+
+                <div className="flex" style={{ justifyContent: 'flex-end' }} >
+
+                    <p className="message"
+                        style={props.author ?
+                            { marginRight: '5px' } :
+                            { marginRight: '35px' }}
+                    >
+                        {props.content}
+                    </p>
+                    {
+                        props.author &&
+                        <ResizeContainer height="30px" width="30px">
+                            <ProfilePicture image={props.author && props.author.url} />
+                        </ResizeContainer>
+                    }
+                </div>
+
+                <div className="flex" style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingBottom: '2px' }}>
+                    {
+                        currentChannel && currentChannel.type !== "WHISPER" &&
+                        <ResizeContainer height="auto">
+                            {
+                                currentChannel.type !== "WHISPER" && props.author &&
+                                currentChannel.ownerId === props.author.id &&
+                                <RawIcon icon="location_away" />
+                            }
+                            {props.author && isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
+                        </ResizeContainer>
+                    }
+                    {
+                        props.author &&
+                        <p className="message-author"
+                            style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70px' }}
+                        >{props.author.username}</p>
+                    }
+                </div>
+
             </div>
         </div>
     )
@@ -218,85 +240,173 @@ type TMessage = {
     id: number,
     content: string,
     sendBy: number,
-
+    lastMessage: boolean,
     displayUser: boolean,
-
-    owner: boolean
+    author: any,
+    owner: boolean,
 }
 
 
 function Message(props: TMessage) {
 
     const { user } = useCurrentUser();
-    const { fetchUser } = useFetchUsers();
-    const { getMemberById } = useMembers();
-
-    const [author, setAuthor]: any = useState();
-
-    useEffect(() => {
-        if (props.displayUser) {
-            let _author = getMemberById(props.sendBy);
-            if (_author)
-                setAuthor(_author);
-            else {
-                _author = fetchUser(props.sendBy);
-                if (_author)
-                    setAuthor(_author);
-            }
-
-        }
-        else
-            setAuthor(null)
-    }, [props.displayUser])
-
-    function addStyle() {
-        if (user && props.sendBy === user.id)
-            return ({ backgroundColor: '#FFF5DD' });
-    }
-
-    const pickMessageStyle = useCallback(() => {
-        let style = {};
-        if (author)
-            style = { marginBottom: '30px' }
-        if (user && props.sendBy === user.id)
-            style = { ...style, justifyContent: 'right', flexDirection: 'rowreverse' }
-        return (style)
-    }, [author]);
 
     return (
-        <div>
-            <div className="message-div relative"
-                style={pickMessageStyle()}
-            >
-                <div className="flex-column" >
-                    <div className="message-infos">
-                        <p className="message" style={addStyle()} >
-                            {props.content}
-                        </p>
-                    </div>
-                    {
-                        author &&
-                        <>
-                            {
-                                user && user.id !== props.sendBy ?
-                                    <MessengerUserLabel
-                                        id={props.id}
-                                        author={author}
-                                        owner={props.owner}
-                                    /> :
-                                    <MessengerCurrentUserLabel
-                                        author={author}
-                                        owner={props.owner}
-                                    />
-                            }
-                        </>
-                    }
+        <>
+            {
+                props.sendBy === user.id ?
+                    <MessengerCurrentUserLabel
+                        {...props}
+                    /> :
+                    <AuthorMessage
+                        {...props}
+                    />
+            }
+        </>
+    )
+}
 
-                </div>
-            </div>
+
+type TAuthorProfilePicture = {
+    author: any,
+    id: number,
+    type: string,
+    setShowUserMenu: any,
+    showUserMenu: any
+}
+
+
+function AuthorProfilePicture(props: TAuthorProfilePicture) {
+
+    return (
+        <div className="relative">
+            <ResizeContainer height="30px" width="30px"
+                className={props.type !== "WHISPER" ? "pointer" : ""}
+                onClick={() => props.setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
+            >
+                <ProfilePicture image={props.author.url} />
+            </ResizeContainer>
+            {
+                props.type !== "WHISPER" &&
+                props.showUserMenu && props.showUserMenu.show && props.showUserMenu.id === props.id &&
+                <UserMenu
+                    setShowUserMenu={props.setShowUserMenu}
+                    user={props.author}
+                />
+            }
         </div>
     )
 }
+
+
+type TAuthorAccess = {
+    author: any,
+    id: number,
+    type: string,
+    setShowUserMenu: any,
+}
+
+function AuthorAccess(props: TAuthorAccess) {
+    const { currentChannel } = useChannelsContext();
+    const { isUserAdministrators } = useAdinistrators();
+
+    return (
+        <div
+            className="flex"
+            style={{ alignItems: 'flex-end' }}
+            onClick={() => props.setShowUserMenu((o: any) => ({ show: !o.show, id: props.id }))}
+        >
+
+            <p className="message-author"
+                style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    textDecoration: 'underline',
+                }}
+            >{props.author.username}</p>
+
+
+            <ResizeContainer height="auto" className="flex" style={{ alignItems: 'flex-end' }}>
+                {
+                    currentChannel.type !== "WHISPER" && props.author &&
+                    currentChannel.ownerId === props.author.id &&
+                    <RawIcon icon="location_away" />
+                }
+                {props.author && isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
+            </ResizeContainer>
+        </div>
+    )
+}
+
+
+type TUserMessage = {
+    lastMessage: boolean,
+    author: any,
+    id: number,
+    content: string
+}
+
+function AuthorMessage(props: TUserMessage) {
+
+    const { showUserMenu, setShowUserMenu } = useContext(MessengerContext);
+    const { currentChannel } = useChannelsContext();
+
+    let type = currentChannel && currentChannel.type;
+
+
+    function style() {
+        let style: any = { scrollMargin: '30px' };
+        if (props.author && !props.lastMessage) {
+            style = { ...style, marginBottom: '30px' }
+            console.log("in")
+        }
+        return (style);
+    }
+
+    return (
+        <div className="message-div" style={style()}
+        >
+            <div className="flex-column"
+            >
+
+                <div className="flex" style={{ alignItems: 'flex-end' }}>
+                    {
+                        props.author &&
+                        <AuthorProfilePicture
+                            id={props.id}
+                            author={props.author}
+                            type={type}
+                            setShowUserMenu={setShowUserMenu}
+                            showUserMenu={showUserMenu}
+                        />
+                    }
+
+                    <p className="message"
+                        style={props.author ?
+                            { marginLeft: '5px' } :
+                            { marginLeft: '35px' }}
+                    >
+                        {props.content}
+                    </p>
+                </div>
+
+                {
+                    props.author && type !== "WHISPER" &&
+                    <AuthorAccess
+                        id={props.id}
+                        author={props.author}
+                        type={type}
+                        setShowUserMenu={setShowUserMenu}
+                    />
+                }
+            </div>
+        </div>
+    )
+
+}
+
+
 
 function MessageNotification(props: any) {
     return (
@@ -359,10 +469,13 @@ export default function Messenger(props: TMessenger) {
             }
         }
         >
-            <MessengerConversation
-                messages={messages}
-                blockedFriend={props.blockedFriend}
-            />
+            {
+                messages &&
+                <MessengerConversation
+                    messages={messages}
+                    blockedFriend={props.blockedFriend}
+                />
+            }
             <MessengerInput
                 blockedFriend={props.blockedFriend}
             />
@@ -374,65 +487,105 @@ export default function Messenger(props: TMessenger) {
 function MessengerConversation({ messages, blockedFriend }: any) {
     const { currentFriend } = useFriendsContext();
     const { currentChannel } = useChannelsContext();
-    
+
     const [render, setRender] = useState(false);
 
-    let renderMessages: any = useRef(null);
-    const lastMessageRef: any = React.useRef(null);
+    // let renderMessages: any = useRef(null);
+
+    const { getMemberById, isUserIdMember } = useMembers();
+
+    const { user } = useCurrentUser();
+    const { fetchUser, fetchUsers } = useFetchUsers();
+
+    const messagesContainerRef = useRef(null);
+
+    const [authors, setAuthors]: any = useState([]);
+
+
+    async function loadAuthors(messages: any[]) {
+        let users: any[] = [];
+        let ids : number [] = [];
+        await Promise.all(
+            messages.map(async (m: any, index: number) => {
+                if ((index + 1 !== messages.length &&
+                    m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
+                    if (!ids.length || !ids.find((id: number) => id === m.sendBy)) {
+                        ids = [...ids, m.sendBy];
+                        if (!isUserIdMember(m.sendBy)) {
+                            users.push(await fetchUser(m.sendBy));
+                        }
+                        else
+                        {
+                            users.push(getMemberById(m.sendBy));
+                        }
+                    }
+                }
+            }))
+        users = users.filter(u => u);
+        console.log(users)
+        setAuthors(users);
+    }
+
+    useEffect(() => {
+        if (messages && messages.length && currentChannel) {
+            loadAuthors(messages);
+        }
+    }, [messages, currentChannel])
 
 
 
-    const rendMessages = useCallback(async () => {
+    const rendMessages = useCallback(() => {
         console.log("render messages called")
         if (!messages.length) {
-            setRender((p: boolean) => !p);
-            renderMessages.current = <NoMessages />
+            return (<NoMessages />);
         }
         else {
-            setRender((p: boolean) => !p);
             let displayUser: boolean;
-            renderMessages.current =
+            let _author: any;
+            console.log("inside ", messages.length)
+            return (
                 messages.map((m: any, index: number) => {
+                    _author = null;
                     displayUser = false;
                     if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
                         displayUser = true;
+                            _author = authors.find((u: any) => u.id === m.sendBy)
                     }
 
                     if (m.type === "NOTIF")
                         return (<MessageNotification key={m.id} content={m.content} />)
                     else if (m.type !== "NOTIF") {
+
                         return (
                             <Message
+                                lastMessage={index + 1 === messages.length}
                                 key={m.id}
                                 id={m.id}
                                 content={m.content}
                                 sendBy={m.sendBy}
+                                author={_author}
                                 displayUser={displayUser}
                                 owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
                             />
                         )
                     }
-                })
+                }));
+
         }
-    }, [messages]);
+
+    }, [messages, authors]);
 
     useEffect(() => {
-        rendMessages();
-    }, [messages])
+        if (messagesContainerRef) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+    }, [messagesContainerRef, messages, authors])
 
-
-    React.useEffect(() => {
-        if (!blockedFriend)
-            lastMessageRef.current.scrollIntoView();
-    }, [currentChannel, render])
-
-    console.log("render Messages => ", renderMessages.current, messages)
 
     return (
-        <div className="messages-display">
-            {renderMessages.current}
+        <div className="messages-display" ref={messagesContainerRef}>
+            {authors && authors.length && rendMessages()}
             {blockedFriend && <BlockMessage username={currentFriend.username || currentChannel.name} />}
-            <div ref={lastMessageRef}></div>
         </div>
     )
 }

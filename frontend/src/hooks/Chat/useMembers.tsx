@@ -18,6 +18,15 @@ export default function useMembers()
     }, [currentChannel, channels])
 
 
+    const isUserIdMember = useCallback((userId: number) => {
+        if (userId && channels && currentChannel)
+        {
+            if (currentChannel.members.find((id : number) => id === userId))
+                return (true)
+            return (false)
+        }
+    }, [currentChannel, channels])
+
     const isUserOwner = useCallback((user : any) => {
         if (user && channels && currentChannel)
         {
@@ -94,6 +103,7 @@ export default function useMembers()
     return (
         {
             isUserMember,
+            isUserIdMember,
             isUserOwner,
             isUserBanned,
             addMember,

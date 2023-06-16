@@ -31,6 +31,12 @@ export default function FriendEvents({ children }: any) {
                 }
             })
 
+            socket.on('updatedFriend', (friend: any) => {
+                console.log("UPDATED FRIEND EVENT => ")
+                if (friend)
+                    updateFriend(friend);
+            })
+
             socket.on('removedFriend', (friend: any) => {
                 // console.log("REMOVE FRIEND EVENT")
                 if (friend)

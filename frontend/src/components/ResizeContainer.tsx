@@ -18,7 +18,7 @@ export default function ResizeContainer({children, ...props} : any)
     }
 
     return (
-        <div style={style()} {...props} >
+        <div className="reset" style={style()} {...props} >
             {children}
         </div>
     )

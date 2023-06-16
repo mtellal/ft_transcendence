@@ -21,7 +21,6 @@
     align-items: center;
     position: sticky;
     bottom: 0;
-    margin-top: 5px;
 }
 
 .messenger-input
@@ -52,8 +51,6 @@
 
 .message-infos
 {
-    padding: 0 35px;
-    max-width: 70%;
     margin-right: auto;
 }
 
@@ -66,6 +63,10 @@
     border-radius: 5px;
     word-break: break-all;
     font-size: 15px;
+
+    max-width: 90%;
+    margin-right: auto;
+
 }
 
 .message-author-infos
