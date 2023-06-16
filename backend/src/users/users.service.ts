@@ -158,6 +158,12 @@ export class UsersService {
     })
   }
 
+  async getStats(userId: number) {
+    return await this.prisma.stats.findUnique({
+      where: {userId}
+    });
+  }
+
   async checkifUserblocked(userId: number, blockedId: number) {
     const isBlocked = await this.prisma.blockedUser.findFirst({
       where: {
