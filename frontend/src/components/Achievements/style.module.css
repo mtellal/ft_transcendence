@@ -1,0 +1,11 @@
+.container {
+	display: flex;
+	height: 30%;
+	margin-top: 5%;
+	margin-left: 5px;
+	margin-right: 5px;
+	/* background-color: aliceblue; */
+	border-radius: 25px;
+	align-items: center;
+	overflow-x: scroll;
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo_user from "../../assets/user.png"
 import { getMatchHistory, getUser, getUserProfilePictrue } from "../../requests/user";
 import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
+import { Achievements } from "../../components/Achievements/Achievements";
 import s from './style.module.css'
 
 interface UserProfileProps {
@@ -35,6 +36,7 @@ export function UserProfile({ id }: UserProfileProps) {
 				<img className={s.image} src={logo_user} alt="profilePictureUser"></img>
 			</div>
 			<HistoryMatchs id={id} />
+			<Achievements />
 		</div>
 	);
 }
