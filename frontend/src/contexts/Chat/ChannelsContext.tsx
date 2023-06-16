@@ -233,8 +233,9 @@ function reducer(channels: any, action: any) {
             if (channels.length && message) {
                 return (
                     channels.map((c: any, i: number) => {
-                        if (c.id === message.channelId)
+                        if (c.id === message.channelId) {
                             c.messages = [...c.messages, message];
+                        }
                         return (c);
                     })
                 )
@@ -285,15 +286,8 @@ export function ChannelsProvider({ children }: any) {
             return (
                 await Promise.all(channelList.map(async (c: any) => {
                     if (c.members && c.members.length) {
-                        if (c.type === "WHISPER" && friends.length) {
-                            const friend = friends.find((u: any) =>
-                                c.members.find((id: number) => u.id === id));
-                            users = [user, friend];
-                        }
-                        else {
-                            users = await fetchUsers(c.members);
-                            users = users.filter((u: any) => u)
-                        }
+                        users = await fetchUsers(c.members);
+                        users = users.filter((u: any) => u)
                         return ({ ...c, users })
                     }
                 }))
@@ -302,23 +296,13 @@ export function ChannelsProvider({ children }: any) {
         return ([]);
     }
 
-    function filterAvailableChannels(channelList: Channel[]) {
-        return (
-            channelList.filter((c: Channel) =>
-                ((c.type !== "WHISPER") ||
-                    (friends.length && c.members.find((id: number) =>
-                        friends.find((f: any) => f.id === id))))
-                    ? c : null
-            )
-        )
-    }
 
     const loadChannels = useCallback(async () => {
         console.log("////////////// load channels")
         setChannelsLoading(true)
         let channelList;
         channelList = await getChannels(user.id).then(res => res.data);
-        channelList = filterAvailableChannels(channelList);
+        // channelList = filterAvailableChannels(channelList);
         channelList = await loadUsersChannels(channelList);
         channelsDispatch({ type: 'initChannels', channels: channelList });
         channelList.forEach((channel: Channel) => {
@@ -330,16 +314,16 @@ export function ChannelsProvider({ children }: any) {
         setChannelsLoading(false)
         console.log("load channels ////////////// ")
 
-    }, [user, socket, friendsLoaded])
+    }, [user, socket])
 
     useEffect(() => {
-        if (user && socket && !channelsLoading && friendsLoaded) {
+        if (user && socket && !channelsLoading && !channels.length) {
             loadChannels();
         }
-    }, [socket, user, friends])
+    }, [socket, user])
 
 
-    // console.log(channels)
+    console.log(channels)
 
     ////////////////////////////////////////////////////////////////
     //               C U R R E N T    C H A N N E L               //

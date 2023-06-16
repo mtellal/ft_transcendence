@@ -359,7 +359,6 @@ function AuthorMessage(props: TUserMessage) {
         let style: any = { scrollMargin: '30px' };
         if (props.author && !props.lastMessage) {
             style = { ...style, marginBottom: '30px' }
-            console.log("in")
         }
         return (style);
     }
@@ -418,7 +417,9 @@ function MessageNotification(props: any) {
 
 
 type TMessenger = {
-    blockedFriend: boolean
+    blockedFriend: boolean,
+    hidden: boolean,
+    whisperUser:any, 
 }
 
 export default function Messenger(props: TMessenger) {
@@ -449,17 +450,15 @@ export default function Messenger(props: TMessenger) {
             messages = filterMessages(messages, members);
             setMessages(messages);
         }
-    }, [currentChannel.messages, user])
-
-
+    }, [currentChannel && currentChannel.messages, user])
 
     useEffect(() => {
-        if (currentChannel.messages) {
+        if (currentChannel && currentChannel.messages && currentChannel.messages.length) {
             initMessages();
         }
         else
             setMessages([]);
-    }, [currentChannel.messages, user.blockList])
+    }, [currentChannel && currentChannel.messages, user.blockList])
 
     return (
         <MessengerContext.Provider value={
@@ -469,33 +468,26 @@ export default function Messenger(props: TMessenger) {
             }
         }
         >
-            {
-                messages &&
-                <MessengerConversation
-                    messages={messages}
-                    blockedFriend={props.blockedFriend}
+                {
+                    messages && currentChannel && 
+                    <MessengerConversation
+                        messages={messages}
+                        {...props}
+                    />
+                }
+                <MessengerInput
+                    {...props}
                 />
-            }
-            <MessengerInput
-                blockedFriend={props.blockedFriend}
-            />
         </MessengerContext.Provider>
     )
 }
 
 
-function MessengerConversation({ messages, blockedFriend }: any) {
-    const { currentFriend } = useFriendsContext();
+function MessengerConversation({ messages, blockedFriend, hidden, whisperUser }: any) {
     const { currentChannel } = useChannelsContext();
 
-    const [render, setRender] = useState(false);
-
-    // let renderMessages: any = useRef(null);
-
     const { getMemberById, isUserIdMember } = useMembers();
-
-    const { user } = useCurrentUser();
-    const { fetchUser, fetchUsers } = useFetchUsers();
+    const { fetchUser } = useFetchUsers();
 
     const messagesContainerRef = useRef(null);
 
@@ -504,7 +496,8 @@ function MessengerConversation({ messages, blockedFriend }: any) {
 
     async function loadAuthors(messages: any[]) {
         let users: any[] = [];
-        let ids : number [] = [];
+        let ids: number[] = [];
+        console.log("author re fetched")
         await Promise.all(
             messages.map(async (m: any, index: number) => {
                 if ((index + 1 !== messages.length &&
@@ -514,15 +507,13 @@ function MessengerConversation({ messages, blockedFriend }: any) {
                         if (!isUserIdMember(m.sendBy)) {
                             users.push(await fetchUser(m.sendBy));
                         }
-                        else
-                        {
+                        else {
                             users.push(getMemberById(m.sendBy));
                         }
                     }
                 }
             }))
         users = users.filter(u => u);
-        console.log(users)
         setAuthors(users);
     }
 
@@ -530,26 +521,27 @@ function MessengerConversation({ messages, blockedFriend }: any) {
         if (messages && messages.length && currentChannel) {
             loadAuthors(messages);
         }
+        else {
+            setAuthors([]);
+        }
     }, [messages, currentChannel])
 
 
 
     const rendMessages = useCallback(() => {
-        console.log("render messages called")
-        if (!messages.length) {
-            return (<NoMessages />);
-        }
-        else {
+        console.log("messages => ", messages)
+        if (messages.length) {
+
+
             let displayUser: boolean;
             let _author: any;
-            console.log("inside ", messages.length)
             return (
                 messages.map((m: any, index: number) => {
                     _author = null;
                     displayUser = false;
                     if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
                         displayUser = true;
-                            _author = authors.find((u: any) => u.id === m.sendBy)
+                        _author = authors.find((u: any) => u.id === m.sendBy)
                     }
 
                     if (m.type === "NOTIF")
@@ -570,22 +562,29 @@ function MessengerConversation({ messages, blockedFriend }: any) {
                         )
                     }
                 }));
-
         }
-
     }, [messages, authors]);
 
     useEffect(() => {
         if (messagesContainerRef) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
-    }, [messagesContainerRef, messages, authors])
+    }, [messagesContainerRef, authors, hidden])
 
+    // console.log("messages props => ", messages, "currentchannel messages => ", currentChannel.messages)
 
     return (
-        <div className="messages-display" ref={messagesContainerRef}>
-            {authors && authors.length && rendMessages()}
-            {blockedFriend && <BlockMessage username={currentFriend.username || currentChannel.name} />}
+        <div className={hidden ? "messages-display hidden" : "messages-display visible"} ref={messagesContainerRef}>
+            {
+                !messages.length || !authors.length ?
+                    <NoMessages />
+                    :
+                    rendMessages()
+            }
+            {
+                blockedFriend && currentChannel && currentChannel.type === "WHISPER" &&
+                <BlockMessage username={whisperUser.username || currentChannel.name} />
+            }
         </div>
     )
 }
@@ -605,7 +604,7 @@ function MessengerInput(props: any) {
         if (props.blockedFriend)
             return ("User blocked")
         return ("Write your message")
-    }, []);
+    }, [currentChannel, props.blockedFriend]);
 
     const submit = useCallback((e: any) => {
         if (e.key === "Enter" && value && !props.blockedFriend && currentChannel && socket) {
@@ -619,10 +618,10 @@ function MessengerInput(props: any) {
 
 
     return (
-        <div className="messages-input"
+        <div className={props.hidden ? "messages-input hidden" : "messages-input visible"}
         >
             <input
-                className="messenger-input"
+                className={props.hidden ? "messenger-input hidden" : "messenger-input visible"}
                 value={value}
                 onChange={handleChange}
                 placeholder={canSendMessages()}

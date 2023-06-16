@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 import MenuElement from "../components/Menu/MenuElement";
 import { Outlet, useSearchParams } from "react-router-dom";
@@ -11,16 +11,38 @@ import { ChannelsProvider } from "../../../contexts/Chat/ChannelsContext";
 import './Chat.css'
 import FriendEvents from "../Events/FriendsEvents";
 import ChannelsEvents from "../Events/ChannelsEvents";
-import { useChannelsContext } from "../../../hooks/Hooks";
+import { ConfirmPage, ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
+
+
+export const ChatInterfaceContext: React.Context<any> = createContext(null);
 
 function ChatInterface() {
+
+    const [action, setAction]: any = useState(null);
+
     return (
-        <div className="chat">
-            <div className="chat-container">
-                <MenuElement />
-                <Outlet />
+        <ChatInterfaceContext.Provider value={{ setAction }}>
+            <div className="chat">
+                <div className="chat-container relative">
+                    <MenuElement />
+                    <Outlet />
+                    {
+                        action && (action.user || action.channel) && action.function &&
+                        <ConfirmPage>
+                            <ConfirmView
+                                type={action.type}
+                                username={(action.user && action.user.username) || (action.channel && action.channel.name)}
+                                valid={async () => {
+                                    await action.function(action.user, action.channel);
+                                    setAction(null)
+                                }}
+                                cancel={() => setAction(null)}
+                            />
+                        </ConfirmPage>
+                    }
+                </div>
             </div>
-        </div>
+        </ChatInterfaceContext.Provider>
     )
 }
 

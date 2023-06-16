@@ -6,15 +6,7 @@
 
 /*              REMOVE FRIEND VIEW  */
 
-.confirmview-container
-{
-    padding: 0;
-    margin: 0;
-    background-color: rgba(0, 0, 0, 0.384);
-    height: 100%;
-    width: 100%;
-    top: 0;
-}
+
 
 .remove-friend-div
 {

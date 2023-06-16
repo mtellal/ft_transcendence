@@ -17,7 +17,7 @@ export default function ChannelInfos(props: TChannelInfos) {
     const [renderMembersPP, setRenderMembersPP] = useState([]);
 
     const loadMembers = useCallback(async () => {
-        if (props.channel.users && props.channel.users.length) {
+        if (props.channel && props.channel.users && props.channel.users.length) {
             setRenderMembersPP(
                 props.channel.users.map((user: any) =>
                     <div key={user.id} className="channelinfos-pp-container">
@@ -36,8 +36,8 @@ export default function ChannelInfos(props: TChannelInfos) {
     return (
         <div className="flex-center">
             <h2 style={{ whiteSpace: 'nowrap' }}>{props.channel && props.channel.name} - </h2>
-            {props.channel.type === "PROTECTED" && <RawIcon icon="shield" />}
-            {props.channel.type === "PRIVATE" && <RawIcon icon="lock" />}
+            {props.channel && props.channel.type === "PROTECTED" && <RawIcon icon="shield" />}
+            {props.channel && props.channel.type === "PRIVATE" && <RawIcon icon="lock" />}
             <div className="flex-center channelinfos-members-container">
                 {renderMembersPP}
             </div>

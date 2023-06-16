@@ -77,7 +77,7 @@ export async function removeChannel(id: number) {
 export async function getChannelMessages(channelId: number) {
     return (
         axios.get(`${back}/chat/${channelId}/messages`)
-            .then(res => res.data)
+            .then(res => res)
             .catch(err => err)
     )
 }

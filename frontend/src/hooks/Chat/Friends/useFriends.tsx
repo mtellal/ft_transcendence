@@ -3,6 +3,7 @@ import { useChannelsContext, useCurrentUser, useFriendsContext } from "../../Hoo
 import useFetchUsers from "../../useFetchUsers";
 import { removeUserFriend } from "../../../requests/friends";
 import { useNavigate } from "react-router-dom";
+import { useChannels } from "../useChannels";
 
 export function useFriends() {
     const navigate = useNavigate();
@@ -10,10 +11,13 @@ export function useFriends() {
     const { fetchUserProfilePicture } = useFetchUsers();
     const { friends, friendsDispatch, currentFriend } = useFriendsContext();
 
+    const {channels} = useChannelsContext();
+    const { leaveChannel } = useChannels();
+
     const isUserFriend = useCallback((user: any) => {
-        if (friends && friends.length)
+        if (friends && friends.length && user)
         {
-            return (friends.find((u: any) => u.user === user.id))
+            return (friends.find((u: any) => u.id === user.id))
         }
         return (false);
     }, [friends])
@@ -40,7 +44,6 @@ export function useFriends() {
             friendsDispatch({ type: 'removeFriend', friend })
             if (currentFriend && currentFriend.id === friend.id)
             {
-                console.log("remove friend call, currentFriend => ", currentFriend)
                 navigate("/chat");
             }
         }

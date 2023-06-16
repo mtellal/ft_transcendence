@@ -19,7 +19,7 @@ export default function FriendEvents({ children }: any) {
         if (socket) {
 
             socket.on('receivedRequest', (request: any) => {
-                // console.log("REQUEST FRIEND EVENT => ", request)
+                console.log("REQUEST FRIEND EVENT => ", request)
                 addFriendRequest(request)
             })
 
@@ -38,12 +38,9 @@ export default function FriendEvents({ children }: any) {
             })
 
             socket.on('removedFriend', (friend: any) => {
-                // console.log("REMOVE FRIEND EVENT")
+                console.log("REMOVE FRIEND EVENT")
                 if (friend)
                 {
-                    const whisper = getChannelFromFriendName(friend);
-                    if (whisper)
-                        leaveChannel(whisper);
                     removeFriend(friend);
                 }
             })

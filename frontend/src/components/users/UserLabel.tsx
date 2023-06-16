@@ -7,6 +7,8 @@ import { getUserProfilePictrue } from '../../requests/user'
 import { TUserInfos, UserInfos } from './UserInfos';
 
 import './UserLabel.css'
+import { getBlockList } from '../../requests/block';
+import { useCurrentUser } from '../../hooks/Hooks';
 
 type TUserLabelSearch = TUserInfos & {
     id: number,
@@ -20,8 +22,17 @@ type TUserLabelSearch = TUserInfos & {
 
 export function UserLabelSearch(props: TUserLabelSearch) {
     const [invitation, setInvitation]: [any, any] = React.useState(false);
+    const { user, token } = useCurrentUser();
 
     const [url, setUrl]: any = useState();
+
+    const [currentUserBlocked, setCurrentUserBlocked] = useState(false);
+
+    async function loadBlockList() {
+        const blockList = await getBlockList(props.id, token);
+        if (blockList && blockList.length && blockList.find((o: any) => o.userId === user.id))
+            setCurrentUserBlocked(true);
+    }
 
     async function loadURL() {
         await getUserProfilePictrue(props.id)
@@ -34,14 +45,19 @@ export function UserLabelSearch(props: TUserLabelSearch) {
     useEffect(() => {
         if (props.id) {
             loadURL();
+            // loadBlockList();
         }
     }, [props.id])
 
     return (
         <div className='flex-ai UserLabelSearch-container'>
             <UserInfos {...props} profilePictureURL={url} />
-            {props.add &&
-                !invitation &&
+            {
+                currentUserBlocked && !props.delete && !props.invitation &&
+                <p>Blocked</p>
+            }
+            {
+                !currentUserBlocked &&  props.add && !invitation &&
                 <Icon
                     icon="add"
                     onClick={() => { props.onClick(); setInvitation(true) }}
@@ -69,7 +85,7 @@ type TUserLabel = TUserInfos & {
 
 export default function UserLabel(props: TUserLabel) {
     return (
-        <NavLink to={`/chat/friends/${props.username}/${props.id}`}
+        <NavLink to={`/chat/user/${props.username}/${props.id}`}
             className={({ isActive }) =>
                 isActive ? "friend-element hover-fill-grey selected" : "friend-element hover-fill-grey"
             }

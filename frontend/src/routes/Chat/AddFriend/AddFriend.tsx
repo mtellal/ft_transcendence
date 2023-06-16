@@ -110,7 +110,7 @@ export default function AddFriend() {
     )
 }
 
-function FriendRequests() {
+export function FriendRequests() {
 
     const { fetchUsers } = useFetchUsers();
     const { friendInvitations } = useFriendsContext();
@@ -161,12 +161,10 @@ function FriendRequests() {
         <>
             {
                 userInvitations.length ?
-                    <div className="add-element-invitations">
-                        <CollectionElement
-                            title="Invitations"
-                            collection={invitations}
-                        />
-                    </div>
+                    <CollectionElement
+                        title="Invitations"
+                        collection={invitations}
+                    />
                     :
                     null
             }

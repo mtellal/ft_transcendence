@@ -117,3 +117,19 @@
         overflow: scroll;
     }
 }
+
+.menuinput-input
+{
+    height: 2rem;
+    padding: 5px 5px;
+    align-items: center;
+    font-size: medium;
+    font-family: 'inter', sans-serif;
+    border-radius: 5px;
+    border: 1px solid black;
+    box-shadow: 1px 1px 3px black;
+}
+
+.menuinput-input:focus {
+    outline: none;
+}

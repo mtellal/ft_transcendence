@@ -26,7 +26,7 @@ export function CreateChannel() {
 
     const { channels, channelsDispatch, setCurrentChannel } = useChannelsContext();
 
-    const {addChannel } = useChannels();
+    const { addChannel } = useChannels();
 
     const navigate = useNavigate();
 
@@ -56,7 +56,7 @@ export function CreateChannel() {
             <div className="flex">
                 <ArrowBackMenu
                     title="Channel"
-                    path="/chat/add-group"
+                    path="/chat/more/channels"
                 />
             </div>
             <h2>Create a channel</h2>

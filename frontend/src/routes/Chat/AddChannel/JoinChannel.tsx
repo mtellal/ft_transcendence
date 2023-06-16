@@ -213,7 +213,7 @@ export default function JoinChannel() {
                     <div className="flex">
                         <ArrowBackMenu
                             title="Channel"
-                            path="/chat/add-group"
+                            path="/chat/more/channels"
                         />
                     </div>
                 }

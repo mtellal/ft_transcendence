@@ -12,94 +12,82 @@ import { useBlock } from "../../../../hooks/Chat/useBlock";
 import { InterfaceContext } from "../../Interface/Interface";
 import { useFriends } from "../../../../hooks/Chat/Friends/useFriends";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
+import { ChatInterfaceContext } from "../../Chat/Chat";
+import useFetchUsers from "../../../../hooks/useFetchUsers";
 
-function IconsBanner(props: any) {
 
-    const { currentFriend } = useFriendsContext();
+type TIconsBanner = {
+    whisperUser: any,
+    channel: any,
+    setBlockedFriend: any,
+    invitation: any,
+    type: any,
+    mobile?: any
+    profile: any,
+}
+
+function IconsBanner(props: TIconsBanner) {
+
+    const { user } = useCurrentUser();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
     const { removeFriend } = useFriends();
     const { leaveChannel } = useChannels();
 
-    const { setAction } = useContext(InterfaceContext);
+    const { setAction } = useContext(ChatInterfaceContext);
 
-    function bannerBlock() {
-        if (currentFriend) {
-            if (isUserBlocked(currentFriend))
-                unblockUser(currentFriend);
+    const bannerBlock = useCallback(() => {
+        if (props.whisperUser) {
+            if (isUserBlocked(props.whisperUser))
+                unblockUser(props.whisperUser);
             else
-                blockUser(currentFriend)
+                blockUser(props.whisperUser)
             props.setBlockedFriend((p: boolean) => !p);
         }
-    }
+    }, [props.whisperUser]);
 
     const pickRemoveIcon = useCallback(() => {
-        if (props.channel) {
-            if (props.channel.type === "WHISPER")
+        if (props.channel && props.channel.type !== "WHISPER") {
+            if (props.channel.ownerId === user.id)
                 return (
                     <Icon
-                        icon="person_remove"
+                        icon="delete_forever"
                         onClick={() => {
                             setAction({
-                                type: 'remove',
-                                user: currentFriend,
+                                type: 'delete',
                                 channel: props.channel,
                                 function: (user: any, channel: any) => {
-                                    removeFriend(user);
-                                    console.log("leaveChannel called ", channel)
+                                    leaveChannel(channel)
+                                }
+                            })
+                        }}
+                        description="Delete"
+                    />
+                )
+            else
+                return (
+                    <Icon
+                        icon="logout"
+                        onClick={() => {
+                            setAction({
+                                type: 'leave',
+                                channel: props.channel,
+                                function: (user: any, channel: any) => {
                                     leaveChannel(channel);
                                 }
                             })
                         }}
-                        description="Remove"
+                        description="Leave"
                     />
                 )
-            else {
-                if (props.channel.ownerId === props.user.id)
-                    return (
-                        <Icon
-                            icon="delete_forever"
-                            onClick={() => {
-                                setAction({
-                                    type: 'delete',
-                                    channel: props.channel,
-                                    function: (user: any, channel: any) => {
-                                        leaveChannel(channel)
-                                    }
-                                })
-                            }}
-                            description="Delete"
-                        />
-                    )
-                else
-                    return (
-                        <Icon
-                            icon="logout"
-                            onClick={() => {
-                                setAction({
-                                    type: 'leave',
-                                    channel: props.channel,
-                                    function: (user: any, channel: any) => { 
-                                        leaveChannel(channel);
-                                    }
-                                })
-                            }}
-                            description="Leave"
-                        />
-                    )
-            }
         }
-    }, [props.channel])
+    }, [props.channel, props.whisperUser])
 
     return (
         <>
-            {
-                props.channel && props.channel.type === "WHISPER" ?
-                    <Icon icon="person" onClick={props.profile} description="Profile" />
-                    : <Icon icon="groups" onClick={props.profile} description="Channel" />
-            }
+            <Icon icon="person" onClick={props.profile} description="Profile" />
             <Icon icon="sports_esports" onClick={props.invitation} description="Invitation" />
             {
-                props.type === "WHISPER" && currentFriend &&
+                props.type === "WHISPER" && props.whisperUser &&
                 <Icon icon="block" onClick={bannerBlock} description="Block" />
             }
             {pickRemoveIcon()}
@@ -109,21 +97,20 @@ function IconsBanner(props: any) {
 }
 
 type TBanner = {
+    whisperUser: any,
     channel: any,
     type: string,
     setBlockedFriend: any,
-    profile: () => {} | any,
     invitation: () => {} | any,
-    remove: () => {} | any,
+    profile: any,
 }
 
 export default function Banner({ ...props }: TBanner) {
 
-    const { user } = useCurrentUser();
-    const { currentFriend } = useFriendsContext();
     const { currentChannel } = useChannelsContext();
     const { isMobileDisplay } = useWindow();
 
+    const { fetchUser } = useFetchUsers();
 
     return (
         <>
@@ -133,9 +120,9 @@ export default function Banner({ ...props }: TBanner) {
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?
                             <UserInfos
-                                username={currentFriend && currentFriend.username}
-                                userStatus={currentFriend && currentFriend.userStatus}
-                                profilePictureURL={currentFriend && currentFriend.url}
+                                username={props.whisperUser && props.whisperUser.username}
+                                userStatus={props.whisperUser && props.whisperUser.userStatus}
+                                profilePictureURL={props.whisperUser && props.whisperUser.url}
                             />
                             :
                             <ChannelInfos
@@ -144,12 +131,12 @@ export default function Banner({ ...props }: TBanner) {
                     }
                 </div>
                 {
-                    isMobileDisplay ?
+                    isMobileDisplay && currentChannel ?
 
                         <div className="mobile-iconsbanner">
                             <IconsBanner
                                 channel={currentChannel}
-                                user={user}
+                                whisperUser={props.whisperUser}
                                 mobile={true}
                                 {...props}
                             />
@@ -157,7 +144,7 @@ export default function Banner({ ...props }: TBanner) {
                         :
                         <IconsBanner
                             channel={currentChannel}
-                            user={user}
+                            whisperUser={props.whisperUser}
                             {...props}
                         />
                 }

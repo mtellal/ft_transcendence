@@ -173,9 +173,11 @@ export default function ChannelsEvents({ children }: any) {
                 socket.on('message', (m: any) => {
                     console.log("message recieved")
                     if (m.length) {
+                        console.log("init messages")
                         channelsDispatch({ type: 'initMessages', messages: m });
                     }
                     if (m.content) {
+                        console.log("add message")
                         channelsDispatch({ type: 'addMessage', message: m });
                     }
                 });
@@ -183,12 +185,12 @@ export default function ChannelsEvents({ children }: any) {
 
 
             socket.on('updatedUser', async (user: any) => {
-                console.log("UPDATE FRIEND EVENT => ", user)
-                if (user)
+                console.log("UPDATE USER CHANNEL FRIEND EVENT => ", user)
+                /* if (user)
                 {
                     if (isUserFriend(user))
                         updateFriend(user);
-                }
+                } */
             })
 
             return () => {

@@ -16,7 +16,7 @@ export function useChannels() {
     const { channels, channelsDispatch, currentChannel } = useChannelsContext();
 
     const addChannel = useCallback(async (channel: any, includeCurrentUser: boolean) => {
-        if (socket) {
+        if (socket && channel) {
             if ((!channel.users || !channel.users.length) && channel.members) {
                 if (includeCurrentUser)
                     channel.members = [...channel.members, user.id]
@@ -87,6 +87,7 @@ export function useChannels() {
     }
 
     const leaveChannel = useCallback((channel: any) => {
+        console.log("leave channel called")
         if (channel && channel.id && socket) {
             channelsDispatch({ type: 'removeChannel', channelId: channel.id })
             socket.emit('leaveChannel', {
@@ -95,6 +96,7 @@ export function useChannels() {
             navigate("/chat");
         }
     }, [socket])
+
 
     const getChannelFromFriendName = useCallback((friend: any) => {
         if (channels && channels.length) {

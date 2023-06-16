@@ -60,24 +60,18 @@ const router = createBrowserRouter([
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
                     {
-                        path: "add-friend",
-                        loader: appLoader,
-                        errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddFriend/>
-                    },
-                    {
-                        path: "add-group",
+                        path: "more/channels",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <AddChannel />
                     },
                     {
-                        path: "add-group/join",
+                        path: "more/channels/join",
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <JoinChannel />
                     },
                     {
-                        path: "add-group/create",
+                        path: "more/channels/create",
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <CreateChannel />
                     },
@@ -87,7 +81,12 @@ const router = createBrowserRouter([
                         element:  <Interface />
                     },
                     {
-                        path: "friends/:username/:id",
+                        path: "friends/:friendname/:id",
+                        errorElement: <Navigate to="/chat" replace/>,
+                        element: <Interface />
+                    },
+                    {
+                        path: "user/:username/:id",
                         errorElement: <Navigate to="/chat" replace/>,
                         element: <Interface />
                     }

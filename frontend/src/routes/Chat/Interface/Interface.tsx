@@ -14,72 +14,89 @@ import { useBlock } from "../../../hooks/Chat/useBlock";
 import { ConfirmPage, ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
 import { createChannel, getWhisperChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
+import { convertTypeAcquisitionFromJson } from "typescript";
+import useFetchUsers from "../../../hooks/useFetchUsers";
 
 
 export const InterfaceContext: React.Context<any> = createContext(null);
 
 export default function Interface() {
     const p: any = useParams();
+    const navigate = useNavigate();
 
     const [params, setParams] = useState(p);
 
-    const navigate = useNavigate();
-    const { token, user, userDispatch }: any = useCurrentUser();
+    const { token, user }: any = useCurrentUser();
+    const { addChannel } = useChannels();
+    const { isUserBlocked } = useBlock();
 
     const { friends, friendsDispatch, currentFriend, setCurrentFriend }: any = useFriendsContext();
-
     const { currentChannel, setCurrentChannel, channels } = useChannelsContext();
 
-    const [profile, setProfile] = React.useState(false);
-    const [removeView, setRemoveView] = React.useState(false);
     const [blockedFriend, setBlockedFriend]: [any, any] = React.useState(false);
+    const { fetchUser } = useFetchUsers();
 
-    const { addChannel } = useChannels();
+    const [profile, setProfile] = useState(false);
 
-    const [action, setAction]: any = useState(null);
+    const [whisperUser, setWhisperUser] = useState();
+
+    const selectWhisper = useCallback(async (_user: any) => {
+        let channel;
+        // console.log("//////////////////////////////")
+        // console.log(channels)
+        if (channels && channels.length) {
+            // console.log("channels not empty", channels)
+            channel = channels.find((c: any) =>
+                c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
+            // console.log("channel found from channels => ", channel);
+        }
+        if (!channel) {
+            await getWhisperChannel(user.id, _user.id)
+                .then(res => {
+                    if (res.data) {
+                        // console.log("WHISPER FOUND")
+                        channel = res.data
+                    }
+                })
+            await addChannel(channel, false);
+        }
+        return (channel);
+    }, [channels]);
 
     async function loadFriendChannel(friend: any) {
         let channel;
         setCurrentFriend(friend)
         friendsDispatch({ type: 'removeNotif', friend });
 
-        channel = channels.find((c: any) =>
-            c.type === "WHISPER" && c.members.find((id: number) => friend.id === id))
-        if (!channel) {
-            channel = await getWhisperChannel(user.id, friend.id).then(res => res.data);
-            if (!channel) {
-                await createChannel({
-                    name: "privateMessage",
-                    type: "WHISPER",
-                    members: [
-                        friend.id
-                    ],
-                }, token)
-                    .then(res => { channel = res.data })
-            }
-            await addChannel(channel, false);
-        }
+        channel = selectWhisper(friend);
+        selectWhisper(friend);
         setCurrentFriend(friend);
         return (setCurrentChannel(channel));
     }
 
 
-    async function loadInterface() {
-        if (channels && channels.length) {
-            if (params.channelName) {
-                const channel = channels.find((c: any) => c.name === params.channelName)
-                if (channel)
-                    return (setCurrentChannel(channel));
-            }
-            else if (params.username && friends && friends.length) {
-                const friend = friends.find((f: any) => f.username === params.username);
-                if (friend) {
-                    return (loadFriendChannel(friend));
-                }
-            }
-            navigate("/chat")
+    const loadInterface = useCallback(async () => {
+        if (params.channelName) {
+            const channel = channels.find((c: any) => c.name === params.channelName)
+            if (channel)
+                return (setCurrentChannel(channel));
         }
-    }
+        else if (params.friendname && friends && friends.length) {
+            const friend = friends.find((f: any) => f.username === params.friendname);
+            if (friend) {
+                return (loadFriendChannel(friend));
+            }
+        }
+        if (params.username) {
+            const user = await fetchUser(params.id);
+            setWhisperUser(user);
+            const channel = await selectWhisper(user);
+            if (channel)
+                return (setCurrentChannel(channel));
+            return ;
+        }
+        navigate("/chat")
+    }, [channels, friends]);
 
 
     useEffect(() => {
@@ -89,55 +106,43 @@ export default function Interface() {
     // update current friend selected when he is picked from MenuElement
 
     React.useEffect(() => {
-        setProfile(false);
-        setRemoveView(false);
-        if (currentFriend && user) {
-            if (user.blockList.length) {
-                if (user.blockList.find((obj: any) => currentFriend.id === obj.userId))
-                    setBlockedFriend(true);
-                else
-                    setBlockedFriend(false)
-            }
+        if (whisperUser && user && currentChannel && currentChannel.type === "WHISPER") {
+            if (isUserBlocked(whisperUser))
+                setBlockedFriend(true);
+
         }
-    }, [currentFriend, user])
+        else {
+            setBlockedFriend(false)
+        }
+    }, [whisperUser, user, currentChannel])
+
 
     return (
-        <InterfaceContext.Provider value={{ setAction }}>
+        <>
             {
                 currentChannel ?
                     <div className={"flex-column relative interface-container visible"}>
                         <Banner
+                            whisperUser={whisperUser}
                             channel={currentChannel}
                             type={currentChannel && currentChannel.type}
-                            profile={() => setProfile(prev => !prev)}
                             invitation={() => { }}
+                            profile={() => setProfile((p: boolean) => !p)}
                             setBlockedFriend={setBlockedFriend}
-                            remove={() => setRemoveView(prev => !prev)}
                         />
-                        {
-                            profile ?
-                                <Profile /> :
-                                <Messenger
-                                    blockedFriend={blockedFriend}
-                                />
-                        }
-                        {
-                            action && (action.user || action.channel) && action.function &&
-                            <ConfirmPage>
-                                <ConfirmView
-                                    type={action.type}
-                                    username={(action.user && action.user.username) || (action.channel && action.channel.name)}
-                                    valid={async () => {
-                                        await action.function(action.user, action.channel);
-                                        setAction(null)
-                                    }}
-                                    cancel={() => setAction(null)}
-                                />
-                            </ConfirmPage>
-                        }
+                        {profile && <Profile />}
+
+                        <Messenger
+                            whisperUser={whisperUser}
+                            blockedFriend={blockedFriend}
+                            hidden={profile}
+                        />
                     </div>
-                    : null
+                    :
+                    <div className="fill flex-center">
+                        <p>No conversation found</p>
+                    </div>
             }
-        </InterfaceContext.Provider >
+        </ >
     )
 }
