@@ -3,18 +3,18 @@ import s from './style.module.css'
 
 interface BoxAchievementsProps {
 	name: string;
-	content: string;
+	description: string;
 	image: any;
 }
 
-export function BoxAchievements({ name, content, image }: BoxAchievementsProps) {
+export function BoxAchievements({ name, description, image }: BoxAchievementsProps) {
 	return (
 		<div className={s.container}>
 			<div className={s.headerDiv}>
 				{name}
 			</div>
 			<div className={s.content}>
-				<p>{content}</p>
+				<p>{description}</p>
 				<img className={s.image} src={image} alt="imgAchievements"/>
 				<div className={s.bar}>
 					<div className={s.progress}></div>

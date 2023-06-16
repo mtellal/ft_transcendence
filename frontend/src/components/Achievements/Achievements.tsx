@@ -7,13 +7,13 @@ import s from './style.module.css'
 export function Achievements() {
 	return (
 		<div className={s.container}>
-			<BoxAchievements name={'Novice'} content={"Win 1 game"} image={trophy_1}/>
-			<BoxAchievements name={'Intermediaire'} content={"Win 5 games"} image={trophy_5}/>
-			<BoxAchievements name={'Intermediaire'} content={"Win 5 games"} image={trophy_5}/>
-			<BoxAchievements name={'Intermediaire'} content={"Win 5 games"} image={trophy_5}/>
-			<BoxAchievements name={'Intermediaire'} content={"Win 5 games"} image={trophy_5}/>
-			<BoxAchievements name={'Intermediaire'} content={"Win 5 games"} image={trophy_5}/>
-			<BoxAchievements name={'Intermediaire'} content={"Win 5 games"} image={trophy_5}/>
+			<BoxAchievements name={'Novice'} description={"Win 1 game"} image={trophy_1}/>
+			<BoxAchievements name={'Intermediaire'} description={"Win 5 games"} image={trophy_5}/>
+			<BoxAchievements name={'Intermediaire'} description={"Win 5 games"} image={trophy_5}/>
+			<BoxAchievements name={'Intermediaire'} description={"Win 5 games"} image={trophy_5}/>
+			<BoxAchievements name={'Intermediaire'} description={"Win 5 games"} image={trophy_5}/>
+			<BoxAchievements name={'Intermediaire'} description={"Win 5 games"} image={trophy_5}/>
+			<BoxAchievements name={'Intermediaire'} description={"Win 5 games"} image={trophy_5}/>
 		</div>
 	);
 }
