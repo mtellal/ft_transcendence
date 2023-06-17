@@ -15,7 +15,6 @@ import History from './routes/History/History';
 
 import AddFriend from "./routes/Chat/AddFriend/AddFriend";
 import Interface from './routes/Chat/Interface/Interface';
-import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
 
 import {
@@ -25,6 +24,7 @@ import {
 
 import Chat from './routes/Chat/Chat/Chat';
 import AddChannel from './routes/Chat/AddChannel/AddChannel';
+import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
 
 const router = createBrowserRouter([

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateProfilePicture, updateUser } from "../../requests/user";
 
@@ -7,35 +7,37 @@ import InfoInput from "../../components/Input/InfoInput";
 import { useCurrentUser } from "../../hooks/Hooks";
 
 import './Profile.css'
-import { CollectionUsers } from "../Chat/components/ChannelProfile/ChannelUserLabel";
 import { useBlock } from "../../hooks/Chat/useBlock";
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const [username, setUsername]: [string, any] = React.useState(props.username);
     const [error, setError] = React.useState("");
     const [updated, setUpdated] = React.useState(false);
+    const prevUsernameRef = useRef(props.username);
 
     async function updateProfile() {
-        updateUser({
-            username: username,
-            userStatus: "ONLINE"
-        }, id)
-            .then(d => {
-                if (d.status !== 200 || d.statusText !== "OK")
-                    throw "";
-                if (username === props.username)
-                    throw "Already yours";
-                setError("");
-                setUpdated(true);
-                updateCurrentUser(d.data);
-            })
-            .catch(e => {
-                if (e === "Already yours")
-                    setError("Already yours")
-                else
-                    setError("Username invalid");
-                setUpdated(false);
-            })
+        setError("");
+        setUpdated(false);
+        if (!username || !username.trim())
+            return setError("Username required and can't be empty");
+        if (username.trim().length > 15)
+            return setError("Username too long (15 chars max)");
+        if (username.trim().match(/[^a-zA-Z0-9 ]/g))
+            return setError("Username invalid (only alphanumeric characters)")
+
+        if (prevUsernameRef.current !== username) {
+            updateUser({
+                username: username,
+                userStatus: "ONLINE"
+            }, id)
+                .then(d => {
+                    if (d.status !== 200 || d.statusText !== "OK")
+                        throw "";
+                    setUpdated(true);
+                    updateCurrentUser(d.data);
+                })
+            prevUsernameRef.current = username;
+        }
     }
 
     return (
@@ -68,8 +70,10 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
 
 function ProfilePicture({ token, image, setImage }: any) {
     const navigate = useNavigate();
+    const [error, setError] = useState("");
 
     async function editProfilePicture(e: any) {
+        setError("");
         const file = e.target.files[0];
         if (file.type.match("image.*")) {
             let url = window.URL.createObjectURL(e.target.files[0])
@@ -79,7 +83,7 @@ function ProfilePicture({ token, image, setImage }: any) {
                 console.log("Error => ", fileRes);
         }
         else
-            console.log("Wrong format file")
+            setError("Wrong format file");
     }
 
     async function disconnect() {
@@ -87,9 +91,8 @@ function ProfilePicture({ token, image, setImage }: any) {
     }
 
     return (
-        <div className="flex-column-center ">
+        <div className="flex-column-center">
             <div>
-
                 <div className="picture-container">
                     <img className="profile-picture" src={image} />
                 </div>
@@ -109,6 +112,7 @@ function ProfilePicture({ token, image, setImage }: any) {
                     />
                 </form>
             </div>
+            {error && <p className="red-c" style={{fontSize: 'small'}} >{error}</p>}
             <button
                 className="profile-picture-button"
                 onClick={disconnect}
@@ -131,8 +135,7 @@ export default function Profile() {
 
     const [blockedUsers, setBlockedUsers] = useState([]);
 
-    async function initBlockedUsers()
-    {
+    async function initBlockedUsers() {
         const users = await getblockedUsers();
         console.log(users, user.blockList)
         if (users && users.length)

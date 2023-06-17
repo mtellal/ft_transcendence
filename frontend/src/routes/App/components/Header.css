@@ -31,7 +31,6 @@
     align-items: center;
 }
 
-
 .pp-container > *
 {
     cursor: pointer;
@@ -44,6 +43,7 @@
     align-items: center;
     cursor: pointer;
     color: black;
+    text-decoration: none;
 }
 
 .pp-username
@@ -52,9 +52,4 @@
     text-overflow: ellipsis;
     max-width: 100px;
     overflow: hidden;
-}
-
-.pp-username:hover
-{
-    text-decoration: underline;
 }

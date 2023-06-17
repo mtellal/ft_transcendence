@@ -8,7 +8,8 @@ import { CollectionElement } from "../../routes/Chat/components/Menu/MenuElement
 type TUsersCollection = {
     title: string,
     users: any[],
-    setUsers: (u : any) => {} | any
+    setUsers: (u : any) => {} | any,
+    blackList?: any[]
 }
 
 export default function UsersCollection(props: TUsersCollection) {
@@ -26,11 +27,18 @@ export default function UsersCollection(props: TUsersCollection) {
     }
 
     async function search() {
+        if (!searchUserValue && !searchUserValue.trim())
+            return 
         await getUserByUsername(searchUserValue)
             .then(res => setSearchUser(res.data))
     }
 
     function addUser(user: any) {
+        if (props.blackList && props.blackList.length && 
+                props.blackList.find((u: any) => u.id === user.i))
+        {
+            return ;
+        }
         if (!alreadyInCollection(user)) {
             props.setUsers((p: any) => [...p, user])
             reset();

@@ -8,7 +8,6 @@ import { createChannel } from "../../../requests/chat";
 import UsersCollection from "../../../components/collections/UsersCollection";
 import PickMenu from "../../../components/PickMenu";
 
-import './CreateChannel.css'
 import ArrowBackMenu from "../components/ArrowBackMenu";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 
@@ -16,32 +15,38 @@ import { useChannels } from "../../../hooks/Chat/useChannels";
 export function CreateChannel() {
 
     const [name, setName]: [string, any] = useState("");
-    const [type, setType]: [string, any] = useState("")
+    const [type, setType]: [string, any] = useState("public")
     const [password, setPassword]: [string, any] = useState("");
-    const [admins, setAdmins] = useState([]);
-    const [members, setMembers] = useState([]);
-    const [banMembers, setBanMembers] = useState([]);
+
+    const [error, setError] = useState("");
 
     const { token } = useCurrentUser();
 
-    const { channels, channelsDispatch, setCurrentChannel } = useChannelsContext();
+    const { setCurrentChannel } = useChannelsContext();
 
     const { addChannel } = useChannels();
 
     const navigate = useNavigate();
 
     async function submit() {
-        if (!name || !type)
-            return;
+        if (!type)
+            return (setError("Access required"))
+
+        if (!name.trim() || name.trim().match(/[^a-zA-Z0-9 ]/g) || name.length > 15)
+            return setError("Name incorrect, (alphanumeric - 15 chars max)");
+        if (type === "protected") {
+            if (!password.trim())
+                return setError("Password required");
+            if (password.trim().length > 15)
+                return setError("Password too long (15 chars max)")
+        }
+
 
         let channel: any;
         await createChannel({
-            name,
+            name: name.trim(),
             type: type.toUpperCase(),
             password,
-            administrators: admins.map((u: any) => u.id),
-            members: members.map((u: any) => u.id),
-            banList: banMembers.map((u: any) => u.id),
         }, token)
             .then(res => {
                 if (res.data) {
@@ -56,9 +61,10 @@ export function CreateChannel() {
             navigate('/chat')
     }
 
-
     return (
-        <div className="createchannel-container scroll">
+        <div className="scroll"
+            style={{padding: '5%'}}
+        >
             <div className="flex">
                 <ArrowBackMenu
                     title="Channel"
@@ -71,37 +77,34 @@ export function CreateChannel() {
                 label="Name"
                 value={name}
                 setValue={setName}
-                submit={null}
+                submit={() => { }}
             />
-            <InfoInput
-                id="password"
-                label="Password"
-                value={password}
-                setValue={setPassword}
-                submit={null}
-            />
-            <PickMenu
-                title="Visibility"
-                collection={["public", "protected", "private"]}
-                selected={type}
-                setSelected={setType}
-            />
-            <UsersCollection
-                title="Admins"
-                users={admins}
-                setUsers={setAdmins}
-            />
-            <UsersCollection
-                title="Members"
-                users={members}
-                setUsers={setMembers}
-            />
-            <UsersCollection
-                title="Banned Members"
-                users={banMembers}
-                setUsers={setBanMembers}
-            />
-            <button className="button" onClick={() => submit()}>
+            {
+                type === "protected" &&
+                <InfoInput
+                    id="password"
+                    label="Password"
+                    value={password}
+                    setValue={setPassword}
+                    submit={() => { }}
+                />
+            }
+            <div style={{ paddingBottom: '20px' }}>
+
+                <h2>Access</h2>
+                <PickMenu
+                    title="Visibility"
+                    collection={["public", "protected", "private"]}
+                    selected={type}
+                    setSelected={setType}
+                />
+            </div>
+            {error && <p className="red-c" >{error}</p>}
+            <button
+                className="button white"
+                style={{ width: '100px', height: '40px', fontSize: 'medium' }}
+                onClick={() => submit()}
+            >
                 Create
             </button>
         </div>
