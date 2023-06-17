@@ -14,6 +14,7 @@ import { useFriends } from "../../../../hooks/Chat/Friends/useFriends";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
 import { ChatInterfaceContext } from "../../Chat/Chat";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
+import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 
 
 type TIconsBanner = {
@@ -32,6 +33,7 @@ function IconsBanner(props: TIconsBanner) {
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
     const { removeFriend } = useFriends();
     const { leaveChannel } = useChannels();
+    const { isUserFriend } = useFriends();
 
     const { setAction } = useContext(ChatInterfaceContext);
 
@@ -45,43 +47,6 @@ function IconsBanner(props: TIconsBanner) {
         }
     }, [props.whisperUser]);
 
-    const pickRemoveIcon = useCallback(() => {
-        if (props.channel && props.channel.type !== "WHISPER") {
-            if (props.channel.ownerId === user.id)
-                return (
-                    <Icon
-                        icon="delete_forever"
-                        onClick={() => {
-                            setAction({
-                                type: 'delete',
-                                channel: props.channel,
-                                function: (user: any, channel: any) => {
-                                    leaveChannel(channel)
-                                }
-                            })
-                        }}
-                        description="Delete"
-                    />
-                )
-            else
-                return (
-                    <Icon
-                        icon="logout"
-                        onClick={() => {
-                            setAction({
-                                type: 'leave',
-                                channel: props.channel,
-                                function: (user: any, channel: any) => {
-                                    leaveChannel(channel);
-                                }
-                            })
-                        }}
-                        description="Leave"
-                    />
-                )
-        }
-    }, [props.channel, props.whisperUser])
-
     return (
         <>
             <Icon icon="person" onClick={props.profile} description="Profile" />
@@ -90,7 +55,42 @@ function IconsBanner(props: TIconsBanner) {
                 props.type === "WHISPER" && props.whisperUser &&
                 <Icon icon="block" onClick={bannerBlock} description="Block" />
             }
-            {pickRemoveIcon()}
+            {
+                props.type === "WHISPER" && isUserFriend(props.whisperUser) && 
+                <Icon
+                    icon="person_remove"
+                    onClick={() => {
+                        setAction(
+                            <ConfirmView
+                                type="remove"
+                                username={props.whisperUser.username}
+                                valid={() => { removeFriend(props.whisperUser); setAction(null) }}
+                                cancel={() => setAction(null)}
+                            />
+
+                        )
+                    }}
+                    description="Leave"
+                />
+            }
+            {
+                props.type !== "WHISPER" && 
+                <Icon
+                    icon="logout"
+                    onClick={() => {
+                        setAction(
+                            <ConfirmView
+                                type="leave"
+                                username={props.channel.name}
+                                valid={() => { leaveChannel(props.channel); setAction(null) }}
+                                cancel={() => setAction(null)}
+                            />
+
+                        )
+                    }}
+                    description="Leave"
+                />
+            }
         </>
     )
 

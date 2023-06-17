@@ -34,11 +34,11 @@ export default function ChannelInfos(props: TChannelInfos) {
 
 
     return (
-        <div className="flex-center">
-            <h2 style={{ whiteSpace: 'nowrap' }}>{props.channel && props.channel.name} - </h2>
+        <div className="flex-center" style={{height: '50px'}}>
+            <h3 style={{ whiteSpace: 'nowrap' }}>{props.channel && props.channel.name} - </h3>
             {props.channel && props.channel.type === "PROTECTED" && <RawIcon icon="shield" />}
             {props.channel && props.channel.type === "PRIVATE" && <RawIcon icon="lock" />}
-            <div className="flex-center channelinfos-members-container">
+            <div className="flex-ai channelinfos-members-container">
                 {renderMembersPP}
             </div>
         </div>

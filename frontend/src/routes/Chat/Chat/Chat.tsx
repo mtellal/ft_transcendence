@@ -20,6 +20,7 @@ function ChatInterface() {
 
     const [action, setAction]: any = useState(null);
 
+
     return (
         <ChatInterfaceContext.Provider value={{ setAction }}>
             <div className="chat">
@@ -27,17 +28,9 @@ function ChatInterface() {
                     <MenuElement />
                     <Outlet />
                     {
-                        action && (action.user || action.channel) && action.function &&
+                        action && 
                         <ConfirmPage>
-                            <ConfirmView
-                                type={action.type}
-                                username={(action.user && action.user.username) || (action.channel && action.channel.name)}
-                                valid={async () => {
-                                    await action.function(action.user, action.channel);
-                                    setAction(null)
-                                }}
-                                cancel={() => setAction(null)}
-                            />
+                            {action}
                         </ConfirmPage>
                     }
                 </div>

@@ -75,7 +75,6 @@ function UserMenu(props: TUserManu) {
     const { blockUser, unblockUser, isUserBlocked } = useBlock();
 
     function profile() {
-        console.log("profile");
     }
 
     function block() {
@@ -497,7 +496,6 @@ function MessengerConversation({ messages, blockedFriend, hidden, whisperUser }:
     async function loadAuthors(messages: any[]) {
         let users: any[] = [];
         let ids: number[] = [];
-        console.log("author re fetched")
         await Promise.all(
             messages.map(async (m: any, index: number) => {
                 if ((index + 1 !== messages.length &&
@@ -529,7 +527,6 @@ function MessengerConversation({ messages, blockedFriend, hidden, whisperUser }:
 
 
     const rendMessages = useCallback(() => {
-        console.log("messages => ", messages)
         if (messages.length) {
 
 

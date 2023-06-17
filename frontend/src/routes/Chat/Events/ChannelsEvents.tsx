@@ -71,7 +71,13 @@ export default function ChannelsEvents({ children }: any) {
                 triggered when the owner has left the channel, a new owner is deisgnated
             */
             socket.on('ownerChanged', (res: any) => {
-                console.log("UPDATED CHANNEL EVENT")
+                console.log("OWNER CHANGED EVENT")
+                console.log(res)
+                if (res && res.channelId && res.userId)
+                {
+                    channelsDispatch({ type: 'ownerChanged', channelId: res.channelId, userId: res.userId })
+
+                }
                 // name / password / type
             })
 
@@ -173,11 +179,9 @@ export default function ChannelsEvents({ children }: any) {
                 socket.on('message', (m: any) => {
                     console.log("message recieved")
                     if (m.length) {
-                        console.log("init messages")
                         channelsDispatch({ type: 'initMessages', messages: m });
                     }
                     if (m.content) {
-                        console.log("add message")
                         channelsDispatch({ type: 'addMessage', message: m });
                     }
                 });

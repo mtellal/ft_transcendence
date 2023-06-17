@@ -18,6 +18,8 @@ export default function Profile() {
     const { currentFriend } = useFriendsContext();
     const { currentChannel } = useChannelsContext();
 
+    console.log("CURRENT CHANNEL => ", currentChannel)
+
     return (
         <div className="scroll">
             {
@@ -25,6 +27,8 @@ export default function Profile() {
                 <ChannelProfile
                     name={currentChannel && currentChannel.name}
                     members={currentChannel && currentChannel.users}
+                    administrators={currentChannel && currentChannel.administrators}
+                    owner={currentChannel && currentChannel.owner}
                     channel={currentChannel}
                 />
             }

@@ -22,6 +22,14 @@ export function useFriends() {
         return (false);
     }, [friends])
 
+    const isUserFriendByUsername = useCallback((user: any) => {
+        if (friends && friends.length && user)
+        {
+            return (friends.find((u: any) => u.username === user.username))
+        }
+        return (false);
+    }, [friends])
+
     /*
         add a friend if he doesn't exists, 
         or update his informations (name, status, profile picture ...)
@@ -52,6 +60,7 @@ export function useFriends() {
     return (
         {
             isUserFriend,
+            isUserFriendByUsername,
             updateFriend,
             removeFriend
         }

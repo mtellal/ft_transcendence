@@ -18,27 +18,26 @@ export function useChannels() {
     const addChannel = useCallback(async (channel: any, includeCurrentUser: boolean) => {
         if (socket && channel) {
             if ((!channel.users || !channel.users.length) && channel.members) {
-                if (includeCurrentUser)
-                    channel.members = [...channel.members, user.id]
                 const users = await fetchUsers(channel.members)
                 if (users)
                     channel = { ...channel, users }
             }
+            if (includeCurrentUser)
+                channel.users = [...channel.users, user];
             channelsDispatch({ type: 'addChannel', channel });
             joinChannel(channel);
-            console.log("joined channel")
         }
     }, [socket, channelsDispatch])
 
     const addChannelProtected = useCallback(async (channel: any, password: string, includeCurrentUser: boolean) => {
         if (socket) {
             if (!channel.users || !channel.users.length && channel.members) {
-                if (includeCurrentUser)
-                    channel.members = [...channel.members, user.id]
                 const users = await fetchUsers(channel.members)
                 if (users)
                     channel = { ...channel, users }
             }
+            if (includeCurrentUser)
+                channel.users = [...channel.users, user];
             channelsDispatch({ type: 'addChannel', channel });
             joinChannelProtected(channel.id, password);
         }
@@ -52,7 +51,6 @@ export function useChannels() {
                 const messages = await getChannelMessages(channel.id);
                 if (messages)
                     channel.messages = messages;
-                console.log("channel.messages => ", channel.messages)
                 addChannel(channel, false);
             }
         }
@@ -60,7 +58,6 @@ export function useChannels() {
 
     const joinChannel = useCallback((channel: any) => {
         if (socket) {
-            console.log("channel joined")
             socket.emit('joinChannel', {
                 channelId: channel.id
             })
@@ -87,7 +84,6 @@ export function useChannels() {
     }
 
     const leaveChannel = useCallback((channel: any) => {
-        console.log("leave channel called")
         if (channel && channel.id && socket) {
             channelsDispatch({ type: 'removeChannel', channelId: channel.id })
             socket.emit('leaveChannel', {
@@ -139,6 +135,13 @@ export function useChannels() {
         return (false);
     }, [channels])
 
+    const isLocalChannelsByName = useCallback((channel: any) => {
+        if (channels && channels.length && channel) {
+            return (channels.filter((c: any) => channel.name === c.name))
+        }
+        return (false);
+    }, [channels])
+
 
     return (
         {
@@ -152,6 +155,7 @@ export function useChannels() {
             updateChannelInfos,
             channelAlreadyExists,
             isLocalChannel,
+            isLocalChannelsByName,
             getChannelFromFriendName
         }
     )

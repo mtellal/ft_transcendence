@@ -34,6 +34,7 @@ export function CreateChannel() {
         if (!name || !type)
             return;
 
+        let channel: any;
         await createChannel({
             name,
             type: type.toUpperCase(),
@@ -43,11 +44,16 @@ export function CreateChannel() {
             banList: banMembers.map((u: any) => u.id),
         }, token)
             .then(res => {
-                addChannel(res.data, false)
-                setCurrentChannel(res.data);
+                if (res.data) {
+                    channel = res.data;
+                    addChannel(res.data, false)
+                    setCurrentChannel(res.data);
+                }
             })
-        console.log("channelCreated")
-        navigate(`/chat/groups/${name}`)
+        if (channel)
+            navigate(`/chat/channel/${channel.id}`)
+        else
+            navigate('/chat')
     }
 
 
@@ -56,7 +62,7 @@ export function CreateChannel() {
             <div className="flex">
                 <ArrowBackMenu
                     title="Channel"
-                    path="/chat/more/channels"
+                    path="/chat"
                 />
             </div>
             <h2>Create a channel</h2>

@@ -1,5 +1,5 @@
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState, createContext} from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import UserLabel from "../../../../components/users/UserLabel";
@@ -22,6 +22,9 @@ import { ChatInterfaceContext } from "../../Chat/Chat";
 import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
 import { FriendRequests } from "../../AddFriend/AddFriend";
 import ChannelInfos from "../../../../components/channels/ChannelInfos";
+import useBanUser from "../../../../hooks/Chat/useBanUser";
+import { ChannelSearchLabel } from "../ChannelSearchLabel/ChannelSearchLabel";
+import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 
 /*
     tittle
@@ -44,14 +47,11 @@ export function CollectionElement(props: any) {
                 {
                     props.add ?
                         <Link
-                            to="/chat/more/channels"
+                            to="/chat/channel/create"
                             onClick={props.removeNotif}
                             style={{ textDecoration: 'none', color: 'black', justifySelf: 'flex-end' }}
                         >
-                            <Icon
-                                icon="more_horiz"
-                                description="more"
-                            />
+                            <Icon icon="add" description="add" />
                         </Link>
                         : null
                 }
@@ -60,32 +60,6 @@ export function CollectionElement(props: any) {
                 {props.collection}
             </div>
         </div>
-    )
-}
-
-/*
-key={channel.id}
-                        id={channel.id}
-                        username={channel.name}
-                        avatar={null}
-                        userStatus={"OFFLINE"}
-                        click={(user: any) => props.setCurrentElement(user)}
-                        notifs={0}
-    */
-
-function ChannelElement(props: any) {
-    return (
-        <Link to={`/chat/groups/${props.name}`} className="group hover-fill-grey"
-            style={props.selected ? { backgroundColor: '#F4F4F4' } : {}}
-        >
-            <p>{props.name}</p>
-            <p className="group-separator">-</p>
-            <p className="group-members">{props.nbMembers} members</p>
-            <div style={{ marginLeft: 'auto' }}>
-                {props.type === "PROTECTED" && <RawIcon icon="shield" />}
-                {props.type === "PRIVATE" && <RawIcon icon="lock" />}
-            </div>
-        </Link>
     )
 }
 
@@ -103,8 +77,6 @@ export default function MenuElement() {
     const { friends, friendsDispatch, setCurrentFriend } = useFriendsContext();
     const {
         channels,
-        setCurrentChannel,
-        currentChannel
     } = useChannelsContext();
 
     const { addChannel } = useChannels();
@@ -128,7 +100,7 @@ export default function MenuElement() {
             setHideMenu(true)
     },)
 
-    const setWhispers = useCallback(async() => {
+    const setWhispers = useCallback(async () => {
         if (channels && channels.length) {
             const whispers = await Promise.all(
                 channels.map(async (channel: any) => {
@@ -180,14 +152,17 @@ export default function MenuElement() {
             setChannelsList(
                 channels.map((channel: any) =>
                     channel.type !== "WHISPER" && (
-                        <ChannelElement
+                        <div
                             key={channel.id}
-                            id={channel.id}
-                            name={channel.name}
-                            type={channel.type}
-                            nbMembers={channel.members.length}
-                            notifs={0}
-                        />
+                            className="pointer"
+                            style={{ borderTop: '1px solid black' }}
+                            onClick={() => navigate(`/chat/channel/${channel.id}`)}
+                        >
+                            <ChannelInfos
+                                key={channel.id}
+                                channel={channel}
+                            />
+                        </div>
                     ))
             )
         }
@@ -229,40 +204,47 @@ export default function MenuElement() {
 function SearchUser() {
     const [value, setValue]: any = useState("");
     const [user, setUser] = useState();
-    const [channels, setChannels] = useState([]);
+    const [channelList, setChannelList] = useState([]);
     const [error, setError] = useState("");
 
     const { fetchUserByUsername } = useFetchUsers();
 
-    const { isUserFriend } = useFriends();
-
     async function searchUser() {
         if (!value || !value.trim())
             return;
-        const user = await fetchUserByUsername(value.trim());
-        let channel;
+        let user;
+        let channelArray;
+        setError("");
+        setUser(null);
+        setChannelList([]);
+        user = await fetchUserByUsername(value.trim());
         if (user) {
             setUser(user);
-            setChannels(null);
-            setError("");
         }
         else {
             await getChannelByName(value.trim())
                 .then(res => {
                     if (res.data)
-                        channel = res.data;
+                    {
+                        console.log(res.data)
+                        channelArray = res.data;
+                    }
                 })
-            if (channel) {
-                setChannels(channel);
-                setUser(null);
+            if (channelArray) {
+                setChannelList(channelArray);
             }
             else {
-                setUser(null)
-                setError("User not found");
+                setError("User/Channel not found");
             }
         }
     }
 
+    function reset()
+    {
+        setChannelList(null);
+        setUser(null);
+        setValue("")
+    }
 
     return (
         <div className="">
@@ -280,32 +262,40 @@ function SearchUser() {
                 />
             }
             {
-                channels &&
-                <SearchedChannel
-                    channels={channels}
-                />
+                channelList && channelList.length ?
+                    <SearchedChannel
+                        channels={channelList}
+                        reset={reset}
+                    />
+                    : null
             }
         </div>
     )
 }
 
-
-function LabelElement({ children }: any) {
-    return (
-        <div className='flex-ai UserLabelSearch-container'>
-            {children}
-        </div>
-    )
-}
+export const SearchedChannelLabelContext : React.Context<any> = createContext(null);
 
 function SearchedChannel(props: any) {
 
     const [renderChannels, setRenderChannels] = useState([]);
     const { fetchUsers } = useFetchUsers();
     const { setAction } = useContext(ChatInterfaceContext)
-    const { isLocalChannel, leaveChannel, addChannel } = useChannels();
-
+    const { addChannel, leaveChannel } = useChannels();
     const { channels } = useChannelsContext();
+
+
+    function joinChannel(channel: any) {
+        if (channel.type !== 'WHISPER') {
+            setAction(
+                <ConfirmView
+                    type="join"
+                    username={channel.name}
+                    valid={() => { addChannel(channel, true); setAction(null); props.reset() }}
+                    cancel={() => setAction(null)}
+                />
+            )
+        }
+    }
 
     const load = useCallback(async () => {
         if (props.channels && props.channels.length) {
@@ -315,41 +305,21 @@ function SearchedChannel(props: any) {
                         const users = await fetchUsers(c.members);
                         c.users = users;
                         return (
-                            <LabelElement key={c.id}>
-                                <ChannelInfos
-                                    channel={c}
-                                />
-                                {
-                                    isLocalChannel(c) ?
-                                        <Icon
-                                            icon="logout"
-                                            onClick={() => {
-                                                setAction({
-                                                    type: 'leave',
-                                                    channel: c,
-                                                    function: (user: any, channel: any) => {
-                                                        leaveChannel(channel)
-                                                    }
-                                                })
-                                            }}
-                                            description="leave"
+                            <ChannelSearchLabel
+                                key={c.id}
+                                channel={c}
+                                join={() => joinChannel(c)}
+                                leaveChannel={() =>
+                                    setAction(
+                                        <ConfirmView
+                                            type="leave"
+                                            username={c.name}
+                                            valid={() => { leaveChannel(c); setAction(null); props.reset()}}
+                                            cancel={() => setAction(null)}
                                         />
-                                        :
-                                        <Icon
-                                            icon="login"
-                                            onClick={() => {
-                                                setAction({
-                                                    type: 'join',
-                                                    channel: c,
-                                                    function: (user: any, channel: any) => {
-                                                        addChannel(channel, true)
-                                                    }
-                                                })
-                                            }}
-                                            description="join"
-                                        />
+                                    )
                                 }
-                            </LabelElement>
+                            />
 
                         )
                     })
@@ -364,18 +334,13 @@ function SearchedChannel(props: any) {
 
 
     return (
-        <>
+        <SearchedChannelLabelContext.Provider value={{reset: props.reset}}>
             {
                 renderChannels
             }
-        </>
+        </SearchedChannelLabelContext.Provider>
     )
 }
-
-
-
-
-
 
 
 type TMenuInput = {
@@ -515,23 +480,24 @@ export function SearchedUser(props: TType) {
                                 .catch(err => { })
                         }
                         await addChannel(channel, false);
-                        navigate(`/chat/user/${props.user.username}/${props.user.id}`)
+                        navigate(`/chat/user/${props.user.id}`)
                     }}
                     description="chat"
                 />
 
                 {
-                    isUserFriend(props.user) ?
+                    isUserFriend(props.user)?
                         <Icon
                             icon="person_remove"
                             onClick={() => {
-                                setAction({
-                                    type: 'remove',
-                                    user: props.user,
-                                    function: (user: any, channel: any) => {
-                                        removeFriend(user)
-                                    }
-                                })
+                                setAction(
+                                    <ConfirmView
+                                        type="remove"
+                                        username={props.user.username}
+                                        valid={() => { removeFriend(props.user); setAction(null) }}
+                                        cancel={() => setAction(null)}
+                                    />
+                                )
                             }}
                             description="remove"
                         /> :
@@ -541,13 +507,14 @@ export function SearchedUser(props: TType) {
                                 <Icon
                                     icon="person_add"
                                     onClick={() => {
-                                        setAction({
-                                            type: 'add',
-                                            user: props.user,
-                                            function: (user: any, channel: any) => {
-                                                sendRequest(user)
-                                            }
-                                        })
+                                        setAction(
+                                            <ConfirmView
+                                                type="add"
+                                                username={props.user.username}
+                                                valid={() => { sendRequest(props.user); setAction(null) }}
+                                                cancel={() => setAction(null)}
+                                            />
+                                        )
                                     }}
                                     description="add"
                                 />
@@ -560,26 +527,28 @@ export function SearchedUser(props: TType) {
                         <Icon
                             icon="block"
                             onClick={() => {
-                                setAction({
-                                    type: 'unblock',
-                                    user: props.user,
-                                    function: (user: any, channel: any) => {
-                                        unblockUser(user)
-                                    }
-                                })
+                                setAction(
+                                    <ConfirmView
+                                        type="unblock"
+                                        username={props.user.username}
+                                        valid={() => { unblockUser(props.user); setAction(null) }}
+                                        cancel={() => setAction(null)}
+                                    />
+                                )
                             }}
-                            description="block"
+                            description="unblock"
                         /> :
                         <Icon
                             icon="block"
                             onClick={() => {
-                                setAction({
-                                    type: 'block',
-                                    user: props.user,
-                                    function: (user: any, channel: any) => {
-                                        blockUser(user)
-                                    }
-                                })
+                                setAction(
+                                    <ConfirmView
+                                        type="block"
+                                        username={props.user.username}
+                                        valid={() => { blockUser(props.user); setAction(null) }}
+                                        cancel={() => setAction(null)}
+                                    />
+                                )
                             }}
                             description="block"
                         />

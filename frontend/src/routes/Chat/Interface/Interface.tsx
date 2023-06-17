@@ -12,7 +12,7 @@ import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import './Interface.css'
 import { useBlock } from "../../../hooks/Chat/useBlock";
 import { ConfirmPage, ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
-import { createChannel, getWhisperChannel } from "../../../requests/chat";
+import { createChannel, getChannel, getWhisperChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 import { convertTypeAcquisitionFromJson } from "typescript";
 import useFetchUsers from "../../../hooks/useFetchUsers";
@@ -42,19 +42,14 @@ export default function Interface() {
 
     const selectWhisper = useCallback(async (_user: any) => {
         let channel;
-        // console.log("//////////////////////////////")
-        // console.log(channels)
         if (channels && channels.length) {
-            // console.log("channels not empty", channels)
             channel = channels.find((c: any) =>
                 c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
-            // console.log("channel found from channels => ", channel);
         }
         if (!channel) {
             await getWhisperChannel(user.id, _user.id)
                 .then(res => {
                     if (res.data) {
-                        // console.log("WHISPER FOUND")
                         channel = res.data
                     }
                 })
@@ -63,32 +58,26 @@ export default function Interface() {
         return (channel);
     }, [channels]);
 
-    async function loadFriendChannel(friend: any) {
-        let channel;
-        setCurrentFriend(friend)
-        friendsDispatch({ type: 'removeNotif', friend });
-
-        channel = selectWhisper(friend);
-        selectWhisper(friend);
-        setCurrentFriend(friend);
-        return (setCurrentChannel(channel));
+    async function loadChannel() {
+        let channel = channels.find((c: any) => c.name === params.channelName);
+        if (!channel) {
+            await getChannel(params.channelId)
+                .then(res => {
+                    if (res.data)
+                        channel = res.data;
+                })
+        }
+        return (channel);
     }
 
-
     const loadInterface = useCallback(async () => {
-        if (params.channelName) {
-            const channel = channels.find((c: any) => c.name === params.channelName)
+        if (params.channelId) {
+            const channel = await loadChannel();
             if (channel)
                 return (setCurrentChannel(channel));
         }
-        else if (params.friendname && friends && friends.length) {
-            const friend = friends.find((f: any) => f.username === params.friendname);
-            if (friend) {
-                return (loadFriendChannel(friend));
-            }
-        }
-        if (params.username) {
-            const user = await fetchUser(params.id);
+        else if (params.userId) {
+            const user = await fetchUser(params.userId);
             setWhisperUser(user);
             const channel = await selectWhisper(user);
             if (channel)

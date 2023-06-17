@@ -116,6 +116,20 @@ function reducer(channels: any, action: any) {
                 )
             }
         }
+        case ('ownerChanged'): {
+            if (channels && channels.length && action.channelId && action.userId) {
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId) {
+                            c.ownerId = action.userId;
+                            if (!c.administrators.find((id: number) => id === action.userId))
+                                c.administrators.push(action.userId);                        
+                        }
+                        return (c);
+                    })
+                )
+            }
+        }
         case ('addAdministrators'): {
             if (channels.length && action.channelId && action.userId) {
                 return (channels.map((c: Channel) => {
@@ -241,28 +255,6 @@ function reducer(channels: any, action: any) {
                 )
             }
         }
-        case ('addNotif'): {
-            if (channels && channels.lentgh && action.channelId) {
-                return (
-                    channels.map((c: Channel) => {
-                        if (c.id === action.channelId)
-                            c.notifs += 1;
-                        return (c);
-                    })
-                )
-            }
-        }
-        case ('removeNotif'): {
-            if (channels && channels.lentgh && action.channelId) {
-                return (
-                    channels.map((c: Channel) => {
-                        if (c.id === action.channelId)
-                            c.notifs = 0;
-                        return (c);
-                    })
-                )
-            }
-        }
         default: return (channels)
     }
 }
@@ -323,7 +315,7 @@ export function ChannelsProvider({ children }: any) {
     }, [socket, user])
 
 
-    console.log(channels)
+    // console.log("channels => ", channels)
 
     ////////////////////////////////////////////////////////////////
     //               C U R R E N T    C H A N N E L               //

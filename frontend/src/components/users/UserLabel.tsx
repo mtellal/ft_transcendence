@@ -85,7 +85,7 @@ type TUserLabel = TUserInfos & {
 
 export default function UserLabel(props: TUserLabel) {
     return (
-        <NavLink to={`/chat/user/${props.username}/${props.id}`}
+        <NavLink to={`/chat/user/${props.id}`}
             className={({ isActive }) =>
                 isActive ? "friend-element hover-fill-grey selected" : "friend-element hover-fill-grey"
             }

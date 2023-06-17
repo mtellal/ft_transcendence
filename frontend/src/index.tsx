@@ -24,7 +24,6 @@ import {
 } from 'react-router-dom';
 
 import Chat from './routes/Chat/Chat/Chat';
-import JoinChannel from './routes/Chat/AddChannel/JoinChannel';
 import AddChannel from './routes/Chat/AddChannel/AddChannel';
 
 
@@ -60,33 +59,17 @@ const router = createBrowserRouter([
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
                     {
-                        path: "more/channels",
-                        loader: appLoader,
-                        errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddChannel />
-                    },
-                    {
-                        path: "more/channels/join",
-                        errorElement: <Navigate to="/chat" replace/>,
-                        element:  <JoinChannel />
-                    },
-                    {
-                        path: "more/channels/create",
+                        path: "channel/create",
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <CreateChannel />
                     },
                     {
-                        path: "groups/:channelName",
+                        path: "channel/:channelId",
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <Interface />
                     },
                     {
-                        path: "friends/:friendname/:id",
-                        errorElement: <Navigate to="/chat" replace/>,
-                        element: <Interface />
-                    },
-                    {
-                        path: "user/:username/:id",
+                        path: "user/:userId",
                         errorElement: <Navigate to="/chat" replace/>,
                         element: <Interface />
                     }

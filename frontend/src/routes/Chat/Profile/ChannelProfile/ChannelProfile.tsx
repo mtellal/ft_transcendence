@@ -40,6 +40,7 @@ export default function ChannelProfile(props: any) {
             if (administrators && administrators.length)
                 setAdmins(administrators)
             const owner = getOwner(props.channel);
+            console.log("owner => ", owner, props.channel)
             if (owner)
                 setOwner(owner);
 
@@ -49,11 +50,11 @@ export default function ChannelProfile(props: any) {
             const bannesUsers = await getUsersBanned(props.channel);
             setBanned(bannesUsers)
         }
-    }, [props.channel && props.channel.muteList, props.members])
+    }, [props.channel])
 
     useEffect(() => {
         init();
-    }, [props.members, channels])
+    }, [props.channel, channels])
 
     return (
         <PofileChannelContext.Provider
