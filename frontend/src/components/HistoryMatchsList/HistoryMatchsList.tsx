@@ -12,7 +12,6 @@ export function HistoryMatchsList({ match }: HistoryMatchsListProps) {
 	const [userB, setUserB] = useState<any>();
 
 	async function getInfoUsers() {
-		console.log(match.player1Id, match.player2Id);
 		const dataUserA = await getUser(match.player1Id);
 		setUserA(dataUserA.data);
 		const dataUserB = await getUser(match.player2Id);
