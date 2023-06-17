@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Stats } from "@prisma/client";
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 
 @Injectable()
 export class UsersAchievementsService {
@@ -28,7 +28,7 @@ export class UsersAchievementsService {
 		  condition: (stats: Stats) => stats.matchesPlayed >= 20,
 		},
 		{
-		  name: "On Fire",
+		  name: "OnFire",
 		  description: "Achieve 5 wins in a row",
 		  condition: (stats: Stats) => stats.winStreak >= 5,
 		},
@@ -39,7 +39,7 @@ export class UsersAchievementsService {
 		},
 		{
 		  name: "Godlike",
-		  description: "Have 80% win rate on 10 Pong matches",
+		  description: "Have 80% win rate on more than 10 Pong matches",
 		  condition: (stats: Stats) => (stats.matchesWon / stats.matchesPlayed) >= 0.8 && stats.matchesPlayed >= 10,
 		},
 	];
@@ -47,7 +47,7 @@ export class UsersAchievementsService {
 	constructor(private prisma: PrismaService) {}
 
 	async showAchievements(userId: number) {
-		return await this.prisma.achievement.findMany({
+		return await this.prisma.achievements.findMany({
 			where: {
 				userId: userId
 			},
@@ -55,10 +55,10 @@ export class UsersAchievementsService {
 	}
 
 	async delAchievements() {
-		await this.prisma.achievement.deleteMany({});
+		await this.prisma.achievements.deleteMany({});
 	}
 
-	async checkAndUnlockAchievements(userId: number, client: Socket) {
+	async checkAndUnlockAchievements(userId: number, server: Server, client: Socket) {
 		const userStats = await this.prisma.stats.findUnique({
 			where: { userId },
 		});
@@ -69,30 +69,30 @@ export class UsersAchievementsService {
 			if (achievement.condition(userStats) && !await this.isAchievementUnlocked(userId, achievement.name)) {
 				let updated = await this.unlockAchievement(userId, achievement);
 				if (updated)
-					client.emit("Achievement", updated);
+					server.to(client.id).emit('Achievement', updated);
 			}
 		}
 	}
 
 	private async isAchievementUnlocked(userId: number, achievementName: string) {
-		return await this.prisma.achievement.findFirst({
+		return await this.prisma.achievements.findFirst({
 			where : {
 				userId: userId,
-				name: achievementName,
+				[achievementName]: true,
 			}
 		});
 	}
 
 
 	private async unlockAchievement(userId: number, achievement: any) {
-		return await this.prisma.achievement.create({
+		const updated = await this.prisma.achievements.update({
+			where: {
+				userId: userId,
+			},
 			data: {
-				user: {
-					connect: { id: userId }
-				},
-				name: achievement.name,
-				description: achievement.description,
-			}
+				[achievement.name]: true,
+			},
 		});
+		return updated;
 	}
 }
