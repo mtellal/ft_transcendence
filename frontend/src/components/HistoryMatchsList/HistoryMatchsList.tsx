@@ -23,16 +23,6 @@ export function HistoryMatchsList({ match }: HistoryMatchsListProps) {
 		getInfoUsers();
 	}, [])
 
-	// createdAt: "2023-06-16T11:13:11.538Z",
-	// gametype: "SPEEDUP",
-	// id: 22,
-	// player1Id: 2,
-	// player1Score: 7,
-	// player2Id: 1,
-	// player2Score: 1,
-	// status: "FINISHED",
-	// wonBy: 2
-
 	if (!userA || !userB) {
 		return ;
 	}
