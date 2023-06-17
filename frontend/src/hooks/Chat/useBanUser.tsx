@@ -1,20 +1,15 @@
-import React, { useCallback, useContext } from "react";
-import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../Hooks";
-import { useNavigate } from "react-router-dom";
+import { useCallback } from "react";
+import { useChannelsContext, useChatSocket } from "../Hooks";
 import useFetchUsers from "../useFetchUsers";
 
 
 export default function useBanUser() {
     const { socket } = useChatSocket();
-    const { channelsDispatch, currentChannel, channels } = useChannelsContext();
-    const { friends } = useFriendsContext();
-    const { user } = useCurrentUser();
-    const navigate = useNavigate();
+    const { channelsDispatch, channels } = useChannelsContext();
     const { fetchUsers } = useFetchUsers();
 
     const banUser = useCallback((user: any, channel: any) => {
-        console.log("ban user ");
-        if (socket && channel && user) {
+        if (channels && channels.length && socket && channel && user) {
             socket.emit('banUser', {
                 channelId: channel.id,
                 userId: user.id
@@ -23,35 +18,27 @@ export default function useBanUser() {
             channelsDispatch({ type: 'removeAdministrators', channelId: channel.id, userId: user.id })
             channelsDispatch({ type: 'addBanList', channelId: channel.id, userId: user.id });
         }
-    }, [socket, channels, currentChannel])
+    }, [socket, channels])
 
     const unbanUser = useCallback((user: any, channel: any) => {
-        console.log("unban user ");
-        if (socket && channel && user) {
+        if (channels && channels.length && socket && channel && user) {
             socket.emit('unbanUser', {
                 channelId: channel.id,
                 userId: user.id
             })
             channelsDispatch({ type: 'removeBanList', channelId: channel.id, userId: user.id })
         }
-    }, [socket, channels, currentChannel])
+    }, [socket, channels])
 
     const isUserBanned = useCallback((user: any, channel: any) => {
-        console.log("isUserBanned ")
         if (channel && channel.banList && channel.banList.length)
             return (channel.banList.find((id: number) => id === user.id))
         return (false);
     }, [])
 
     const getUsersBanned = useCallback(async (channel: any) => {
-        if (channel && channels && channels.length) {
-
-            let banned = channel.banList;
-
-            if (banned.length) {
-                let usersBanned = await Promise.all(await fetchUsers(banned))
-                return (usersBanned)
-            }
+        if (channel && channel.banList) {
+            return (await Promise.all(await fetchUsers(channel.banList)));
         }
         return ([]);
     }, [channels])

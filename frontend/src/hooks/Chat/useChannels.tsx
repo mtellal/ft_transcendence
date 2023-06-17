@@ -5,7 +5,6 @@ import useFetchUsers from "../useFetchUsers";
 import { getChannelMessages, getWhisperChannel } from "../../requests/chat";
 
 
-
 export function useChannels() {
     const navigate = useNavigate();
 
@@ -14,6 +13,61 @@ export function useChannels() {
     const { fetchUsers } = useFetchUsers();
 
     const { channels, channelsDispatch, currentChannel } = useChannelsContext();
+
+    const isChannelPublic = useCallback((channel : any) => {
+        if (channel)
+            return (channel.type === "PUBLIC")
+    }, [])  
+
+    const isChannelPrivate = useCallback((channel : any) => {
+        if (channel)
+            return (channel.type === "PRIVATE")
+    }, [])  
+
+    const isChannelProtected = useCallback((channel : any) => {
+        if (channel)
+            return (channel.type === "PROTECTED")
+    }, [])  
+
+
+    const updateChannelName = useCallback((channelId: number, name: string) => {
+        if (socket && channels && channels.length && channelId && name)
+        {
+            console.log("update channel name", channelId, name)
+            socket.emit('updateChannel', {
+                channelId: channelId, 
+                name: name, 
+            });
+            channelsDispatch({type: 'updateChannelInfos', channelId, infos: {name}})
+        }
+    }, [socket, channels])
+
+    const updateChannelPassword = useCallback((channelId: number , password: string) => {
+        if (socket && channels && channels.length && channelId && password)
+        {
+            console.log("update channel password", channelId, password)
+            socket.emit('updateChannel', {
+                channelId, 
+                password, 
+            });
+            channelsDispatch({type: 'updateChannelInfos', channelId, infos: {password}})
+        }
+    }, [socket, channels])
+
+
+    const updateChannelType = useCallback((channelId: number, type: string, password: string = "") => {
+        if (socket && channels && channels.length && channelId && type)
+        {
+            console.log("update channel type", channelId, type)
+            socket.emit('updateChannel', {
+                channelId, 
+                type, 
+                password
+            });
+            channelsDispatch({type: 'updateChannelInfos', channelId, infos: {type}})
+        }
+    }, [socket, channels])
+
 
     const addChannel = useCallback(async (channel: any, includeCurrentUser: boolean) => {
         if (socket && channel) {
@@ -74,14 +128,15 @@ export function useChannels() {
     }, [socket])
 
 
-    function forceToLeaveChannel(res: any) {
+    const forceToLeaveChannel = useCallback((res: any) => {
         channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId });
         channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId });
         if (res.userId === user.id)
             channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
+        console.log("forced to leave", res, currentChannel)
         if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
             navigate("/chat");
-    }
+    }, [currentChannel, user])
 
     const leaveChannel = useCallback((channel: any) => {
         if (channel && channel.id && socket) {
@@ -145,6 +200,12 @@ export function useChannels() {
 
     return (
         {
+            isChannelPublic,
+            isChannelPrivate,
+            isChannelProtected,
+            updateChannelName,
+            updateChannelPassword,
+            updateChannelType,
             addChannel,
             addChannelFromFriend,
             addChannelProtected,

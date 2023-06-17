@@ -23,19 +23,19 @@ export function useFriendRequest() {
     }, [setFriendInvitations, friendInvitations])
 
     const validFriend = useCallback((friend: any) => {
-        if (friends)
+        if (friends && friend)
             return (friends.every((user: any) => friend.id !== user.id) && friend.id !== user.id)
         return (false);
     }, [friends]);
 
     const sendRequest = useCallback(async (friend: any) => {
-        if (validFriend(friend)) {
+        if (friend && validFriend(friend)) {
             await sendFriendRequest(friend.id, token);
         }
     }, [token]);
 
     const acceptFriend = useCallback(async (user: any) => {
-        if (friendInvitations && friendInvitations.length) {
+        if (friendInvitations && friendInvitations.length && user) {
             const request = friendInvitations.find((r: any) => r.sendBy === user.id);
             if (request) {
                 const validRes = await validFriendRequest(request.id, token);

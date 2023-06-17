@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react"
 
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
-import useChannelInfos from "../../../../hooks/Chat/useChannelInfos";
 import InfoInput from "../../../../components/Input/InfoInput";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 export default function ChannelName({ channel }: any) {
     const { isCurrentUserAdmin } = useUserAccess();
-    const { updateChannelName } = useChannelInfos();
+    const { updateChannelName } = useChannels();
 
     const [name, setName]: any = useState("")
     const [error, setError] = useState("");

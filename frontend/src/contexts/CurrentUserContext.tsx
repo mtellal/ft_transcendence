@@ -6,18 +6,15 @@ import { login, logout } from "../requests/user";
 function reducer(user: any, action: any) {
     switch (action.type) {
         case ('login'): {
-            return ({ ...user, userStatus: "ONLINE", blockList: [] })
+            return ({ ...user, userStatus: "ONLINE" })
         }
         case ('logout'): {
-            return ({ ...user, userStatus: "OFFLINE", blockList: [] })
+            return ({ ...user, userStatus: "OFFLINE" })
         }
         case ('updateUser'): {
-            if (action.user)
+            if (user && action.user)
             {
-                if (user)
-                    return ({...user, ...action.user})
-                else
-                    return (action.user)
+                return ({...user, ...action.user})
             }
         }
         case ('updateProfilePicture'): {
@@ -28,10 +25,10 @@ function reducer(user: any, action: any) {
             return ({ ...user, blockList: action.blockList });
         }
         case ('addBlockList'): {
-            if (user && user.blockList && action.block)
+            if (user && user.blockList && action.block && 
+                    (!user.blockList.length || !user.blockList.find((o: any) => o.userId !== action.block.userId) ))
             {
                 user.blockList.push(action.block);
-                console.log("addBlokcList", user.blockList)
             }
             return (user);
         }

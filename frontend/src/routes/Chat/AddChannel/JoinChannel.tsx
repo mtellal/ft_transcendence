@@ -23,9 +23,7 @@ import { useWindow } from "../../../hooks/useWindow";
 import ArrowBackMenu from "../components/ArrowBackMenu";
 import useBanUser from "../../../hooks/Chat/useBanUser";
 import ResizeContainer from "../../../components/ResizeContainer";
-import useChannelAccess from "../../../hooks/Chat/useChannelAccess";
 import InfoInput from "../../../components/Input/InfoInput";
-import useChannelInfos from "../../../hooks/Chat/useChannelInfos";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 import useMembers from "../../../hooks/Chat/useMembers";
 

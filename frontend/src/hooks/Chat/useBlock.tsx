@@ -12,22 +12,18 @@ export function useBlock()
     const isUserBlocked = useCallback((mUser: any) => {
         if (user && user.blockList && user.blockList.length && mUser)
         {
-            if (user.blockList.find((o: any) => o.userId === mUser.id))
-                return (true)
+            return (user.blockList.find((o: any) => o.userId === mUser.id));
         }
         return (false);
-    }, [user && user.blockList])
-
+    }, [user])
 
     const isUserBlockedById = useCallback((UserId: any) => {
         if (user && user.blockList && user.blockList.length && UserId)
         {
-            if (user.blockList.find((o: any) => o.userId === UserId))
-                return (true)
+            return (user.blockList.find((o: any) => o.userId === UserId));
         }
         return (false);
-    }, [user && user.blockList])
-
+    }, [user])
 
     const getblockedUsers = useCallback(async () => {
         if (user && user.blockList && user.blockList.length)
@@ -35,28 +31,28 @@ export function useBlock()
             const blockIds = user.blockList.map((o: any) => o.userId)
             return ( await fetchUsers(blockIds))
         }
-    }, [user, user.blockList])
+    }, [user])
 
     const blockUser = useCallback(async (mUser: any) => {
         if (user && user.blockList && mUser)
         {
-            console.log("blockUser called", user.blockList, mUser.id)
-            const blockObject = await blockUserRequest(mUser.id, token).then(res => res.data);
-            if (blockObject)
-                userDispatch({type: 'addBlockList', block: blockObject })
+            await blockUserRequest(mUser.id, token)
+                .then(res => {
+                    if (res.data)
+                        userDispatch({type: 'addBlockList', block: res.data })
+                });
         }
 
-    }, [user, user.blockList])
+    }, [user])
 
     const unblockUser = useCallback(async (mUser: any) => {
         if (user && user.blockList && user.blockList.length && mUser)
         {
-            console.log("unblockUser called", user.blockList, mUser.id)
             unblockUserRequest(mUser.id, token);
             userDispatch({type: 'removeBlockList', userId: mUser.id })
         }
 
-    }, [user, user.blockList])
+    }, [user])
 
     return (
         {

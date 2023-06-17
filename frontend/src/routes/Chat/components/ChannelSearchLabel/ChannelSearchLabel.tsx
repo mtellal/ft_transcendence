@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useCurrentUser } from "../../../../hooks/Hooks";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
-import useChannelAccess from "../../../../hooks/Chat/useChannelAccess";
 import useBanUser from "../../../../hooks/Chat/useBanUser";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
@@ -74,8 +73,7 @@ type TChannelSearch = {
 export function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
 
     const { user } = useCurrentUser();
-    const { channelAlreadyExists } = useChannels();
-    const { isChannelProtected, isChannelPrivate } = useChannelAccess();
+    const { isChannelPrivate, isChannelProtected } = useChannels();
     const { isUserBanned } = useBanUser()
 
     const { setAction } = useContext(ChatInterfaceContext);

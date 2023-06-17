@@ -1,8 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
-import useChannelInfos from "../../../../hooks/Chat/useChannelInfos";
 import InfoInput from "../../../../components/Input/InfoInput";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 export default function ChannelPassword({ channel }: any) {
@@ -12,7 +12,7 @@ export default function ChannelPassword({ channel }: any) {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    const { updateChannelPassword } = useChannelInfos();
+    const { updateChannelPassword } = useChannels();
 
     function submitName() {
         let newPassword: string = password && password.trim();

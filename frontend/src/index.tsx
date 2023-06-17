@@ -4,7 +4,6 @@ import { Navigate, Route }from 'react-router-dom'
 import './index.css';
 import App, { loader as appLoader, loader } from './routes/App/App';
 
-
 import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
@@ -12,10 +11,7 @@ import Profile from './routes/Profile/Profile';
 import LaunchGame from './routes/Game/Game';
 import History from './routes/History/History';
 
-
-import AddFriend from "./routes/Chat/AddFriend/AddFriend";
 import Interface from './routes/Chat/Interface/Interface';
-
 
 import {
     createBrowserRouter,
@@ -23,7 +19,6 @@ import {
 } from 'react-router-dom';
 
 import Chat from './routes/Chat/Chat/Chat';
-import AddChannel from './routes/Chat/AddChannel/AddChannel';
 import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
 

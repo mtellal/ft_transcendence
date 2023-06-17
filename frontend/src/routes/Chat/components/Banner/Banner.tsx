@@ -15,6 +15,7 @@ import { useChannels } from "../../../../hooks/Chat/useChannels";
 import { ChatInterfaceContext } from "../../Chat/Chat";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
+import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
 
 
 type TIconsBanner = {
@@ -31,9 +32,11 @@ function IconsBanner(props: TIconsBanner) {
 
     const { user } = useCurrentUser();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
-    const { removeFriend } = useFriends();
+    const { removeFriend, updateFriend } = useFriends();
     const { leaveChannel } = useChannels();
     const { isUserFriend } = useFriends();
+
+    const { sendRequest } = useFriendRequest();
 
     const { setAction } = useContext(ChatInterfaceContext);
 
@@ -56,6 +59,23 @@ function IconsBanner(props: TIconsBanner) {
                 <Icon icon="block" onClick={bannerBlock} description="Block" />
             }
             {
+                props.type === "WHISPER" && !isUserFriend(props.whisperUser) && 
+                <Icon
+                    icon="person_add"
+                    onClick={() => {
+                        setAction(
+                            <ConfirmView
+                                type="send a request friend to"
+                                username={props.whisperUser.username}
+                                valid={() => { sendRequest(props.whisperUser); setAction(null) }}
+                                cancel={() => setAction(null)}
+                            />
+                        )
+                    }}
+                    description="Leave"
+                />
+            }
+            {
                 props.type === "WHISPER" && isUserFriend(props.whisperUser) && 
                 <Icon
                     icon="person_remove"
@@ -67,7 +87,6 @@ function IconsBanner(props: TIconsBanner) {
                                 valid={() => { removeFriend(props.whisperUser); setAction(null) }}
                                 cancel={() => setAction(null)}
                             />
-
                         )
                     }}
                     description="Leave"

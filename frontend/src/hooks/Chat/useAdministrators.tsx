@@ -1,17 +1,12 @@
-import React, { useCallback, useContext } from "react";
-import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../Hooks";
-import { useNavigate } from "react-router-dom";
+import { useCallback } from "react";
+import { useChannelsContext, useChatSocket } from "../Hooks";
 
 
 export default function useAdinistrators() {
     const { socket } = useChatSocket();
     const { channelsDispatch, currentChannel, channels } = useChannelsContext();
-    const { friends } = useFriendsContext();
-    const { user } = useCurrentUser();
-    const navigate = useNavigate();
 
     const makeAdmin = useCallback((user: any, channel: any) => {
-        console.log("make admin user ", user);
         if (socket && channel && user) {
             socket.emit('makeAdmin', {
                 channelId: channel.id,
@@ -22,7 +17,6 @@ export default function useAdinistrators() {
     }, [socket])
 
     const removeAdmin = useCallback((user: any, channel: any) => {
-        console.log("remove admin user ", user);
         if (socket && channel && user) {
             socket.emit('removeAdmin', {
                 channelId: channel.id,
@@ -33,22 +27,21 @@ export default function useAdinistrators() {
     }, [socket])
 
     const isUserAdministrators = useCallback((user: any) => {
-        if (channels && currentChannel && currentChannel.administrators && currentChannel.administrators.length)
+        if (channels && channels.length &&
+            currentChannel && currentChannel.administrators && currentChannel.administrators.length)
             return (currentChannel.administrators.find((id: number) => id === user.id))
         return (false);
     }, [channels, currentChannel])
 
     const getAdministrators = useCallback((channel: any) => {
-        if (channel && channels && channels.length) {
+        if (channel && channels && channels.length &&
+            channel.administrators && channel.administrators.length &&
+            channel.users && channel.users.length) {
 
-            let admins = channel.administrators;
             let users = channel.users;
 
-            if (admins.length && users.length) {
-                let userAdmins = admins.map((id: number) => users.find((u: any) => u.id === id))
-                userAdmins = userAdmins.filter((u: any) => u)
-                return (userAdmins)
-            }
+            let userAdmins = channel.administrators.map((id: number) => users.find((u: any) => u.id === id))
+            return (userAdmins.filter((u: any) => u));
         }
         return ([]);
     }, [channels])

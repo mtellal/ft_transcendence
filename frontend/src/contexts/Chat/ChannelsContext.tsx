@@ -270,8 +270,6 @@ export function ChannelsProvider({ children }: any) {
     const [currentChannel, setCurrentChannelLocal]: any = useState();
     const [channelsLoading, setChannelsLoading] = useState(false);
 
-    const { friends, friendsLoaded } = useFriendsContext();
-
     async function loadUsersChannels(channelList: Channel[]) {
         let users;
         if (channelList && channelList.length) {
@@ -290,11 +288,9 @@ export function ChannelsProvider({ children }: any) {
 
 
     const loadChannels = useCallback(async () => {
-        console.log("////////////// load channels")
         setChannelsLoading(true)
         let channelList;
         channelList = await getChannels(user.id).then(res => res.data);
-        // channelList = filterAvailableChannels(channelList);
         channelList = await loadUsersChannels(channelList);
         channelsDispatch({ type: 'initChannels', channels: channelList });
         channelList.forEach((channel: Channel) => {
@@ -304,7 +300,6 @@ export function ChannelsProvider({ children }: any) {
         });
         // channelList.map(async (c : any) => await removeChannel(c.id))
         setChannelsLoading(false)
-        console.log("load channels ////////////// ")
 
     }, [user, socket])
 
@@ -314,8 +309,6 @@ export function ChannelsProvider({ children }: any) {
         }
     }, [socket, user])
 
-
-    // console.log("channels => ", channels)
 
     ////////////////////////////////////////////////////////////////
     //               C U R R E N T    C H A N N E L               //

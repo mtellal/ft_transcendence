@@ -16,6 +16,8 @@ import { createChannel, getChannel, getWhisperChannel } from "../../../requests/
 import { useChannels } from "../../../hooks/Chat/useChannels";
 import { convertTypeAcquisitionFromJson } from "typescript";
 import useFetchUsers from "../../../hooks/useFetchUsers";
+import useBanUser from "../../../hooks/Chat/useBanUser";
+import useMembers from "../../../hooks/Chat/useMembers";
 
 
 export const InterfaceContext: React.Context<any> = createContext(null);
@@ -37,6 +39,7 @@ export default function Interface() {
     const { fetchUser } = useFetchUsers();
 
     const [profile, setProfile] = useState(false);
+    const { isUserMember } = useMembers();
 
     const [whisperUser, setWhisperUser] = useState();
 
@@ -58,7 +61,7 @@ export default function Interface() {
         return (channel);
     }, [channels]);
 
-    async function loadChannel() {
+    const loadChannel = useCallback(async () => {
         let channel = channels.find((c: any) => c.name === params.channelName);
         if (!channel) {
             await getChannel(params.channelId)
@@ -68,21 +71,31 @@ export default function Interface() {
                 })
         }
         return (channel);
+    }, [user]);
+
+    function isCurrentUserMember(channel: any) {
+        if (channel && channel.members && !channel.members.find((id: number) => id === user.id))
+            return (false);
+        return (true);
     }
 
     const loadInterface = useCallback(async () => {
         if (params.channelId) {
-            const channel = await loadChannel();
+            let channel = await loadChannel();
+            if (!isCurrentUserMember(channel))
+                channel = null;
             if (channel)
                 return (setCurrentChannel(channel));
         }
         else if (params.userId) {
             const user = await fetchUser(params.userId);
             setWhisperUser(user);
-            const channel = await selectWhisper(user);
+            let channel = await selectWhisper(user);
+            if (!isCurrentUserMember(channel))
+                channel = null;
             if (channel)
                 return (setCurrentChannel(channel));
-            return ;
+            return;
         }
         navigate("/chat")
     }, [channels, friends]);

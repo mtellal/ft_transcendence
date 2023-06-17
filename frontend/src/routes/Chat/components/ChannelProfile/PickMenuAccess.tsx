@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
-import useChannelInfos from "../../../../hooks/Chat/useChannelInfos";
 import PickMenu from "../../../../components/PickMenu";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 export default function PickMenuAccess({ channel, protectedAccess }: any) {
     const { isCurrentUserAdmin } = useUserAccess();
-    const { updateChannelType } = useChannelInfos();
+    const { updateChannelType } = useChannels();
 
     const [success, setSuccess] = useState("");
     const [type, setType] = useState("")

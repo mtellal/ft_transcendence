@@ -1,10 +1,10 @@
 import React, { useContext, useState } from "react"
 import InfoInput from "../../../../components/Input/InfoInput";
-import useChannelInfos from "../../../../hooks/Chat/useChannelInfos";
 
 import ResizeContainer from "../../../../components/ResizeContainer";
 import './ConfirmAction.css'
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 export function ConfirmAction(props: any) {
 
@@ -143,7 +143,7 @@ export function ConfirmViewTypeProteced(props: any) {
 
     const [error, setError] = useState("");
 
-    const { updateChannelType } = useChannelInfos();
+    const { updateChannelType } = useChannels();
 
     function submit() {
         let newPassword: string = password && password.trim();

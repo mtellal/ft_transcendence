@@ -6,21 +6,13 @@ import useFetchUsers from "../../hooks/useFetchUsers";
 
 export const FriendsContext: React.Context<any> = createContext([]);
 
-function fromatFriend(friend: any) {
-    return (
-        {
-            ...friend,
-            notifs: 0,
-        }
-    )
-}
+
 
 function reducer(friends: any, action: any) {
     switch (action.type) {
         case ('setFriendList'): {
             if (action.friendList && action.friendList.length) {
-                const nfriends = action.friendList.map((f: any) => fromatFriend(f))
-                return (isEqual(friends, nfriends) ? friends : nfriends)
+                return (isEqual(friends, action.friendList) ? friends : action.friendList)
             }
             else return (friends);
         }
@@ -30,38 +22,16 @@ function reducer(friends: any, action: any) {
                 return (friends.map((f: any) => f.id === action.friend.id ? action.friend : f))
             }
             else
-                return ([...friends, fromatFriend(action.friend)]);
+                return ([...friends, action.friend]);
         }
         case ('removeFriend'): {
             if (friends.length)
                 return (friends.filter((u: any) => u.id !== action.friend.id))
             return (friends);
         }
-        case ('addNotif'): {
-            if (friends.length)
-                return (
-                    friends.map((f: any) => {
-                        if (f.id === action.friendId) {
-                            if (!f.notifs) f.notifs = 1;
-                            else f.notifs += 1;
-                        }
-                        return (f)
-                    })
-                )
-            else
-                return (friends);
-        }
-        case ('removeNotif'): {
-            friends.map((f: any) => {
-                if (action.friend.id === f.id && f.notifs)
-                    f.notifs = 0;
-                return (f);
-            });
-        }
         default: return (friends);
     }
 }
-
 
 type TFriendRequest = {
     id: number,
@@ -70,7 +40,6 @@ type TFriendRequest = {
     userId: number,
     createdAt: string
 }
-
 
 export function FriendsProvider({ children }: any) {
 
@@ -82,7 +51,6 @@ export function FriendsProvider({ children }: any) {
     const [friendInvitations, setFriendInvitations]: [TFriendRequest[], any] = useState([]);
 
     const [friendsLoading, setFriendsLoading] = useState(false);
-    const [friendsLoaded, setFriendsLoaded] = useState(false);
 
     async function loadFriendList() {
         setFriendsLoading(true);
@@ -91,7 +59,6 @@ export function FriendsProvider({ children }: any) {
             friendList = friendList.sort((a: any, b: any) => a.username > b.username ? 1 : -1);
             friendsDispatch({ type: 'setFriendList', friendList })
         }
-        setFriendsLoaded(true);
         setFriendsLoading(false);
     }
 
@@ -150,7 +117,6 @@ export function FriendsProvider({ children }: any) {
             setCurrentFriend,
             friendInvitations,
             setFriendInvitations,
-            friendsLoaded
         }}>
             {children}
         </FriendsContext.Provider>
