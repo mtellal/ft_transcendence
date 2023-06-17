@@ -36,7 +36,7 @@ export function UserProfile({ id }: UserProfileProps) {
 				<img className={s.image} src={logo_user} alt="profilePictureUser"></img>
 			</div>
 			<HistoryMatchs id={id} />
-			<Achievements />
+			<Achievements id={id} />
 		</div>
 	);
 }

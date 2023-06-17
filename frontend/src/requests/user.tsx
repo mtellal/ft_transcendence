@@ -79,3 +79,15 @@ export async function getMatchHistory(id: number | string) {
             .catch(err => err)
     )
 }
+
+export async function getAchievements(id: number | string) {
+    return (
+        axios.get(`${back}/users/${id}/achievements`, {
+            headers: {
+                'Accept': '*/*'
+            }
+        })
+            .then(res => res)
+            .catch(err => err)
+    )
+}

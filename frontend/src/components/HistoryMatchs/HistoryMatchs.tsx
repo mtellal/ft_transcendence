@@ -66,7 +66,7 @@ export function HistoryMatchs({ id }: UserProfileProps) {
 			{
 				createdAt: "2023-06-16T11:13:11.538Z",
 				gametype: "SPEEDUP",
-				id: 25,
+				id: 26,
 				player1Id: 1,
 				player1Score: 11,
 				player2Id: 2,
@@ -77,7 +77,7 @@ export function HistoryMatchs({ id }: UserProfileProps) {
 			{
 				createdAt: "2023-06-16T11:13:11.538Z",
 				gametype: "SPEEDUP",
-				id: 25,
+				id: 27,
 				player1Id: 1,
 				player1Score: 11,
 				player2Id: 2,

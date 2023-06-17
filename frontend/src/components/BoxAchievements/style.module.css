@@ -8,28 +8,34 @@
 	min-width: 200px;
 	text-align: center;
 	overflow-y: scroll;
-	/* overflow-x: scroll; */
 }
 
 .headerDiv {
 	font-size: 150%;
 	height: 20%;
 	display: flex;
-	background-color: rgb(65, 65, 65);
+	background-color: rgb(88, 88, 88);
 	justify-content: center;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
 
 .content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	margin-top: 3%;
 }
 
 .image {
 	height: 50px;
 	width: 50px;
-	opacity: 0.2;
-	/* opacity: 1; */
+}
+
+.cross {
+	margin-top: 8px;
+	height: 30px;
+	width: 30px;
 }
 
 
@@ -44,8 +50,6 @@
 .progress {
 	width: 70%;
 	height: 20px;
-	/* overflow-y: auto; */
-	/* height: 5%; */
 	border-radius: 10px;
 	background-color: #4CAF50;
 }
