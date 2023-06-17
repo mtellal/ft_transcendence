@@ -58,19 +58,25 @@ export class UsersAchievementsService {
 		await this.prisma.achievements.deleteMany({});
 	}
 
-	async checkAndUnlockAchievements(userId: number, server: Server, client: Socket) {
+	async checkAndUnlockAchievements(userId: number, server: Server, clientMap:  Map<number, string>) {
 		const userStats = await this.prisma.stats.findUnique({
 			where: { userId },
 		});
 		if (!userStats)
 			throw new Error(`Stats not found for user with ID ${userId}`);
-
 		for (const achievement of this.predefinedAchievements) {
 			if (achievement.condition(userStats) && !await this.isAchievementUnlocked(userId, achievement.name)) {
 				let updated = await this.unlockAchievement(userId, achievement);
 				if (updated)
-					server.to(client.id).emit('Achievement', updated);
-			}
+					if (clientMap.has(userId))
+						server.to(clientMap.get(userId)).emit('Achievement', {
+							Unlocked: {
+								name: achievement.name,
+								description: achievement.description
+							},
+							updated,
+						});
+			};
 		}
 	}
 
