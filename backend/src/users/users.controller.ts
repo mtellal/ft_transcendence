@@ -376,9 +376,4 @@ export class UsersController {
     return this.userAchievementsService.showAchievements(id);
   }
 
-  @Get('achievement/delete')
-  async deleteAchievements() {
-    await this.userAchievementsService.delAchievements();
-  }
-
 }

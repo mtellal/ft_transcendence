@@ -54,10 +54,6 @@ export class UsersAchievementsService {
 		});
 	}
 
-	async delAchievements() {
-		await this.prisma.achievements.deleteMany({});
-	}
-
 	async checkAndUnlockAchievements(userId: number, server: Server, clientMap:  Map<number, string>) {
 		const userStats = await this.prisma.stats.findUnique({
 			where: { userId },
