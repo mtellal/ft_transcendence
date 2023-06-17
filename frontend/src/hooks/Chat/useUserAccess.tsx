@@ -6,15 +6,14 @@ export default function useUserAccess() {
 
     const { user } = useCurrentUser();
     const { channels, currentChannel } = useChannelsContext();
-    const [ isCurrentUserOwner, setIsCurrentUserOwner] = useState(false);
-    const [ isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+    const [isCurrentUserOwner, setIsCurrentUserOwner] = useState(false);
+    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
 
     useEffect(() => {
-        if (currentChannel && user)
-        {
-                setIsCurrentUserOwner(user.id === currentChannel.ownerId);
-                if (currentChannel.administrators)
-                    setIsCurrentUserAdmin(currentChannel.administrators.find((id: number) => id === user.id) ? true : false)
+        if (currentChannel && user) {
+            setIsCurrentUserOwner(user.id === currentChannel.ownerId);
+            if (currentChannel.administrators)
+                setIsCurrentUserAdmin(currentChannel.administrators.find((id: number) => id === user.id) ? true : false)
         }
     }, [currentChannel, user, channels])
 
@@ -25,9 +24,8 @@ export default function useUserAccess() {
     }, [])
 
     const isUserAdmin = useCallback((channel: any, user: any) => {
-        if (channel && channel.administrators && user &&
-            channel.administrators.find((id: number) => id === user.id))
-            return (true);
+        if (channel && channel.administrators && channel.administrators.length && user)
+            return (channel.administrators.find((id: number) => id === user.id))
         return (false);
     }, [])
 
@@ -39,9 +37,8 @@ export default function useUserAccess() {
         return (0)
     }, [isCurrentUserAdmin, isCurrentUserOwner])
 
-    const getUserAccess = useCallback((user : any) => {
-        if (currentChannel && channels)
-        {
+    const getUserAccess = useCallback((user: any) => {
+        if (currentChannel && channels) {
             if (isUserOwner(currentChannel, user))
                 return (1)
             if (isUserAdmin(currentChannel, user))
@@ -49,7 +46,6 @@ export default function useUserAccess() {
             return (0)
         }
     }, [currentChannel, channels])
-
 
     return (
         {

@@ -3,7 +3,7 @@ import { useCurrentUser } from "../../hooks/Hooks";
 import { getUserByUsername } from "../../requests/user";
 import InfoInput from "../Input/InfoInput";
 import { UserLabelSearch } from "../users/UserLabel";
-import { CollectionElement } from "../../routes/Chat/components/Menu/MenuElement";
+import { CollectionElement } from "./CollectionElement";
 
 type TUsersCollection = {
     title: string,

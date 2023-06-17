@@ -1,20 +1,15 @@
 import React from 'react'
 import jwtDecode from 'jwt-decode';
-import { Outlet, redirect, useLoaderData, useLocation } from 'react-router-dom';
+import { Outlet, redirect, useLoaderData } from 'react-router-dom';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/SideBar';
 import { extractCookie } from '../../Cookie';
-import {
-  blockUserRequest,
-  unblockUserRequest
-} from '../../requests/block';
 
 import {
   getUser,
   getUserProfilePictrue,
-  updateUser,
 } from '../../requests/user'
 
 import { CurrentUserProvider } from '../../contexts/CurrentUserContext';
@@ -53,8 +48,8 @@ function App() {
     >
       <div className="App" >
         <Header />
-          <Sidebar />
-            <Outlet />
+        <Sidebar />
+        <Outlet />
         <Footer />
       </div>
     </CurrentUserProvider>

@@ -1,15 +1,12 @@
-import React, { useCallback, useContext } from "react";
-import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../Hooks";
-import { useNavigate } from "react-router-dom";
-import useUserAccess from "./useUserAccess";
+import { useCallback } from "react";
+import { useChannelsContext, useChatSocket } from "../Hooks";
 
 
 export default function useKickUser() {
     const { socket } = useChatSocket();
-    const { channelsDispatch, currentChannel, channels } = useChannelsContext();
+    const { channelsDispatch } = useChannelsContext();
 
     const kickUser = useCallback((user: any, channel: any) => {
-        console.log("kick user ", user);
         if (socket && channel && user) {
             socket.emit('kickUser', {
                 channelId: channel.id,

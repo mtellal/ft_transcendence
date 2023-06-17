@@ -1,21 +1,19 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext } from "react";
 
 import Icon from "../../../../components/Icon";
 import { UserInfos } from "../../../../components/users/UserInfos";
 import ChannelInfos from "../../../../components/channels/ChannelInfos";
-import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../../hooks/Hooks";
+import { useChannelsContext, useCurrentUser } from "../../../../hooks/Hooks";
 
-import './Banner.css'
 import { useWindow } from "../../../../hooks/useWindow";
 import ArrowBackMenu from "../ArrowBackMenu";
 import { useBlock } from "../../../../hooks/Chat/useBlock";
-import { InterfaceContext } from "../../Interface/Interface";
 import { useFriends } from "../../../../hooks/Chat/Friends/useFriends";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
 import { ChatInterfaceContext } from "../../Chat/Chat";
-import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
+import './Banner.css'
 
 
 type TIconsBanner = {
@@ -128,8 +126,6 @@ export default function Banner({ ...props }: TBanner) {
 
     const { currentChannel } = useChannelsContext();
     const { isMobileDisplay } = useWindow();
-
-    const { fetchUser } = useFetchUsers();
 
     return (
         <>

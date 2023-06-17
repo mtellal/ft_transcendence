@@ -13,10 +13,9 @@
 .header-pong
 {
     font-size: xx-large;
-    margin: 0 5vh;
+    margin: 0 20px;
     font-family: 'Righteous';
     letter-spacing: 2px;
-    padding: 1vh 1vh ;
     border-radius: 5px;
     text-decoration: underline;
     color: black;

@@ -14,15 +14,12 @@ export default function ChannelsEvents({ children }: any) {
     const { socket } = useChatSocket();
     const { channels, channelsDispatch } = useChannelsContext();
 
-    const { friends } = useFriendsContext();
-    const { updateFriend, isUserFriend } = useFriends();
     const { addedMember } = useMembers();
 
     const {
         addChannel,
         forceToLeaveChannel,
         updateChannelInfos,
-        addChannelFromFriend
     } = useChannels();
 
     useEffect(() => {

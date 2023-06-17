@@ -8,13 +8,13 @@ import ResizeContainer from "../../../../components/ResizeContainer";
 import ProfilePicture from "../../../../components/users/ProfilePicture";
 import Icon, { RawIcon } from "../../../../components/Icon";
 
-import './ChannelSearchLabel.css'
 import { getChannelProtected } from "../../../../requests/chat";
 import InfoInput from "../../../../components/Input/InfoInput";
 import { ChatInterfaceContext } from "../../Chat/Chat";
 import { ConfirmViewButtons } from "../../Profile/ChannelProfile/ConfirmAction";
-import { SearchedChannelLabelContext } from "../Menu/MenuElement";
+import { SearchedChannelLabelContext } from "../Menu/SearchElement/SearchElement";
 
+import './ChannelSearchLabel.css'
 
 function ProtectedChannelPassword(props: any) {
 

@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
-import { getChannelMessages, getWhisperChannel } from "../../requests/chat";
 
 
 export function useChannels() {
@@ -14,57 +13,54 @@ export function useChannels() {
 
     const { channels, channelsDispatch, currentChannel } = useChannelsContext();
 
-    const isChannelPublic = useCallback((channel : any) => {
+    const isChannelPublic = useCallback((channel: any) => {
         if (channel)
             return (channel.type === "PUBLIC")
-    }, [])  
+    }, [])
 
-    const isChannelPrivate = useCallback((channel : any) => {
+    const isChannelPrivate = useCallback((channel: any) => {
         if (channel)
             return (channel.type === "PRIVATE")
-    }, [])  
+    }, [])
 
-    const isChannelProtected = useCallback((channel : any) => {
+    const isChannelProtected = useCallback((channel: any) => {
         if (channel)
             return (channel.type === "PROTECTED")
-    }, [])  
+    }, [])
 
 
     const updateChannelName = useCallback((channelId: number, name: string) => {
-        if (socket && channels && channels.length && channelId && name)
-        {
+        if (socket && channels && channels.length && channelId && name) {
             console.log("update channel name", channelId, name)
             socket.emit('updateChannel', {
-                channelId: channelId, 
-                name: name, 
+                channelId: channelId,
+                name: name,
             });
-            channelsDispatch({type: 'updateChannelInfos', channelId, infos: {name}})
+            channelsDispatch({ type: 'updateChannelInfos', channelId, infos: { name } })
         }
     }, [socket, channels])
 
-    const updateChannelPassword = useCallback((channelId: number , password: string) => {
-        if (socket && channels && channels.length && channelId && password)
-        {
+    const updateChannelPassword = useCallback((channelId: number, password: string) => {
+        if (socket && channels && channels.length && channelId && password) {
             console.log("update channel password", channelId, password)
             socket.emit('updateChannel', {
-                channelId, 
-                password, 
+                channelId,
+                password,
             });
-            channelsDispatch({type: 'updateChannelInfos', channelId, infos: {password}})
+            channelsDispatch({ type: 'updateChannelInfos', channelId, infos: { password } })
         }
     }, [socket, channels])
 
 
     const updateChannelType = useCallback((channelId: number, type: string, password: string = "") => {
-        if (socket && channels && channels.length && channelId && type)
-        {
+        if (socket && channels && channels.length && channelId && type) {
             console.log("update channel type", channelId, type)
             socket.emit('updateChannel', {
-                channelId, 
-                type, 
+                channelId,
+                type,
                 password
             });
-            channelsDispatch({type: 'updateChannelInfos', channelId, infos: {type}})
+            channelsDispatch({ type: 'updateChannelInfos', channelId, infos: { type } })
         }
     }, [socket, channels])
 
@@ -96,19 +92,6 @@ export function useChannels() {
             joinChannelProtected(channel.id, password);
         }
     }, [socket])
-
-
-    const addChannelFromFriend = useCallback(async (friend: any) => {
-        if (socket && friend && user) {
-            const channel = await getWhisperChannel(user.id, friend.id);
-            if (channel) {
-                const messages = await getChannelMessages(channel.id);
-                if (messages)
-                    channel.messages = messages;
-                addChannel(channel, false);
-            }
-        }
-    }, [socket, user, channels, channelsDispatch])
 
     const joinChannel = useCallback((channel: any) => {
         if (socket) {
@@ -207,7 +190,6 @@ export function useChannels() {
             updateChannelPassword,
             updateChannelType,
             addChannel,
-            addChannelFromFriend,
             addChannelProtected,
             joinChannel,
             joinChannelProtected,

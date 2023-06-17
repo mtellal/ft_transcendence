@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useCurrentUser } from "../hooks/Hooks";
 
 const back = process.env.REACT_APP_BACK;
 
@@ -18,7 +17,7 @@ export async function getChannel(id: number) {
 export async function getWhisperChannel(userId: number, friendId: number) {
     return (
         axios.get(`${back}/users/whispers?id=${userId}&friendId=${friendId}`)
-            .then(res => res.data)
+            .then(res => res)
             .catch(err => err)
     )
 }
@@ -61,22 +60,6 @@ export async function createChannel(channel: any, token: number | string) {
 export async function getChannels(id: string | number) {
     return (
         axios.get(`${back}/users/${id}/channels`)
-            .then(res => res)
-            .catch(err => err)
-    )
-}
-
-export async function removeChannel(id: number) {
-    return (
-        axios.delete(`${back}/chat/${id}`)
-            .then(res => res)
-            .catch(err => err)
-    )
-}
-
-export async function getChannelMessages(channelId: number) {
-    return (
-        axios.get(`${back}/chat/${channelId}/messages`)
             .then(res => res)
             .catch(err => err)
     )

@@ -1,26 +1,17 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
-import useFetchUsers from "../useFetchUsers";
 import useMembers from "./useMembers";
 
 
 export default function useMuteUser() {
-    const { user } = useCurrentUser();
     const { socket } = useChatSocket();
     const { channels, channelsDispatch, currentChannel } = useChannelsContext();
-    const { fetchUsers } = useFetchUsers();
-    const [isCurrentUserMuted, setIsCurrentUserMuted] = useState(false);
 
     const { getMembersById } = useMembers(); 
 
-    useEffect(() => {
-        const muted = isUserMuted(user, currentChannel);
-        setIsCurrentUserMuted(muted)
-    }, [currentChannel, user])
-
-
     const isUserMuted = useCallback((user: any, channel: any) => {
-        if (channel && channel.muteList && channel.muteList.length && user)
+        if (channels && channels.length && 
+            channel && channel.muteList && channel.muteList.length && user)
         {
             const muteObject = channel.muteList.find((o : any) => o.userId === user.id); 
             if (muteObject && muteObject.duration)
@@ -35,13 +26,14 @@ export default function useMuteUser() {
     }, [channels])
 
     const getUsersMuted = useCallback( async (channel: any) => {
-        if (channel && channel.muteList && channel.muteList.length)
+        if (channels && channels.length && 
+            channel && channel.muteList && channel.muteList.length)
         {
             const mutedIds = channel.muteList.map((o: any) => o.userId); 
             return (getMembersById(mutedIds))
         }
         return ([]);
-    }, [])
+    }, [channels])
 
     const muteUser = useCallback((user: any, channel: any, duration: number) => {
         if (channels && channels.length && socket && user && channel) {
@@ -57,7 +49,6 @@ export default function useMuteUser() {
 
     const unmuteUser = useCallback((user: any, channel: any) => {
         if (channels && channels.length && socket && user && channel) {
-            console.log("unmute user ", user.id, channel.id)
             socket.emit('unmuteUser', {
                 channelId: channel.id,
                 userId: user.id,
@@ -73,7 +64,6 @@ export default function useMuteUser() {
             unmuteUser,
             getUsersMuted,
             isUserMuted, 
-            isCurrentUserMuted
         }
     )
 }

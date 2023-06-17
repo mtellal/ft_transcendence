@@ -1,12 +1,7 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { getChannel, getChannels, removeChannel } from "../../requests/chat";
-import { useChatSocket, useFriendsContext, useCurrentUser } from "../../hooks/Hooks";
-import {
-    getUser, getUserProfilePictrue
-} from '../../requests/user'
+import { getChannels } from "../../requests/chat";
+import { useChatSocket, useCurrentUser } from "../../hooks/Hooks";
 import useFetchUsers from "../../hooks/useFetchUsers";
-import { useNavigate } from "react-router-dom";
-import useKickUser from "../../hooks/Chat/usekickUser";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 

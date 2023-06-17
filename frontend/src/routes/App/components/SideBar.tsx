@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 
 import './Sidebar.css'
-import { Link, NavLink } from "react-router-dom";
-import PickMenu from "../../../components/PickMenu";
+import { NavLink } from "react-router-dom";
 import { useWindow } from "../../../hooks/useWindow";
 
 function MenuElement(props: any) {

@@ -19,7 +19,7 @@ import {
 } from 'react-router-dom';
 
 import Chat from './routes/Chat/Chat/Chat';
-import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
+import { CreateChannel } from './routes/Chat/CreateChannel';
 
 
 const router = createBrowserRouter([

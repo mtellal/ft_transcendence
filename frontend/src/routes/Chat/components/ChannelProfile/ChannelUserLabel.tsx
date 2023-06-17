@@ -10,8 +10,8 @@ import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import { PofileChannelContext } from '../../Profile/ChannelProfile/ChannelProfile';
-import { CollectionElement } from "../Menu/MenuElement";
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
+import { CollectionElement } from "../../../../components/collections/CollectionElement";
 
 export function CollectionUsers(props: any) {
     const [renderUsers, setRenderUsers] = useState([]);
