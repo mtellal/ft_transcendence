@@ -38,7 +38,7 @@ model User {
   player1Games    Game[]          @relation("Player1")
   player2Games    Game[]          @relation("Player2")
   stats           Stats?
-  achievements    Achievement[]
+  achievements    Achievements?
   createdAt       DateTime        @default(now())
 }
 
@@ -57,13 +57,19 @@ model Stats {
   @@id([userId])
 }
 
-model Achievement {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String
-  user        User    @relation(fields: [userId], references: [id])
-  userId      Int
-  createdAt   DateTime  @default(now())
+model Achievements {
+  User  User @relation(fields: [userId] , references: [id])
+  userId  Int
+
+  Novice       Boolean @default(false)
+  Intermediate Boolean @default(false)
+  Expert       Boolean @default(false)
+  Master       Boolean @default(false)
+  OnFire       Boolean @default(false)
+  Tenacious    Boolean @default(false)
+  Godlike      Boolean @default(false)
+
+  @@id([userId])
 }
 
 model BlockedUser {

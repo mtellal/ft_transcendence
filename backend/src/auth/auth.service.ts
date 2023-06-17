@@ -13,6 +13,7 @@ import { createWriteStream } from 'fs';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import * as crypto from 'crypto';
+import { UsersAchievementsService } from "../users/users-achievements.service";
  
 
 @Injectable()
@@ -31,8 +32,12 @@ export class AuthService {
 				data: {
 					username: dto.username,
 					password: hash,
-					stats: {create: {}
-				}
+					stats: {
+						create: {}
+					},
+					achievements: {
+						create: {}
+					},
 				},
 			});
 			return this.signToken(user.id, user.username);
@@ -106,7 +111,10 @@ export class AuthService {
 					avatar: './uploads/' + profile.id + '.png',
 					stats: {
 						create: {}
-					}
+					},
+					achievements: {
+						create: {}
+					},
 				  },
 			  });
 			  return newuser.oauth_code;

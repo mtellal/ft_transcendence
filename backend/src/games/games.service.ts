@@ -5,7 +5,7 @@ import { JwtPayloadDto } from '../auth/dto';
 import { GameState, Status, defaultGameState } from './games.interface';
 import { GameDto } from './dto/games.dto';
 import { UsersAchievementsService } from '../users/users-achievements.service';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 @Injectable()
 export class GamesService {
@@ -214,7 +214,7 @@ export class GamesService {
     }
   }
 
-  async startGame(room: Game, server: any, client: Socket) {
+  async startGame(room: Game, server: Server, userTosocket:  Map<number, string>) {
     let game = new GameState();
     game = JSON.parse(JSON.stringify(defaultGameState));
     game.gametype = room.gametype;
@@ -234,16 +234,16 @@ export class GamesService {
           clearInterval(gameLoopInterval);
           const finishedGame = await this.updateGame(room, game);
           await this.updateStats(room, game);
-          this.updateAchievement(finishedGame, client);
+          this.updateAchievement(finishedGame, server, userTosocket);
           server.to(`room-${room.id}`).emit('finishedGame', finishedGame);
         }
       }, tickRate);
     }, 3000);
   }
 
-  private async updateAchievement(room: Game, client: Socket) {
-    const P1Achievement = this.achievement.checkAndUnlockAchievements(room.player1Id, client);
-    const P2Achievement = this.achievement.checkAndUnlockAchievements(room.player2Id, client);
+  private async updateAchievement(room: Game, server: Server, clientMap:  Map<number, string>) {
+    const P1Achievement = this.achievement.checkAndUnlockAchievements(room.player1Id, server, clientMap);
+    const P2Achievement = this.achievement.checkAndUnlockAchievements(room.player2Id, server, clientMap);
   }
 
   async updateGame(room: Game, game: GameState) {

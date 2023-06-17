@@ -164,10 +164,10 @@ export class UsersController {
       avatar: file.path
     })
     for (const friendId of updatedUser.friendList) {
-      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedUser', updatedUser);
+      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
     }
     for (const channel of updatedUser.channelList) {
-      this.usersGateway.server.to(channel.toString()).emit('updatedUser', updatedUser);
+      this.usersGateway.server.to(channel.toString()).emit('updatedMember', updatedUser);
     }
   }
 
@@ -357,10 +357,10 @@ export class UsersController {
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
     const updatedUser = await this.usersService.update(id, updateUserDto);
     for (const friendId of updatedUser.friendList) {
-      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedUser', updatedUser);
+      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
     }
     for (const channel of updatedUser.channelList) {
-      this.usersGateway.server.to(channel.toString()).emit('updatedUser', updatedUser);
+      this.usersGateway.server.to(channel.toString()).emit('updatedMember', updatedUser);
     }
     return updatedUser;
   }
@@ -375,10 +375,5 @@ export class UsersController {
   async showAchievements(@Param('id', ParseIntPipe) id: number) {
     return this.userAchievementsService.showAchievements(id);
   }
-
-  // @Get('achievement/delete')
-  // async deleteAchievements() {
-  //   await this.userAchievementsService.delAchievements();
-  // }
 
 }
