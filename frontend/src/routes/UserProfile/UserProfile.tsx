@@ -3,6 +3,7 @@ import logo_user from "../../assets/user.png"
 import { getMatchHistory, getUser, getUserProfilePictrue } from "../../requests/user";
 import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
 import { Achievements } from "../../components/Achievements/Achievements";
+import { Stats } from "../../components/Stats/Stats";
 import s from './style.module.css'
 
 interface UserProfileProps {
@@ -16,13 +17,10 @@ export function UserProfile({ id }: UserProfileProps) {
 	async function getInfoUser() {
 		const dataUser = await getUser(id);
 		setData(dataUser.data);
-		// Ici, recuperer la photo de profile
-
-
 	}
 
 	useEffect(() => {
-		getInfoUser();
+			getInfoUser();
 	}, [])
 
 	if (!data) {
@@ -35,7 +33,10 @@ export function UserProfile({ id }: UserProfileProps) {
 				<p className={s.username}>{data.username}</p>
 				<img className={s.image} src={logo_user} alt="profilePictureUser"></img>
 			</div>
-			<HistoryMatchs id={id} />
+			<div className={s.stats}>
+				<HistoryMatchs id={id} />
+				<Stats id={id} />
+			</div>
 			<Achievements id={id} />
 		</div>
 	);

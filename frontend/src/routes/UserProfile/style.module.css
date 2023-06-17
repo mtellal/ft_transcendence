@@ -7,6 +7,12 @@
 	max-width: 99%;
 }
 
+.stats {
+	display: flex;
+	/* background-color: black; */
+	justify-content: space-evenly;
+}
+
 .infoUser {
 	height: 15%;
 	width: 100%;

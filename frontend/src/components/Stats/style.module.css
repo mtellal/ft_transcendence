@@ -9,25 +9,33 @@
 	font-size: 3vh;
 	align-items: center;
 	border-radius: 25px;
-	overflow-y: auto;
 	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
-.title {
+ul {
+	margin-top: 5px;
+	font-weight: 600;
+}
+
+h1 {
 	width: 100vw;
 	font-size: 35px;
 	margin: 0;
-	margin-bottom: 15px;
 	background-color: aliceblue;
 	text-align: center;
 	border-bottom: 3px solid black;
 	border-top-left-radius: 25px;
 	border-top-right-radius: 25px;
 	position: sticky;
-	top: 0;
 }
 
+li {
+	list-style: none;
+}
 
-.list {
-	margin-bottom: 5%;
+@media (max-width: 900px) {
+	.container {
+		display: none;
+	}
 }

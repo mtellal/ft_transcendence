@@ -91,3 +91,15 @@ export async function getAchievements(id: number | string) {
             .catch(err => err)
     )
 }
+
+export async function getStats(id: number | string) {
+    return (
+        axios.get(`${back}/users/${id}/stats`, {
+            headers: {
+                'Accept': '*/*'
+            }
+        })
+            .then(res => res)
+            .catch(err => err)
+    )
+}
