@@ -21,13 +21,13 @@ export class AuthController{
 	@Post('signin')
 	@ApiOperation({ summary: 'Sign in', description: 'Sign in using existing user credentials. Returns a JWT corresponding to that user' })
 	@ApiBody({ type: SigninDto })
- 	@ApiQuery({ name: 'step', required: false, type: 'string' })
-	async signin(@Body() body: SigninDto, @Query('twoFA', ParseBoolPipe) twoFA?: boolean) {
+	async signin(@Body() body: SigninDto, @Query('twoFA', ParseBoolPipe) twoFA: boolean) {
 		let response;
 		if (twoFA)
 			response = await this.authService.signin(body.username, body.password, body.code);
 		else
 			response = await this.authService.signin(body.username, body.password);
+		
 		return { step: response.step,  access_token: response.access_token };
 	}
 
