@@ -161,7 +161,10 @@ export class UsersController {
       this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
     }
     for (const channel of updatedUser.channelList) {
-      this.usersGateway.server.to(channel.toString()).emit('updatedMember', updatedUser);
+      this.usersGateway.server.to(channel.toString()).emit('updatedMember', {
+        channelId: channel,
+        user: updatedUser
+      })
     }
   }
 
@@ -336,7 +339,10 @@ export class UsersController {
       this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
     }
     for (const channel of updatedUser.channelList) {
-      this.usersGateway.server.to(channel.toString()).emit('updatedMember', updatedUser);
+      this.usersGateway.server.to(channel.toString()).emit('updatedMember', {
+        channelId: channel,
+        user: updatedUser
+      })
     }
     return updatedUser;
   }

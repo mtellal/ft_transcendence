@@ -57,7 +57,7 @@
 The Users Gateway doesn't listen to any events, however it emits:
 - updatedFriend: will send an updated User object to every user of a friendlist in case of update (profile picture, name...)
 
-- updateMember: will send an updated User object to every user of every channel joined by the user
+- updatedMember: will send an updated User object to every user of every channel joined by the user
 
 - receivedRequest: will be sent to the recipient of a friend request once it is posted
 
