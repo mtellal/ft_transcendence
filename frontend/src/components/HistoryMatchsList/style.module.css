@@ -9,3 +9,8 @@
 	border: 3px solid black;
 	border-radius: 10px;
 }
+
+.image {
+	height: 40px;
+	width: 40px;
+}
