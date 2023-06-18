@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Redirect, Req, Request, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Redirect, Req, Request, Res, UseGuards, ParseBoolPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto, TradeDto } from "./dto";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -63,15 +63,8 @@ export class AuthController{
 	@ApiQuery({ name: 'enable', required: true, type: 'boolean' })
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(JwtGuard)
-	async updateTwoFA(@Query('enable') enable: string, @Req() req) {
-		let bool: boolean;
-		if (enable == 'true')
-			bool = true;
-		else if (enable == 'false')
-			bool = false;
-		else
-			return 'wrong query';
-		await this.authService.updateTwoFactorStatus(req.user.id, bool);
+	async updateTwoFA(@Query('enable', ParseBoolPipe) enable: boolean, @Req() req) {
+		await this.authService.updateTwoFactorStatus(req.user.id, enable);
 		return 'success';
 	}
 
