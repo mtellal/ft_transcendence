@@ -13,17 +13,20 @@ interface UserProfileProps {
 export function UserProfile({ id }: UserProfileProps) {
 
 	const [data, setData] = useState<any>();
+	const [avatar, setAvatar] = useState<any>();
 
 	async function getInfoUser() {
 		const dataUser = await getUser(id);
 		setData(dataUser.data);
+		const pp = await getUserProfilePictrue(id);
+		setAvatar(window.URL.createObjectURL(new Blob([pp.data])));
 	}
 
 	useEffect(() => {
 			getInfoUser();
 	}, [])
 
-	if (!data) {
+	if (!data || !avatar) {
 		return ;
 	}
 
@@ -31,7 +34,7 @@ export function UserProfile({ id }: UserProfileProps) {
 		<div className={s.container}>
 			<div className={s.infoUser}>
 				<p className={s.username}>{data.username}</p>
-				<img className={s.image} src={logo_user} alt="profilePictureUser"></img>
+				<img className={s.image} src={avatar} alt="profilePictureUser"></img>
 			</div>
 			<div className={s.stats}>
 				<HistoryMatchs id={id} />
