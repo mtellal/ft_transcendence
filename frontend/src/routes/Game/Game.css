@@ -1,0 +1,73 @@
+
+.launchgame
+{
+    grid-row: 2 / span 18;
+    grid-column: auto / span 20;
+}
+
+.game
+{
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+.game--canvas
+{
+    background-color: rgb(255, 247, 237);
+    height: 100%;
+    width: 100%;
+}
+
+.game--canvas:focus
+{
+    outline: none;
+}
+
+
+
+/* ///////////  PLAY PAGE   ///////// */
+
+.play-page
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.play-button
+{
+    height: 40px;
+    width: 50px;
+    border-radius: 5px;
+    border: 1px solid black;
+    cursor: pointer;
+    font-family: 'inter', sans-serif;
+    font-size: medium;
+}
+
+.play-button:hover
+{
+    background-color: rgba(0, 0, 0);
+    color: white;
+    border: 1px solid white;
+}
+
+
+@media screen and (max-width: 700px)
+{
+    .launchgame
+    {
+        min-height: 60vh;
+        grid-row: auto / span 19;
+        grid-column: 1 / -1;
+    }
+}
+

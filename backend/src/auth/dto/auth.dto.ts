@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 
@@ -25,4 +25,21 @@ export class SigninDto {
 	@IsString()
 	@IsNotEmpty()
 	password: string;
+
+	@ApiProperty({description: 'code of the user. Is optional', example: 'test'})
+	@IsString()
+	@IsOptional()
+	code?: string;
+}
+
+export class TradeDto {
+	@ApiProperty({ description: 'OAuth code', example: 'oauth_code' })
+ 	@IsString()
+	@IsNotEmpty()
+	oauth_code: string;
+
+	@ApiProperty({ description: 'OTP code. Is optional', example: 'otp_code' })
+	@IsString()
+	@IsOptional()
+	otp_code?: string;
 }

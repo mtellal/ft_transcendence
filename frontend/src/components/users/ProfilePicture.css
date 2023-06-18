@@ -1,0 +1,17 @@
+
+.pp-round
+{
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    margin-right: 5px;
+    aspect-ratio: 1 / 1;
+}
+
+.pp
+{    
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}

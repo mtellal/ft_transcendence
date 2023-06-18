@@ -1,0 +1,53 @@
+.profilepage
+{
+    padding: 5%;
+}
+
+
+/*              REMOVE FRIEND VIEW  */
+
+.confirmview-container
+{
+    padding: 5%;
+    background-color: white;
+    height: auto;
+    width: auto;
+    max-height: 40%;
+    max-width: 80%;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px black;
+}
+
+.remove-friend-div
+{
+    padding: 5%;
+    background-color: white;
+    min-height: 20%;
+    min-width: 40%;
+    max-width: 80%;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px black;
+}
+
+.remove-friend-username
+{
+    font-size: medium;
+    font-weight: 500;
+}
+
+.remove-friend-buttons
+{
+    padding: 5% 5%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmview-button
+{
+    height: 40px;
+    width: 80px;
+    padding: 3%;
+    font-weight: 600;
+}

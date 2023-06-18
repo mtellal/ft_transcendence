@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { ChannelType, MessageType } from "@prisma/client"
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
@@ -16,34 +17,46 @@ export class MessageDto {
 
 export class CreateChannelDto {
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   name?: string
 
+  @ApiProperty()
   @IsEnum(ChannelType)
   type: ChannelType
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   password?: string
 
+  @ApiProperty()
   @IsArray()
   @IsOptional()
-  memberList?: number[]
+  members?: number[]
 
+  @ApiProperty()
   @IsArray()
   @IsOptional()
-  adminList?: number[]
+  administrators?: number[]
+
+  @ApiProperty()
+  @IsArray()
+  @IsOptional()
+  banList?: number[]
 }
 
 export class JoinChannelDto {
 
+  @ApiProperty()
   @IsNumber()
   channelId: number
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
-  password: string
+  password?: string
 }
 
 export class AddUserDto {
@@ -54,7 +67,7 @@ export class AddUserDto {
   userId: number
 }
 
-export class KickUserDto {
+export class AdminActionDto {
   @IsNumber()
   channelId: number
 
@@ -66,7 +79,60 @@ export class KickUserDto {
   reason: string
 }
 
+export class MuteDto {
+  @IsNumber()
+  channelId: number
+
+  @IsNumber()
+  userId: number
+
+  @IsNumber()
+  duration: number
+
+  @IsString()
+  @IsOptional()
+  reason?: string
+}
+
 export class LeaveChannelDto {
   @IsNumber()
   channelId: number
+}
+
+export class UpdateChannelDto {
+  @ApiProperty()
+  @IsNumber()
+  channelId: number
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  name?: string
+
+  @ApiProperty()
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string
+}
+
+export class PatchChannelDto {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  name?: string
+
+  @ApiProperty()
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type?: ChannelType
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string
 }

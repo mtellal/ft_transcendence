@@ -1,0 +1,20 @@
+
+/*      ///////     COLLECTION  ///// */
+
+.collection-element
+{
+    width: 100%;
+    margin: 0;
+    padding: 5% 0;
+}
+
+.collection-element-label
+{
+    display: flex;
+    align-items: center;
+}
+
+.collection-element-title
+{
+    padding-right: 5%;
+}

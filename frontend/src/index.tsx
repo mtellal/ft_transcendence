@@ -2,27 +2,25 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Navigate, Route }from 'react-router-dom'
 import './index.css';
-import App, { loader as appLoader, loader } from './routes/App';
-
+import App, { loader as appLoader, loader } from './routes/App/App';
 
 import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
-import Profile from './routes/Profile';
-import LaunchGame from './routes/Game';
-import History from './routes/History';
+import Profile from './routes/Profile/Profile';
+import LaunchGame from './routes/Game/Game';
+import History from './routes/History/History';
 
-
-import AddElement from "./Chat/Interface/AddElement";
-import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
-
+import Interface from './routes/Chat/Interface/Interface';
 
 import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router-dom';
 
-import Chat from './routes/Chat';
+import Chat from './routes/Chat/Chat/Chat';
+import { CreateChannel } from './routes/Chat/CreateChannel';
+import MenuElement from './routes/Chat/Menu/MenuElement';
 
 
 const router = createBrowserRouter([
@@ -57,28 +55,24 @@ const router = createBrowserRouter([
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
                     {
-                        path: "add-friend",
-                        loader: appLoader,
+                        path: "",
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement title="friend" />
+                        element:  <MenuElement />
                     },
                     {
-                        path: "add-group",
-                        loader: appLoader,
+                        path: "channel/create",
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement title="group" />
+                        element:  <CreateChannel />
                     },
                     {
-                        path: "groups/:groupid",
-                        loader: interfaceLoader,
+                        path: "channel/:channelId",
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <Interface friend={false} group={true}/>
+                        element:  <Interface />
                     },
                     {
-                        path: "friends/:username/:id",
-                        loader: interfaceLoader,
+                        path: "user/:userId",
                         errorElement: <Navigate to="/chat" replace/>,
-                        element: <Interface friend={true} group={false}/>
+                        element: <Interface />
                     }
                 ]
             },

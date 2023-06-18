@@ -1,0 +1,33 @@
+.footer
+{
+    grid-row: 20 / span 20;
+    grid-column: 1 / -1;
+    border-top: 1px solid rgb(0, 0, 0);
+}
+
+.footer--authors
+{
+    margin: 0;
+    font-size: small;
+}
+
+.footer--copyright
+{
+    margin: 0;
+    font-size: x-small;
+}
+
+.author--link
+{
+    text-decoration: none;
+    font-weight: 600;
+    color: black;
+}
+
+@media screen and (max-width: 700px) {
+    .footer {
+        grid-row: auto / span 20;
+        height: 30px;
+        margin-top: auto
+    }
+}

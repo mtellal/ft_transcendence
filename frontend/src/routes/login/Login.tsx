@@ -1,10 +1,11 @@
 import React from "react";
 import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
-import { setCookie } from "../../utils/Cookie";
+import { setCookie } from "../../Cookie";
 
 import userImg from '../../assets/icon-login.png'
 
 import './Sign.css'
+import { getTokenRequest } from "../../requests/auth";
 
 
 export function ChooseLogin() {
@@ -25,22 +26,37 @@ export function ChooseLogin() {
             >
                 Signin as <img className="chooselogin-img" src="./assets/42_Logo.svg" />
             </a>
+
+            <a
+                className="flex-center button chooselogin-button"
+                onClick={() => navigate("/login/signup")}
+            >
+                Signup
+            </a>
         </div>
     )
 }
 
 
 export async function loader({ params, request }: any) {
-    let url = request.url.split('token=');
-    if (url.length > 1) {
-        let data = JSON.parse(decodeURI(url[1]));
-        if (data.access_token) {
-            setCookie("access_token", data.access_token);
-            return (redirect("/"));
+    let validLogin = false;
+    let url = request.url.split('oauth_code=');
+    if (url && url.length > 1) {
+        let oauth_code = decodeURI(url[1]);
+        if (oauth_code) {
+            await getTokenRequest(oauth_code, "wfw")
+                .then(({ error, res }: any) => {
+                    if (!error) {
+                        setCookie("access_token", res.data.access_token);
+                        validLogin = true;
+                    }
+                })
         }
     }
     else
         setCookie("access_token", "")
+    if (validLogin)
+        return (redirect("/"))
     return ({})
 }
 
