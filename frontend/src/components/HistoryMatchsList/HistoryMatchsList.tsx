@@ -4,9 +4,10 @@ import s from './style.module.css'
 
 interface HistoryMatchsListProps {
 	match: any;
+	id: number;
 }
 
-export function HistoryMatchsList({ match }: HistoryMatchsListProps) {
+export function HistoryMatchsList({ match, id }: HistoryMatchsListProps) {
 
 	const [userA, setUserA] = useState<any>();
 	const [userB, setUserB] = useState<any>();
@@ -30,11 +31,10 @@ export function HistoryMatchsList({ match }: HistoryMatchsListProps) {
 	return (
 		<div className={s.container}
 		style={{
-			backgroundColor: match.wonBy === match.player1Id ? '#DCFFD4' : '#FFD4D4'
+			backgroundColor: match.wonBy === id ? '#DCFFD4' : '#FFD4D4'
 		}}
 		>
-			<p
-			>{userA.username} {match.player1Score} - {userB.username} {match.player2Score}</p>
+			<p>{userA.username} {match.player1Score} - {userB.username} {match.player2Score}</p>
 		</div>
 	);
 }

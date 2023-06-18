@@ -96,6 +96,8 @@ export function HistoryMatchs({ id }: UserProfileProps) {
 		return ;
 	}
 
+	console.log(history);
+
 	return (
 		<div className={s.container}>
 			<h1 className={s.title}>History matchs</h1>
@@ -104,7 +106,7 @@ export function HistoryMatchs({ id }: UserProfileProps) {
 					if (match.status === 'FINISHED') {
 						return (
 							<div key={match.id}>
-							<HistoryMatchsList match={match} />
+							<HistoryMatchsList match={match} id={id} />
 						</div>
 						);
 					} else {
