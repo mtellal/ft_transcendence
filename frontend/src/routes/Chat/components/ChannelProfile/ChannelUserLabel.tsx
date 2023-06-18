@@ -248,9 +248,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
     return (
         <div className="friend-element">
             <UserInfos
-                username={props.user && props.user.username}
-                profilePictureURL={props.user && props.user.url}
-                userStatus={props.user && props.user.userStatus}
+                user={props.user}
             />
 
             {

@@ -14,19 +14,18 @@ import { useChannels } from "../../hooks/Chat/useChannels";
 
 export function CreateChannel() {
 
+    const navigate = useNavigate();
+    const { token } = useCurrentUser();
+    const { addChannel } = useChannels();
+    const { setCurrentChannel } = useChannelsContext();
+
+
     const [name, setName]: [string, any] = useState("");
     const [type, setType]: [string, any] = useState("public")
     const [password, setPassword]: [string, any] = useState("");
 
     const [error, setError] = useState("");
 
-    const { token } = useCurrentUser();
-
-    const { setCurrentChannel } = useChannelsContext();
-
-    const { addChannel } = useChannels();
-
-    const navigate = useNavigate();
 
     async function submit() {
         if (!type)

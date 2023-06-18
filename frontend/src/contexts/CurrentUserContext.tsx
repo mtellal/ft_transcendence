@@ -26,7 +26,7 @@ function reducer(user: any, action: any) {
         }
         case ('addBlockList'): {
             if (user && user.blockList && action.block && 
-                    (!user.blockList.length || !user.blockList.find((o: any) => o.userId !== action.block.userId) ))
+                    (!user.blockList.length || !user.blockList.find((o: any) => o.userId === action.block.userId) ))
             {
                 user.blockList.push(action.block);
             }

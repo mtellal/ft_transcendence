@@ -39,7 +39,9 @@ export function useBlock()
             await blockUserRequest(mUser.id, token)
                 .then(res => {
                     if (res.data)
+                    {
                         userDispatch({type: 'addBlockList', block: res.data })
+                    }
                 });
         }
 

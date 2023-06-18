@@ -1,28 +1,28 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import useFetchUsers from "../../../../../hooks/useFetchUsers";
-import { createChannel, getChannelByName, getWhisperChannel } from "../../../../../requests/chat";
-import { useChannels } from "../../../../../hooks/Chat/useChannels";
-import { ChatInterfaceContext } from "../../../Chat/Chat";
-import { useChannelsContext, useCurrentUser } from "../../../../../hooks/Hooks";
-import { ConfirmView } from "../../../Profile/ChannelProfile/ConfirmAction";
-import { ChannelSearchLabel } from "../../ChannelSearchLabel/ChannelSearchLabel";
-import { useFriends } from "../../../../../hooks/Chat/Friends/useFriends";
-import { useBlock } from "../../../../../hooks/Chat/useBlock";
-import { useFriendRequest } from "../../../../../hooks/Chat/Friends/useFriendRequest";
+import useFetchUsers from "../../../hooks/useFetchUsers";
+import { createChannel, getChannelByName, getWhisperChannel } from "../../../requests/chat";
+import { useChannels } from "../../../hooks/Chat/useChannels";
+import { ChatInterfaceContext } from "../Chat/Chat";
+import { useChannelsContext, useCurrentUser } from "../../../hooks/Hooks";
+import { ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
+import { ChannelSearchLabel } from "../components/ChannelSearchLabel/ChannelSearchLabel";
+import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
+import { useBlock } from "../../../hooks/Chat/useBlock";
+import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
 import { useNavigate } from "react-router-dom";
-import { getBlockList } from "../../../../../requests/block";
-import { getUserProfilePictrue } from "../../../../../requests/user";
-import Icon from "../../../../../components/Icon";
-import ProfilePicture from "../../../../../components/users/ProfilePicture";
-import { UserInfos } from "../../../../../components/users/UserInfos";
+import { getBlockList } from "../../../requests/block";
+import { getUserProfilePictrue } from "../../../requests/user";
+import Icon from "../../../components/Icon";
+import ProfilePicture from "../../../components/users/ProfilePicture";
+import { UserInfos } from "../../../components/users/UserInfos";
 
 export const SearchedChannelLabelContext: React.Context<any> = createContext(null);
 
-type TSearchedUserIconChat = {
+type TUserProps = {
     user: any
 }
 
-function SearchedUserIconChat(props: TSearchedUserIconChat) {
+function SearchedUserIconChat(props: TUserProps) {
 
     const navigate = useNavigate();
 
@@ -33,7 +33,6 @@ function SearchedUserIconChat(props: TSearchedUserIconChat) {
     async function selectChannel() {
         let channel;
         if (channels && channels.length) {
-            console.log("channels not empty", channels)
             channel = channels.find((c: any) =>
                 c.type === "WHISPER" && c.members.find((id: number) => props.user.id === id))
         }
@@ -49,30 +48,32 @@ function SearchedUserIconChat(props: TSearchedUserIconChat) {
     }
 
     return (
-        <Icon
-            icon="chat"
-            onClick={async () => {
-                let channel = await selectChannel();
-                if (!channel) {
-                    await createChannel({
-                        name: "privateMessage",
-                        type: "WHISPER",
-                        members: [
-                            props.user.id
-                        ],
-                    }, token)
-                        .then(res => { channel = res.data })
-                }
-                await addChannel(channel, false);
-                navigate(`/chat/user/${props.user.id}`)
-            }}
-            description="chat"
-        />
+        <div style={{ padding: '0 5px' }}>
+            <Icon
+                icon="chat"
+                onClick={async () => {
+                    let channel = await selectChannel();
+                    if (!channel) {
+                        await createChannel({
+                            name: "privateMessage",
+                            type: "WHISPER",
+                            members: [
+                                props.user.id
+                            ],
+                        }, token)
+                            .then(res => { channel = res.data })
+                    }
+                    await addChannel(channel, false);
+                    navigate(`/chat/user/${props.user.id}`)
+                }}
+                description="chat"
+            />
+        </div>
     )
 }
 
 
-function SearchedUserIconFriend(props: any) {
+function SearchedUserIconFriend(props: TUserProps) {
 
     const { user, token } = useCurrentUser();
     const { setAction } = useContext(ChatInterfaceContext);
@@ -96,7 +97,7 @@ function SearchedUserIconFriend(props: any) {
     }, [props.user])
 
     return (
-        <>
+        <div style={{ padding: '0 5px' }}>
             {
                 isUserFriend(props.user) ?
                     <Icon
@@ -134,98 +135,90 @@ function SearchedUserIconFriend(props: any) {
                     </>
 
             }
-        </>
+        </div>
     )
 }
 
-type TSearchedUser = {
-    user: any
-}
-
-export function SearchedUser(props: TSearchedUser) {
+function SearchUserIconBlock(props: TUserProps) {
 
     const { setAction } = useContext(ChatInterfaceContext);
-
-    const { user, token } = useCurrentUser();
-
-    const { sendRequest } = useFriendRequest();
-    const { isUserFriend, removeFriend } = useFriends();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
 
-    const [currentUserBlocked, setCurrentUserBlocked] = useState(false);
+    const [userBlocked, setUserBlocked] = useState(isUserBlocked(props.user));
 
-    async function loadBlockList() {
-        const blockList = await getBlockList(props.user && props.user.id, token).then(res => res.data);
-        if (blockList && blockList.length && blockList.find((o: any) => o.userId === user.id))
-            setCurrentUserBlocked(true);
-    }
-
-
-    useEffect(() => {
-        if (props.user && props.user.id) {
-            loadBlockList();
+    const block = useCallback(() => {
+        if (userBlocked) {
+            setUserBlocked(false);
+            setAction(
+                <ConfirmView
+                    type="unblock"
+                    username={props.user.username}
+                    valid={() => { unblockUser(props.user); setAction(null) }}
+                    cancel={() => setAction(null)}
+                />
+            )
         }
-    }, [props.user])
+        else {
+            setUserBlocked(true);
+            setAction(
+                <ConfirmView
+                    type="block"
+                    username={props.user.username}
+                    valid={() => { blockUser(props.user); setAction(null) }}
+                    cancel={() => setAction(null)}
+                />
+            )
+        }
+    }, [userBlocked])
 
+
+    return (
+        <div style={{ padding: '0 5px' }}>
+            {
+                userBlocked ?
+                    <Icon
+                        icon="block"
+                        onClick={() => block()}
+                        description="unblock"
+                    /> :
+                    <Icon
+                        icon="block"
+                        onClick={() => block()}
+                        description="block"
+                    />
+            }
+        </div>
+    )
+}
+
+export function SearchedUser(props: TUserProps) {
+    const { user } = useCurrentUser();
 
     return (
         <div className='flex-ai UserLabelSearch-container'>
             <UserInfos
-                username={props.user && props.user.username}
-                profilePictureURL={props.user && props.user.url}
-                userStatus={props.user && props.user.userStatus}
+                user={props.user}
             />
 
             <div
                 className="flex"
                 style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-start' }}
             >
-
-                <SearchedUserIconChat
-                    user={props.user}
-                />
-
-                <SearchedUserIconFriend
-                    user={props.user}
-                />
                 {
-                    isUserBlocked(props.user) ?
-                        <Icon
-                            icon="block"
-                            onClick={() => {
-                                setAction(
-                                    <ConfirmView
-                                        type="unblock"
-                                        username={props.user.username}
-                                        valid={() => { unblockUser(props.user); setAction(null) }}
-                                        cancel={() => setAction(null)}
-                                    />
-                                )
-                            }}
-                            description="unblock"
-                        /> :
-                        <Icon
-                            icon="block"
-                            onClick={() => {
-                                setAction(
-                                    <ConfirmView
-                                        type="block"
-                                        username={props.user.username}
-                                        valid={() => { blockUser(props.user); setAction(null) }}
-                                        cancel={() => setAction(null)}
-                                    />
-                                )
-                            }}
-                            description="block"
+                    props.user && props.user.id && user && props.user.id !== user.id &&
+                    <>
+                        <SearchedUserIconChat
+                            user={props.user}
                         />
+
+                        <SearchedUserIconFriend
+                            user={props.user}
+                        />
+                        <SearchUserIconBlock
+                            user={props.user}
+                        />
+                    </>
                 }
-                {/* {
-                    !currentUserBlocked && props.add && !invitation &&
-                    <Icon
-                        icon="add"
-                        onClick={() => { props.onClick(); setInvitation(true) }}
-                    />
-                } */}
             </div>
         </div>
     )
@@ -256,28 +249,29 @@ function SearchedChannel(props: any) {
         }
     }
 
+    function _leaveChannel(channel: any) {
+        setAction(
+            <ConfirmView
+                type="leave"
+                username={channel.name}
+                valid={() => { leaveChannel(channel); setAction(null); props.reset() }}
+                cancel={() => setAction(null)}
+            />
+        )
+    }
+
     const load = useCallback(async () => {
         if (props.channels && props.channels.length) {
             setRenderChannels(
                 await Promise.all(
                     props.channels.map(async (c: any) => {
-                        const users = await fetchUsers(c.members);
-                        c.users = users;
+                        c.users = await fetchUsers(c.members);
                         return (
                             <ChannelSearchLabel
                                 key={c.id}
                                 channel={c}
                                 join={() => joinChannel(c)}
-                                leaveChannel={() =>
-                                    setAction(
-                                        <ConfirmView
-                                            type="leave"
-                                            username={c.name}
-                                            valid={() => { leaveChannel(c); setAction(null); props.reset() }}
-                                            cancel={() => setAction(null)}
-                                        />
-                                    )
-                                }
+                                leaveChannel={() => _leaveChannel(c)}
                             />
 
                         )
@@ -346,9 +340,10 @@ function MenuInput(props: TMenuInput) {
 
 
 export default function SearchElement() {
+    const { user } = useCurrentUser();
     const [value, setValue]: any = useState("");
     const [error, setError] = useState("");
-    const [user, setUser] = useState();
+    const [searchedUser, setSearchedUser] = useState();
     const [channelList, setChannelList] = useState([]);
 
     const { fetchUserByUsername } = useFetchUsers();
@@ -359,11 +354,11 @@ export default function SearchElement() {
         let user;
         let channelArray;
         setError("");
-        setUser(null);
+        setSearchedUser(null);
         setChannelList([]);
         user = await fetchUserByUsername(value.trim());
         if (user) {
-            setUser(user);
+            setSearchedUser(user);
         }
         else {
             await getChannelByName(value.trim())
@@ -383,9 +378,11 @@ export default function SearchElement() {
 
     function reset() {
         setChannelList(null);
-        setUser(null);
+        setSearchedUser(null);
         setValue("")
     }
+
+    // console.log(user && user.blockList);
 
     return (
         <div className="">
@@ -397,7 +394,7 @@ export default function SearchElement() {
             />
             {error && <p className="reset red-c">{error}</p>}
             {
-                user && <SearchedUser user={user} />
+                searchedUser && <SearchedUser user={searchedUser} />
             }
             {
                 channelList && channelList.length ?

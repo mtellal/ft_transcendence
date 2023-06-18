@@ -7,49 +7,53 @@ import './UserInfos.css'
 
 
 export type TUserInfos = {
-    username: string,
-    profilePictureURL: string,
-    userStatus: string,
+    user: any
     onClick?: () => {} | any
 }
 
-export function UserInfos({ username, profilePictureURL, userStatus, onClick }: TUserInfos) {
+export function UserInfos({ user, onClick }: TUserInfos) {
 
     function selectStatusDiv() {
-        if (userStatus === "ONLINE")
+        if (user && user.userStatus === "ONLINE")
             return ({ backgroundColor: "#14CA00" })
-        else if (userStatus === "OFFLINE")
+        else if (user && user.userStatus === "OFFLINE")
             return ({ backgroundColor: "#FF0000" })
-        else if (userStatus === "INGAME")
+        else if (user && user.userStatus === "INGAME")
             return ({ backgroundColor: '#FFC600' })
     }
 
     function selectStatusText() {
-        if (userStatus === "ONLINE")
+        if (user && user.userStatus === "ONLINE")
             return ("On line")
-        else if (userStatus === "OFFLINE")
+        else if (user && user.userStatus === "OFFLINE")
             return ("Disconnected")
-        else if (userStatus === "INGAME")
+        else if (user && user.userStatus === "INGAME")
             return ("In game")
     }
 
     return (
         <div className="userinfos-container" onClick={onClick} >
-            <div className='userinfos-pp-container'>
-                <ProfilePicture
-                    image={profilePictureURL || imgUser}
-                />
-            </div>
-            <div
-                className="userinfos-icon-status"
-                style={selectStatusDiv()}
-            />
-            <div className="flex-column user-infos">
-                <p className="userinfos-username" >{username}</p>
-                <p className="userinfos-status">
-                    {selectStatusText()}
-                </p>
-            </div>
+            {
+                user ?
+                <>
+                    <div className='userinfos-pp-container'>
+                        <ProfilePicture
+                            image={user && user.url}
+                        />
+                    </div>
+                    <div
+                        className="userinfos-icon-status"
+                        style={selectStatusDiv()}
+                    />
+                    <div className="flex-column user-infos">
+                        <p className="userinfos-username" >{user && user.username}</p>
+                        <p className="userinfos-status">
+                            {selectStatusText()}
+                        </p>
+                    </div>
+                </>
+                : null
+            }
         </div>
     )
 }

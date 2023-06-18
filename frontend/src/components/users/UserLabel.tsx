@@ -51,7 +51,7 @@ export function UserLabelSearch(props: TUserLabelSearch) {
 
     return (
         <div className='flex-ai UserLabelSearch-container'>
-            <UserInfos {...props} profilePictureURL={url} />
+            <UserInfos {...props}  />
             {
                 currentUserBlocked && !props.delete && !props.invitation &&
                 <p>Blocked</p>
@@ -78,7 +78,6 @@ export function UserLabelSearch(props: TUserLabelSearch) {
 
 type TUserLabel = TUserInfos & {
     id: number,
-    username: string,
     notifs?: number,
     onClick?: () => {} | any
 }

@@ -65,9 +65,7 @@ export default function UsersCollection(props: TUsersCollection) {
                 <UserLabelSearch
                     key={searchUser.id}
                     id={searchUser.id}
-                    username={searchUser.username}
-                    profilePictureURL={searchUser.avatar}
-                    userStatus={searchUser.userStatus}
+                    user={searchUser}
                     invitation={!alreadyInCollection(searchUser)}
                     accept={() => addUser(searchUser)}
                     refuse={() => reset()}
@@ -82,9 +80,7 @@ export default function UsersCollection(props: TUsersCollection) {
                                 <UserLabelSearch
                                     key={user.id}
                                     id={user.id}
-                                    username={user.username}
-                                    profilePictureURL={user.avatar}
-                                    userStatus={user.userStatus}
+                                    user={user}
                                     delete={() => removeUser(user)}
                                 />
                             )

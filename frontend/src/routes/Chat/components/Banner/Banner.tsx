@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import Icon from "../../../../components/Icon";
 import { UserInfos } from "../../../../components/users/UserInfos";
@@ -14,6 +14,7 @@ import { ChatInterfaceContext } from "../../Chat/Chat";
 import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
 import './Banner.css'
+import { getBlockList } from "../../../../requests/block";
 
 
 type TIconsBanner = {
@@ -28,7 +29,7 @@ type TIconsBanner = {
 
 function IconsBanner(props: TIconsBanner) {
 
-    const { user } = useCurrentUser();
+    const { user, token } = useCurrentUser();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
     const { removeFriend, updateFriend } = useFriends();
     const { leaveChannel } = useChannels();
@@ -38,6 +39,8 @@ function IconsBanner(props: TIconsBanner) {
 
     const { setAction } = useContext(ChatInterfaceContext);
 
+    const [currentUserBlocked, setCurrentUserBlocked] = useState(false);
+    
     const bannerBlock = useCallback(() => {
         if (props.whisperUser) {
             if (isUserBlocked(props.whisperUser))
@@ -48,6 +51,22 @@ function IconsBanner(props: TIconsBanner) {
         }
     }, [props.whisperUser]);
 
+
+
+    async function loadBlockList() {
+        const blockList = await getBlockList(props.whisperUser && props.whisperUser.id, token).then(res => res.data);
+        if (blockList && blockList.length && blockList.find((o: any) => o.userId === user.id))
+            setCurrentUserBlocked(true);
+    }
+
+
+    useEffect(() => {
+        if (props.whisperUser && props.whisperUser.id) {
+            loadBlockList();
+        }
+    })
+
+
     return (
         <>
             <Icon icon="person" onClick={props.profile} description="Profile" />
@@ -57,7 +76,7 @@ function IconsBanner(props: TIconsBanner) {
                 <Icon icon="block" onClick={bannerBlock} description="Block" />
             }
             {
-                props.type === "WHISPER" && !isUserFriend(props.whisperUser) && 
+                props.type === "WHISPER" && !isUserFriend(props.whisperUser) && !currentUserBlocked &&
                 <Icon
                     icon="person_add"
                     onClick={() => {
@@ -74,7 +93,7 @@ function IconsBanner(props: TIconsBanner) {
                 />
             }
             {
-                props.type === "WHISPER" && isUserFriend(props.whisperUser) && 
+                props.type === "WHISPER" && isUserFriend(props.whisperUser) && !currentUserBlocked &&
                 <Icon
                     icon="person_remove"
                     onClick={() => {
@@ -135,9 +154,7 @@ export default function Banner({ ...props }: TBanner) {
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?
                             <UserInfos
-                                username={props.whisperUser && props.whisperUser.username}
-                                userStatus={props.whisperUser && props.whisperUser.userStatus}
-                                profilePictureURL={props.whisperUser && props.whisperUser.url}
+                                user={props.whisperUser}
                             />
                             :
                             <ChannelInfos

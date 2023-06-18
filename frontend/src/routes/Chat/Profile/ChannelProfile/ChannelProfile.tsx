@@ -40,7 +40,6 @@ export default function ChannelProfile(props: any) {
             if (administrators && administrators.length)
                 setAdmins(administrators)
             const owner = getOwner(props.channel);
-            console.log("owner => ", owner, props.channel)
             if (owner)
                 setOwner(owner);
 
@@ -63,7 +62,7 @@ export default function ChannelProfile(props: any) {
                 setConfirmView,
             }}
         >
-            <div>
+            <div className="scroll">
                 <div style={{padding: '5%'}}>
                     <ChannelName 
                         channel={props.channel} 

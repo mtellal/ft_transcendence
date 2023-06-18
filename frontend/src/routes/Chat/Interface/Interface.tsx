@@ -3,11 +3,10 @@ import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-r
 
 import Banner from "../components/Banner/Banner";
 import Profile from "../Profile/Profile";
-import Messenger from "../components/Messenger/Messenger";
+import Messenger from "../Messenger/Messenger";
 
 import { useChannelsContext, useChatSocket, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
-import RemoveView from "../components/RemoveElement.tsx/RemoveView";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import './Interface.css'
 import { useBlock } from "../../../hooks/Chat/useBlock";
@@ -23,23 +22,20 @@ import useMembers from "../../../hooks/Chat/useMembers";
 export const InterfaceContext: React.Context<any> = createContext(null);
 
 export default function Interface() {
-    const p: any = useParams();
+    const params:any = useParams();
     const navigate = useNavigate();
 
-    const [params, setParams] = useState(p);
-
-    const { token, user }: any = useCurrentUser();
+    const { fetchUser } = useFetchUsers();
+    const { user }: any = useCurrentUser();
     const { addChannel } = useChannels();
     const { isUserBlocked } = useBlock();
+    const { friends}: any = useFriendsContext();
 
-    const { friends, friendsDispatch, currentFriend, setCurrentFriend }: any = useFriendsContext();
     const { currentChannel, setCurrentChannel, channels } = useChannelsContext();
 
     const [blockedFriend, setBlockedFriend]: [any, any] = React.useState(false);
-    const { fetchUser } = useFetchUsers();
 
     const [profile, setProfile] = useState(false);
-    const { isUserMember } = useMembers();
 
     const [whisperUser, setWhisperUser] = useState();
 
@@ -62,7 +58,9 @@ export default function Interface() {
     }, [channels]);
 
     const loadChannel = useCallback(async () => {
-        let channel = channels.find((c: any) => c.name === params.channelName);
+        let channel;
+        if (channels && channels.length)
+            channel = channels.find((c: any) => c.id === params.channelId);
         if (!channel) {
             await getChannel(params.channelId)
                 .then(res => {
@@ -71,29 +69,26 @@ export default function Interface() {
                 })
         }
         return (channel);
-    }, [user]);
+    }, [user, channels]);
 
-    function isCurrentUserMember(channel: any) {
-        if (channel && channel.members && !channel.members.find((id: number) => id === user.id))
-            return (false);
-        return (true);
-    }
+    const isCurrentUserMember = useCallback((channel: any) => {
+        if (user && channel && channel.members && channel.members.find((id: number) => id === user.id))
+            return (true);
+        return (false);
+    }, [user]);
 
     const loadInterface = useCallback(async () => {
         if (params.channelId) {
+            setWhisperUser(null);
             let channel = await loadChannel();
-            if (!isCurrentUserMember(channel))
-                channel = null;
-            if (channel)
+            if (isCurrentUserMember(channel))
                 return (setCurrentChannel(channel));
         }
         else if (params.userId) {
             const user = await fetchUser(params.userId);
             setWhisperUser(user);
             let channel = await selectWhisper(user);
-            if (!isCurrentUserMember(channel))
-                channel = null;
-            if (channel)
+            if (isCurrentUserMember(channel))
                 return (setCurrentChannel(channel));
             return;
         }
@@ -105,13 +100,11 @@ export default function Interface() {
         loadInterface();
     }, [channels, friends, params])
 
-    // update current friend selected when he is picked from MenuElement
 
     React.useEffect(() => {
         if (whisperUser && user && currentChannel && currentChannel.type === "WHISPER") {
             if (isUserBlocked(whisperUser))
                 setBlockedFriend(true);
-
         }
         else {
             setBlockedFriend(false)
@@ -127,7 +120,7 @@ export default function Interface() {
                         <Banner
                             whisperUser={whisperUser}
                             channel={currentChannel}
-                            type={currentChannel && currentChannel.type}
+                            type={currentChannel.type}
                             invitation={() => { }}
                             profile={() => setProfile((p: boolean) => !p)}
                             setBlockedFriend={setBlockedFriend}

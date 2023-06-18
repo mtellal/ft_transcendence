@@ -12,7 +12,7 @@ import { getChannelProtected } from "../../../../requests/chat";
 import InfoInput from "../../../../components/Input/InfoInput";
 import { ChatInterfaceContext } from "../../Chat/Chat";
 import { ConfirmViewButtons } from "../../Profile/ChannelProfile/ConfirmAction";
-import { SearchedChannelLabelContext } from "../Menu/SearchElement/SearchElement";
+import { SearchedChannelLabelContext } from "../../Menu/SearchElement";
 
 import './ChannelSearchLabel.css'
 

@@ -20,6 +20,7 @@ import {
 
 import Chat from './routes/Chat/Chat/Chat';
 import { CreateChannel } from './routes/Chat/CreateChannel';
+import MenuElement from './routes/Chat/Menu/MenuElement';
 
 
 const router = createBrowserRouter([
@@ -53,6 +54,11 @@ const router = createBrowserRouter([
                 element: <Chat />,
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
+                    {
+                        path: "",
+                        errorElement: <Navigate to="/chat" replace/>,
+                        element:  <MenuElement />
+                    },
                     {
                         path: "channel/create",
                         errorElement: <Navigate to="/chat" replace/>,

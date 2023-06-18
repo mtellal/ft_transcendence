@@ -1,29 +1,18 @@
 
-import React, { useCallback, useContext, useEffect, useState, createContext} from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import UserLabel from "../../../../components/users/UserLabel";
-import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../../hooks/Hooks";
-import { createChannel, getChannel, getChannelByName, getChannels, getWhisperChannel } from "../../../../requests/chat";
-import { useWindow } from "../../../../hooks/useWindow";
+import UserLabel from "../../../components/users/UserLabel";
+import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
+import { useWindow } from "../../../hooks/useWindow";
 
+import useFetchUsers from "../../../hooks/useFetchUsers";
+import { FriendRequests } from "../components/FriendRequests/FriendRequests";
+import ChannelInfos from "../../../components/channels/ChannelInfos";
+import { CollectionElement } from "../../../components/collections/CollectionElement";
+import SearchElement from "./SearchElement";
 import './MenuElement.css'
-import Icon, { RawIcon } from "../../../../components/Icon";
-import { useChannels } from "../../../../hooks/Chat/useChannels";
-import { getBlockList } from "../../../../requests/block";
-import { getUserProfilePictrue } from "../../../../requests/user";
-import useFetchUsers from "../../../../hooks/useFetchUsers";
-import ProfilePicture from "../../../../components/users/ProfilePicture";
-import { useFriends } from "../../../../hooks/Chat/Friends/useFriends";
-import { useBlock } from "../../../../hooks/Chat/useBlock";
-import { ChatInterfaceContext } from "../../Chat/Chat";
-import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
-import { FriendRequests } from "../FriendRequests/FriendRequests";
-import ChannelInfos from "../../../../components/channels/ChannelInfos";
-import { ChannelSearchLabel } from "../ChannelSearchLabel/ChannelSearchLabel";
-import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
-import { CollectionElement } from "../../../../components/collections/CollectionElement";
-import SearchElement from "./SearchElement/SearchElement";
+import { ChatInterfaceContext } from "../Chat/Chat";
 
 
 
@@ -45,16 +34,8 @@ export default function MenuElement() {
 
     const [friendsList, setFriendsList] = React.useState([]);
     const [channelsList, setChannelsList] = useState([]);
-    const [hideMenu, setHideMenu] = useState(true);
     const [whispersList, setWhispersList] = useState([]);
 
-
-    useEffect(() => {
-        if (location && location.pathname === "/chat" && isMobileDisplay)
-            setHideMenu(false)
-        else
-            setHideMenu(true)
-    })
 
     const setWhispers = useCallback(async () => {
         if (channels && channels.length) {
@@ -68,10 +49,8 @@ export default function MenuElement() {
                             <UserLabel
                                 key={_user.id}
                                 id={_user.id}
-                                username={_user.username}
-                                profilePictureURL={_user.url}
-                                userStatus={_user.userStatus}
-                                onClick={() => { }}
+                                user={_user}
+                                onClick={() => {}}
                                 notifs={_user.notifs}
                             />
                         )
@@ -88,10 +67,8 @@ export default function MenuElement() {
                 <UserLabel
                     key={user.id}
                     id={user.id}
-                    username={user.username}
-                    profilePictureURL={user.url}
-                    userStatus={user.userStatus}
-                    onClick={() => { }}
+                    user={user}
+                    onClick={() => {}}
                     notifs={user.notifs}
                 />
             ))
@@ -112,7 +89,9 @@ export default function MenuElement() {
                             key={channel.id}
                             className="pointer"
                             style={{ borderTop: '1px solid black' }}
-                            onClick={() => navigate(`/chat/channel/${channel.id}`)}
+                            onClick={() => {
+                                navigate(`/chat/channel/${channel.id}`)
+                            }}
                         >
                             <ChannelInfos
                                 key={channel.id}
@@ -130,10 +109,7 @@ export default function MenuElement() {
     }, [friends, channels])
 
     return (
-        <div
-            className={hideMenu ? "menu-container hidden" : "menu-container visible"}
-        >
-
+        <div className="menu-container fill">
             <SearchElement />
             <FriendRequests />
             <CollectionElement

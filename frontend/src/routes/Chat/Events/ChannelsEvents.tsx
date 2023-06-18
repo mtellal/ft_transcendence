@@ -185,8 +185,8 @@ export default function ChannelsEvents({ children }: any) {
             }
 
 
-            socket.on('updatedUser', async (user: any) => {
-                console.log("UPDATE USER CHANNEL FRIEND EVENT => ", user)
+            socket.on('updatedMember', async (user: any) => {
+                console.log("UPDATE USER CHANNEL FRIEND EVENT => ")
                 /* if (user)
                 {
                     if (isUserFriend(user))
@@ -210,7 +210,7 @@ export default function ChannelsEvents({ children }: any) {
                         socket.off('message')
                     socket.off('mutedUser')
                     socket.off('unmutedUser')
-                    socket.off('updatedUser')
+                    socket.off('updatedMember')
                 }
             }
         }

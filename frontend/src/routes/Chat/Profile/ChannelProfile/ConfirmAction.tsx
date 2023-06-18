@@ -131,12 +131,6 @@ export function ConfirmViewMuteAction(props: any) {
     )
 }
 
-
-
-
-
-
-
 export function ConfirmViewTypeProteced(props: any) {
 
     const [password, setPassword]: any = useState("")
@@ -210,15 +204,5 @@ export function ConfirmPage({ children, ...props }: any) {
         >
             {children}
         </div>
-    )
-}
-
-function MessengerConfirmBlockAction(props: any) {
-    return (
-        <ConfirmPage>
-            <div className="red">
-                <p>wdipfjwb</p>
-            </div>
-        </ConfirmPage>
     )
 }

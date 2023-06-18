@@ -42,9 +42,7 @@ export function FriendRequests() {
                 <UserLabelSearch
                     key={u.id}
                     id={u.id}
-                    username={u.username}
-                    profilePictureURL={u.avatar}
-                    userStatus={u.userStatus}
+                    user={u}
                     invitation={true}
                     accept={() => acceptFriend(u)}
                     refuse={() => refuseFriend(u)}

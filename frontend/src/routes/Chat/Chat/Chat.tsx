@@ -1,7 +1,7 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
-import MenuElement from "../components/Menu/MenuElement";
-import { Outlet } from "react-router-dom";
+import MenuElement from "../Menu/MenuElement";
+import { Outlet, useLocation } from "react-router-dom";
 
 import { FriendsProvider } from "../../../contexts/Chat/FriendsContext";
 import { SocketProvider } from "../../../contexts/Chat/ChatSocketContext";
@@ -22,7 +22,6 @@ function ChatInterface() {
         <ChatInterfaceContext.Provider value={{ setAction }}>
             <div className="chat">
                 <div className="chat-container relative">
-                    <MenuElement />
                     <Outlet />
                     {
                         action && 

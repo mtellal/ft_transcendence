@@ -1,11 +1,5 @@
 
 /*  ////////    CHAT MESSAGES   ///////// */
-
-.messages-container
-{
-    width: 70%;
-}
-
 .messages-display
 {
     flex: 7;
@@ -43,6 +37,7 @@
 
 .message-div
 {
+    background-color: azure;
     display: flex;
     align-items: flex-end;
     justify-content: left;
