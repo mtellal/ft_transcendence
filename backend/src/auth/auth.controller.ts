@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Redirect, Req, Request, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Redirect, Req, Request, Res, UseGuards, ParseBoolPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto, TradeDto } from "./dto";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -22,9 +22,9 @@ export class AuthController{
 	@ApiOperation({ summary: 'Sign in', description: 'Sign in using existing user credentials. Returns a JWT corresponding to that user' })
 	@ApiBody({ type: SigninDto })
  	@ApiQuery({ name: 'step', required: false, type: 'string' })
-	async signin(@Body() body: SigninDto, @Query('step') step?: string) {
+	async signin(@Body() body: SigninDto, @Query('twoFA', ParseBoolPipe) twoFA?: boolean) {
 		let response;
-		if (step === '2fa')
+		if (twoFA)
 			response = await this.authService.signin(body.username, body.password, body.code);
 		else
 			response = await this.authService.signin(body.username, body.password);
@@ -63,15 +63,8 @@ export class AuthController{
 	@ApiQuery({ name: 'enable', required: true, type: 'boolean' })
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(JwtGuard)
-	async updateTwoFA(@Query('enable') enable: string, @Req() req) {
-		let bool: boolean;
-		if (enable == 'true')
-			bool = true;
-		else if (enable == 'false')
-			bool = false;
-		else
-			return 'wrong query';
-		await this.authService.updateTwoFactorStatus(req.user.id, bool);
+	async updateTwoFA(@Query('enable', ParseBoolPipe) enable: boolean, @Req() req) {
+		await this.authService.updateTwoFactorStatus(req.user.id, enable);
 		return 'success';
 	}
 
