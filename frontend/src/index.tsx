@@ -27,6 +27,7 @@ import Chat from './routes/Chat/Chat/Chat';
 import JoinChannel from './routes/Chat/AddChannel/JoinChannel';
 import AddChannel from './routes/Chat/AddChannel/AddChannel';
 import { UserProfile } from './routes/UserProfile/UserProfile';
+import { Ladder } from './routes/Ladder/Ladder';
 
 
 const router = createBrowserRouter([
@@ -48,9 +49,13 @@ const router = createBrowserRouter([
 			{
                 path: "userprofile",
                 element: <UserProfile id={3}/>
-            },
-            {
-                path: "game",
+			},
+			{
+				path: "ladder",
+				element: <Ladder />
+			},
+			{
+				path: "game",
                 loader: appLoader,
                 element: <LaunchGame />
             },
