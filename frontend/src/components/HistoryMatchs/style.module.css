@@ -1,0 +1,38 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 35vh;
+	width: 40vw;
+	margin-top: 4%;
+	background-color: grey;
+	border: 4px solid black;
+	font-size: 3vh;
+	align-items: center;
+	border-radius: 25px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.title {
+	width: 100vw;
+	font-size: 35px;
+	margin: 0;
+	margin-bottom: 15px;
+	background-color: aliceblue;
+	text-align: center;
+	border-bottom: 3px solid black;
+	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
+	position: sticky;
+	top: 0;
+}
+
+
+.list {
+	margin-bottom: 5%;
+}
+
+.noMatchs {
+	font-size: 30px;
+	text-align: center;
+}

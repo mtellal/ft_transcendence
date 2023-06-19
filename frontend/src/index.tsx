@@ -21,6 +21,7 @@ import {
 import Chat from './routes/Chat/Chat/Chat';
 import { CreateChannel } from './routes/Chat/CreateChannel';
 import MenuElement from './routes/Chat/Menu/MenuElement';
+import { UserProfile } from './routes/UserProfile/UserProfile';
 
 
 const router = createBrowserRouter([
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
             {
                 path: "profile",
                 element: <Profile />
+            },
+			{
+                path: "userprofile",
+                element: <UserProfile id={2}/>
             },
             {
                 path: "game",

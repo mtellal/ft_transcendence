@@ -1,12 +1,25 @@
+// {
+//   "compilerOptions": {
+//     "outDir": "./dist/",
+//     "noImplicitAny": true,
+//     "module": "es6",
+//     "target": "es5",
+//     "jsx": "react",
+//     "allowJs": true,
+//     "moduleResolution": "node",
+//     "allowSyntheticDefaultImports":true
+//   }
+// }
+
 {
-  "compilerOptions": {
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "es6",
-    "target": "es5",
-    "jsx": "react",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports":true
-  }
+	"compilerOptions": {
+	  "target": "es2020",
+	  "module": "esnext",
+	  "jsx": "react",
+	  "esModuleInterop": true,
+	  "skipLibCheck": true,
+	  "forceConsistentCasingInFileNames": true,
+	  "moduleResolution": "node",
+	  "noImplicitAny": true
+	}
 }
