@@ -44,8 +44,7 @@
 
 .play-button
 {
-    height: 40px;
-    width: 50px;
+    padding: 10px;
     border-radius: 5px;
     border: 1px solid black;
     cursor: pointer;

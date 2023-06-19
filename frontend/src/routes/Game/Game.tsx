@@ -1,259 +1,232 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
+import { io, Socket } from 'socket.io-client';
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { useCurrentUser } from "../../hooks/Hooks";
 import './Game.css'
-
 
 let up: boolean;
 let down: boolean;
 
 
 function Game(props: any) {
-    const canvasRef: any = React.useRef();
-    const animationID = React.useRef(0);
-    const player1Ref = React.useRef({ x: 10, y: 10, width: 100, height: 100 })
-    const player2Ref = React.useRef({ x: 10, y: 10, width: 100, height: 100 })
-    const ballRef = React.useRef({ x: 0, y: 0, velx: 0, vely: 0, radius: 0 })
+  const canvasRef: any = React.useRef();
 
-    const [scores, setScores] = React.useState({ p1: 0, p2: 0 })
+  const token = useOutletContext();
+  const [socket, setSocket] = useState(null);
+  const [gameRoom, setGameRoom] = useState(null);
 
-    function initPlayers(canvasHeight: any, canvasWidth: any) {
-        const player1 = player1Ref.current;
-        const player2 = player2Ref.current;
+  const [context, setContext]: any = useState();
 
-        player1.width = 10;
-        player1.height = 100;
-        player1.x = canvasWidth * 0.02;
-        player1.y = canvasHeight / 2 - player1.height;
+  const [scoreP1, setScoreP1] = useState(0);
+  const [scoreP2, setScoreP2] = useState(0);
 
-        player2.width = 10;
-        player2.height = 100;
-        player2.x = canvasWidth - canvasWidth * 0.03;
-        player2.y = canvasHeight / 2 - player2.height;
+  const [ratioHeight, setRatioHeight] = useState(1);
+  const [ratioWidth, setRatioWidth] = useState(1);
+
+  useEffect(() => {
+    initContext();
+  }, [])
+
+  useEffect(() => {
+    if (canvasRef && canvasRef.current)
+    {
+      window.addEventListener('resize', initContext)
+      return () => window.removeEventListener('resize', initContext);
     }
+  }, [canvasRef])
 
-    function initBall(canvasHeight: any, canvasWidth: any) {
-        const ball = ballRef.current;
-        const signx = Math.floor(Math.random() * 10) % 2 === 0 ? 0 : 1;
-        const signy = Math.floor(Math.random() * 10) % 2 === 0 ? 0 : 1;
+  useEffect(() => {
+    if (props.gameRoom)
+      setGameRoom(props.gameRoom);
+  }, [props.gameRoom])
 
-        ball.x = canvasWidth / 2;
-        ball.y = canvasHeight / 2;
-        ball.velx = signx ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1)
-        ball.vely = signy ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1)
-
-        ball.radius = 10;
+  useEffect(() => {
+    if (props.socket && context) {
+      setSocket(props.socket);
+      props.socket.on('updatedState', (updatedGameState: any) => {
+        drawGameState(updatedGameState);
+      })
+      return () => props.socket.off('updatedState')
     }
+  }, [props.socket, context, ratioHeight, ratioWidth]);
 
 
-    /* //////////   DRAW FUNCTIONS     //////////*/
+  function initContext() {
+    const context = canvasRef.current.getContext('2d');
+    setContext(context);
+    setRatioWidth(canvasRef.current.clientWidth / 1600);
+    setRatioHeight(canvasRef.current.clientHeight / 800);
+    canvasRef.current.width =  canvasRef.current.clientWidth;
+    canvasRef.current.height = canvasRef.current.clientHeight;
+  }
+
+  function drawBall(context: any, x: number, y: number, radius: number) {
+    context.beginPath();
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  function drawPlayers(context: any, player1: any, player2: any, ratioHeight: number, ratioWidth: number) {
+    context.beginPath();
+    context.fillRect(player1.x * ratioWidth, player1.y * ratioHeight, player1.width * ratioWidth, player1.height * ratioHeight);
+    context.fillRect(player2.x * ratioWidth, player2.y * ratioHeight, player2.width * ratioWidth, player2.height * ratioHeight);
+  }
+
+  function drawField(context: any, width: number, height: number) {
+    context.beginPath();
+    context.arc(width / 2, height / 2, 50, 0, Math.PI * 2);
+    context.fillStyle = '#FFD8B8';
+    context.fill();
+    context.stroke();
+    context.fillStyle = 'black';
+    context.fillRect(width / 2, 0, 1, height);
+
+  }
+
+  const drawGameState = useCallback((gameState: any) => {
+    if (context && canvasRef && canvasRef.current && ratioHeight && ratioWidth) {
+      context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+      drawField(context, canvasRef.current.width, canvasRef.current.height)
+
+      drawPlayers(context, gameState.player1, gameState.player2, ratioHeight, ratioWidth)
+      drawBall(context, gameState.ball.x * ratioWidth, gameState.ball.y * ratioHeight, gameState.ball.radius * ratioWidth);
 
 
-    function drawPlayers(context: any) {
-        const p1 = player1Ref.current;
-        const p2 = player2Ref.current;
-
-        context.beginPath();
-        context.fillRect(p1.x, p1.y, p1.width, p1.height)
-        context.fillRect(p2.x, p2.y, p2.width, p2.height)
-    }
-
-    function drawBall(context: any) {
-        const ball = ballRef.current;
-        context.beginPath();
-        context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        context.fill();
-    }
-
-    function drawPlayground(context: any) {
-        const canvas: any = canvasRef.current;
-
-        context.beginPath();
-        context.arc(canvas.width / 2, canvas.height / 2, 50, 0, Math.PI * 2);
-        context.fillStyle = '#FFD8B8'
-        context.fill();
-        context.stroke();
-        context.fillStyle = 'black'
-        context.fillRect(canvas.width / 2, 0, 1, canvas.height)
-    }
-
-
-    function draw(context: any) {
-        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-        drawPlayground(context)
-        drawPlayers(context);
-        drawBall(context);
-    }
-
-    /* //////////   MOVEMENTS FUNCTIONS     //////////*/
-
-    function handleKeyDown(e: any) {
-        if (e.key === "w")
-            up = true;
-        else if (e.key === "s")
-            down = true;
-    }
-
-    function handleKeyUp(e: any) {
-        if (e.key === "w")
-            up = false;
-        else if (e.key === "s")
-            down = false;
-    }
-
-    function moveUp() {
-        if (player1Ref.current.y - 5 > 0)
-            player1Ref.current.y -= 5;
-    }
-
-    function moveDown() {
-        const p1 = player1Ref.current;
-        if (p1.y + 5 + p1.height < canvasRef.current.height)
-            p1.y += 5;
-    }
-
-    function movePlayer() {
-        if (up)
-            moveUp();
-        else if (down)
-            moveDown();
-    }
-
-    function moveBall() {
-        const canvas = canvasRef.current;
-        const ball = ballRef.current;
-        const player1 = player1Ref.current;
-        const player2 = player2Ref.current;
-
-        let nextPosX = ball.x + ball.velx;
-        nextPosX += ball.velx > 0 ? ball.radius : -ball.radius;
-        let nextPosY = ball.y + ball.vely;
-        nextPosY += ball.vely > 0 ? ball.radius : -ball.radius;
-
-        if ((nextPosX > player1.x && nextPosX < player1.x + player1.width &&
-            nextPosY > player1.y && nextPosY < player1.y + player1.height) ||
-            (nextPosX > player2.x && nextPosX < player2.x + player2.width &&
-                nextPosY > player2.y && nextPosY < player2.y + player2.height)) {
-            ball.velx *= -1;
-        }
-
-        if (nextPosX < 0 || nextPosX > canvas.width) {
-            if (nextPosX < 0)
-                setScores(prev => ({ ...prev, p2: prev.p2 + 1 }))
-            else if (nextPosX > canvas.width)
-                setScores(prev => ({ ...prev, p1: prev.p1 + 1 }))
-
-            initBall(canvas.height, canvas.width);
-            return (1);
-        }
-        if (nextPosY < 0 || nextPosY > canvas.height) {
-            ball.vely *= -1;
-        }
-        else {
-            ball.x += ball.velx;
-            ball.y += ball.vely;
-        }
-        return (0)
-    }
-
-    function resizeHandler(context: any) {
-        const canvas = canvasRef.current;
-        const width = canvas.parentNode.offsetWidth;
-        const height = canvas.parentNode.offsetHeight;
-
-        if (canvas.width !== width || canvas.height !== height) {
-            canvas.width = width
-            canvas.height = height
-        }
-
-        initGame(canvas, context)
-    }
-
-    function initGame(canvas: any, context: any) {
-        canvas.height = canvas.parentNode.offsetHeight;
-        canvas.width = canvas.parentNode.offsetWidth;
-
-        initPlayers(canvas.height, canvas.width);
-        initBall(canvas.height, canvas.width);
-        draw(context);
+      setScoreP1((p: number) => p !== gameState.score.player1Score ? gameState.score.player1Score : p);
+      setScoreP2((p: number) => p !== gameState.score.player2Score ? gameState.score.player2Score : p);
 
     }
+  }, [context, canvasRef, ratioHeight, ratioWidth]);
 
-    React.useEffect(() => {
+  /* //////////   MOVEMENTS FUNCTIONS     //////////*/
 
-        let newgame;
-
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-
-        initGame(canvas, context)
-
-        const resizeEvent = () => resizeHandler(context);
-
-        window.addEventListener('resize', resizeEvent);
-
-        const game = () => {
-
-            movePlayer();
-            draw(context);
-            newgame = moveBall();
-            if (newgame) {
-                draw(context);
-                setTimeout(() => {
-                    animationID.current = window.requestAnimationFrame(game);
-                }, 1000);
-            }
-            else
-                animationID.current = window.requestAnimationFrame(game);
-
-        }
-
-        if (props.launch)
-            game();
-
-        return (() => {
-            window.cancelAnimationFrame(animationID.current);
-            window.removeEventListener('resize', resizeEvent);
-        })
-
-    }, [props.launch])
+  const handleKeyDown = (e: any) => {
+    if (e.key === "w") {
+      moveUp();
+    } else if (e.key === "s") {
+      moveDown();
+    }
+  };
 
 
-    return (
-        <div className="game">
-            <canvas
-                ref={canvasRef}
-                className="game--canvas"
-                onKeyUp={handleKeyUp}
-                onKeyDown={handleKeyDown}
-                tabIndex={0}
-            >
+  const moveUp = useCallback(() => {
+    if (socket) {
+      socket.emit("moveUp", gameRoom?.id);
+    }
+  }, [socket]);
 
-            </canvas>
-        </div>
-    )
+  const moveDown = useCallback(() => {
+    if (socket)
+      socket.emit("moveDown", gameRoom?.id);
+  }, [socket]);
+
+  return (
+    <div className="game relative">
+      <canvas
+        ref={canvasRef}
+        className="game--canvas"
+        //onKeyUp={handleKeyUp}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+      />
+      <div className="absolute" style={{ top: '10px', left: '30px', fontSize: 'x-large' }}>
+        <p>{scoreP1}</p>
+      </div>
+      <div className="absolute " style={{ top: '10px', right: '30px', fontSize: 'x-large'  }}>
+        <p>{scoreP2}</p>
+      </div>
+    </div>
+  )
 }
 
 function PlayPage(props: any) {
-    return (
-        <div className="play-page">
-            <button
-                onClick={props.click}
-                className="play-button"
-            >
-                Play
-            </button>
-        </div>
-    )
+
+  return (
+    <div className="play-page">
+      <button onClick={props.click} className="play-button">
+        Play
+      </button>
+    </div>
+  );
 }
 
+function SearchGame(props: any) {
+
+  const [points, setPoints] = useState("");
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (points.length > 6)
+        setPoints("");
+      else
+        setPoints((p: string) => p += ". ")
+    }, 1000)
+    return () => clearInterval(id);
+  }, [points])
+
+
+  return (
+    <div className="play-page">
+      <button className="play-button">
+        Searching a game {points}
+      </button>
+    </div>
+  );
+}
 
 export default function LaunchGame() {
-    const [play, setPlay] = React.useState(false);
+  const [play, setPlay] = React.useState(false);
 
-    return (
-        <div className="launchgame relative">
-            <Game launch={play} />
-            {!play && <PlayPage click={() => setPlay(true)} />}
-        </div>
-    )
+  const { user, token } = useCurrentUser();
+
+  const [socket, setSocket] = useState(null);
+  const [gameRoom, setGameRoom] = useState(null);
+  const [gameState, setGameState] = useState(null);
+
+  const [searchingGame, setSearchingGame] = useState(false);
+  const [gameFound, setGameFound] = useState(false);
+
+  const searchGame = useCallback(() => {
+    if (socket) {
+      setSearchingGame(true);
+      socket.emit('join', {
+        gametype: "CLASSIC"
+      });
+      socket.on('joinedGame', (joinedGame: any) => {
+        if (joinedGame && joinedGame.player1Id && joinedGame.player2Id) {
+          setGameFound(true);
+          setSearchingGame(false);
+          setGameRoom(joinedGame);
+          socket.off('joinedGame')
+        }
+      });
+    }
+  }, [socket]);
+
+
+  useEffect(() => {
+    const s = io('http://localhost:3000/game', {
+      transports: ['websocket'],
+      extraHeaders: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    setSocket(s);
+
+    return () => {
+      s.disconnect();
+    }
+  }, []);
+
+
+  return (
+    <div className="launchgame relative">
+      {gameFound && socket && <Game launch={gameFound} socket={socket} gameRoom={gameRoom} />}
+      {searchingGame && <SearchGame />}
+      {!play && !searchingGame && !gameFound && <PlayPage click={() => searchGame()} />}
+    </div>
+  )
 }
