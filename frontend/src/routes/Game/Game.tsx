@@ -7,6 +7,7 @@ import './Game.css'
 import useFetchUsers from "../../hooks/useFetchUsers";
 import ProfilePicture from "../../components/users/ProfilePicture";
 import ResizeContainer from "../../components/ResizeContainer";
+import { updateUser } from "../../requests/user";
 
 let up: boolean;
 let down: boolean;
@@ -208,7 +209,7 @@ function SearchGame(props: any) {
 export default function LaunchGame() {
   const [play, setPlay] = React.useState(false);
 
-  const { user, token } = useCurrentUser();
+  const { user, token, updateCurrentUser } = useCurrentUser();
 
   const [socket, setSocket] = useState(null);
   const [gameRoom, setGameRoom] = useState(null);
@@ -219,7 +220,7 @@ export default function LaunchGame() {
   const [gameResult, setGameResult] = useState();
 
   const searchGame = useCallback((mode: string = "CLASSIC") => {
-    if (socket) {
+    if (socket && user) {
       setSearchingGame(true);
       socket.emit('join', {
         gametype: mode
@@ -229,11 +230,13 @@ export default function LaunchGame() {
           setGameFound(true);
           setSearchingGame(false);
           setGameRoom(joinedGame);
+          if (user)
+            updateUser({ ...user, userStatus: "INGAME" }, user.id)
           socket.off('joinedGame')
         }
       });
     }
-  }, [socket]);
+  }, [socket, user]);
 
 
   useEffect(() => {
@@ -246,16 +249,22 @@ export default function LaunchGame() {
 
     setSocket(s);
 
-    s.on('finishedGame', (res: any) => {
-      if (res) {
-        setGameResult(res);
-      }
-    })
+    if (user) {
+      s.on('finishedGame', (res: any) => {
+        if (res) {
+          setGameResult(res);
+          if (user)
+            updateUser({ ...user, userStatus: "ONLINE" }, user.id)
+        }
+      })
+    }
 
     return () => {
+      if (user)
+        updateUser({ ...user, userStatus: "ONLINE" }, user.id)
       s.disconnect();
     }
-  }, []);
+  }, [user]);
 
   const cancelSearchGame = useCallback(() => {
     if (socket) {
