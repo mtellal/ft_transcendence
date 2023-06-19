@@ -1,11 +1,12 @@
 import { BadRequestException, ForbiddenException, NotAcceptableException, NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
-import { User, MessageType } from '@prisma/client';
+import { User, MessageType, ChannelType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { AddUserDto, AdminActionDto, CreateChannelDto, JoinChannelDto, LeaveChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
+import { AddUserDto, AdminActionDto, CreateChannelDto, InviteDto, JoinChannelDto, LeaveChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
+import { GamesService } from 'src/games/games.service';
 
 @WebSocketGateway({cors: {origin: '*'}})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -15,7 +16,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private connectedUsers = new Map<number, string>();
 
-  constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService ){}
+  constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService, private gamesService: GamesService ){}
 
   @SubscribeMessage('message')
   @UsePipes(new ValidationPipe())
@@ -67,14 +68,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
   }
 
-/*   @SubscribeMessage('createChannel')
+  @SubscribeMessage('sendInvite')
   @UsePipes(new ValidationPipe())
-  async createChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: CreateChannelDto)
-  {
-    console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
-
+  async sendInvite(@ConnectedSocket() client: Socket, @MessageBody() dto: InviteDto) {
+    console.log("/////////////////////////////// EVENT SENDINVITE ///////////////////////////////")
     let user: User;
-
     let token = client.handshake.headers.cookie;
     if (token)
     {
@@ -82,6 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       token = token.split('=')[1];
     }
     try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
       const authToken = token;
       if (!authToken)
         throw new UnauthorizedException();
@@ -89,33 +88,108 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
+      console.log(user);
     }
     catch(error) {
       console.error(error);
       client.disconnect();
-      console.log("!!!!!!!!!! FAILED in creating channel !!!!!!!!!!")
-      console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
+      console.log("/////////////////////////////// EVENT SENDINVITE ///////////////////////////////")
       return ;
     }
-    console.log(dto);
     try {
-      const newChannel = await this.chatService.createChannel(dto, user);
-      for (const memberId of newChannel.members) {
-        const socketId = this.connectedUsers.get(memberId);
-        if (socketId) {
-          const socket = this.server.sockets.sockets.get(socketId);
-          socket.join(newChannel.id.toString());
-        }
+      //Need a create game invite
+      //Need to check if channel exist too
+      //Need to check if the user is already in game, if an invite has already been sent
+      //Once a game is created, emit the message with the game id as content?
+      const channel = await this.chatService.findOne(dto.channelId);
+      if (!channel) {
+        throw new NotFoundException('Channel not found');
       }
-      this.server.to(this.getSocketId(user.id)).emit('createChannel', newChannel);
-      this.server.to(newChannel.id.toString()).emit('newChannel', newChannel);
+      if (!client.rooms.has(channel.id.toString())) {
+        throw new ForbiddenException('User not on that channel');
+      }
+      if (await this.chatService.checkMute(channel, user)) {
+        throw new ForbiddenException('You have been muted');
+      }
+      if (await this.gamesService.isUserinGame(user.id)) {
+        throw new ForbiddenException(`User ${user.username} cannot send an invite (in game/matchmaking or pending invite)`);
+      }
+      const newGame = await this.gamesService.createInvite(user.id, dto);
+      console.log(newGame);
+      const invite = await this.chatService.createInvite({
+        channelId: channel.id,
+        type: MessageType.INVITE,
+        content: newGame.id.toString(),
+      })
+      this.server.to(channel.id.toString()).emit('message', invite);
     }
-    catch (error) {
-      throw new WsException(error);
+    catch(e) {
+      console.log(e);
+      throw new WsException(e);
     }
-    console.log("!!!!!!!!!! SUCCEED in creating channel !!!!!!!!!!")
-    console.log("/////////////////////////////// EVENT CREATCHANNEL ///////////////////////////////")
-  } */
+  }
+
+
+  @SubscribeMessage('acceptInvite')
+  async acceptInvite(@ConnectedSocket() client: Socket, @MessageBody() messageId: number) {
+    console.log("/////////////////////////////// EVENT ACCEPT INVITE ///////////////////////////////")
+    let user: User;
+    let token = client.handshake.headers.cookie;
+    if (token)
+    {
+      // token === cookies (for now it is just access_token=xxxxxxxxxxx)
+      token = token.split('=')[1];
+    }
+    try {
+      /* Temporary to test with postman, will need to be changed depending on the way the front sends the info */
+      const authToken = token;
+      if (!authToken)
+        throw new UnauthorizedException();
+      const decodedToken = await this.jwtService.decode(authToken) as { id: number };
+      user = await this.userService.findOne(decodedToken.id);
+      if (!user)
+        throw new UnauthorizedException();
+      console.log(user);
+    }
+    catch(error) {
+      console.error(error);
+      client.disconnect();
+      console.log("/////////////////////////////// EVENT ACCEPT INVITE ///////////////////////////////")
+      return ;
+    }
+    try {
+      const invite = await this.chatService.findMessage(messageId);
+      console.log(invite);
+      if (!invite) {
+        throw new NotFoundException(`Message with ${messageId} does not exist`)
+      }
+      if (invite.type !== MessageType.INVITE) {
+        throw new ForbiddenException(`Message with ${messageId} is not a valid invite`)
+      }
+      if (invite.acceptedBy) {
+        throw new ForbiddenException(`Invite was already accepted by another user`);
+      }
+      if (user.id === invite.sendBy) {
+        throw new ForbiddenException(`You cannot accept your own invite`);
+      }
+      if (await this.gamesService.isUserinGame(user.id)) {
+        throw new ForbiddenException(`You already are in a game or a pending game (matchmaking or invite)`);
+      }
+      const gameId = parseInt(invite.content);
+      const game = await this.gamesService.findOne(gameId);
+      if (!game) {
+        throw new NotFoundException(`Game with id of ${gameId} doesn't exist`);
+      }
+      const joinedGame = await this.gamesService.acceptInvite(user.id, gameId);
+      //Might need to tweak this, check with front
+      this.server.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
+      this.server.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame);
+    }
+    catch(e) {
+      console.log(e);
+      throw new WsException(e);
+    }
+  }
 
   @SubscribeMessage('joinChannel')
   @UsePipes(new ValidationPipe())

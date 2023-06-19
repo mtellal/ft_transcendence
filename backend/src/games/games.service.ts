@@ -6,6 +6,7 @@ import { GameState, Status, defaultGameState } from './games.interface';
 import { GameDto } from './dto/games.dto';
 import { UsersAchievementsService } from '../users/users-achievements.service';
 import { Server, Socket } from 'socket.io';
+import { InviteDto } from 'src/chat/dto/channel.dto';
 
 @Injectable()
 export class GamesService {
@@ -15,6 +16,12 @@ export class GamesService {
 
   async allGames() {
     return await this.prisma.game.findMany({});
+  }
+
+  async findOne(gameId: number) {
+    return await this.prisma.game.findUnique({
+      where: {id: gameId}
+    });
   }
 
   async createGame(payload: any, gameDto: GameDto) {
@@ -426,5 +433,70 @@ export class GamesService {
       return (true);
     }
     return (false);
+  }
+
+  async changeGameStatus(gameId: number, status: GameStatus) {
+    await this.prisma.game.update({
+      where: {id: gameId},
+      data: {
+        status: GameStatus.ONGOING,
+      }
+    })
+  }
+
+  async isUserinGame(userId: number) {
+    const game_exist = await this.prisma.game.findFirst({
+      where: {
+        AND: [
+          {
+            OR: [
+              { status: GameStatus.MATCHMAKING },
+              { status: GameStatus.ONGOING },
+              { status: GameStatus.INVITE },
+            ]
+          },
+          {
+            OR: [
+              { player1Id: userId },
+              { player2Id: userId },
+            ]
+          },
+        ],
+      }
+    })
+    console.log(game_exist);
+    if (game_exist) {
+      return (true);
+    }
+    return (false);
+  }
+
+  async createInvite(userId: number, dto: InviteDto) {
+    const newGame = await this.prisma.game.create({
+      data: {
+        player1: {
+          connect: {
+            id: userId
+          }
+        },
+        gametype: dto.gametype,
+        status: GameStatus.INVITE
+      }
+    })
+    return newGame;
+  }
+
+  async acceptInvite(userId: number, gameId: number) {
+    const joinedGame = await this.prisma.game.update({
+      where: {id: gameId},
+      data: {
+        player2: {
+          connect: {
+            id: userId
+          }
+        }
+      }
+    })
+    return joinedGame;
   }
 }

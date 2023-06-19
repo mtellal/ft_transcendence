@@ -1,12 +1,13 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { GamesService } from './games.service';
 import { Socket, Server } from 'socket.io';
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtWsGuard, UserPayload } from '../auth/guard/jwt.ws.guard';
 import { JwtPayloadDto } from '../auth/dto';
 import { GameDto } from './dto/games.dto';
+import { GameStatus } from '@prisma/client';
 
 @WebSocketGateway({ namespace: 'game' })
 export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -82,12 +83,15 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(JwtWsGuard)
   async handleCancel(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto) {
     client.leave();
-    this.gamesService.deleteMatchmakingGame(payload);
+    await this.gamesService.deleteMatchmakingGame(payload);
   }
 
   @SubscribeMessage('join')
   @UseGuards(JwtWsGuard)
-  async HandleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameDto: GameDto) {
+  async handleJoin(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameDto: GameDto) {
+    if (await this.gamesService.isUserinGame(payload.id)) {
+      throw new ForbiddenException(`User with id of ${payload.id} is already in game`);
+    }
     const room = await this.gamesService.findPendingGame(payload, gameDto);
     console.log("event received");
     if (!room) {
@@ -104,12 +108,40 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(`room-${room.id}`).emit('foundGame', room);
       this.server.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
       this.gamesService.startGame(room, this.server, this.userToSocket);
-      console.log()
       /* setTimeout(() => {
         this.gamesService.startGame(room, this.server);
       }, 5000); */
     }
   }
 
-
+  @SubscribeMessage('joinInvite')
+  @UseGuards(JwtWsGuard)
+  async joinInvite(@ConnectedSocket() client: Socket, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameId: number) {
+    try {
+      const room = await this.gamesService.findOne(gameId);
+      if (!room) {
+        throw new NotFoundException(`Game with id of ${gameId} does not exist`);
+      }
+      client.join(`room-${gameId}`);
+      this.server.to(`room-${gameId}`).emit('joinedGame', room);
+      let otherPlayer: string | null = null;
+      if (payload.id === room.player1Id) {
+        otherPlayer = this.userToSocket.get(room.player2Id);
+      }
+      if (payload.id === room.player2Id) {
+        otherPlayer = this.userToSocket.get(room.player1Id);
+      }
+      if (!otherPlayer) {
+        this.server.to(`room-${room.id}`).emit('waitingforP2', room);
+      }
+      else {
+        await this.gamesService.changeGameStatus(gameId, GameStatus.ONGOING);
+        this.server.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
+        this.gamesService.startGame(room, this.server, this.userToSocket);
+      }
+    }
+    catch (e) {
+      throw new WsException(e)
+    };
+  }
 }

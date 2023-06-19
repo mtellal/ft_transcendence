@@ -58,8 +58,8 @@ model Stats {
 }
 
 model Achievements {
-  User  User @relation(fields: [userId] , references: [id])
-  userId  Int
+  User   User @relation(fields: [userId], references: [id])
+  userId Int
 
   Novice       Boolean @default(false)
   Intermediate Boolean @default(false)
@@ -128,13 +128,14 @@ enum MessageType {
 }
 
 model Message {
-  id        Int         @id @default(autoincrement())
-  sendBy    Int?
-  content   String
-  type      MessageType @default(MESSAGE)
-  Channel   Channel?    @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  channelId Int?
-  createdAt DateTime    @default(now())
+  id         Int         @id @default(autoincrement())
+  sendBy     Int?
+  acceptedBy Int?
+  content    String
+  type       MessageType @default(MESSAGE)
+  Channel    Channel?    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId  Int?
+  createdAt  DateTime    @default(now())
 }
 
 enum GameStatus {

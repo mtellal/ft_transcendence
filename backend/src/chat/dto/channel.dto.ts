@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ChannelType, MessageType } from "@prisma/client"
+import { ChannelType, GameType, MessageType } from "@prisma/client"
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class MessageDto {
@@ -13,6 +13,15 @@ export class MessageDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+}
+
+export class InviteDto {
+  @IsNumber()
+  channelId: number;
+
+  @IsEnum(GameType)
+  @IsOptional()
+  gametype: GameType
 }
 
 export class CreateChannelDto {
