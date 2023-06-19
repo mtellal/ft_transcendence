@@ -4,6 +4,9 @@ import { io, Socket } from 'socket.io-client';
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import { useCurrentUser } from "../../hooks/Hooks";
 import './Game.css'
+import useFetchUsers from "../../hooks/useFetchUsers";
+import ProfilePicture from "../../components/users/ProfilePicture";
+import ResizeContainer from "../../components/ResizeContainer";
 
 let up: boolean;
 let down: boolean;
@@ -29,8 +32,7 @@ function Game(props: any) {
   }, [])
 
   useEffect(() => {
-    if (canvasRef && canvasRef.current)
-    {
+    if (canvasRef && canvasRef.current) {
       window.addEventListener('resize', initContext)
       return () => window.removeEventListener('resize', initContext);
     }
@@ -57,7 +59,7 @@ function Game(props: any) {
     setContext(context);
     setRatioWidth(canvasRef.current.clientWidth / 1600);
     setRatioHeight(canvasRef.current.clientHeight / 800);
-    canvasRef.current.width =  canvasRef.current.clientWidth;
+    canvasRef.current.width = canvasRef.current.clientWidth;
     canvasRef.current.height = canvasRef.current.clientHeight;
   }
 
@@ -134,7 +136,7 @@ function Game(props: any) {
       <div className="absolute" style={{ top: '10px', left: '30px', fontSize: 'x-large' }}>
         <p>{scoreP1}</p>
       </div>
-      <div className="absolute " style={{ top: '10px', right: '30px', fontSize: 'x-large'  }}>
+      <div className="absolute " style={{ top: '10px', right: '30px', fontSize: 'x-large' }}>
         <p>{scoreP2}</p>
       </div>
     </div>
@@ -143,11 +145,29 @@ function Game(props: any) {
 
 function PlayPage(props: any) {
 
+  const [showMode, setShowMode] = useState(false);
+
   return (
     <div className="play-page">
-      <button onClick={props.click} className="play-button">
-        Play
-      </button>
+      {
+        showMode ?
+          <div className="flex-column-center">
+            <button onClick={() => { props.searchGame("CLASSIC") }} className="play-button">
+              Classic
+            </button>
+            <button onClick={() => { props.searchGame("SPEEDUP") }} className="play-button">
+              Speed up
+            </button>
+            <button onClick={() => { props.searchGame("HARDMODE") }} className="play-button">
+              Hardcore
+            </button>
+          </div>
+          :
+          <button onClick={() => setShowMode(true)} className="play-button">
+            Play
+          </button>
+      }
+
     </div>
   );
 }
@@ -169,9 +189,18 @@ function SearchGame(props: any) {
 
   return (
     <div className="play-page">
-      <button className="play-button">
-        Searching a game {points}
-      </button>
+      <div className="flex-column-center">
+        <button className="play-button" style={{ cursor: 'none' }}>
+          Searching a game {points}
+        </button>
+        <button
+          className="play-button"
+          onClick={props.cancelSearchGame}
+          style={{ marginTop: '20px' }}
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }
@@ -183,16 +212,17 @@ export default function LaunchGame() {
 
   const [socket, setSocket] = useState(null);
   const [gameRoom, setGameRoom] = useState(null);
-  const [gameState, setGameState] = useState(null);
 
   const [searchingGame, setSearchingGame] = useState(false);
   const [gameFound, setGameFound] = useState(false);
 
-  const searchGame = useCallback(() => {
+  const [gameResult, setGameResult] = useState();
+
+  const searchGame = useCallback((mode: string = "CLASSIC") => {
     if (socket) {
       setSearchingGame(true);
       socket.emit('join', {
-        gametype: "CLASSIC"
+        gametype: mode
       });
       socket.on('joinedGame', (joinedGame: any) => {
         if (joinedGame && joinedGame.player1Id && joinedGame.player2Id) {
@@ -216,17 +246,96 @@ export default function LaunchGame() {
 
     setSocket(s);
 
+    s.on('finishedGame', (res: any) => {
+      if (res) {
+        setGameResult(res);
+      }
+    })
+
     return () => {
       s.disconnect();
     }
   }, []);
 
+  const cancelSearchGame = useCallback(() => {
+    if (socket) {
+      setSearchingGame(false);
+      socket.emit('cancel');
+    }
+  }, [socket]);
+
+
+  function playAgain() {
+    setPlay(false);
+    setGameFound(false);
+    setGameResult(null);
+    setGameRoom(null);
+  }
 
   return (
     <div className="launchgame relative">
-      {gameFound && socket && <Game launch={gameFound} socket={socket} gameRoom={gameRoom} />}
-      {searchingGame && <SearchGame />}
-      {!play && !searchingGame && !gameFound && <PlayPage click={() => searchGame()} />}
+      {gameFound && socket && !gameResult && <Game launch={gameFound} socket={socket} gameRoom={gameRoom} />}
+      {searchingGame && <SearchGame cancelSearchGame={() => cancelSearchGame()} />}
+      {
+        !play && !searchingGame && !gameFound &&
+        <PlayPage
+          searchGame={(mode: string) => searchGame(mode)}
+        />
+      }
+      {
+        gameResult &&
+        <GameResult
+          gameResult={gameResult}
+          playAgain={playAgain}
+        />
+      }
+    </div>
+  )
+}
+
+
+function GameResult(props: any) {
+
+  const [player, setPlayer]: any = useState();
+
+  const { user } = useCurrentUser();
+  const { fetchUser } = useFetchUsers();
+
+
+  async function loadPlayers(gameResult: any) {
+    let id;
+    let oplayer;
+    if (gameResult.player1Id === user.id)
+      oplayer = await fetchUser(gameResult.player2Id);
+    else
+      oplayer = await fetchUser(gameResult.player1Id);
+    setPlayer(oplayer);
+  }
+
+  useEffect(() => {
+    if (props.gameResult) {
+      loadPlayers(props.gameResult);
+    }
+  }, [props.gameResult])
+
+  return (
+    <div className="play-page">
+      {
+        props.gameResult && player && user &&
+        <div className="flex-column-center reset label white" style={{ padding: '20px', minWidth: '200px' }}>
+          <h2>Winner</h2>
+          <ResizeContainer height="50px" width="50px">
+            <ProfilePicture
+              image={props.gameResult.wonBy === user.id ? user.url : player.url}
+            />
+          </ResizeContainer>
+          <p>{props.gameResult.wonBy === user.id ? user.username : player.username}</p>
+          <p>{`${props.gameResult.player1Score} - ${props.gameResult.player2Score}`}</p>
+          <button className="play-button" onClick={props.playAgain}>
+            Play again
+          </button>
+        </div>
+      }
     </div>
   )
 }

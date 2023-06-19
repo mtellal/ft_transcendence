@@ -3,6 +3,7 @@
 {
     grid-row: 2 / span 18;
     grid-column: auto / span 20;
+    overflow: hidden;
 }
 
 .game
@@ -34,8 +35,6 @@
     width: 100%;
     position: absolute;
     top: 0;
-    height: 100%;
-    width: 100%;
     background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;

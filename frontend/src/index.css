@@ -72,6 +72,15 @@ code {
   cursor: pointer;
 }
 
+
+.label
+{
+  padding: 10px 10px;
+  box-shadow: 0 1px 3px black;
+  border: none;
+  border-radius: 5px;
+}
+
 .button:hover
 {
   box-shadow: 0 1px 5px black;
