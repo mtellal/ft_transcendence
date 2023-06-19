@@ -31,7 +31,8 @@ export function LadderList({ user }: LadderListProps) {
 	return (
 		<div className={s.container}>
 			<img className={s.image} src={avatar}/>
-			<p>{dataUser.username} {user.stats.eloRating}</p>
+			<p className={s.name}>{dataUser.username} </p>
+			<p className={s.elo}>Elo: {user.stats.eloRating}</p>
 		</div>
 	);
 }
