@@ -21,6 +21,7 @@ import {
 import Chat from './routes/Chat/Chat/Chat';
 import { CreateChannel } from './routes/Chat/CreateChannel';
 import MenuElement from './routes/Chat/Menu/MenuElement';
+import TwoFactor from './routes/login/2FA';
 
 
 const router = createBrowserRouter([
@@ -94,6 +95,10 @@ const router = createBrowserRouter([
             {
                 path: "signup",
                 element: <SignUp />,
+            },
+            {
+                path: "2fa",
+                element: <TwoFactor />,
             }
         ]
     },
@@ -101,7 +106,7 @@ const router = createBrowserRouter([
         path: "login:token",
         element: <Login />,
         loader: loginLoader
-    }
+    },
 ])
 
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateProfilePicture, updateUser } from "../../requests/user";
 
@@ -8,6 +8,9 @@ import { useCurrentUser } from "../../hooks/Hooks";
 
 import './Profile.css'
 import { useBlock } from "../../hooks/Chat/useBlock";
+import PickMenu from "../../components/PickMenu";
+import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
+import useFetchUsers from "../../hooks/useFetchUsers";
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const [username, setUsername]: [string, any] = React.useState(props.username);
@@ -112,7 +115,7 @@ function ProfilePicture({ token, image, setImage }: any) {
                     />
                 </form>
             </div>
-            {error && <p className="red-c" style={{fontSize: 'small'}} >{error}</p>}
+            {error && <p className="red-c" style={{ fontSize: 'small' }} >{error}</p>}
             <button
                 className="profile-picture-button"
                 onClick={disconnect}
@@ -122,6 +125,86 @@ function ProfilePicture({ token, image, setImage }: any) {
         </div>
     )
 }
+
+function Enable2FA(props: any) {
+    const { user, token, updateCurrentUser } = useCurrentUser();
+    const { fetchUser } = useFetchUsers();
+    const [selected, setSelected] = useState("false");
+    const [updated, setUpdated] = useState(false);
+
+    const [qrcode, setQrCode] = useState(null);
+
+    useEffect(() => {
+        if (user && user.twoFactorStatus)
+            setSelected(`${user.twoFactorStatus}`)
+    }, [user])
+
+    function convertBase64ToBlob(base64Image: string) {
+        const parts = base64Image.split(';base64,');
+        const imageType = parts[0].split(':')[1];
+        const decodedData = window.atob(parts[1]);
+        const uInt8Array = new Uint8Array(decodedData.length);
+        for (let i = 0; i < decodedData.length; ++i) {
+            uInt8Array[i] = decodedData.charCodeAt(i);
+        }
+        return new Blob([uInt8Array], { type: imageType });
+    }
+
+    // console.log(user)
+
+    async function generateQrCode() {
+        await getQRCodeRequest(token)
+            .then(async (res: any) => {
+                if (res.data) {
+                    let blob = convertBase64ToBlob(res.data.qrcode);
+                    const url = window.URL.createObjectURL(blob)
+                    console.log(url);
+                    setQrCode(url);
+                    const updatedUser = await fetchUser(user.id);
+                    updateCurrentUser(updatedUser);
+                }
+            })
+    }
+
+    const loadQrCode = useCallback(async (s: string) => {
+        if (s === "true" && token && user) {
+            console.log(user)
+            enable2FARequest(true, token);
+            if (user && !user.twoFactorSecret) {
+                generateQrCode();
+            }
+        }
+    }, [user, token]);
+
+    function submit(s: string) {
+        setSelected((p: string) => {
+            if (p !== s) {
+                enable2FARequest(s === "true", token);
+                loadQrCode(s);
+                setUpdated(true);
+            }
+            return (s);
+        });
+    }
+
+    console.log(user)
+
+    return (
+        <div className="" style={{ width: '200px' }}>
+            <h2>Authentifiaction</h2>
+            <h4>Enable 2FA</h4>
+            {updated && <p className="green-c" >updated</p>}
+            {qrcode && <img src={qrcode} />}
+            <PickMenu
+                selected={selected}
+                setSelected={submit}
+                collection={["true", "false"]}
+                picking={() => setUpdated(false)}
+            />
+        </div >
+    )
+}
+
 
 export default function Profile() {
 
@@ -148,7 +231,7 @@ export default function Profile() {
     }, [user])
 
     return (
-        <div className="profile">
+        <div className="profile scroll">
             <h2>Profile</h2>
             <div className="flex">
                 <ProfileInfos
@@ -162,6 +245,7 @@ export default function Profile() {
                     setImage={updateCurrentProfilePicture}
                 />
             </div>
+            <Enable2FA />
         </div>
     )
 }

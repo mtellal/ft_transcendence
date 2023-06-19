@@ -1,5 +1,6 @@
 .footer
 {
+    background-color: white;
     grid-row: 20 / span 20;
     grid-column: 1 / -1;
     border-top: 1px solid rgb(0, 0, 0);

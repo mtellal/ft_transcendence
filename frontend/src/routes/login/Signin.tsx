@@ -1,19 +1,39 @@
-import React from "react";
-import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
-
+import React, { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import IconInput from "../../components/Input/IconInput";
-
 import { setCookie } from "../../Cookie";
+import { getTokenRequest, signinRequest } from "../../requests/auth";
 
 import './Sign.css'
-import { signinRequest } from "../../requests/auth";
 
 export default function SignIn() {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [error, setError] = React.useState("");
+    const [secret, setSecret] = useState("");
 
     const navigate = useNavigate();
+
+    async function handleResponse(data: any) {
+        if (data) {
+            console.log(data);
+            if (!data || !data.access_token) {
+                navigate("/login/2fa", { state: { username, password } })
+                // check 2fa
+                /*  if (!secret || !secret.trim())
+                     return (setError("Secret required"));
+                 else
+                 {
+                     const trade = await getTokenRequest("", secret);
+                     console.log(trade);
+                 } */
+            }
+            else if (data.access_token) {
+                setCookie("access_token", data.access_token);
+                navigate("/");
+            }
+        }
+    }
 
     async function handleSubmit() {
         if (!username || !password)
@@ -21,8 +41,7 @@ export default function SignIn() {
         await signinRequest(username, password)
             .then(({ error, errMessage, res }: any) => {
                 if (!error) {
-                    setCookie("access_token", res.data.access_token);
-                    navigate("/");
+                    handleResponse(res.data)
                 }
                 else
                     setError(errMessage)
@@ -36,25 +55,27 @@ export default function SignIn() {
 
 
     return (
-        <div className="flex-column-center login-form-container">
-            <IconInput
-                id="submit"
-                style={iconInputStyle}
-                icon="person"
-                placeholder="Username"
-                value={username}
-                setValue={setUsername}
-                submit={() => handleSubmit()}
-            />
-            <IconInput
-                id="password"
-                style={iconInputStyle}
-                icon="lock"
-                placeholder="Password"
-                value={password}
-                setValue={setPassword}
-                submit={() => handleSubmit()}
-            />
+        <div className="flex-column-center" style={{ minHeight: '250px'}}>
+            <div className="flex-column-center " style={{minHeight: '150px'}}>
+                <IconInput
+                    id="submit"
+                    style={iconInputStyle}
+                    icon="person"
+                    placeholder="Username"
+                    value={username}
+                    setValue={setUsername}
+                    submit={() => handleSubmit()}
+                />
+                <IconInput
+                    id="password"
+                    style={iconInputStyle}
+                    icon="lock"
+                    placeholder="Password"
+                    value={password}
+                    setValue={setPassword}
+                    submit={() => handleSubmit()}
+                />
+            </div>
             {error && <p>error: {error}</p>}
             <button
                 className="flex-center sign--button"

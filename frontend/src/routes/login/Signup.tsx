@@ -6,6 +6,7 @@ import { setCookie } from "../../Cookie";
 
 import './Sign.css'
 import { signupRequest } from "../../requests/auth";
+import { NavigationButton } from "./NavigationButton";
 
 
 export default function SignUp() {
@@ -39,47 +40,43 @@ export default function SignUp() {
     }
 
     return (
-        <div className="flex-column-center login-form-container">
-            <IconInput
-                id="signup-username"
-                style={iconInputStyle}
-                icon="person"
-                placeholder="Username"
-                value={username}
-                setValue={setUsername}
-                submit={handleSubmit}
-            />
-            <IconInput
-                id="signup-password"
-                style={iconInputStyle}
-                icon="lock"
-                placeholder="Password"
-                value={password}
-                setValue={setPassword}
-                submit={handleSubmit}
-            />
-            <IconInput
-                id="signup-confirm"
-                style={iconInputStyle}
-                icon="lock"
-                placeholder="Confirm password"
-                value={confirmPassword}
-                setValue={setConfirmPassword}
-                submit={handleSubmit}
-            />
+        <div className="flex-column-center"  style={{justifyContent: 'space-around', marginBottom: '60px'}}>
+            <div className="flex-column-center">
+                <IconInput
+                    id="signup-username"
+                    style={iconInputStyle}
+                    icon="person"
+                    placeholder="Username"
+                    value={username}
+                    setValue={setUsername}
+                    submit={handleSubmit}
+                />
+                <IconInput
+                    id="signup-password"
+                    style={iconInputStyle}
+                    icon="lock"
+                    placeholder="Password"
+                    value={password}
+                    setValue={setPassword}
+                    submit={handleSubmit}
+                />
+                <IconInput
+                    id="signup-confirm"
+                    style={iconInputStyle}
+                    icon="lock"
+                    placeholder="Confirm password"
+                    value={confirmPassword}
+                    setValue={setConfirmPassword}
+                    submit={handleSubmit}
+                />
+            </div>
             {error && <p>error: {error}</p>}
-            <button
-                className="sign--button"
-                onClick={handleSubmit}
-            >
-                Sign up
-            </button>
-            <Link
-                to={"/login/signin"}
-                className="sign--link"
-            >
-                Sign in
-            </Link>
+            <NavigationButton 
+                mainTitle="Signup"
+                secondTitle="signin"
+                onClick={() => handleSubmit()}
+                path="/login/signin"
+            />
         </div>
     )
 }

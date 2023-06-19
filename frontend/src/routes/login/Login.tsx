@@ -44,7 +44,7 @@ export async function loader({ params, request }: any) {
     if (url && url.length > 1) {
         let oauth_code = decodeURI(url[1]);
         if (oauth_code) {
-            await getTokenRequest(oauth_code, "wfw")
+            await getTokenRequest(oauth_code, "")
                 .then(({ error, res }: any) => {
                     if (!error) {
                         setCookie("access_token", res.data.access_token);
@@ -64,7 +64,7 @@ export default function Login() {
 
     return (
         <div className="flex-center login-page">
-            <div className="flex-column login-form">
+            <div className="flex-column login-form relative">
                 <img src={userImg} className="sign--img" />
                 <Outlet />
             </div>
