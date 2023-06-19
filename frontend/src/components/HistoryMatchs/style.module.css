@@ -31,3 +31,8 @@
 .list {
 	margin-bottom: 5%;
 }
+
+.noMatchs {
+	font-size: 30px;
+	text-align: center;
+}
