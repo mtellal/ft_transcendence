@@ -21,12 +21,9 @@ import {
 import Chat from './routes/Chat/Chat/Chat';
 import { CreateChannel } from './routes/Chat/CreateChannel';
 import MenuElement from './routes/Chat/Menu/MenuElement';
-<<<<<<< HEAD
 import TwoFactor from './routes/login/2FA';
-=======
 import { UserProfile } from './routes/UserProfile/UserProfile';
 import { Ladder } from './routes/Ladder/Ladder';
->>>>>>> 977302d362f2ff30c696af5ac69ab5b690069a9b
 
 
 const router = createBrowserRouter([
