@@ -26,10 +26,10 @@ export function Ladder() {
 		<div className={s.container}>
 			<h1 className={s.title}>Ladder</h1>
 			<div className={s.list}>
-				{ladder.map((user: any) => {
+				{ladder.map((user: any, index: number) => {
 					return (
 						<div key={user.id}>
-							<LadderList user={user} />
+							<LadderList user={user} index={index} />
 						</div>
 					);
 				})}
