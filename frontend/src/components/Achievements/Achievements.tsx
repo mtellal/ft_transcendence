@@ -30,11 +30,6 @@ export function Achievements({ id }: UserProfileProps) {
 	
 	if (!achievements) {
 		return ;
-		// console.log(achievements);
-		// console.log(achievements[0]["Novice"]);
-		// for (let i = 1; i < 5: i++) {
-			// console.log(achievements[i]["Novice"]);
-		// }
 	}
 
 	return (

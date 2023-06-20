@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import logo_user from "../../assets/user.png"
-import { getMatchHistory, getUser, getUserProfilePictrue } from "../../requests/user";
+import { getUser, getUserProfilePictrue } from "../../requests/user";
 import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
 import { Achievements } from "../../components/Achievements/Achievements";
 import { Stats } from "../../components/Stats/Stats";
