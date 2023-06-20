@@ -15,13 +15,13 @@ import { ConfirmView } from "../../Profile/ChannelProfile/ConfirmAction";
 import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
 import './Banner.css'
 import { getBlockList } from "../../../../requests/block";
+import { SetInvitation } from "../Invitation";
 
 
 type TIconsBanner = {
     whisperUser: any,
     channel: any,
     setBlockedFriend: any,
-    invitation: any,
     type: any,
     mobile?: any
     profile: any,
@@ -40,7 +40,7 @@ function IconsBanner(props: TIconsBanner) {
     const { setAction } = useContext(ChatInterfaceContext);
 
     const [currentUserBlocked, setCurrentUserBlocked] = useState(false);
-    
+
     const bannerBlock = useCallback(() => {
         if (props.whisperUser) {
             if (isUserBlocked(props.whisperUser))
@@ -70,7 +70,17 @@ function IconsBanner(props: TIconsBanner) {
     return (
         <>
             <Icon icon="person" onClick={props.profile} description="Profile" />
-            <Icon icon="sports_esports" onClick={props.invitation} description="Invitation" />
+            <Icon
+                icon="sports_esports"
+                onClick={() => {
+                    setAction(
+                        <SetInvitation
+                            channelId={props.channel && props.channel.id}
+                        />
+                    )
+                }}
+                description="Invitation"
+            />
             {
                 props.type === "WHISPER" && props.whisperUser &&
                 <Icon icon="block" onClick={bannerBlock} description="Block" />
@@ -110,7 +120,7 @@ function IconsBanner(props: TIconsBanner) {
                 />
             }
             {
-                props.type !== "WHISPER" && 
+                props.type !== "WHISPER" &&
                 <Icon
                     icon="logout"
                     onClick={() => {
@@ -137,7 +147,6 @@ type TBanner = {
     channel: any,
     type: string,
     setBlockedFriend: any,
-    invitation: () => {} | any,
     profile: any,
 }
 

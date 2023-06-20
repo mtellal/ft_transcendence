@@ -176,17 +176,49 @@ export function ConfirmViewTypeProteced(props: any) {
 }
 
 
-export function ConfirmViewButtons(props: any) {
+type TConfirmViewButtons = {
+    valid: any,
+    cancel: any 
+    color1?: string, 
+    backColor1?: string,
+    color2?: string, 
+    backColor2?: string,
+}
+
+export function ConfirmViewButtons(props: TConfirmViewButtons) {
+
+    function validStyle()
+    {
+        let style = {};
+        if (props.color1)
+            style = {color: props.color1};
+        if (props.backColor1)
+            style = {...style, backgroundColor: props.backColor1}
+        return (style);
+    }
+
+    function validCancel()
+    {
+        let style = {};
+        if (props.color2)
+            style = {color: props.color2};
+        if (props.backColor2)
+            style = {...style, backgroundColor: props.backColor2}
+        return (style);
+    }
+
     return (
         <div className="fill flex" style={{ justifyContent: 'space-around' }}>
             <button
                 className="button red white-color confirmview-button"
+                style={validStyle()}
                 onClick={props.valid}
             >
                 Valid
             </button>
             <button
                 className="button white confirmview-button"
+                style={validCancel()}
                 onClick={props.cancel}
             >
                 Cancel

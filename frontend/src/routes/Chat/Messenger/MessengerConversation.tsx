@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
- 
-import { useChannelsContext } from "../../../hooks/Hooks";
+
+import { useChannelsContext, useCurrentUser } from "../../../hooks/Hooks";
 import useMembers from "../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../hooks/useFetchUsers";
 
 import Message from "./Message";
 import './Messenger.css'
+import { ConfirmViewButtons } from "../Profile/ChannelProfile/ConfirmAction";
+import { useInvitation } from "../../../hooks/Chat/useInvitation";
 
 
 function MessageNotification(props: any) {
@@ -35,9 +37,40 @@ function NoMessages() {
 }
 
 
+function InvitationMessage(props: any) {
+
+    const { user } = useCurrentUser();
+    const { acceptInvitation } = useInvitation();
+    console.log(props.message);
+ 
+    return (
+        <div className="flex-center">
+            <div
+                className="flex-ai"
+                style={{ width: '80%', margin: '5px 0', border: '1px solid black', borderRadius: '5px', boxShadow: '1px 2px 5px black', padding: '3%' }}
+            >
+                <p className="reset" >{ } wants to play a game in CLASSIC mode</p>
+                {
+                    props.message && !props.message.acceptedBy && user && props.sendBy !== user.id && 
+                    <button
+                        className="button"
+                        style={{ width: '100px', fontSize: 'medium', fontWeight: '500' }}
+                        onClick={() => {
+                            props.message && acceptInvitation(props.message.id)
+                        }}
+                    >
+                        Join
+                    </button>
+                }
+            </div>
+        </div>
+    )
+}
+
+
 
 export default function MessengerConversation({ messages, blockedFriend, hidden, whisperUser }: any) {
-    
+
     const { fetchUser } = useFetchUsers();
     const { currentChannel } = useChannelsContext();
     const { getMemberById, isUserIdMember } = useMembers();
@@ -86,13 +119,16 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
                 messages.map((m: any, index: number) => {
                     _author = null;
                     displayUser = false;
-                    if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
+                    if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) ||
+                        (index === messages.length - 1) || (m.type === "INVITE")) {
                         displayUser = true;
                         _author = authors.find((u: any) => u.id === m.sendBy)
                     }
 
                     if (m.type === "NOTIF")
                         return (<MessageNotification key={m.id} content={m.content} />)
+                    else if (m.type === "INVITE")
+                        return (<InvitationMessage key={m.id} author={_author} message={m} />)
                     else if (m.type !== "NOTIF") {
 
                         return (

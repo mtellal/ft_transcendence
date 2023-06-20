@@ -121,7 +121,6 @@ export default function Interface() {
                             whisperUser={whisperUser}
                             channel={currentChannel}
                             type={currentChannel.type}
-                            invitation={() => { }}
                             profile={() => setProfile((p: boolean) => !p)}
                             setBlockedFriend={setBlockedFriend}
                         />
