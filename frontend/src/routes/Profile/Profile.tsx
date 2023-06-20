@@ -6,11 +6,10 @@ import InfoInput from "../../components/Input/InfoInput";
 
 import { useCurrentUser } from "../../hooks/Hooks";
 
-import './Profile.css'
-import { useBlock } from "../../hooks/Chat/useBlock";
 import PickMenu from "../../components/PickMenu";
 import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
 import useFetchUsers from "../../hooks/useFetchUsers";
+import './Profile.css'
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const [username, setUsername]: [string, any] = React.useState(props.username);
@@ -66,10 +65,6 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     )
 }
 
-/*
-    - update user infos with fetch a PATCH/POST method (or any other update html method)
-    - handle pp edit, save it in session/local storage and push in database ? or fetch, update database and fetch it again ? 
-*/
 
 function ProfilePicture({ token, image, setImage }: any) {
     const navigate = useNavigate();
@@ -150,9 +145,8 @@ function Enable2FA(props: any) {
         return new Blob([uInt8Array], { type: imageType });
     }
 
-    // console.log(user)
-
     async function generateQrCode() {
+        setUpdated(null);
         await getQRCodeRequest(token)
             .then(async (res: any) => {
                 if (res.data) {
@@ -166,41 +160,43 @@ function Enable2FA(props: any) {
             })
     }
 
-    const loadQrCode = useCallback(async (s: string) => {
-        if (s === "true" && token && user) {
-            console.log(user)
-            enable2FARequest(true, token);
-            if (user && !user.twoFactorSecret) {
-                generateQrCode();
-            }
-        }
-    }, [user, token]);
+
 
     function submit(s: string) {
         setSelected((p: string) => {
             if (p !== s) {
                 enable2FARequest(s === "true", token);
-                loadQrCode(s);
                 setUpdated(true);
+                setQrCode(null);
             }
             return (s);
         });
     }
 
-    console.log(user)
 
     return (
-        <div className="" style={{ width: '200px' }}>
+        <div>
             <h2>Authentifiaction</h2>
             <h4>Enable 2FA</h4>
+            { qrcode && <img src={qrcode}/> }
             {updated && <p className="green-c" >updated</p>}
-            {qrcode && <img src={qrcode} />}
-            <PickMenu
-                selected={selected}
-                setSelected={submit}
-                collection={["true", "false"]}
-                picking={() => setUpdated(false)}
-            />
+            <div style={{ width: '200px', marginBottom: '10px' }}>
+                <PickMenu
+                    selected={selected}
+                    setSelected={submit}
+                    collection={["true", "false"]}
+                    picking={() => setUpdated(false)}
+                />
+            </div>
+            {
+                selected === "true" &&
+                <button
+                    className="button"
+                    onClick={() => generateQrCode()}
+                >
+                    generate qr code
+                </button>
+            }
         </div >
     )
 }
@@ -214,23 +210,6 @@ export default function Profile() {
         updateCurrentUser,
         updateCurrentProfilePicture
     }: any = useCurrentUser();
-    const { getblockedUsers } = useBlock();
-
-    const [blockedUsers, setBlockedUsers] = useState([]);
-
-    async function initBlockedUsers() {
-        const users = await getblockedUsers();
-        console.log(users, user.blockList)
-        if (users && users.length)
-            setBlockedUsers(users);
-    }
-
-    console.log(user)
-
-    useEffect(() => {
-        if (user)
-            initBlockedUsers();
-    }, [user])
 
     return (
         <div className="profile scroll">
