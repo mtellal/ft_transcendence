@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Redirect, Req, Request, Res, UseGuards, ParseBoolPipe } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, Res, UseGuards, ParseBoolPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto, TradeDto } from "./dto";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -44,10 +44,14 @@ export class AuthController{
 	@UseGuards(FTOauthGuard)
 	@ApiOperation({ summary: 'ftAuthCallback', description: 'Endpoint description 42oauth service redirect endpoint, returns otp in query to use with 42/trade enpoint' })
 	async ftAuthCallback(@Req() req, @Res() res) {
-		const code = await this.authService.oauthLogIn(req.user);
-		const redirectUrl = 'http://localhost:8080/login?oauth_code=' + code;
-		console.log(code);
-		res.redirect(redirectUrl);
+		try {
+			const code = await this.authService.oauthLogIn(req.user);
+			const redirectUrl = 'http://localhost:8080/login?oauth_code=' + code;
+			console.log(code);
+			res.redirect(redirectUrl);
+		} catch (e) {
+			res.redirect('http://localhost:8080/login');
+		}
 	}
 
 	@Post('42/trade')

@@ -13,7 +13,7 @@ import { createWriteStream } from 'fs';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import * as crypto from 'crypto';
-import { UsersAchievementsService } from "../users/users-achievements.service";
+import { UsersGateway } from "../users/users.gateway";
  
 
 @Injectable()
@@ -21,7 +21,8 @@ export class AuthService {
 	constructor(
 		private prisma: PrismaService,
 		private jwt: JwtService,
-		private config: ConfigService
+		private config: ConfigService,
+		private usersGateway: UsersGateway
 	) {}
 
 	async signup(dto: AuthDto) {
@@ -57,6 +58,9 @@ export class AuthService {
 		})
 		if (!user) 
 			throw new ForbiddenException('Credentials incorrect',);
+		const alreadyConnected = this.usersGateway.getSocketId(user.id);
+		if (alreadyConnected)
+			throw new ForbiddenException('Already Connected');
 		const pwMatches = await argon.verify(user.password, password);
 		if (!pwMatches)
 			throw new ForbiddenException('Credentials incorrect');
@@ -134,6 +138,10 @@ export class AuthService {
 				oauth_exp: expirationTime ? new Date(expirationTime) : null,
 			},
 		});
+		const alreadyConnected = this.usersGateway.getSocketId(user.id);
+		console.log('ALREADY CONNECTED');
+		if (alreadyConnected)
+			throw new ForbiddenException('Already Connected');
 		return updatedUser.oauth_code;
 	}
 
