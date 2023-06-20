@@ -23,7 +23,6 @@ export function HistoryMatchsList({ match, id }: HistoryMatchsListProps) {
 		setAvatarA(window.URL.createObjectURL(new Blob([ppA.data])));
 		const ppB = await getUserProfilePictrue(match.player2Id);
 		setAvatarB(window.URL.createObjectURL(new Blob([ppB.data])));
-		// Ici, charger les avatar de chacun des 2 users
 	}
 
 	useEffect(() => {

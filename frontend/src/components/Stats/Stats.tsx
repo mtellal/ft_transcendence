@@ -25,16 +25,16 @@ export function Stats({ id }: UserProfileProps) {
 
 	return (
 		<div className={s.container} >
-			<h1>Statistics</h1>
-			<ul>
-				<li>Elo: {stats['eloRating']}</li>
-				<li>Matches played: {stats['matchesPlayed']}</li>
-				<li>Matches won: {stats['matchesWon']}</li>
-				<li>Matches lost: {stats['matchesLost']}</li>
-				<li>Goals scored: {stats['goalsScored']}</li>
-				<li>Goals taken: {stats['goalsTaken']}</li>
-				<li>Win streak: {stats['winStreak']}</li>
-				<li>Loss streak: {stats['lossStreak']}</li>
+			<h1 className={s.title}>Statistics</h1>
+			<ul className={s.ul}>
+				<li className={s.li}>Elo: {stats['eloRating']}</li>
+				<li className={s.li}>Matches played: {stats['matchesPlayed']}</li>
+				<li className={s.li}>Matches won: {stats['matchesWon']}</li>
+				<li className={s.li}>Matches lost: {stats['matchesLost']}</li>
+				<li className={s.li}>Goals scored: {stats['goalsScored']}</li>
+				<li className={s.li}>Goals taken: {stats['goalsTaken']}</li>
+				<li className={s.li}>Win streak: {stats['winStreak']}</li>
+				<li className={s.li}>Loss streak: {stats['lossStreak']}</li>
 			</ul>
 		</div>
 	);
