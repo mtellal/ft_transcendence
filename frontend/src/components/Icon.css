@@ -1,0 +1,36 @@
+.icon-container
+{
+    position: relative;
+    align-self: center;
+    justify-self: center ;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 40px;
+    aspect-ratio: 1 / 1;
+}
+
+.icon-container:hover div
+{
+    visibility: visible;
+}
+
+.icon-container:active
+{
+    background-color: white;
+}
+
+.description
+{
+    position:absolute;
+    bottom: -15px;
+    visibility: hidden;
+}
+
+@media screen and (max-width: 700px)
+{
+    .icon-container {
+        margin-left: auto;
+        height: auto;
+        padding: 5px;
+    }
+}

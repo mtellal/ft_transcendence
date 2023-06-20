@@ -1,0 +1,122 @@
+.profile
+{
+    grid-row: 2 / span 18;
+    grid-column: auto / span 20;
+    margin: 0;   
+    padding: 5%;
+}
+
+.profileinfos-container
+{
+    width: 70%;
+}
+
+.profileinfos-input-container
+{
+    max-width: 400px;
+}
+
+.profile-infos-button:hover
+{
+    background-color: rgb(223, 223, 223);
+}
+
+.profile-infos-button:active
+{
+    background-color: white;
+}
+
+.profileinfos-updated
+{
+    color: rgb(0, 211, 63);
+    margin: 0;
+    padding-bottom: 10px;
+    font-size: small;
+}
+
+.profileinfos-error
+{
+    color: rgb(211, 0, 0);
+    margin: 0;
+    padding-bottom: 10px;
+    font-size: small;
+}
+
+/* ///////////////////////////////////// */
+
+
+.picture-container
+{
+    border: 1px solid rgb(172, 172, 172);
+    overflow: hidden;
+    border-radius: 50%;
+    height: 130px;
+    width: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-picture
+{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-picture-input
+{
+    width:0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.profil-picture-label
+{
+    background-color: rgb(255, 255, 255);
+    position: relative;
+    top: -20px;
+    right: -10px;
+    padding: 5px 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.profil-picture-label:hover
+{
+    background-color: rgb(197, 197, 197);
+}
+
+.profile-picture-button
+{
+    padding: 5px;
+    cursor: pointer;
+}
+
+
+@media screen and (max-width: 700px) {
+
+    .profile
+    {
+        padding: 10%;
+        grid-row: auto / span 18;
+        grid-column: 1 / -1;
+    }
+
+    .picture-container
+    {
+        height: 100px;
+        width: 100px;
+    }
+
+    .profil-picture-label
+    {
+        font-size: small;
+        height: 20px;
+        width: 20px;
+        margin: 5px;
+    }
+
+}

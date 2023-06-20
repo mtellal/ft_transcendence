@@ -140,6 +140,30 @@ export class UsersService {
     })
   }
 
+  async getMatchHistory(userId: number) {
+    return await this.prisma.game.findMany({
+      where: {
+        OR: [
+          {
+            player1Id: userId,
+          },
+          {
+            player2Id: userId,
+          }
+        ]
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+  }
+
+  async getStats(userId: number) {
+    return await this.prisma.stats.findUnique({
+      where: {userId}
+    });
+  }
+
   async checkifUserblocked(userId: number, blockedId: number) {
     const isBlocked = await this.prisma.blockedUser.findFirst({
       where: {
@@ -226,6 +250,32 @@ export class UsersService {
           hasEvery: [friendshipDto.id, friendshipDto.friendId]
         }
     }})
+  }
+
+  async getUsersByEloRating() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        userStatus: true,
+        stats: {
+          select: {
+            eloRating: true,
+            matchesPlayed: true,
+            matchesWon: true,
+            matchesLost: true,
+            winStreak: true,
+          }
+        }
+      },
+      orderBy: {
+        stats: {
+          eloRating: 'desc',
+        }
+      }
+    })
+    return users;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

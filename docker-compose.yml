@@ -8,7 +8,7 @@ services:
       - PORT=${FRONT_PORT}
       - REACT_APP_BACK=${BACK_URL}
     ports:
-      - 8080:8080
+      - ${FRONT_PORT}:${FRONT_PORT}
   backend:
     build:
       dockerfile: Dockerfile
@@ -20,7 +20,7 @@ services:
       - .env
     command: npm run start:dev
     ports:
-      - 3000:3000
+      - ${BACK_PORT}:${BACK_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
     ports:
-      - '8888:5432'
+      - 9999:5432
     volumes:
       - ./db:/var/lib/postgresql/data
     healthcheck:

@@ -22,17 +22,21 @@
 .chooselogin-button-container
 {
     margin-top: 10%;
-    height: 200px;
+    min-height: 200px;
     width: 100%;
 }
 
 .chooselogin-button
 {
     margin-top: 10%;
-    height: 50px;
-    width: 80%;
+    height: 40px;
+    min-width: 80%;
     font-size: medium;
     font-weight: 500;
+    text-decoration: none;
+    color: black;
+    background-color: white;
+    padding: 0px 0px;
 }
 
 .chooselogin-img

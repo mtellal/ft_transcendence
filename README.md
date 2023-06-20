@@ -7,6 +7,21 @@
 
 ## Docs:
 
+### REACT
+- https://react.dev/ - React official doc 
+- https://stackoverflow.com/questions/54576865/when-to-use-native-react-usereducer-hook-and-how-it-differentiate-from-redux - When to use `useReducer` or `Redux`
+
+### CSS 
+- https://github.com/suitcss/suit - suitCSS - naming convention used by twitter 
+  ##### BEM
+  - https://yandex.com/dev/bem/ - BEM naming convention 
+  - https://webuild.envato.com/blog/how-to-scale-and-maintain-legacy-css-with-sass-and-smacss/ 
+  - https://www.york.ac.uk/pattern-library/about/css.html 
+
+#### AJAX / HTTP POLLING
+- https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/ - Async map array of promises + explications async/sync processes
+- https://stackoverflow.com/questions/12555043/my-understanding-of-http-polling-long-polling-http-streaming-and-websockets
+
 #### Typescript 
 - https://mattbatman.com/typescript-and-webpack-and-images - import resolve tsc and webpack
 

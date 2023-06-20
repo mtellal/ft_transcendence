@@ -1,4 +1,4 @@
-body {
+html, body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -12,10 +12,23 @@ code {
     monospace;
 }
 
-
 .hover-fill-grey:hover
 {
   background-color: rgb(231, 231, 231);
+}
+
+.hover-gray:hover{
+  background-color: rgb(231, 231, 231);
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-ai
+{
+  display: flex;
+  align-items: center;
 }
 
 .flex-column
@@ -23,6 +36,7 @@ code {
   display: flex;
   flex-direction: column;
 }
+
 
 .flex-column-center
 {
@@ -63,15 +77,37 @@ code {
   box-shadow: 0 1px 5px black;
 }
 
+
 .light-red
 {
  background-color: rgb(255, 220, 220);
+}
+
+.lightred-c
+{
+  color: rgb(255, 220, 220);
 }
 
 .red
 {
   background-color: rgb(255, 78, 78);
 }
+
+.red-c
+{
+  color: red;
+}
+
+.gray-c
+{
+  color: gray
+}
+
+.black-c
+{
+  color: black;
+}
+
 
 .white
 {
@@ -92,4 +128,55 @@ code {
 {
   height: 100%;
   width: 100%;
+}
+
+.reset
+{
+  margin: 0;
+  padding: 0;
+}
+
+.reset-m
+{
+  margin: 0;
+}
+
+.reset-p
+{
+  padding: 0;
+}
+
+.sticky-bot
+{
+  position: sticky;
+  bottom: 0;
+}
+
+.scroll
+{
+  overflow-y: scroll;
+}
+
+.hidden
+{
+  overflow: hidden;
+}
+
+.no-wrap
+{
+  white-space: nowrap;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: visible;
+}
+
+.decoration-none
+{
+  outline: none;
+  text-decoration: none;
 }

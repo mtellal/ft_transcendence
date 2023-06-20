@@ -1,0 +1,33 @@
+.banner
+{
+    border-bottom: 1px solid black;
+    display: flex;
+    padding: 10px 10px;
+    flex-wrap: wrap;
+}
+
+.banner-icon-container
+{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+    flex-wrap: wrap;
+    overflow: hidden;
+}
+
+.banner-fill-icon-container
+{
+    background-color: aqua;
+}
+
+.banner-icons-container
+{
+    width: 100%;
+}
+
+@media  screen and (max-width: 700px) {
+    .banner {
+    }
+}
+

@@ -2,32 +2,31 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Navigate, Route }from 'react-router-dom'
 import './index.css';
-import App, { loader as appLoader, loader } from './routes/App';
+import App, { loader as appLoader, loader } from './routes/App/App';
 
 
 import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
-import Profile from './routes/Profile';
-import LaunchGame from './routes/Game';
-import History from './routes/History';
+import Profile from './routes/Profile/Profile';
+import LaunchGame from './routes/Game/Game';
+import History from './routes/History/History';
 
 
-import AddElement from "./Chat/Interface/AddElement";
-import Interface, { loader as interfaceLoader} from './Chat/Interface/Interface';
+import AddFriend from "./routes/Chat/AddFriend/AddFriend";
+import Interface from './routes/Chat/Interface/Interface';
+import { CreateChannel } from './routes/Chat/AddChannel/CreateChannel';
 
-
-import { currentUser as user } from './exampleDatas'
 
 import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router-dom';
 
-import Chat from './routes/Chat';
+import Chat from './routes/Chat/Chat/Chat';
+import JoinChannel from './routes/Chat/AddChannel/JoinChannel';
+import AddChannel from './routes/Chat/AddChannel/AddChannel';
 
-
-type user = any;
 
 const router = createBrowserRouter([
     {
@@ -57,32 +56,40 @@ const router = createBrowserRouter([
             },
             {
                 path: "chat",
-                element: <Chat user={user} />,
+                element: <Chat />,
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
                     {
                         path: "add-friend",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement user={user} title="friend" />
+                        element:  <AddFriend/>
                     },
                     {
                         path: "add-group",
                         loader: appLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <AddElement user={user} title="group" />
+                        element:  <AddChannel />
                     },
                     {
-                        path: "groups/:groupid",
-                        loader: interfaceLoader,
+                        path: "add-group/join",
                         errorElement: <Navigate to="/chat" replace/>,
-                        element:  <Interface friend={false} group={true}/>
+                        element:  <JoinChannel />
+                    },
+                    {
+                        path: "add-group/create",
+                        errorElement: <Navigate to="/chat" replace/>,
+                        element:  <CreateChannel />
+                    },
+                    {
+                        path: "groups/:channelName",
+                        errorElement: <Navigate to="/chat" replace/>,
+                        element:  <Interface />
                     },
                     {
                         path: "friends/:username/:id",
-                        loader: interfaceLoader,
                         errorElement: <Navigate to="/chat" replace/>,
-                        element: <Interface friend={true} group={false}/>
+                        element: <Interface />
                     }
                 ]
             },
@@ -108,14 +115,17 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "login/:token",
+        path: "login:token",
         element: <Login />,
         loader: loginLoader
     }
 ])
 
+
 const rootElement = document.getElementById("root");
+
 if (!rootElement) throw new Error('Failed to find the root element');
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
     <RouterProvider router={router} />

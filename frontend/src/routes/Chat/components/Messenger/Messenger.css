@@ -1,0 +1,151 @@
+
+/*  ////////    CHAT MESSAGES   ///////// */
+
+.messages-container
+{
+    width: 70%;
+}
+
+.messages-display
+{
+    flex: 7;
+    overflow-y: scroll;
+}
+
+.messages-input
+{
+    padding: 10px 0;
+    word-wrap: break-word;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    margin-top: 5px;
+}
+
+.messenger-input
+{
+    margin: 0;
+    padding: 10px 10px;
+    align-items: center;
+    font-family: 'inter', sans-serif;
+    font-size: 15px;
+    box-shadow: 1px 2px 5px black;
+    border-radius: 5px;
+    border: 1px solid grey;
+    width: 70%;
+}
+
+.messenger-input:focus
+{
+    outline: none;
+}
+
+.message-div
+{
+    display: flex;
+    align-items: flex-end;
+    justify-content: left;
+    padding: 0 2%;
+}
+
+.message-infos
+{
+    padding: 0 5px;
+    max-width: 70%;
+}
+
+.message
+{
+    margin: 2px 0;
+    width: auto;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid black;
+    padding: 5px 5px;
+    border-radius: 5px;
+    word-break: break-all;
+    font-size: 15px;
+}
+
+.message-author-infos
+{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.message-author
+{
+    font-size: small;
+    margin: 0;
+}
+
+.no-messages-div
+{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-messages
+{
+    font-size: large;
+}
+
+/*  /////   BLOCK MESSAGE   ////    */
+
+.friend-block
+{
+    padding: 10px 5px;
+    font-size: large;
+    font-weight: 600;
+}
+
+/*  /////   GAME INVITATION MESSAGE   ////    */
+
+.invitation
+{
+    background-color: rgb(255, 250, 243);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-invitation
+{
+    display: flex;
+    align-items: center;
+}
+
+.friend-invitation
+{
+    padding: 10px 5px;
+    font-size: large;
+    font-weight: 600;
+}
+
+
+.message-resize-pp
+{
+    height: 30px;
+    width: 30px;
+}
+
+.admin-icon
+{
+    align-self: flex-end;
+}
+
+.message-notification
+{
+    padding: 5px 0;
+    margin: 10px 0;
+}
+
+
+@media screen and (max-width: 700px) {
+
+}

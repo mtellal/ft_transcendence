@@ -1,0 +1,60 @@
+.header
+{
+    grid-row: 1 / span 1;
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgb(0, 0, 0);
+}
+
+.header-pong
+{
+    font-size: xx-large;
+    margin: 0 5vh;
+    font-family: 'Righteous';
+    letter-spacing: 2px;
+    padding: 1vh 1vh ;
+    border-radius: 5px;
+    text-decoration: underline;
+    color: black;
+}
+
+.header-userinfos-container
+{
+    margin-left: auto;
+    padding: 0 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+
+.pp-container > *
+{
+    cursor: pointer;
+}
+
+.pp-link
+{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: black;
+}
+
+.pp-username
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    overflow: hidden;
+}
+
+.pp-username:hover
+{
+    text-decoration: underline;
+}

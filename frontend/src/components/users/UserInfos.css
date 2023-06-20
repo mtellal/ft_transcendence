@@ -1,0 +1,53 @@
+/*    U S E R    I N F O S      */
+
+.userinfos-container {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.userinfos-pp-container {
+    width: 40px;
+    height: 40px;
+}
+
+.friend-image {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    max-width: 40px;
+    max-height: 50px;
+}
+
+.userinfos-icon-status {
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 50%;
+    background-color: rgb(255, 0, 0);
+    align-self: end;
+    position: relative;
+    top: -5px;
+    left: -15px;
+    border: 2px solid rgb(255, 255, 255);
+}
+
+.user-infos>p {
+    margin: 0;
+}
+
+.user-infos {
+    padding-bottom: 5px;
+    justify-content: space-around;
+}
+
+.userinfos-username {
+    font-size: large;
+}
+
+.userinfos-status {
+    display: flex;
+    font-size: small;
+    color: grey;
+}

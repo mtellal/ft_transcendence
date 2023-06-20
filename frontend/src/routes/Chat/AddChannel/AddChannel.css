@@ -1,0 +1,22 @@
+
+/* A D D    C H A N N E L */
+
+.addchannel
+{
+    padding: 5%;
+}
+
+.addchannel-button-container
+{
+    height: 150px;
+    justify-content: space-around;
+}
+
+.add-channel-button
+{
+    height: 30px;
+    font-weight: 500;
+    font-size: medium;
+    text-decoration: none;
+    color: black;
+}
