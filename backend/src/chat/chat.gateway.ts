@@ -118,7 +118,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(newGame);
       const invite = await this.chatService.createInvite({
         channelId: channel.id,
-        type: MessageType.INVITE,
+        userId: user.id,
+        gametype: dto.gametype,
         content: newGame.id.toString(),
       })
       this.server.to(channel.id.toString()).emit('message', invite);
@@ -182,6 +183,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const joinedGame = await this.gamesService.acceptInvite(user.id, gameId);
       //Might need to tweak this, check with front
+      const updatedInvite = await this.chatService.acceptInvite(messageId, user.id);
+      this.server.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
       this.server.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
       this.server.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame);
     }

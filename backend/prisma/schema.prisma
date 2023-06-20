@@ -131,6 +131,7 @@ model Message {
   id         Int         @id @default(autoincrement())
   sendBy     Int?
   acceptedBy Int?
+  gametype   GameType?
   content    String
   type       MessageType @default(MESSAGE)
   Channel    Channel?    @relation(fields: [channelId], references: [id], onDelete: Cascade)
