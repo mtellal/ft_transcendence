@@ -20,8 +20,6 @@ export function Ladder() {
 		return ;
 	}
 
-	console.log(ladder);
-
 	return (
 		<div className={s.container}>
 			<h1 className={s.title}>Ladder</h1>

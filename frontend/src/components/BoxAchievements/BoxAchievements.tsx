@@ -28,9 +28,6 @@ export function BoxAchievements({ name, description, image, condition }: BoxAchi
 				/>
 				{condition && <img className={s.image} src={check}/>}
 				{!condition && <img className={s.cross} src={cross}/>}
-				{/* <div className={s.bar}>
-					<div className={s.progress}></div>
-				</div> */}
 			</div>
 		</div>
 	);

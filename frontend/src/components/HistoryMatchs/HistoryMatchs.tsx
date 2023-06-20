@@ -25,8 +25,6 @@ export function HistoryMatchs({ id }: UserProfileProps) {
 		return ;
 	}
 
-	console.log(history);
-
 	if (history.length === 0) {
 		return (
 			<div className={s.container}>
