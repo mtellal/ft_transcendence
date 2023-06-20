@@ -231,7 +231,7 @@ export default function LaunchGame() {
           setSearchingGame(false);
           setGameRoom(joinedGame);
           if (user)
-            updateUser({ ...user, userStatus: "INGAME" }, user.id)
+            updateUser({ userStatus: "INGAME" }, user.id)
           socket.off('joinedGame')
         }
       });
@@ -254,14 +254,14 @@ export default function LaunchGame() {
         if (res) {
           setGameResult(res);
           if (user)
-            updateUser({ ...user, userStatus: "ONLINE" }, user.id)
+            updateUser({ userStatus: "ONLINE" }, user.id)
         }
       })
     }
 
     return () => {
       if (user)
-        updateUser({ ...user, userStatus: "ONLINE" }, user.id)
+        updateUser({  userStatus: "ONLINE" }, user.id)
       s.disconnect();
     }
   }, [user]);

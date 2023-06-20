@@ -225,6 +225,8 @@ export default function Profile() {
             setBlockedUsers(users);
     }
 
+    console.log(user)
+
     useEffect(() => {
         if (user)
             initBlockedUsers();
