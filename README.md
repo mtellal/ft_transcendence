@@ -110,6 +110,9 @@ The backend listens to these events:
 
 - 'updateChannel': Takes a channedId and a name (optional) or a type (optional) or a password (optional). Emits 'updatedChannel' to the room with the updatedChannel object
 
+- 'sendInvite': Takes a channelId and a gametype in the dto. Can't send an invite if muted. Emits the invite as a message with the type INVITE and the gameId of the newly created game room as content
+
+- 'acceptInvite': Takes a message id as a parameter. If it's a valid invite, will emit 'acceptedInvite' to both players with the game room object containing relevant info
 
 #### Games Gateway
 
@@ -120,7 +123,9 @@ The Games gateway listens to those events:
   - 'waitingforP2' if a game is created and we're waiting for another player
   - 'foundGame': if a pending game is found
   - 'GameStart': When the game is ready (two players joined)
-  
+
+- 'joinInvite': Takes a gameId as parameter. Uses the same events as 'join'. However, the match will only start if both users are connected to the game socket and joined the room.
+
 - 'cancel': Deletes a matchmaking game
 
 - 'moveUp': takes a roomId (number) as parameter
