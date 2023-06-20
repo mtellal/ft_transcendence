@@ -103,3 +103,15 @@ export async function getStats(id: number | string) {
             .catch(err => err)
     )
 }
+
+export async function getLadder() {
+    return (
+        axios.get(`${back}/users/ladder`, {
+            headers: {
+                'Accept': '*/*'
+            }
+        })
+            .then(res => res)
+            .catch(err => err)
+    )
+}

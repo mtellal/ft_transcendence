@@ -22,6 +22,7 @@ import Chat from './routes/Chat/Chat/Chat';
 import { CreateChannel } from './routes/Chat/CreateChannel';
 import MenuElement from './routes/Chat/Menu/MenuElement';
 import { UserProfile } from './routes/UserProfile/UserProfile';
+import { Ladder } from './routes/Ladder/Ladder';
 
 
 const router = createBrowserRouter([
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
                 path: "userprofile",
                 element: <UserProfile id={2}/>
             },
+			{
+				path: "ladder",
+				element: <Ladder />
+			},
             {
                 path: "game",
                 loader: appLoader,
