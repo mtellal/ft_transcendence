@@ -8,7 +8,7 @@ import { AddUserDto, AdminActionDto, CreateChannelDto, InviteDto, JoinChannelDto
 import { ChatService } from './chat.service';
 import { GamesService } from 'src/games/games.service';
 
-@WebSocketGateway({cors: {origin: '*'}})
+@WebSocketGateway({namespace: 'chat'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
@@ -118,7 +118,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(newGame);
       const invite = await this.chatService.createInvite({
         channelId: channel.id,
-        type: MessageType.INVITE,
+        userId: user.id,
+        gametype: dto.gametype,
         content: newGame.id.toString(),
       })
       this.server.to(channel.id.toString()).emit('message', invite);
@@ -182,6 +183,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const joinedGame = await this.gamesService.acceptInvite(user.id, gameId);
       //Might need to tweak this, check with front
+      const updatedInvite = await this.chatService.acceptInvite(messageId, user.id);
+      this.server.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
       this.server.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
       this.server.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame);
     }
@@ -918,7 +921,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
-    console.log(this.server.engine.clientsCount);
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -936,6 +938,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
+      if (this.connectedUsers.has(user.id)) {
+        this.server.to(client.id).emit('alreadyConnected', user.id);
+        throw new UnauthorizedException(`User ${user.username} is already connected to socket chat`)
+      }
       console.log("user => ", user);
     }
     catch(error) {

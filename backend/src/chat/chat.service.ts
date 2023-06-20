@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AdminActionDto, CreateChannelDto, JoinChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
-import { Channel, User, Message, ChannelType } from '@prisma/client';
+import { AdminActionDto, CreateChannelDto, CreateInviteDto, JoinChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
+import { Channel, User, Message, ChannelType, MessageType } from '@prisma/client';
 import * as argon from 'argon2';
 import { UsersService } from 'src/users/users.service';
 import { GamesService } from 'src/games/games.service';
@@ -71,11 +71,13 @@ export class ChatService {
     return (message);
   }
 
-  async createInvite(messageDto: MessageDto) {
+  async createInvite(messageDto: CreateInviteDto) {
     const invite = await this.prisma.message.create({
       data: {
         channelId: messageDto.channelId,
-        type: messageDto.type,
+        sendBy: messageDto.userId,
+        type: MessageType.INVITE,
+        gametype: messageDto.gametype,
         content: messageDto.content
       }
     })
@@ -86,6 +88,16 @@ export class ChatService {
       }
     })
     return (invite);
+  }
+
+  async acceptInvite(messageId: number, userId: number) {
+    const invite = await this.prisma.message.update({
+      where: {id: messageId},
+      data: {
+        acceptedBy: userId
+      }
+    })
+    return invite;
   }
 
   async getMessage(channelId: number): Promise<Message[]> {

@@ -311,7 +311,9 @@ export class UsersController {
       throw new NotAcceptableException(`Can't block yourself`);
     if (await this.usersService.checkifUserblocked(user.id, id))
       throw new NotAcceptableException(`User is already blocked`);
-    return await this.usersService.blockUser(user, id);
+    const newBlock = await this.usersService.blockUser(user, id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('blockedUser', newBlock);
+    return newBlock;
   }
 
   @UseGuards(JwtGuard)
@@ -327,7 +329,9 @@ export class UsersController {
       throw new NotAcceptableException(`User is not blocked`);
     if (id === user.id)
       throw new NotAcceptableException(`Can't unblock yourself`);
-    return await this.usersService.unblockUser(user, id);
+    const unblock = await this.usersService.unblockUser(user, id);
+    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('unblockedUser', {userId: id});
+    return unblock;
   }
 
   @UseGuards(JwtGuard)

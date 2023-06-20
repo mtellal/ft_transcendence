@@ -24,6 +24,22 @@ export class InviteDto {
   gametype: GameType
 }
 
+export class CreateInviteDto {
+  @IsNumber()
+  channelId: number;
+
+  @IsNumber()
+  userId: number;
+
+  @IsEnum(GameType)
+  @IsOptional()
+  gametype: GameType;
+
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+}
+
 export class CreateChannelDto {
 
   @ApiProperty()

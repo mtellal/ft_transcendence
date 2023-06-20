@@ -5,7 +5,7 @@ import { User } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 import { UsersService } from './users.service';
 
-@WebSocketGateway({cors: {origin: '*'}})
+@WebSocketGateway({ namespace: 'users' })
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
   @WebSocketServer()
@@ -18,7 +18,6 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
   async handleConnection(client: Socket) {
     console.log("/////////////////////////////// EVENT HANDLECONNECTION: UsersGateway ///////////////////////////////")
 
-    console.log(this.server.engine.clientsCount);
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -36,6 +35,10 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
+      if (this.connectedUsers.has(user.id)) {
+        this.server.to(client.id).emit('alreadyConnected', user.id);
+        throw new UnauthorizedException(`User ${user.username} is already connected to socket chat`)
+      }
       console.log("user => ", user);
     }
     catch(error) {
@@ -50,11 +53,21 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
     console.log("/////////////////////////////// EVENT HANDLECONNECTION: UsersGateway ///////////////////////////////")
   }
 
-  async handleDisconnect(client: any) {
+  async handleDisconnect(client: Socket) {
     console.log('Disconnect');
+    this.removeSocketId(client.id);
+    client.disconnect();
   }
 
   getSocketId(userId: number) {
     return this.connectedUsers.get(userId);
+  }
+
+  removeSocketId(clientId: string) {
+    for (const [userId, socketId] of this.connectedUsers.entries()) {
+      if (socketId === clientId) {
+        this.connectedUsers.delete(userId);
+      }
+    }
   }
 }
