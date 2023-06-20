@@ -24,7 +24,7 @@ model User {
   username        String          @unique
   password        String
   email           String?         @unique
-  avatar          String?
+  avatar          String          @default("./uploads/default.png")
   oauth_code      String?         @unique
   oauth_exp       DateTime?
   twoFactorSecret String?
@@ -35,7 +35,41 @@ model User {
   friendList      Int[]           @default([])
   blockedList     BlockedUser[]
   channelList     Int[]           @default([])
+  player1Games    Game[]          @relation("Player1")
+  player2Games    Game[]          @relation("Player2")
+  stats           Stats?
+  achievements    Achievements?
   createdAt       DateTime        @default(now())
+}
+
+model Stats {
+  User          User @relation(fields: [userId], references: [id])
+  userId        Int
+  matchesPlayed Int  @default(0)
+  matchesWon    Int  @default(0)
+  matchesLost   Int  @default(0)
+  eloRating     Int  @default(1000)
+  winStreak     Int  @default(0)
+  lossStreak    Int  @default(0)
+  goalsScored   Int  @default(0)
+  goalsTaken    Int  @default(0)
+
+  @@id([userId])
+}
+
+model Achievements {
+  User   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  Novice       Boolean @default(false)
+  Intermediate Boolean @default(false)
+  Expert       Boolean @default(false)
+  Master       Boolean @default(false)
+  OnFire       Boolean @default(false)
+  Tenacious    Boolean @default(false)
+  Godlike      Boolean @default(false)
+
+  @@id([userId])
 }
 
 model BlockedUser {
@@ -94,16 +128,46 @@ enum MessageType {
 }
 
 model Message {
-  id        Int         @id @default(autoincrement())
-  sendBy    Int?
-  content   String
-  type      MessageType @default(MESSAGE)
-  Channel   Channel?    @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  channelId Int?
-  createdAt DateTime    @default(now())
+  id         Int         @id @default(autoincrement())
+  sendBy     Int?
+  acceptedBy Int?
+  content    String
+  type       MessageType @default(MESSAGE)
+  Channel    Channel?    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId  Int?
+  createdAt  DateTime    @default(now())
+}
+
+enum GameStatus {
+  MATCHMAKING
+  INVITE
+  ONGOING
+  FINISHED
+}
+
+//Those are just example just to pave the way
+enum GameType {
+  CLASSIC
+  SPEEDUP
+  HARDMODE
 }
 
 // For a Game, need at least the ID of the two players involved, the score, if the match is ongoing or over. Will add more.
 model Game {
   id Int @id @default(autoincrement())
+
+  player1      User? @relation("Player1", fields: [player1Id], references: [id])
+  player1Id    Int?
+  player1Score Int   @default(0)
+
+  player2      User? @relation("Player2", fields: [player2Id], references: [id])
+  player2Id    Int?
+  player2Score Int   @default(0)
+
+  wonBy Int?
+
+  status   GameStatus
+  gametype GameType   @default(CLASSIC)
+
+  createdAt DateTime @default(now())
 }

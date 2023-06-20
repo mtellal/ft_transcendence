@@ -43,3 +43,9 @@ export class TradeDto {
 	@IsOptional()
 	otp_code?: string;
 }
+
+export class JwtPayloadDto {
+	id?: number;
+	username?: string;
+	iat?: number;
+}

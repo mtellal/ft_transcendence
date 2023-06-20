@@ -8,9 +8,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import path = require('path');
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid'
 import { User, Channel } from '@prisma/client';
 import { UsersGateway } from './users.gateway';
+import { UsersAchievementsService } from './users-achievements.service';
 
 export const storage = {
   storage: diskStorage({
@@ -41,7 +41,7 @@ export const storage = {
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly usersGateway: UsersGateway) {}
+  constructor(private readonly usersService: UsersService, private readonly usersGateway: UsersGateway, private readonly userAchievementsService: UsersAchievementsService) {}
 
   @Get()
   @ApiQuery({
@@ -77,6 +77,12 @@ export class UsersController {
     if (!channel)
       throw new NotFoundException('No direct messages channel between these two users');
     return channel;
+  }
+
+  @Get('ladder')
+  @ApiOperation({ summary: 'Get an array of users sorted by their elo rating'})
+  async getLadder() {
+    return await this.usersService.getUsersByEloRating();
   }
 
   @Get(':id')
@@ -152,7 +158,7 @@ export class UsersController {
     if (!file)
       throw new BadRequestException('No file or empty file');
     const user: User = req.user;
-    if (req.user.avatar && path.extname(file.filename) != path.extname(user.avatar))
+    if (req.user.avatar != './uploads/default.png' && path.extname(file.filename) != path.extname(user.avatar))
       this.usersService.deleteImg(req.user.avatar);
     const updatedUser = await this.usersService.update(user.id, {
       avatar: file.path
@@ -208,6 +214,24 @@ export class UsersController {
     if (!user)
       throw new NotFoundException(`User with id of ${id} not found`);
     return await this.usersService.getBlocklist(id);
+  }
+
+  @Get(':id/matchHistory')
+  @ApiOperation({ summary: `Get a user's match history`})
+  async getMatchHistory(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return await this.usersService.getMatchHistory(id);
+  }
+
+  @Get(':id/stats')
+  @ApiOperation({ summary: `Get a user's stats`})
+  async getStats(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.findOne(id);
+    if (!user)
+      throw new NotFoundException(`User with id of ${id} not found`);
+    return await this.usersService.getStats(id);
   }
 
   @Post('friend')
@@ -352,4 +376,10 @@ export class UsersController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.remove(id);
   }
+
+  @Get(':id/achievements')
+  async showAchievements(@Param('id', ParseIntPipe) id: number) {
+    return this.userAchievementsService.showAchievements(id);
+  }
+
 }
