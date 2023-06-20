@@ -67,21 +67,76 @@
 
 ### Events
 
-#### Backend
+#### Users Gateway
+
+The Users Gateway doesn't listen to any events, however it emits:
+- updatedFriend: will send an updated User object to every user of a friendlist in case of update (profile picture, name...)
+
+- updatedMember: will send an updated User object to every user of every channel joined by the user
+
+- receivedRequest: will be sent to the recipient of a friend request once it is posted
+
+- addedFriend: will be sent to the user who sent the friend request only if it is accepted
+
+- removedFriend: will be sent to the user if he has been removed from a friend list
+
+
+#### Chat Gateway
+
+Channel creation is done through a request, once a channel is created, a 'newChannel' event is emitted to every member of the newly created Channel
 
 The backend listens to these events: 
-- 'message': Takes the channelId and the content of the message in the dto. Message will be emited only to the users of that room.
-- 'createChannel': Takes a name (optional), a type, a password (optional), a member list and an administrator list (both optional). Creates a channel with the given type and name, adds the specified users to the channel at its creation.
-- 'joinChannel': Takes a channelId and a password (optional). Join the given channel.
-- 'leaveChannel': Takes a channelId.
-- 'addtoChannel': Takes a channelId and a userId. Only administrators can add someone to a channel.
-- 'kickUser', 'banUser': Takes a channelId, userId and a reason (optional). Administrators can use admin actions on members and owner can use admin action on anyone. Emits a notification to the serv when an admin action was taken.
-- 'muteUser': Takes a channelId, userId, a duration and a reason (optional). A muted user can't send messages to the given channel.
-- 'makeAdmin': Takes a channelId and a userId. Only the owner can make someone else admin.
-- 'updateChannel': Takes a type (optional) and/or a password (optional). If you're trying to make a channel protected by a password, a PROTECTED type is required else we'll throw an error
+- 'message': Takes the channelId and the content of the message in the dto. Message will be emited only to the users of that room through a 'message' event
 
-I added an 'addedtoChannel' event that will be emited to a user that has been newly added to a channel. Let me know if it is useful or not to allow the list of channels of a user to be updated.
-Check the dtos in backend/src/chat/dto to see what the server is expecting to receive
+- 'joinChannel': Takes a channelId and a password (optional). Join the given channel. Will emit 'joinedChannel' to the room when the User is added to the Channel in the db
+
+- 'addtoChannel': Takes a channelId and a userId. Only administrators can add someone to a channel. Will emit 'addedtoChannel' to the room and to the newly added User
+
+- 'leaveChannel': Takes a channelId. Will emit 'leftChannel' to the room and 'ownerChanged' if the user who left was the owner of the Channel
+
+- 'kickUser', 'banUser': Takes a channelId, userId and a reason (optional). Administrators can use admin actions on members and owner can use admin action on anyone. Emits a 'kickedUser' event
+
+- 'muteUser': Takes a channelId, userId, a duration and a reason (optional). A muted user can't send messages to the given channel. Emits a 'mutedUser' event to the room
+
+- 'unmuteUser': Takes a channelId and a userId. Only an admin can unmute a User and only an owner can unmute an admin. Emits a 'unmutedUser' to the room
+
+- 'banUser': Takes a channelId, userId and a reason (optional). Emits 'bannedUser' to the room and forcibly removed the User from the channel via socket.leave(...)
+
+- 'unbanUser': Takes a channelId and a userId. Emits 'unbannedUser' to the room.
+
+- 'makeAdmin': Takes a channelId and a userId. Only the owner can make someone else admin. Emits 'madeAdmin' to the room
+
+- 'removeAdmin': Takes a channelId and a userId. Emits 'removedAdmin' to the room
+
+- 'updateChannel': Takes a channedId and a name (optional) or a type (optional) or a password (optional). Emits 'updatedChannel' to the room with the updatedChannel object
+
+- 'sendInvite': Takes a channelId and a gametype in the dto. Can't send an invite if muted. Emits the invite as a message with the type INVITE and the gameId of the newly created game room as content
+
+- 'acceptInvite': Takes a message id as a parameter. If it's a valid invite, will emit 'acceptedInvite' to both players with the game room object containing relevant info
+
+#### Games Gateway
+
+The Games gateway listens to those events:
+
+- 'join': Takes a dto corresponding to the gametype (CLASSIC, SPEEDUP, HARDMODE). Will join a pending game with that gametype if found. Else will create a game and wait for another player. It will emit: 
+  - In both cases: 'joinedGame' with the game room
+  - 'waitingforP2' if a game is created and we're waiting for another player
+  - 'foundGame': if a pending game is found
+  - 'GameStart': When the game is ready (two players joined)
+
+- 'joinInvite': Takes a gameId as parameter. Uses the same events as 'join'. However, the match will only start if both users are connected to the game socket and joined the room.
+
+- 'cancel': Deletes a matchmaking game
+
+- 'moveUp': takes a roomId (number) as parameter
+
+- 'moveDown': same as above
+
+The Games gateway emits those events:
+
+- 'updatedState': sends a GameState object to the room every 17ms
+
+- 'finishedGame': sends the updated Game object to the room when it's over (P1Wins or P2Wins)
 
 <hr/>
 

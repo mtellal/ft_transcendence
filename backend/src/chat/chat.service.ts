@@ -4,6 +4,7 @@ import { AdminActionDto, CreateChannelDto, JoinChannelDto, MessageDto, MuteDto, 
 import { Channel, User, Message, ChannelType } from '@prisma/client';
 import * as argon from 'argon2';
 import { UsersService } from 'src/users/users.service';
+import { GamesService } from 'src/games/games.service';
 
 @Injectable()
 export class ChatService {
@@ -27,6 +28,12 @@ export class ChatService {
       where: {name},
       include: { muteList: true }
     })
+  }
+
+  async findMessage(id: number) {
+    return await this.prisma.message.findUnique({
+      where: { id }
+    });
   }
 
   async createMessage(messageDto: MessageDto, sender: User)
@@ -62,6 +69,23 @@ export class ChatService {
       }
     })
     return (message);
+  }
+
+  async createInvite(messageDto: MessageDto) {
+    const invite = await this.prisma.message.create({
+      data: {
+        channelId: messageDto.channelId,
+        type: messageDto.type,
+        content: messageDto.content
+      }
+    })
+    await this.prisma.channel.update({
+      where: {id: messageDto.channelId},
+      data: {
+        messages: { connect: {id: invite.id}}
+      }
+    })
+    return (invite);
   }
 
   async getMessage(channelId: number): Promise<Message[]> {
