@@ -39,7 +39,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     if (this.userToSocket.has(decoded.id)) {
-      console.log('game: User already connected on a socket');
+      this.server.to(client.id).emit('alreadyConnected', decoded.id);
       client.disconnect();
       return ;
     }
