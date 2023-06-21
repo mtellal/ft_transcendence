@@ -30,6 +30,7 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <App />,
+        loader: appLoader,
         errorElement: <Navigate to="/" replace/>,
         children: [
             {
@@ -87,7 +88,7 @@ const router = createBrowserRouter([
             },
         ]
     },
-    /* {
+    {
         path: "login",
         element: <Login />,
         children: [
@@ -104,14 +105,10 @@ const router = createBrowserRouter([
                 element: <SignUp />,
             },
             {
-                path: "2fa:oauth_code",
+                path: "2fa",
                 element: <TwoFactor />,
             }
         ]
-    }, */
-    {
-        path: "login:token",
-        element: <Login />,
     },
 ])
 

@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, Outlet, redirect, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { setCookie } from "../../Cookie";
 
 import userImg from '../../assets/icon-login.png'
@@ -38,31 +38,47 @@ export function ChooseLogin() {
 }
 
 
-export async function loader({ params, request }: any) {
-    let validLogin = false;
-    let url = request.url.split('oauth_code=');
-    console.log(request.url)
-    if (url && url.length > 1) {
-        let oauth_code = decodeURI(url[1]);
-        console.log("loader login ", oauth_code)
-        if (oauth_code) {
-            await getTokenRequest(oauth_code, "")
-                .then(({ error, res }: any) => {
-                    console.log(res)
-                    if (!error) {
-                        setCookie("access_token", res.data.access_token);
-                        validLogin = true;
-                    }
-                })
-        }
-    }
-    console.log(validLogin)
-    if (validLogin)
-        return (redirect("/"))
-    return ({})
-}
-
 export default function Login() {
+
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const navigate = useNavigate();
+
+    async function loader() {
+        console.log(location)
+        let validLogin = false;
+        let oauth_code = searchParams.get("oauth_code");
+        let step = searchParams.get("step");
+        console.log("step =>", step)
+        if (oauth_code) {
+            if (step === "true") {
+                console.log("redirection 2fa")
+                return (navigate("/login/2fa", {state: {oauth_code}}));
+            }
+            if (oauth_code) {
+                console.log("normal oauth_code ", oauth_code)
+                await getTokenRequest(oauth_code, "")
+                    .then(({ error, res }: any) => {
+                        console.log(res, error)
+                        if (!error) {
+                            setCookie("access_token", res.data.access_token);
+                            validLogin = true;
+                        }
+                    })
+            }
+        }
+        setCookie("access_token", "")
+        if (validLogin)
+            return (redirect("/"))
+    }
+
+
+    useEffect(() => {
+        loader();
+    }, [])
+
+
 
     return (
         <div className="flex-center login-page">

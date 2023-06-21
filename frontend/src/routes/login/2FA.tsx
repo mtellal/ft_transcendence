@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
-import { Link, Outlet, redirect, useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, redirect, useLoaderData, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import IconInput from "../../components/Input/IconInput";
 
 import { setCookie } from "../../Cookie";
 
 import './Sign.css'
-import { signinRequest } from "../../requests/auth";
+import { getTokenRequest, signinRequest } from "../../requests/auth";
 import { NavigationButton } from "./NavigationButton";
 
 export default function TwoFactor() {
@@ -17,6 +17,7 @@ export default function TwoFactor() {
     const location = useLocation();
 
     useEffect(() => {
+        console.log('INSIDE 2FA')
         if (!location || !location.state) {
             navigate("/signin")
         }
@@ -29,8 +30,23 @@ export default function TwoFactor() {
     async function submit() {
         if (!secret || !secret.trim())
             return setError("Secret required")
-        await signinRequest(location.state.username, location.state.password, secret, "true")
-            .then(({ res }: any) => {
+        if (location.state.username && location.state.password) {
+            await signinRequest(location.state.username, location.state.password, secret, "true")
+                .then(({ res }: any) => {
+                    if (res && res.data) {
+                        if (res.data.access_token) {
+                            setCookie("access_token", res.data.access_token);
+                            navigate("/");
+                        }
+                        else
+                            setError("Code invalid")
+                    }
+                })
+        }
+        else if (location.state.oauth_code)
+        {
+            await getTokenRequest(location.state.oauth_code, secret)
+            .then(res  => {
                 if (res && res.data) {
                     if (res.data.access_token) {
                         setCookie("access_token", res.data.access_token);
@@ -40,6 +56,7 @@ export default function TwoFactor() {
                         setError("Code invalid")
                 }
             })
+        }
     }
 
     const iconInputStyle = {

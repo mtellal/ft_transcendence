@@ -12,7 +12,7 @@ export async function getTokenRequest(oauth_code: string, otp_code: string) {
             oauth_code,
             otp_code
         })
-        .then(res => ({error: false, res}))
+        .then(res => res)
     )
 }
 

@@ -146,40 +146,51 @@ function Enable2FA(props: any) {
         return new Blob([uInt8Array], { type: imageType });
     }
 
-    async function generateQrCode() {
-        setUpdated(null);
-        await getQRCodeRequest(token)
-            .then(async (res: any) => {
-                if (res.data) {
-                    let blob = convertBase64ToBlob(res.data.qrcode);
-                    const url = window.URL.createObjectURL(blob)
-                    console.log(url);
-                    setQrCode(url);
-                    const updatedUser = await fetchUser(user.id);
-                    updateCurrentUser(updatedUser);
-                }
-            })
-    }
+    const generateQrCode = useCallback(async () => {
+        if (token) {
+            await getQRCodeRequest(token)
+                .then(async (res: any) => {
+                    if (res.data) {
+                        let blob = convertBase64ToBlob(res.data.qrcode);
+                        const url = window.URL.createObjectURL(blob)
+                        console.log(url);
+                        setQrCode(url);
+                        const updatedUser = await fetchUser(user.id);
+                        updateCurrentUser(updatedUser);
+                    }
+                })
+        }
+    }, [token]);
 
 
 
-    function submit(s: string) {
+    const enable2FA = useCallback(async () => {
+        await enable2FARequest(true, token);
+        await generateQrCode();
+    }, [token]);
+
+    const submit = useCallback(async (s: string) => {
         setSelected((p: string) => {
             if (p !== s) {
-                enable2FARequest(s === "true", token);
                 setUpdated(true);
-                setQrCode(null);
+                if (s === "true")
+                    enable2FA();
+                else
+                {
+                    setQrCode(null);
+                    enable2FARequest(false, token)
+                }
             }
             return (s);
         });
-    }
+    }, [token]);
 
 
     return (
         <div>
             <h2>Authentifiaction</h2>
             <h4>Enable 2FA</h4>
-            { qrcode && <img src={qrcode}/> }
+            {qrcode && <img src={qrcode} />}
             {updated && <p className="green-c" >updated</p>}
             <div style={{ width: '200px', marginBottom: '10px' }}>
                 <PickMenu
@@ -189,15 +200,6 @@ function Enable2FA(props: any) {
                     picking={() => setUpdated(false)}
                 />
             </div>
-            {
-                selected === "true" &&
-                <button
-                    className="button"
-                    onClick={() => generateQrCode()}
-                >
-                    generate qr code
-                </button>
-            }
         </div >
     )
 }
