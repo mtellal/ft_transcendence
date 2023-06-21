@@ -10,6 +10,9 @@ import PickMenu from "../../components/PickMenu";
 import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
 import useFetchUsers from "../../hooks/useFetchUsers";
 import './Profile.css'
+import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
+import { Stats } from "../../components/Stats/Stats";
+import { Achievements } from "../../components/Achievements/Achievements";
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const [username, setUsername]: [string, any] = React.useState(props.username);
@@ -175,7 +178,7 @@ function Enable2FA(props: any) {
 
 
     return (
-        <div>
+        <div className="auth2fa">
             <h2>Authentifiaction</h2>
             <h4>Enable 2FA</h4>
             { qrcode && <img src={qrcode}/> }
@@ -211,6 +214,8 @@ export default function Profile() {
         updateCurrentProfilePicture
     }: any = useCurrentUser();
 
+	// console.log('TEST', user);
+
     return (
         <div className="profile scroll">
             <h2>Profile</h2>
@@ -220,13 +225,20 @@ export default function Profile() {
                     username={user.username}
                     updateCurrentUser={updateCurrentUser}
                 />
+				<Enable2FA />
                 <ProfilePicture
                     token={token}
                     image={user && user.url}
                     setImage={updateCurrentProfilePicture}
                 />
             </div>
-            <Enable2FA />
+			<div className="flex statsUser">
+				<HistoryMatchs id={user.id} />
+				<Stats id={user.id} />
+			</div>
+			<div className="flex achiev">
+				<Achievements id={user.id} />
+			</div>
         </div>
     )
 }

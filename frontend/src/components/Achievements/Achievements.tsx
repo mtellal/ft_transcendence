@@ -40,7 +40,7 @@ export function Achievements({ id }: UserProfileProps) {
 			<BoxAchievements name={'Master'} description={"Reach 20 Pong matches"} image={master} condition={achievements[0]["Master"]} />
 			<BoxAchievements name={'On fire'} description={"Achieve 5 wins in a row"} image={fire} condition={achievements[0]["OnFire"]} />
 			<BoxAchievements name={'Tenacisous'} description={"Experience 5 losses in a row"} image={tenacious} condition={achievements[0]["Tenacious"]} />
-			<BoxAchievements name={'Godlike'} description={"Have 80% win rate on 10 Pong matches"} image={godlike} condition={achievements[0]["Godlike"]} />
+			<BoxAchievements name={'Godlike'} description={"80% win on 10 matches"} image={godlike} condition={achievements[0]["Godlike"]} />
 		</div>
 	);
 }

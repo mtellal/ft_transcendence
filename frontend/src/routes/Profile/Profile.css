@@ -3,32 +3,35 @@
     grid-row: 2 / span 18;
     grid-column: auto / span 20;
     margin: 0;   
-    padding: 5%;
+    padding: 1%;
+	max-width: 99%;
+
 }
 
 .profileinfos-container
 {
-    width: 70%;
+	margin-top: 35px;
+	width: 45%;
 }
 
 .profileinfos-input-container
 {
-    max-width: 400px;
+	max-width: 400px;
 }
 
 .profile-infos-button:hover
 {
-    background-color: rgb(223, 223, 223);
+	background-color: rgb(223, 223, 223);
 }
 
 .profile-infos-button:active
 {
-    background-color: white;
+	background-color: white;
 }
 
 .profileinfos-updated
 {
-    color: rgb(0, 211, 63);
+	color: rgb(0, 211, 63);
     margin: 0;
     padding-bottom: 10px;
     font-size: small;
@@ -36,7 +39,7 @@
 
 .profileinfos-error
 {
-    color: rgb(211, 0, 0);
+	color: rgb(211, 0, 0);
     margin: 0;
     padding-bottom: 10px;
     font-size: small;
@@ -47,7 +50,7 @@
 
 .picture-container
 {
-    border: 1px solid rgb(172, 172, 172);
+	border: 1px solid rgb(172, 172, 172);
     overflow: hidden;
     border-radius: 50%;
     height: 130px;
@@ -59,14 +62,14 @@
 
 .profile-picture
 {
-    object-fit: cover;
+	object-fit: cover;
     width: 100%;
     height: 100%;
 }
 
 .profile-picture-input
 {
-    width:0;
+	width:0;
     height: 0;
     opacity: 0;
     overflow: hidden;
@@ -74,7 +77,7 @@
 
 .profil-picture-label
 {
-    background-color: rgb(255, 255, 255);
+	background-color: rgb(255, 255, 255);
     position: relative;
     top: -20px;
     right: -10px;
@@ -86,13 +89,29 @@
 
 .profil-picture-label:hover
 {
-    background-color: rgb(197, 197, 197);
+	background-color: rgb(197, 197, 197);
 }
 
 .profile-picture-button
 {
-    padding: 5px;
+	padding: 5px;
     cursor: pointer;
+}
+
+.statsUser {
+	justify-content: space-evenly;
+	/* margin-bottom: 100px; */
+	margin-bottom: 7vh;
+	/* background-color: black; */
+}
+
+.achiev {
+	/* background-color: black; */
+	/* margin-top: 5%; */
+}
+
+.auth2fa {
+	margin-right: 40%;
 }
 
 
@@ -118,5 +137,16 @@
         width: 20px;
         margin: 5px;
     }
+}
 
+@media (max-height: 750px) {
+	.statsUser {
+		display: none;
+	}
+}
+
+@media (max-height: 950px) {
+	.achiev {
+		display: none;
+	}
 }
