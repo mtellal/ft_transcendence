@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { useChannelsContext, useChatSocket, useFriendsContext } from "../../../hooks/Hooks";
+import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../../../hooks/Hooks";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 
 export default function FriendEvents({ children }: any) {
     const { socket } = useChatSocket();
+    const { userSocket } = useCurrentUser();
+
 
     const { friends, currentFriend } = useFriendsContext();
     const { removeFriend, isUserFriend, updateFriend } = useFriends();
@@ -14,9 +16,8 @@ export default function FriendEvents({ children }: any) {
     const { channels } = useChannelsContext();
     const { getChannelFromFriendName, leaveChannel } = useChannels();
 
-
     useEffect(() => {
-        if (socket) {
+        if (socket && userSocket) {
 
             socket.on('receivedRequest', (request: any) => {
                 console.log("REQUEST FRIEND EVENT => ", request)
@@ -31,7 +32,7 @@ export default function FriendEvents({ children }: any) {
                 }
             })
 
-            socket.on('updatedFriend', (friend: any) => {
+            userSocket.on('updatedFriend', (friend: any) => {
                 console.log("UPDATED FRIEND EVENT => ")
                 if (friend)
                     updateFriend(friend);
@@ -45,14 +46,19 @@ export default function FriendEvents({ children }: any) {
                 }
             })
         }
+
         return () => {
+            if (userSocket)
+            {
+                userSocket.off('updatedFriend')
+            }
             if (socket) {
                 socket.off('receivedRequest');
                 socket.off('addedFriend');
                 socket.off('removedFriend');
             }
         }
-    }, [socket, friends, currentFriend, channels])
+    }, [socket, friends, currentFriend, channels, userSocket])
 
     return (children)
 }

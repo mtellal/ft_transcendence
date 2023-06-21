@@ -41,11 +41,14 @@ export function ChooseLogin() {
 export async function loader({ params, request }: any) {
     let validLogin = false;
     let url = request.url.split('oauth_code=');
+    console.log(request.url)
     if (url && url.length > 1) {
         let oauth_code = decodeURI(url[1]);
+        console.log("loader login ", oauth_code)
         if (oauth_code) {
             await getTokenRequest(oauth_code, "")
                 .then(({ error, res }: any) => {
+                    console.log(res)
                     if (!error) {
                         setCookie("access_token", res.data.access_token);
                         validLogin = true;
@@ -53,8 +56,7 @@ export async function loader({ params, request }: any) {
                 })
         }
     }
-    else
-        setCookie("access_token", "")
+    console.log(validLogin)
     if (validLogin)
         return (redirect("/"))
     return ({})

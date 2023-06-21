@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import { io, Socket } from 'socket.io-client';
-import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { useCurrentUser } from "../../hooks/Hooks";
 import './Game.css'
 import useFetchUsers from "../../hooks/useFetchUsers";
@@ -189,7 +189,7 @@ function SearchGame(props: any) {
 
 
   return (
-    <div className="play-page">
+    <div className="play-page" style={{minHeight: '200px'}}>
       <div className="flex-column-center">
         <button className="play-button" style={{ cursor: 'none' }}>
           Searching a game {points}
@@ -208,6 +208,7 @@ function SearchGame(props: any) {
 
 export default function LaunchGame() {
   const [play, setPlay] = React.useState(false);
+  const location = useLocation();
 
   const { user, token, updateCurrentUser } = useCurrentUser();
 
@@ -225,53 +226,87 @@ export default function LaunchGame() {
       socket.emit('join', {
         gametype: mode
       });
+    }
+  }, [socket, user]);
+
+
+  useEffect(() => {
+    if (socket && user)
+    {
       socket.on('joinedGame', (joinedGame: any) => {
         if (joinedGame && joinedGame.player1Id && joinedGame.player2Id) {
           setGameFound(true);
           setSearchingGame(false);
           setGameRoom(joinedGame);
           if (user)
+          {
             updateUser({ userStatus: "INGAME" }, user.id)
+          }
           socket.off('joinedGame')
         }
       });
+      return () => {
+        socket.off('joinedGame');
+      }
     }
-  }, [socket, user]);
+  }, [socket, user, searchingGame])
+
 
 
   useEffect(() => {
-    const s = io('http://localhost:3000/game', {
-      transports: ['websocket'],
-      extraHeaders: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    setSocket(s);
-
-    if (user) {
-      s.on('finishedGame', (res: any) => {
+    if (socket && user) {
+      socket.on('finishedGame', (res: any) => {
         if (res) {
           setGameResult(res);
           if (user)
+          {
             updateUser({ userStatus: "ONLINE" }, user.id)
+          }
         }
       })
+
+      if (location && location.state && location.state.gameId) {
+        socket.emit('joinInvite', location.state.gameId)
+      }
+
     }
 
     return () => {
       if (user)
-        updateUser({  userStatus: "ONLINE" }, user.id)
-      s.disconnect();
+        updateUser({ userStatus: "ONLINE" }, user.id)
+
+      if (socket) {
+        socket.off('finishedGame');
+      }
     }
-  }, [user]);
+
+  }, [socket, user])
+
+
+  useEffect(() => {
+    if (token) {
+      const s = io('http://localhost:3000/game', {
+        transports: ['websocket'],
+        extraHeaders: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      setSocket(s);
+
+      return () => {
+        s.disconnect();
+      }
+    }
+  }, [token]);
+
 
   const cancelSearchGame = useCallback(() => {
     if (socket) {
       setSearchingGame(false);
       socket.emit('cancel');
     }
-  }, [socket]);
+  }, [socket, user]);
 
 
   function playAgain() {

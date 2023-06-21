@@ -283,6 +283,7 @@ export function ChannelsProvider({ children }: any) {
 
 
     const loadChannels = useCallback(async () => {
+        console.log("////// load channels")
         setChannelsLoading(true)
         let channelList;
         channelList = await getChannels(user.id).then(res => res.data);
@@ -295,6 +296,7 @@ export function ChannelsProvider({ children }: any) {
         });
         // channelList.map(async (c : any) => await removeChannel(c.id))
         setChannelsLoading(false)
+        console.log("////// load channels")
 
     }, [user, socket])
 

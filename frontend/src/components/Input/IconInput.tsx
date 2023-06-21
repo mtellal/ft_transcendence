@@ -10,12 +10,16 @@ type TIconInput = {
     value: string,
     style?: {} | any,
     setValue: (s: string) => {} | any,
-    submit?: () => {} | any
+    submit?: () => {} | any,
+    maxLength: number
 }
 
 export default function IconInput(props: TIconInput) {
     function handleChange(e: any) {
-        props.setValue(e.target.value);
+        if (e.target.value.length <= props.maxLength)
+        {
+            props.setValue(e.target.value);
+        }
     }
 
     function onKeyDown(e: any) {

@@ -7,18 +7,22 @@ type TInfoInput = {
     label: number | any,
     blur?: boolean,
     value: string,
-    setValue: (s : string) => {},
-    submit?: () => {} | any, 
-    onChange?: any
+    setValue: (s: string) => {},
+    submit?: () => {} | any,
+    onChange?: any,
+    maxLength: number
 }
 
 export default function InfoInput(props: TInfoInput) {
     const inputRef: any = React.useRef();
 
     function onChange(e: any) {
-        props.setValue(e.target.value);
-        if (props.onChange)
-            props.onChange(e)
+        if (e.target.value.length <= props.maxLength) {
+
+            props.setValue(e.target.value);
+            if (props.onChange)
+                props.onChange(e)
+        }
     }
 
     function handleKeyDown(e: any) {

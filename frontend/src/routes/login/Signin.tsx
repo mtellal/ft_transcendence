@@ -16,17 +16,8 @@ export default function SignIn() {
 
     async function handleResponse(data: any) {
         if (data) {
-            console.log(data);
             if (!data || !data.access_token) {
                 navigate("/login/2fa", { state: { username, password } })
-                // check 2fa
-                /*  if (!secret || !secret.trim())
-                     return (setError("Secret required"));
-                 else
-                 {
-                     const trade = await getTokenRequest("", secret);
-                     console.log(trade);
-                 } */
             }
             else if (data.access_token) {
                 setCookie("access_token", data.access_token);
@@ -36,7 +27,8 @@ export default function SignIn() {
     }
 
     async function handleSubmit() {
-        if (!username || !password)
+        if (!username || !username.trim()
+            || !password || !password.trim())
             return (setError("userame or password empty"));
         await signinRequest(username, password)
             .then(({ error, errMessage, res }: any) => {
@@ -55,8 +47,8 @@ export default function SignIn() {
 
 
     return (
-        <div className="flex-column-center" style={{ minHeight: '250px'}}>
-            <div className="flex-column-center " style={{minHeight: '150px'}}>
+        <div className="flex-column-center" style={{ minHeight: '250px' }}>
+            <div className="flex-column-center " style={{ minHeight: '150px' }}>
                 <IconInput
                     id="submit"
                     style={iconInputStyle}
@@ -65,6 +57,7 @@ export default function SignIn() {
                     value={username}
                     setValue={setUsername}
                     submit={() => handleSubmit()}
+                    maxLength={20}
                 />
                 <IconInput
                     id="password"
@@ -74,6 +67,7 @@ export default function SignIn() {
                     value={password}
                     setValue={setPassword}
                     submit={() => handleSubmit()}
+                    maxLength={30}
                 />
             </div>
             {error && <p>error: {error}</p>}

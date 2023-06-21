@@ -1,6 +1,8 @@
-import React, { useReducer, createContext, useState, useCallback } from "react";
+import React, { useReducer, createContext, useState, useCallback, useEffect } from "react";
 import { getBlockList } from "../requests/block";
 import { login, logout } from "../requests/user";
+import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 
 function reducer(user: any, action: any) {
@@ -47,8 +49,20 @@ export const CurrentUserContext: React.Context<any> = createContext(0);
 
 export function CurrentUserProvider({ children, ...props }: any) {
     const [user, userDispatch]: any = useReducer(reducer, props.user);
+    const [socket, setSocket]: any = useState();
+
 
     React.useEffect(() => {
+
+        const s = io('http://localhost:3000/users', {
+            transports: ['websocket'],
+            extraHeaders: {
+              'Authorization': `Bearer ${props.token}`
+            }
+          });
+    
+          setSocket(s);
+
         userDispatch({ type: 'login' })
         login(user);
 
@@ -58,6 +72,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
             })
 
         return () => {
+            s.disconnect();
             logout(user);
             userDispatch({ type: 'logout' })
         }
@@ -75,6 +90,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
         <CurrentUserContext.Provider
             value={{
                 token: props.token,
+                userSocket: socket,
                 user,
                 userDispatch,
                 updateCurrentUser,

@@ -14,12 +14,10 @@ export function useInvitation() {
         }
     }, [socket])
 
-    const acceptInvitation = useCallback((messageId: number) => {
-        if (socket && messageId)
+    const acceptInvitation = useCallback((id: number) => {
+        if (socket && id)
         {
-            socket.emit('acceptInvite', {
-                messageId
-            })
+            socket.emit('acceptInvite', id)
         }
     }, [socket])
 

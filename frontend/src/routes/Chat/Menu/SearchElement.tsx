@@ -309,9 +309,12 @@ function MenuInput(props: TMenuInput) {
     const inputRef: any = React.useRef();
 
     function onChange(e: any) {
-        props.setValue(e.target.value);
-        if (props.onChange)
-            props.onChange(e)
+        if (e.target.value.length < 200) {
+
+            props.setValue(e.target.value);
+            if (props.onChange)
+                props.onChange(e)
+        }
     }
 
     function handleKeyDown(e: any) {

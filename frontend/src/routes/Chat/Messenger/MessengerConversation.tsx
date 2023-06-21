@@ -37,26 +37,36 @@ function NoMessages() {
 }
 
 
-function InvitationMessage(props: any) {
+type TInvitationMessage = {
+    message: any,
+    author: any
+}
+
+function InvitationMessage(props: TInvitationMessage) {
 
     const { user } = useCurrentUser();
     const { acceptInvitation } = useInvitation();
-    console.log(props.message);
- 
+    const [accepted, setAccepted] = useState(props.message && props.message.acceptedBy);
+
     return (
         <div className="flex-center">
             <div
                 className="flex-ai"
                 style={{ width: '80%', margin: '5px 0', border: '1px solid black', borderRadius: '5px', boxShadow: '1px 2px 5px black', padding: '3%' }}
             >
-                <p className="reset" >{ } wants to play a game in CLASSIC mode</p>
                 {
-                    props.message && !props.message.acceptedBy && user && props.sendBy !== user.id && 
+                    props.author &&
+                    <p className="reset" >{props.author.username} wants to play a game in CLASSIC mode</p>
+
+                }
+                {
+                    props.message && !accepted && user && props.message.sendBy !== user.id &&
                     <button
                         className="button"
                         style={{ width: '100px', fontSize: 'medium', fontWeight: '500' }}
                         onClick={() => {
-                            props.message && acceptInvitation(props.message.id)
+                            acceptInvitation(props.message.id);
+                            setAccepted(true);
                         }}
                     >
                         Join
@@ -74,18 +84,16 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
     const { fetchUser } = useFetchUsers();
     const { currentChannel } = useChannelsContext();
     const { getMemberById, isUserIdMember } = useMembers();
-
     const [authors, setAuthors]: any = useState([]);
     const messagesContainerRef = useRef(null);
 
-
-    async function loadAuthors(messages: any[]) {
-        let users: any[] = [];
-        let ids: number[] = [];
+    async function loadAuthors(messages: any[], membersId: number[], members: any[]) {
+        let users: any[] = members;
+        let ids: number[] = membersId;
         await Promise.all(
             messages.map(async (m: any, index: number) => {
                 if ((index + 1 !== messages.length &&
-                    m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1)) {
+                    m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1) || (m.type === "INVITE")) {
                     if (!ids.length || !ids.find((id: number) => id === m.sendBy)) {
                         ids = [...ids, m.sendBy];
                         if (!isUserIdMember(m.sendBy)) {
@@ -97,13 +105,14 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
                     }
                 }
             }))
-        users = users.filter(u => u);
+        if (users && users.length)
+            users = users.filter(u => u);
         setAuthors(users);
     }
 
     useEffect(() => {
-        if (messages && messages.length && currentChannel) {
-            loadAuthors(messages);
+        if (messages && messages.length && currentChannel && currentChannel.members) {
+            loadAuthors(messages, currentChannel.members, currentChannel.users);
         }
         else {
             setAuthors([]);

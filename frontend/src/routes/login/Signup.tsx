@@ -18,8 +18,14 @@ export default function SignUp() {
     const navigate = useNavigate();
 
     async function handleSubmit() {
-        if (!username || !password || !confirmPassword)
+        if (!username || !username.trim()
+            || !password || !password.trim()
+            || !confirmPassword || !confirmPassword.trim())
             return (setError("userame or password empty"));
+        if (username.trim().length > 20)
+            return (setError("Username too long (max 20 charcters)"))
+        if (password.trim().length > 30)
+            return (setError("Password too long (max 30 charcters)"))
         if (password !== confirmPassword)
             return (setError("password and confirm password are different"))
         await signupRequest(username, password)
@@ -40,7 +46,7 @@ export default function SignUp() {
     }
 
     return (
-        <div className="flex-column-center"  style={{justifyContent: 'space-around', marginBottom: '60px'}}>
+        <div className="flex-column-center" style={{ justifyContent: 'space-around', marginBottom: '60px' }}>
             <div className="flex-column-center">
                 <IconInput
                     id="signup-username"
@@ -50,6 +56,7 @@ export default function SignUp() {
                     value={username}
                     setValue={setUsername}
                     submit={handleSubmit}
+                    maxLength={20}
                 />
                 <IconInput
                     id="signup-password"
@@ -59,6 +66,7 @@ export default function SignUp() {
                     value={password}
                     setValue={setPassword}
                     submit={handleSubmit}
+                    maxLength={30}
                 />
                 <IconInput
                     id="signup-confirm"
@@ -67,11 +75,12 @@ export default function SignUp() {
                     placeholder="Confirm password"
                     value={confirmPassword}
                     setValue={setConfirmPassword}
-                    submit={handleSubmit}
+                    submit={handleSubmit}                    
+                    maxLength={30}
                 />
             </div>
             {error && <p>error: {error}</p>}
-            <NavigationButton 
+            <NavigationButton
                 mainTitle="Signup"
                 secondTitle="signin"
                 onClick={() => handleSubmit()}

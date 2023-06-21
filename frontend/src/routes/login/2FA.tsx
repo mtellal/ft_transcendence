@@ -7,6 +7,7 @@ import { setCookie } from "../../Cookie";
 
 import './Sign.css'
 import { signinRequest } from "../../requests/auth";
+import { NavigationButton } from "./NavigationButton";
 
 export default function TwoFactor() {
     const [secret, setSecret] = React.useState("");
@@ -28,15 +29,15 @@ export default function TwoFactor() {
     async function submit() {
         if (!secret || !secret.trim())
             return setError("Secret required")
-        console.log(secret.trim())
         await signinRequest(location.state.username, location.state.password, secret, "true")
             .then(({ res }: any) => {
-                console.log(res)
                 if (res && res.data) {
                     if (res.data.access_token) {
                         setCookie("access_token", res.data.access_token);
                         navigate("/");
                     }
+                    else
+                        setError("Code invalid")
                 }
             })
     }
@@ -57,23 +58,17 @@ export default function TwoFactor() {
                     value={secret}
                     setValue={setSecret}
                     submit={() => submit()}
+                    maxLength={30}
                 />
             </div>
             {error && <p className="red-c">{error}</p>}
-            <div className="flex-column-center" style={{ width: '100%', marginTop: 'auto' }}>
-                <button
-                    className="flex-center sign--button"
-                    onClick={() => submit()}
-                >
-                    Valid
-                </button>
-                <Link
-                    to={"/login/signin"}
-                    className="sign--link"
-                >
-                    Signin
-                </Link>
-            </div>
+            <NavigationButton
+                mainTitle="Login"
+                secondTitle="Signin"
+                path="/login/signin"
+                onClick={() => submit()}
+            />
+
         </div>
     )
 }

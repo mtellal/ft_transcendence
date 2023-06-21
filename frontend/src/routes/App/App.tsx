@@ -5,7 +5,7 @@ import { Outlet, redirect, useLoaderData } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/SideBar';
-import { extractCookie } from '../../Cookie';
+import { extractCookie, setCookie } from '../../Cookie';
 
 import {
   getUser,
@@ -19,12 +19,14 @@ import './App.css';
 
 export async function loader() {
   const token = extractCookie("access_token");
+  console.log(token)
   if (token) {
     let id = jwtDecode<any>(token).id;
 
     const user = await getUser(id);
     if (user.status !== 200 || user.statusText !== "OK")
-      console.log("Error: app loader => ", user)
+      return (redirect("/login"));
+
 
     let image = await getUserProfilePictrue(id);
     if (image.status === 200 && image.statusText === "OK")
@@ -34,6 +36,7 @@ export async function loader() {
 
     return ({ user: { ...user.data, url: image }, token })
   }
+  setCookie("access_token", "");
   return (redirect("/login"));
 }
 
