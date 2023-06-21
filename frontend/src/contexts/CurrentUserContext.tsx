@@ -64,7 +64,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
           setSocket(s);
 
         userDispatch({ type: 'login' })
-        login(user);
+        login(user, props.token);
 
         getBlockList(user.id, props.token)
             .then(res => {
@@ -73,7 +73,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
 
         return () => {
             s.disconnect();
-            logout(user);
+            logout(user, props.token);
             userDispatch({ type: 'logout' })
         }
     }, [])

@@ -4,20 +4,21 @@ import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
 import { Achievements } from "../../components/Achievements/Achievements";
 import { Stats } from "../../components/Stats/Stats";
 import s from './style.module.css'
+import { useCurrentUser } from "../../hooks/Hooks";
 
 interface UserProfileProps {
 	id: number;
 }
 
 export function UserProfile({ id }: UserProfileProps) {
-
+	const { token } = useCurrentUser();
 	const [data, setData] = useState<any>();
 	const [avatar, setAvatar] = useState<any>();
 
 	async function getInfoUser() {
-		const dataUser = await getUser(id);
+		const dataUser = await getUser(id, token);
 		setData(dataUser.data);
-		const pp = await getUserProfilePictrue(id);
+		const pp = await getUserProfilePictrue(id, token);
 		setAvatar(window.URL.createObjectURL(new Blob([pp.data])));
 	}
 

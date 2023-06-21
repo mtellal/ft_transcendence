@@ -4,7 +4,7 @@ import { Navigate, Route }from 'react-router-dom'
 import './index.css';
 import App, { loader as appLoader, loader } from './routes/App/App';
 
-import Login, { ChooseLogin, loader as loginLoader } from './routes/login/Login'
+import Login, { ChooseLogin } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
 import Profile from './routes/Profile/Profile';
@@ -29,13 +29,11 @@ import { Ladder } from './routes/Ladder/Ladder';
 const router = createBrowserRouter([
     {
         path: "/",
-        loader: appLoader,
         element: <App />,
         errorElement: <Navigate to="/" replace/>,
         children: [
             {
                 path: "",
-                loader: appLoader,
                 element: <LaunchGame />
             },
             {
@@ -89,10 +87,9 @@ const router = createBrowserRouter([
             },
         ]
     },
-    {
+    /* {
         path: "login",
         element: <Login />,
-        loader: loginLoader,
         children: [
             {
                 path: "",
@@ -107,15 +104,14 @@ const router = createBrowserRouter([
                 element: <SignUp />,
             },
             {
-                path: "2fa",
+                path: "2fa:oauth_code",
                 element: <TwoFactor />,
             }
         ]
-    },
+    }, */
     {
         path: "login:token",
         element: <Login />,
-        loader: loginLoader
     },
 ])
 

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { getLadder } from "../../requests/user";
 import s from './style.module.css'
 import { LadderList } from "../../components/LadderList/LadderList";
+import { useCurrentUser } from "../../hooks/Hooks";
 
 export function Ladder() {
 
+	const { token } = useCurrentUser();
 	const [ladder, setLadder] = useState(null);
 
 	async function getData() {
-		const rep = await getLadder();
+		const rep = await getLadder(token);
 		setLadder(rep.data);
 	}
 

@@ -4,6 +4,7 @@ import first from "../../assets/first.png"
 import second from "../../assets/second.png"
 import third from "../../assets/third.png"
 import s from './style.module.css'
+import { useCurrentUser } from "../../hooks/Hooks";
 
 interface LadderListProps {
 	user: any;
@@ -12,13 +13,14 @@ interface LadderListProps {
 
 export function LadderList({ user, index }: LadderListProps) {
 
+	const { token } = useCurrentUser();
 	const [dataUser, setDataUser] = useState<any>();
 	const [avatar, setAvatar] = useState<any>();
 
 	async function getInfoUsers() {
-		const dataUserA = await getUser(user.id);
+		const dataUserA = await getUser(user.id, token);
 		setDataUser(dataUserA.data);
-		const ppA = await getUserProfilePictrue(user.id);
+		const ppA = await getUserProfilePictrue(user.id, token);
 		setAvatar(window.URL.createObjectURL(new Blob([ppA.data])));
 	}
 

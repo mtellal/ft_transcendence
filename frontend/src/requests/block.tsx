@@ -8,7 +8,11 @@ const back = process.env.REACT_APP_BACK;
 
 export async function getBlockList(id: number | string, token: string) {
     return (
-        axios.get(`${back}/users/${id}/blockList`)
+        axios.get(`${back}/users/${id}/blockList`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        })
             .then(res => res)
             .catch(err => err)
     )
@@ -18,7 +22,7 @@ export async function blockUserRequest(id: number | string, token: number | stri
     return (
         axios.post(`${back}/users/block/${id}`, {}, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                Authorization: `Bearer ${token}`
             }
         })
             .then(res => res)
@@ -30,7 +34,7 @@ export async function unblockUserRequest(id: number | string, token: number | st
     return (
         axios.delete(`${back}/users/block/${id}`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                Authorization: `Bearer ${token}`
             }
         })
             .then(res => res)

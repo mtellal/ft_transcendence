@@ -12,6 +12,7 @@ import useFetchUsers from "../../hooks/useFetchUsers";
 import './Profile.css'
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
+    const { token } = useCurrentUser();
     const [username, setUsername]: [string, any] = React.useState(props.username);
     const [error, setError] = React.useState("");
     const [updated, setUpdated] = React.useState(false);
@@ -31,7 +32,7 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
             updateUser({
                 username: username,
                 userStatus: "ONLINE"
-            }, id)
+            }, id, token)
                 .then(d => {
                     if (d.status !== 200 || d.statusText !== "OK")
                         throw "";

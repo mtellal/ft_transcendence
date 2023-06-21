@@ -43,7 +43,7 @@ type TFriendRequest = {
 
 export function FriendsProvider({ children }: any) {
 
-    const { user }: any = useCurrentUser();
+    const { user, token }: any = useCurrentUser();
     const { fetchUsers } = useFetchUsers();
 
     const [friends, friendsDispatch]: any = useReducer(reducer, []);
@@ -101,7 +101,7 @@ export function FriendsProvider({ children }: any) {
     /////////////////////////////////////////////////////////////////////////
 
     const loadInvitations = useCallback(async () => {
-        getUserInvitations(user.id)
+        getUserInvitations(user.id, token)
             .then(res => {
                 if (res.data)
                     setFriendInvitations(res.data);

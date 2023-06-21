@@ -10,14 +10,14 @@ type TInfoInput = {
     setValue: (s: string) => {},
     submit?: () => {} | any,
     onChange?: any,
-    maxLength: number
+    maxLength?: number
 }
 
 export default function InfoInput(props: TInfoInput) {
     const inputRef: any = React.useRef();
 
     function onChange(e: any) {
-        if (e.target.value.length <= props.maxLength) {
+        if (e.target.value.length <= (props.maxLength || 200)) {
 
             props.setValue(e.target.value);
             if (props.onChange)

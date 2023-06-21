@@ -87,7 +87,7 @@ export default function ChannelsEvents({ children }: any) {
                 console.log("ADDED CHANNEL EVENT")
                 if (res && res.channelId && res.userId) {
                     if (res.userId === user.id) {
-                        const channel = await getChannel(res.channelId).then(res => res.data);
+                        const channel = await getChannel(res.channelId, token).then(res => res.data);
                         if (channel) {
                             addChannel(channel, false);
                         }

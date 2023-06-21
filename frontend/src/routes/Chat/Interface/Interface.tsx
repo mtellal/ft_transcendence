@@ -25,6 +25,7 @@ export default function Interface() {
     const params:any = useParams();
     const navigate = useNavigate();
 
+    const { token } = useCurrentUser();
     const { fetchUser } = useFetchUsers();
     const { user }: any = useCurrentUser();
     const { addChannel } = useChannels();
@@ -46,7 +47,7 @@ export default function Interface() {
                 c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
         }
         if (!channel) {
-            await getWhisperChannel(user.id, _user.id)
+            await getWhisperChannel(user.id, _user.id, token)
                 .then(res => {
                     if (res.data) {
                         channel = res.data
@@ -62,7 +63,7 @@ export default function Interface() {
         if (channels && channels.length)
             channel = channels.find((c: any) => c.id === params.channelId);
         if (!channel) {
-            await getChannel(params.channelId)
+            await getChannel(params.channelId, token)
                 .then(res => {
                     if (res.data)
                         channel = res.data;

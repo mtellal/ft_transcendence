@@ -9,6 +9,7 @@ import fire from "../../assets/fire.png"
 import tenacious from "../../assets/tenacious.png"
 import godlike from "../../assets/godlike.png"
 import s from './style.module.css'
+import { useCurrentUser } from "../../hooks/Hooks";
 
 interface UserProfileProps {
 	id: number;
@@ -16,10 +17,11 @@ interface UserProfileProps {
 
 export function Achievements({ id }: UserProfileProps) {
 
+	const { token } = useCurrentUser();
 	const [achievements, setAchievements] = useState(null);
 
 	async function getUserAchievements() {
-		const rep = await getAchievements(id);
+		const rep = await getAchievements(id, token);
 		setAchievements(rep.data);
 	}
 

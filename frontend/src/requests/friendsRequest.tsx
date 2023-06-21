@@ -7,9 +7,13 @@ const back = process.env.REACT_APP_BACK;
 /////////////////////////////////////////////////////////////////////////
 
 
-export async function getUserInvitations(id: number | string) {
+export async function getUserInvitations(id: number | string, token: string) {
     return (
-        axios.get(`${back}/users/${id}/friendRequest`)
+        axios.get(`${back}/users/${id}/friendRequest`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(res => res)
             .catch(err => err)
     )

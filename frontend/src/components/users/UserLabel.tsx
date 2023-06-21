@@ -35,7 +35,7 @@ export function UserLabelSearch(props: TUserLabelSearch) {
     }
 
     async function loadURL() {
-        await getUserProfilePictrue(props.id)
+        await getUserProfilePictrue(props.id, token)
             .then(res => {
                 if (res.status == 200 && res.statusText == "OK")
                     setUrl(window.URL.createObjectURL(new Blob([res.data])))

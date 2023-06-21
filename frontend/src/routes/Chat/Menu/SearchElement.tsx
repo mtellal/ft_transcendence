@@ -37,7 +37,7 @@ function SearchedUserIconChat(props: TUserProps) {
                 c.type === "WHISPER" && c.members.find((id: number) => props.user.id === id))
         }
         if (!channel) {
-            await getWhisperChannel(user.id, props.user.id)
+            await getWhisperChannel(user.id, props.user.id, token)
                 .then(res => {
                     if (res.data) {
                         channel = res.data
@@ -343,7 +343,7 @@ function MenuInput(props: TMenuInput) {
 
 
 export default function SearchElement() {
-    const { user } = useCurrentUser();
+    const { token } = useCurrentUser();
     const [value, setValue]: any = useState("");
     const [error, setError] = useState("");
     const [searchedUser, setSearchedUser] = useState();
@@ -364,7 +364,7 @@ export default function SearchElement() {
             setSearchedUser(user);
         }
         else {
-            await getChannelByName(value.trim())
+            await getChannelByName(value.trim(), token)
                 .then(res => {
                     if (res.data) {
                         channelArray = res.data;

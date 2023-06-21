@@ -257,7 +257,7 @@ function reducer(channels: any, action: any) {
 
 export function ChannelsProvider({ children }: any) {
 
-    const { user } = useCurrentUser();
+    const { user, token } = useCurrentUser();
     const { socket } = useChatSocket();
     const { fetchUsers } = useFetchUsers();
 
@@ -286,7 +286,7 @@ export function ChannelsProvider({ children }: any) {
         console.log("////// load channels")
         setChannelsLoading(true)
         let channelList;
-        channelList = await getChannels(user.id).then(res => res.data);
+        channelList = await getChannels(user.id, token).then(res => res.data);
         channelList = await loadUsersChannels(channelList);
         channelsDispatch({ type: 'initChannels', channels: channelList });
         channelList.forEach((channel: Channel) => {

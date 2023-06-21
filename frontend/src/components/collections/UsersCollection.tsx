@@ -15,7 +15,7 @@ type TUsersCollection = {
 export default function UsersCollection(props: TUsersCollection) {
     const [searchUserValue, setSearchUserValue]: [string, any] = useState("");
     const [searchUser, setSearchUser]: any = useState();
-    const { user } = useCurrentUser();
+    const { user, token } = useCurrentUser();
 
     function alreadyInCollection(u: any) {
         return (props.users.find((p: any) => p.id === u.id) || user.id === u.id)
@@ -29,7 +29,7 @@ export default function UsersCollection(props: TUsersCollection) {
     async function search() {
         if (!searchUserValue && !searchUserValue.trim())
             return 
-        await getUserByUsername(searchUserValue)
+        await getUserByUsername(searchUserValue, token)
             .then(res => setSearchUser(res.data))
     }
 

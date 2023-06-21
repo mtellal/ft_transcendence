@@ -18,17 +18,18 @@ import './App.css';
 
 
 export async function loader() {
+  console.log("app loader")
   const token = extractCookie("access_token");
   console.log(token)
   if (token) {
     let id = jwtDecode<any>(token).id;
 
-    const user = await getUser(id);
+    const user = await getUser(id, token);
     if (user.status !== 200 || user.statusText !== "OK")
       return (redirect("/login"));
 
 
-    let image = await getUserProfilePictrue(id);
+    let image = await getUserProfilePictrue(id, token);
     if (image.status === 200 && image.statusText === "OK")
       image = window.URL.createObjectURL(new Blob([image.data]))
     else

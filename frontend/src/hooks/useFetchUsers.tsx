@@ -5,12 +5,12 @@ import { useCurrentUser } from "./Hooks";
 import defaultPP from '../assets/user.png'
 
 export default function useFetchUsers() {
-    const { user } = useCurrentUser();
+    const { user, token } = useCurrentUser();
 
     const fetchUserProfilePicture = useCallback(async (userId: number) => {
         let path;
         if (userId) {
-            path = await getUserProfilePictrue(userId)
+            path = await getUserProfilePictrue(userId, token)
                 .then(res => {
                     if (res.status === 200 && res.statusText === "OK")
                         return (window.URL.createObjectURL(new Blob([res.data])))
@@ -24,7 +24,7 @@ export default function useFetchUsers() {
     const fetchUser = useCallback(async (userId: number) => {
         if (userId) {
             return (
-                await getUser(userId)
+                await getUser(userId, token)
                     .then(async (res: any) => {
                         if (res.status === 200 && res.statusText === "OK") {
                             let user = res.data;
@@ -39,7 +39,7 @@ export default function useFetchUsers() {
     const fetchUserByUsername = useCallback(async (username: string) => {
         if (username) {
             return (
-                await getUserByUsername(username)
+                await getUserByUsername(username, token)
                     .then(async (res: any) => {
                         if (res.status === 200 && res.statusText === "OK") {
                             let user = res.data;
