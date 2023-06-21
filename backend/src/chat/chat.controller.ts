@@ -7,6 +7,8 @@ import { MessageType, User } from '@prisma/client';
 import { ChatGateway } from './chat.gateway';
 import * as argon from 'argon2';
 
+@UseGuards(JwtGuard)
+@ApiBearerAuth()
 @Controller('chat')
 @ApiTags('chat')
 export class ChatController {
@@ -54,9 +56,7 @@ export class ChatController {
   }
 
   @Put()
-  @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe())
-  @ApiBearerAuth()
   @ApiOperation({summary: 'Creates a channel and returns it'})
   async create(@Body() createChannelDto: CreateChannelDto, @Req() req) {
     console.log("REQUEST => ", req.user)
@@ -70,9 +70,7 @@ export class ChatController {
   }
 
   @Post()
-  @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe())
-  @ApiBearerAuth()
   @ApiOperation({summary: 'Check access to a protected channel'})
   async accessProtectedChannel(@Body() joinChannelDto: JoinChannelDto, @Req() req) {
     const user: User = req.user
@@ -91,9 +89,7 @@ export class ChatController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe())
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Changes the type and/or password of a channel with the given ID'})
   async updateChannel(@Param('id', ParseIntPipe) id: number, @Body() dto: PatchChannelDto, @Req() req) {
     const user: User = req.user;

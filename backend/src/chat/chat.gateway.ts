@@ -7,6 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { AddUserDto, AdminActionDto, CreateChannelDto, InviteDto, JoinChannelDto, LeaveChannelDto, MessageDto, MuteDto, UpdateChannelDto } from './dto/channel.dto';
 import { ChatService } from './chat.service';
 import { GamesService } from 'src/games/games.service';
+import { UsersGateway } from 'src/users/users.gateway';
 
 @WebSocketGateway({namespace: 'chat'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -16,7 +17,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private connectedUsers = new Map<number, string>();
 
-  constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService, private gamesService: GamesService ){}
+  constructor(private jwtService: JwtService, private userService: UsersService, private chatService: ChatService, private gamesService: GamesService, private readonly usersGateway: UsersGateway ){}
 
   @SubscribeMessage('message')
   @UsePipes(new ValidationPipe())
@@ -184,9 +185,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const joinedGame = await this.gamesService.acceptInvite(user.id, gameId);
       //Might need to tweak this, check with front
       const updatedInvite = await this.chatService.acceptInvite(messageId, user.id);
+      //Remove both players pending invite
+      await this.gamesService.removePendingInvite(user.id);
+      await this.gamesService.removePendingInvite(joinedGame.player1Id);
+      //Remove both players pending invite message
+      const invitesP1 = await this.chatService.invalidInvite(joinedGame.player1Id);
+      for (const inviteP1 of invitesP1) {
+        console.log(inviteP1);
+        this.server.to(invite.channelId.toString()).emit('updatedInvite', inviteP1);
+      }
+      const invitesP2 = await this.chatService.invalidInvite(joinedGame.player2Id);
+      console.log(invitesP2);
+      for (const inviteP2 of invitesP2) {
+        console.log(inviteP2);
+        this.server.to(invite.channelId.toString()).emit('updatedInvite', inviteP2);
+      }
       this.server.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
-      this.server.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
-      this.server.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame);
+      this.usersGateway.emitGame(joinedGame.player1Id, joinedGame);
+      this.usersGateway.emitGame(joinedGame.player2Id, joinedGame);
+      /* this.server.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
+      this.server.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame); */
     }
     catch(e) {
       console.log(e);

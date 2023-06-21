@@ -138,11 +138,7 @@ export class AuthService {
 				oauth_exp: expirationTime ? new Date(expirationTime) : null,
 			},
 		});
-		const alreadyConnected = this.usersGateway.getSocketId(user.id);
-		console.log('ALREADY CONNECTED');
-		if (alreadyConnected)
-			throw new ForbiddenException('Already Connected');
-		return updatedUser.oauth_code;
+		return `${updatedUser.oauth_code}&step=${updatedUser.twoFactorStatus}`;
 	}
 
 	async generateHash() {
@@ -170,6 +166,9 @@ export class AuthService {
 		if (!user) {
 			throw new ForbiddenException('Credentials incorrect');
 		}
+		const alreadyConnected = this.usersGateway.getSocketId(user.id);
+		if (alreadyConnected)
+			throw new ForbiddenException('Already Connected');
 		if (user.oauth_exp && Date.now() > user.oauth_exp.getTime()) {
 			throw new ForbiddenException('Authentication code has expired');
 		}

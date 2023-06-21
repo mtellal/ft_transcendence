@@ -100,6 +100,23 @@ export class ChatService {
     return invite;
   }
 
+  async invalidInvite(userId: number) {
+    await this.prisma.message.updateMany({
+      where: {sendBy: userId,
+              acceptedBy: null,
+              type: MessageType.INVITE},
+      data: {
+        acceptedBy: -1
+      }
+    });
+    const invalidInvites = await this.prisma.message.findMany({
+      where: {sendBy: userId,
+        acceptedBy: -1,
+        type: MessageType.INVITE},
+    })
+    return invalidInvites;
+  }
+
   async getMessage(channelId: number): Promise<Message[]> {
     const messages = await this.prisma.message.findMany({
       where: { channelId: channelId},

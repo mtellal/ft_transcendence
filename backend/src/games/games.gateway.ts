@@ -135,7 +135,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(`room-${room.id}`).emit('waitingforP2', room);
       }
       else {
-        await this.gamesService.changeGameStatus(gameId, GameStatus.ONGOING);
+        /* await this.gamesService.changeGameStatus(gameId, GameStatus.ONGOING); */
         this.server.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
         this.gamesService.startGame(room, this.server, this.userToSocket);
       }

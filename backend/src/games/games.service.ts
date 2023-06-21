@@ -153,10 +153,15 @@ export class GamesService {
         }
         if (game.status === GameStatus.ONGOING) {
           const ongoingGame = this.games.get(game.id);
-          if (game.player1Id === payload.id) {
+          if (!ongoingGame) {
+            await this.prisma.game.delete({
+              where: { id: game.id }
+            })
+          }
+          else if (game.player1Id === payload.id) {
             ongoingGame.status = Status.P2WIN;
           }
-          if (game.player2Id === payload.id) {
+          else if (game.player2Id === payload.id) {
             ongoingGame.status = Status.P1WIN;
           }
         }
@@ -452,7 +457,6 @@ export class GamesService {
             OR: [
               { status: GameStatus.MATCHMAKING },
               { status: GameStatus.ONGOING },
-              { status: GameStatus.INVITE },
             ]
           },
           {
@@ -494,9 +498,19 @@ export class GamesService {
           connect: {
             id: userId
           }
-        }
+        },
+        status: GameStatus.ONGOING
       }
     })
     return joinedGame;
+  }
+
+  async removePendingInvite(userId: number) {
+    await this.prisma.game.deleteMany({
+      where: {
+        player1Id: userId,
+        status: GameStatus.INVITE
+      }
+    })
   }
 }
