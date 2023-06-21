@@ -34,14 +34,12 @@ export class AuthController{
 
 	@Get('42')
 	@ApiOperation({ summary: 'ftAuth', description: 'Endpoint description for redirecting to 42 oauth service' })
-	@ApiBearerAuth()
 	@UseGuards(FTOauthGuard)
 	ftAuth(@Req() req){
 		return;
 	}
 
 	@Get('42/redirect')
-	@ApiBearerAuth()
 	@UseGuards(FTOauthGuard)
 	@ApiOperation({ summary: 'ftAuthCallback', description: 'Endpoint description 42oauth service redirect endpoint, returns otp in query to use with 42/trade enpoint' })
 	async ftAuthCallback(@Req() req, @Res() res) {
