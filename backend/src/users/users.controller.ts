@@ -38,6 +38,8 @@ export const storage = {
   },
 }
 
+@UseGuards(JwtGuard)
+@ApiBearerAuth()
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
@@ -130,11 +132,9 @@ export class UsersController {
     return this.usersService.getFriends(user.friendList);
   }
 
-  @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.OK)
   @Post('upload')
   @ApiOperation({ summary: 'Upload an image and update the profile picture of the user identified by its JWT (Needs a valid JWT)'})
-  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -256,10 +256,8 @@ export class UsersController {
     this.usersService.addFriend(friendshipDto.friendId, friendshipDto.id);
   }
 
-  @UseGuards(JwtGuard)
   @Post('friendRequest')
   @ApiBody({type: UserRequestDto})
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Send a pending friend request to another user, if it is accepted, both users will add each other to their friend list'})
   async sendFriendRequest(@Body() friendRequestDto: UserRequestDto, @Request() req)
   {
@@ -279,8 +277,6 @@ export class UsersController {
     this.usersGateway.server.to(this.usersGateway.getSocketId(friend.id)).emit('receivedRequest', newRequest);
   }
 
-  @UseGuards(JwtGuard)
-  @ApiBearerAuth()
   @Post('friendRequest/:requestid')
   @ApiOperation({ summary: 'Accept a pending friend request with a given id, both users will add each other to their friend lists'})
   async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
@@ -289,8 +285,6 @@ export class UsersController {
     this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('addedFriend', user);
   }
 
-  @UseGuards(JwtGuard)
-  @ApiBearerAuth()
   @Delete('friendRequest/:requestid')
   @ApiOperation({ summary: 'Remove a pending friend request with a given id'})
   async deleteFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
@@ -298,10 +292,8 @@ export class UsersController {
     await this.usersService.deleteFriendRequest(user.id, requestId);
   }
 
-  @UseGuards(JwtGuard)
   @Post('block/:id')
   @ApiOperation({ summary: 'Block a user with a given id'})
-  @ApiBearerAuth()
   async blockUser(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user: User = req.user;
     const blockedUser = await this.usersService.findOne(id);
@@ -316,10 +308,8 @@ export class UsersController {
     return newBlock;
   }
 
-  @UseGuards(JwtGuard)
   @Delete('block/:id')
   @ApiOperation({ summary: 'Remove a user with a given id from a blocked user list'})
-  @ApiBearerAuth()
   async unblockUser(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user: User = req.user;
     const unblockedUser = await this.usersService.findOne(id);
@@ -334,10 +324,8 @@ export class UsersController {
     return unblock;
   }
 
-  @UseGuards(JwtGuard)
   @Delete('friend/:id')
   @ApiOperation({ summary: 'Makes two users remove each other to their friendlist, might need to be one-way only. Let me know what you prefer'})
-  @ApiBearerAuth()
   async removeFriend(@Param('id', ParseIntPipe) id: number, @Request() req)
   {
     const user: User = req.user;
