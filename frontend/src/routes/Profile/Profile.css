@@ -152,3 +152,9 @@
 		display: none;
 	}
 }
+
+@media (max-width: 900px) {
+	.auth2fa {
+		display: none;
+	}
+}
