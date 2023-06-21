@@ -100,14 +100,8 @@
 
 .statsUser {
 	justify-content: space-evenly;
-	/* margin-bottom: 100px; */
-	margin-bottom: 7vh;
-	/* background-color: black; */
-}
-
-.achiev {
-	/* background-color: black; */
-	/* margin-top: 5%; */
+	margin-bottom: 15vh;
+	margin-top: 70px;
 }
 
 .auth2fa {
@@ -137,6 +131,14 @@
         width: 20px;
         margin: 5px;
     }
+}
+
+
+@media (max-height: 1080px) {
+	.statsUser {
+		margin-top: 0;
+		margin-bottom: 7vh;
+	}
 }
 
 @media (max-height: 750px) {
