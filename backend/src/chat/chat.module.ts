@@ -11,7 +11,7 @@ import { UsersAchievementsService } from 'src/users/users-achievements.service';
 
 @Module({
   imports: [PrismaModule],
-  providers: [ChatGateway, ChatService, JwtService, UsersService, GamesService, UsersAchievementsService],
+  providers: [ChatGateway, ChatService, JwtService, UsersService, GamesService, UsersAchievementsService, UsersGateway],
   controllers: [ChatController]
 })
 export class ChatModule {}

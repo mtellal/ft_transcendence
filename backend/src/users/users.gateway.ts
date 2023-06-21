@@ -1,7 +1,7 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { User } from '@prisma/client';
+import { Game, User } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 import { UsersService } from './users.service';
 
@@ -57,6 +57,10 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
     console.log('Disconnect');
     this.removeSocketId(client.id);
     client.disconnect();
+  }
+
+  async emitGame(userId: number, joinedGame: Game) {
+    this.server.to(this.getSocketId(userId)).emit('acceptedInvite', joinedGame);
   }
 
   getSocketId(userId: number) {
