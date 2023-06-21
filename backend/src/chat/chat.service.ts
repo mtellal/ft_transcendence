@@ -101,18 +101,34 @@ export class ChatService {
   }
 
   async invalidInvite(userId: number) {
+    //I need to grab only the recently updated invites
+    const invites = await this.prisma.message.findMany({
+      where: {
+        sendBy: userId,
+        acceptedBy: null,
+        type: MessageType.INVITE
+      }
+    })
+    let invitesId: number[] = [];
+    for (const invite of invites) {
+      invitesId.push(invite.id);
+    }
     await this.prisma.message.updateMany({
-      where: {sendBy: userId,
-              acceptedBy: null,
-              type: MessageType.INVITE},
+      where: {
+        id: {
+          in: invitesId
+        }
+      },
       data: {
         acceptedBy: -1
       }
     });
     const invalidInvites = await this.prisma.message.findMany({
-      where: {sendBy: userId,
-        acceptedBy: -1,
-        type: MessageType.INVITE},
+      where: {
+        id: {
+          in: invitesId
+        }
+      },
     })
     return invalidInvites;
   }
