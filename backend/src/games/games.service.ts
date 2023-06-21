@@ -155,7 +155,7 @@ export class GamesService {
           const ongoingGame = this.games.get(game.id);
           if (!ongoingGame) {
             await this.prisma.game.delete({
-              where: { id: game.id}
+              where: { id: game.id }
             })
           }
           else if (game.player1Id === payload.id) {

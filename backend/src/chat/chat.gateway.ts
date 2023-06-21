@@ -188,6 +188,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       //Remove both players pending invite
       await this.gamesService.removePendingInvite(user.id);
       await this.gamesService.removePendingInvite(joinedGame.player1Id);
+      //Remove both players pending invite message
+      const invitesP1 = await this.chatService.invalidInvite(joinedGame.player1Id);
+      for (const inviteP1 of invitesP1) {
+        console.log(inviteP1);
+        this.server.to(invite.channelId.toString()).emit('updatedInvite', inviteP1);
+      }
+      const invitesP2 = await this.chatService.invalidInvite(joinedGame.player2Id);
+      console.log(invitesP2);
+      for (const inviteP2 of invitesP2) {
+        console.log(inviteP2);
+        this.server.to(invite.channelId.toString()).emit('updatedInvite', inviteP2);
+      }
       this.server.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
       this.usersGateway.emitGame(joinedGame.player1Id, joinedGame);
       this.usersGateway.emitGame(joinedGame.player2Id, joinedGame);
