@@ -167,7 +167,6 @@ function reducer(channels: any, action: any) {
                     if (c.id === action.channelId &&
                         c.muteList && c.muteList.length) {
                         c.muteList = c.muteList.filter((o: any) => o.userId !== action.userId);
-                        console.log("removeMuteList =>", c.muteList)
                     }
                     return (c)
                 }
@@ -272,7 +271,7 @@ export function ChannelsProvider({ children }: any) {
                 await Promise.all(channelList.map(async (c: any) => {
                     if (c.members && c.members.length) {
                         users = await fetchUsers(c.members);
-                        users = users.filter((u: any) => u)
+                        users = users.filter((u: any) => u);
                         return ({ ...c, users })
                     }
                 }))

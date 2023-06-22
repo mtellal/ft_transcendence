@@ -43,19 +43,18 @@ export default function TwoFactor() {
                     }
                 })
         }
-        else if (location.state.oauth_code)
-        {
+        else if (location.state.oauth_code) {
             await getTokenRequest(location.state.oauth_code, secret)
-            .then(res  => {
-                if (res && res.data) {
-                    if (res.data.access_token) {
-                        setCookie("access_token", res.data.access_token);
-                        navigate("/");
+                .then(res => {
+                    if (res && res.data) {
+                        if (res.data.access_token) {
+                            setCookie("access_token", res.data.access_token);
+                            navigate("/");
+                        }
+                        else
+                            setError("Code invalid")
                     }
-                    else
-                        setError("Code invalid")
-                }
-            })
+                })
         }
     }
 

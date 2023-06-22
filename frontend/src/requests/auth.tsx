@@ -13,6 +13,7 @@ export async function getTokenRequest(oauth_code: string, otp_code: string) {
             otp_code
         })
         .then(res => res)
+        .catch(err => err)
     )
 }
 

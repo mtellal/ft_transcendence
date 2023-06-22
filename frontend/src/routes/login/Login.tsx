@@ -54,23 +54,28 @@ export default function Login() {
         if (oauth_code) {
             if (step === "true") {
                 console.log("redirection 2fa")
-                return (navigate("/login/2fa", {state: {oauth_code}}));
+                return (navigate("/login/2fa", { state: { oauth_code } }));
             }
             if (oauth_code) {
                 console.log("normal oauth_code ", oauth_code)
                 await getTokenRequest(oauth_code, "")
-                    .then(({ error, res }: any) => {
-                        console.log(res, error)
-                        if (!error) {
+                    .then(res => {
+                        console.log(res && res.data)
+                        if (res && res.data) {
                             setCookie("access_token", res.data.access_token);
                             validLogin = true;
                         }
                     })
+                    .catch(err => console.log(err))
             }
         }
-        setCookie("access_token", "")
+        else
+            setCookie("access_token", "")
         if (validLogin)
-            return (redirect("/"))
+        {
+            console.log("redirection app loader")
+            return (navigate("/"))
+        }
     }
 
 

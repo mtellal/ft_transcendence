@@ -46,7 +46,7 @@ export default function Interface() {
             channel = channels.find((c: any) =>
                 c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
         }
-        if (!channel) {
+        /* if (!channel) {
             await getWhisperChannel(user.id, _user.id, token)
                 .then(res => {
                     if (res.data) {
@@ -54,23 +54,9 @@ export default function Interface() {
                     }
                 })
             await addChannel(channel, false);
-        }
+        } */
         return (channel);
     }, [channels]);
-
-    const loadChannel = useCallback(async () => {
-        let channel;
-        if (channels && channels.length)
-            channel = channels.find((c: any) => c.id === params.channelId);
-        if (!channel) {
-            await getChannel(params.channelId, token)
-                .then(res => {
-                    if (res.data)
-                        channel = res.data;
-                })
-        }
-        return (channel);
-    }, [user, channels]);
 
     const isCurrentUserMember = useCallback((channel: any) => {
         if (user && channel && channel.members && channel.members.find((id: number) => id === user.id))
@@ -81,7 +67,9 @@ export default function Interface() {
     const loadInterface = useCallback(async () => {
         if (params.channelId) {
             setWhisperUser(null);
-            let channel = await loadChannel();
+            let channel;
+            if (channels && channels.length)
+                channel = channels.find((c: any) => c.id === Number(params.channelId));
             if (isCurrentUserMember(channel))
                 return (setCurrentChannel(channel));
         }
@@ -93,10 +81,9 @@ export default function Interface() {
                 return (setCurrentChannel(channel));
             return;
         }
-        navigate("/chat")
     }, [channels, friends]);
 
-
+ 
     useEffect(() => {
         loadInterface();
     }, [channels, friends, params])

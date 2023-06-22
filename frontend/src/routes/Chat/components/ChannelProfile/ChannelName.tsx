@@ -26,8 +26,8 @@ export default function ChannelName({ channel }: any) {
     function submitName() {
         let newName = name && name.trim();
         if (newName) {
-            if (newName.length > 15)
-                return (setError("Maximum length of 15 letters"));
+            if (newName.length > 20)
+                return (setError("20 chars max"));
             if (newName === prevName.current)
                 return;
             prevName.current = newName;
@@ -57,6 +57,7 @@ export default function ChannelName({ channel }: any) {
                             setValue={setName}
                             onChange={onChange}
                             submit={() => submitName()}
+                            maxLength={20}
                         />
                     </>
                     :

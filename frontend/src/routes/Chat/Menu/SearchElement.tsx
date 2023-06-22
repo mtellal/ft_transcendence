@@ -309,7 +309,7 @@ function MenuInput(props: TMenuInput) {
     const inputRef: any = React.useRef();
 
     function onChange(e: any) {
-        if (e.target.value.length < 200) {
+        if (e.target.value.length <= 20) {
 
             props.setValue(e.target.value);
             if (props.onChange)

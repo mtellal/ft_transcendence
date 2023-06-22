@@ -31,13 +31,13 @@ export function CreateChannel() {
         if (!type)
             return (setError("Access required"))
 
-        if (!name.trim() || name.trim().match(/[^a-zA-Z0-9 ]/g) || name.length > 15)
-            return setError("Name incorrect, (alphanumeric - 15 chars max)");
+        if (!name.trim() || name.trim().match(/[^a-zA-Z0-9 ]/g) || name.length > 20)
+            return setError("Name incorrect, (alphanumeric - 20 chars max)");
         if (type === "protected") {
             if (!password.trim())
                 return setError("Password required");
-            if (password.trim().length > 15)
-                return setError("Password too long (15 chars max)")
+            if (password.trim().length > 30)
+                return setError("Password too long (30 chars max)")
         }
 
 
@@ -62,7 +62,7 @@ export function CreateChannel() {
 
     return (
         <div className="scroll"
-            style={{padding: '5%'}}
+            style={{padding: '5%', height: '90%'}}
         >
             <div className="flex">
                 <ArrowBackMenu
@@ -76,7 +76,8 @@ export function CreateChannel() {
                 label="Name"
                 value={name}
                 setValue={setName}
-                submit={() => { }}
+                submit={() => {}}
+                maxLength={20}
             />
             {
                 type === "protected" &&
@@ -86,9 +87,10 @@ export function CreateChannel() {
                     value={password}
                     setValue={setPassword}
                     submit={() => { }}
+                    maxLength={30}
                 />
             }
-            <div style={{ paddingBottom: '20px' }}>
+            <div style={{ paddingBottom: '20px', overflow: 'visible' }}>
 
                 <h2>Access</h2>
                 <PickMenu

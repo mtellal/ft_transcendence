@@ -27,7 +27,7 @@ export default function Messenger(props: TMessenger) {
     const [messages, setMessages] = useState([]);
     const [showUserMenu, setShowUserMenu] = useState({ show: false });
 
-    const filterMessages = useCallback((messages: any[], members: any[]) => {
+    const filterMessages = useCallback((messages: any[]) => {
         if (user.blockList.length) {
             messages = messages.filter((m: any) => {
                 let blockObject = user.blockList.find((o: any) => o.userId === m.sendBy);
@@ -36,17 +36,16 @@ export default function Messenger(props: TMessenger) {
             })
         }
         return (messages)
-    }, [currentChannel, user])
+    }, [currentChannel, currentChannel.messages, user])
 
 
     const initMessages = useCallback(async () => {
-        const members = currentChannel.users;
         let messages: any = currentChannel.messages;
-        if (messages && messages.length && members && members.length) {
-            messages = filterMessages(messages, members);
+        if (messages && messages.length && currentChannel.users) {
+            messages = filterMessages(messages);
             setMessages(messages);
         }
-    }, [currentChannel && currentChannel.messages, user])
+    }, [currentChannel, currentChannel.messages,  user])
 
     useEffect(() => {
         if (currentChannel && currentChannel.messages && currentChannel.messages.length) {
@@ -54,7 +53,7 @@ export default function Messenger(props: TMessenger) {
         }
         else
             setMessages([]);
-    }, [currentChannel && currentChannel.messages, user.blockList])
+    }, [currentChannel, currentChannel.messages, user.blockList])
 
     return (
         <MessengerContext.Provider value={

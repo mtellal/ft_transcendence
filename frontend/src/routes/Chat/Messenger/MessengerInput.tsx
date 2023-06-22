@@ -13,7 +13,10 @@ export default function MessengerInput(props: any) {
     const [value, setValue] = React.useState("");
 
     const handleChange = useCallback((e: any) => {
-        setValue(e.target.value)
+        if (e.target.value.length <= 200)
+        {
+            setValue(e.target.value)
+        }
     }, []);
 
     const canSendMessages = useCallback(() => {

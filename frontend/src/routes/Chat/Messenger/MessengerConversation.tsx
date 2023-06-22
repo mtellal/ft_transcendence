@@ -83,12 +83,12 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
 
     const { fetchUser } = useFetchUsers();
     const { currentChannel } = useChannelsContext();
-    const { getMemberById, isUserIdMember } = useMembers();
+    const { getMemberById, getMembersById, isUserIdMember } = useMembers();
     const [authors, setAuthors]: any = useState([]);
     const messagesContainerRef = useRef(null);
 
-    async function loadAuthors(messages: any[], membersId: number[], members: any[]) {
-        let users: any[] = members;
+    async function loadAuthors(messages: any[], membersId: number[]) {
+        let users: any[] = getMembersById(membersId);
         let ids: number[] = membersId;
         await Promise.all(
             messages.map(async (m: any, index: number) => {
@@ -112,7 +112,7 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
 
     useEffect(() => {
         if (messages && messages.length && currentChannel && currentChannel.members) {
-            loadAuthors(messages, currentChannel.members, currentChannel.users);
+            loadAuthors(messages, currentChannel.members);
         }
         else {
             setAuthors([]);

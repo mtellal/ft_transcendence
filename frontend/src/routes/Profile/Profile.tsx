@@ -24,7 +24,7 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
         if (!username || !username.trim())
             return setError("Username required and can't be empty");
         if (username.trim().length > 15)
-            return setError("Username too long (15 chars max)");
+            return setError("Username too long (20 chars max)");
         if (username.trim().match(/[^a-zA-Z0-9 ]/g))
             return setError("Username invalid (only alphanumeric characters)")
 
@@ -52,6 +52,7 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
                     value={username}
                     setValue={setUsername}
                     submit={updateProfile}
+                    maxLength={20}
                 />
             </div>
             {error && <p className='profileinfos-error' >{error}</p>}

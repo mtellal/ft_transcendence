@@ -60,6 +60,7 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
                 value={searchUserValue}
                 setValue={setSearchUserValue}
                 submit={() => search()}
+                maxLength={20}
             />
             {error && <p className="red-c">{error}</p>}
             {
