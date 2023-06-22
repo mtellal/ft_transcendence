@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import s from './style.module.css'
 import { getStats } from "../../requests/user";
-import { useCurrentUser } from "../../hooks/Hooks";
 
 interface UserProfileProps {
 	id: number;
@@ -9,11 +8,10 @@ interface UserProfileProps {
 
 export function Stats({ id }: UserProfileProps) {
 
-	const { token } = useCurrentUser();
 	const [stats, setStats] = useState(null);
 
 	async function getUserStats() {
-		const rep = await getStats(id, token)
+		const rep = await getStats(id)
 		setStats(rep.data);
 	}
 

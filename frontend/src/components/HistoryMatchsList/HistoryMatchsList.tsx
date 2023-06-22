@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getUser, getUserProfilePictrue } from "../../requests/user";
 import s from './style.module.css'
-import { useCurrentUser } from "../../hooks/Hooks";
 
 interface HistoryMatchsListProps {
 	match: any;
@@ -10,20 +9,19 @@ interface HistoryMatchsListProps {
 
 export function HistoryMatchsList({ match, id }: HistoryMatchsListProps) {
 
-	const { token } = useCurrentUser();
 	const [userA, setUserA] = useState<any>();
 	const [avatarA, setAvatarA] = useState<any>();
 	const [userB, setUserB] = useState<any>();
 	const [avatarB, setAvatarB] = useState<any>();
 
 	async function getInfoUsers() {
-		const dataUserA = await getUser(match.player1Id, token);
+		const dataUserA = await getUser(match.player1Id);
 		setUserA(dataUserA.data);
-		const dataUserB = await getUser(match.player2Id, token);
+		const dataUserB = await getUser(match.player2Id);
 		setUserB(dataUserB.data);
-		const ppA = await getUserProfilePictrue(match.player1Id, token);
+		const ppA = await getUserProfilePictrue(match.player1Id);
 		setAvatarA(window.URL.createObjectURL(new Blob([ppA.data])));
-		const ppB = await getUserProfilePictrue(match.player2Id, token);
+		const ppB = await getUserProfilePictrue(match.player2Id);
 		setAvatarB(window.URL.createObjectURL(new Blob([ppB.data])));
 	}
 
