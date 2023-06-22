@@ -92,6 +92,9 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (await this.gamesService.isUserinGame(payload.id)) {
       throw new ForbiddenException(`User with id of ${payload.id} is already in game`);
     }
+    if (await this.gamesService.userhasPendingInvites(payload.id)) {
+      throw new ForbiddenException(`User with id of ${payload.id} recently sent an invite`);
+    }
     const room = await this.gamesService.findPendingGame(payload, gameDto);
     console.log("event received");
     if (!room) {
