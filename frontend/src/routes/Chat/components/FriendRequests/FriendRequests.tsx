@@ -8,6 +8,7 @@ import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
 import './FriendRequests.css'
 import { CollectionElement } from "../../../../components/collections/CollectionElement";
+import { FriendRequest, User } from "../../../../types";
 
 export function FriendRequests() {
 
@@ -19,7 +20,7 @@ export function FriendRequests() {
     const [invitations, setInvitations]: [any, any] = useState([]);
 
     const loadInvitations = useCallback(async () => {
-        const users = await fetchUsers(friendInvitations.map((r: any) => r.sendBy));
+        const users = await fetchUsers(friendInvitations.map((r: FriendRequest) => r.sendBy));
         if (users && users.length)
             setUserInvitations(users);
     }, [friendInvitations])
@@ -38,7 +39,7 @@ export function FriendRequests() {
 
     React.useEffect(() => {
         if (userInvitations && userInvitations.length) {
-            setInvitations(userInvitations.map((u: any) =>
+            setInvitations(userInvitations.map((u: User) =>
                 <UserLabelSearch
                     key={u.id}
                     id={u.id}

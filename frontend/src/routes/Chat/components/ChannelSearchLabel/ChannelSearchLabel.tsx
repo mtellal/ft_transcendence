@@ -15,8 +15,14 @@ import { ConfirmViewButtons } from "../../Profile/ChannelProfile/ConfirmAction";
 import { SearchedChannelLabelContext } from "../../Menu/SearchElement";
 
 import './ChannelSearchLabel.css'
+import { Channel } from "../../../../types";
 
-function ProtectedChannelPassword(props: any) {
+type TProtectedChannelPassword = {
+    reset: any, 
+    channel: Channel
+}
+
+function ProtectedChannelPassword(props: TProtectedChannelPassword) {
 
     const { token } = useCurrentUser();
     const [passwordValue, setPasswordValue]: any = useState("");
@@ -65,7 +71,7 @@ function ProtectedChannelPassword(props: any) {
 
 
 type TChannelSearch = {
-    channel: any,
+    channel: Channel,
     join: () => {} | any,
     leaveChannel: () => {} | any
 }

@@ -11,6 +11,7 @@ import ChannelInfos from "../../../components/channels/ChannelInfos";
 import { CollectionElement } from "../../../components/collections/CollectionElement";
 import SearchElement from "./SearchElement";
 import './MenuElement.css'
+import { Channel, User } from "../../../types";
 
 
 
@@ -31,10 +32,10 @@ export default function MenuElement() {
     const setWhispers = useCallback(async () => {
         if (channels && channels.length) {
             const whispers = await Promise.all(
-                channels.map(async (channel: any) => {
+                channels.map(async (channel: Channel) => {
                     if (channel.type === "WHISPER" && channel.members.length === 2) {
-                        let _user = channel.members.find((id: number) => id !== user.id);
-                        _user = await fetchUser(_user);
+                        const _userId = channel.members.find((id: number) => id !== user.id);
+                        const _user = await fetchUser(_userId);
                         return (
                             <UserLabel
                                 key={_user.id}
@@ -53,13 +54,12 @@ export default function MenuElement() {
 
     async function setFriendsLabel() {
         setFriendsList(
-            friends.map((user: any) => (
+            friends.map((user: User) => (
                 <UserLabel
                     key={user.id}
                     id={user.id}
                     user={user}
                     onClick={() => {}}
-                    notifs={user.notifs}
                 />
             ))
         )
@@ -73,7 +73,7 @@ export default function MenuElement() {
             setWhispers();
 
             setChannelsList(
-                channels.map((channel: any) =>
+                channels.map((channel: Channel) =>
                     channel.type !== "WHISPER" && (
                         <div
                             key={channel.id}

@@ -1,21 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
+import React from "react"
 
-import './Profile.css'
-import { useChannelsContext, useFriendsContext, useCurrentUser, useChatSocket } from "../../../hooks/Hooks"
+import { useChannelsContext } from "../../../hooks/Hooks"
 import ChannelProfile from "./ChannelProfile/ChannelProfile";
+import './Profile.css'
 
-
-function FriendProfile(props: any) {
-    return (
-        <div className="reset flex-column profilepage">
-            <h2>Historic</h2>
-            <h2>Stats</h2>
-        </div>
-    )
-}
 
 export default function Profile() {
-    const { currentFriend } = useFriendsContext();
     const { currentChannel } = useChannelsContext();
 
     return (
@@ -28,12 +18,6 @@ export default function Profile() {
                     administrators={currentChannel && currentChannel.administrators}
                     owner={currentChannel && currentChannel.owner}
                     channel={currentChannel}
-                />
-            }
-            {
-                currentChannel && currentChannel.users && currentChannel.type === "WHISPER" &&
-                <FriendProfile
-                    currentFriend={currentFriend}
                 />
             }
         </div>

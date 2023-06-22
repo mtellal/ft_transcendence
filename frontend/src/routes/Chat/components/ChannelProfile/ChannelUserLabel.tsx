@@ -12,8 +12,16 @@ import useMembers from "../../../../hooks/Chat/useMembers";
 import { PofileChannelContext } from '../../Profile/ChannelProfile/ChannelProfile';
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import { CollectionElement } from "../../../../components/collections/CollectionElement";
+import { User } from "../../../../types";
 
-export function CollectionUsers(props: any) {
+type TCollectionUsers = {
+    title: string,
+    users: User[], 
+    isAdmin?: boolean, 
+    currentUser?: User, 
+}
+
+export function CollectionUsers(props: TCollectionUsers) {
     const [renderUsers, setRenderUsers] = useState([]);
     const { channels } = useChannelsContext();
 
@@ -39,7 +47,7 @@ export function CollectionUsers(props: any) {
 }
 
 type TChannelUserLabel = {
-    user: any,
+    user: User,
     showChannelStatus: boolean | number,
     isAddable: boolean,
 }

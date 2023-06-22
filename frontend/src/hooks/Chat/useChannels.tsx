@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
+import { Channel, User } from "../../types";
 
 
 export function useChannels() {
@@ -13,17 +14,17 @@ export function useChannels() {
 
     const { channels, channelsDispatch, currentChannel } = useChannelsContext();
 
-    const isChannelPublic = useCallback((channel: any) => {
+    const isChannelPublic = useCallback((channel: Channel) => {
         if (channel)
             return (channel.type === "PUBLIC")
     }, [])
 
-    const isChannelPrivate = useCallback((channel: any) => {
+    const isChannelPrivate = useCallback((channel: Channel) => {
         if (channel)
             return (channel.type === "PRIVATE")
     }, [])
 
-    const isChannelProtected = useCallback((channel: any) => {
+    const isChannelProtected = useCallback((channel: Channel) => {
         if (channel)
             return (channel.type === "PROTECTED")
     }, [])
@@ -62,7 +63,7 @@ export function useChannels() {
     }, [socket, channels])
 
 
-    const addChannel = useCallback(async (channel: any, includeCurrentUser: boolean) => {
+    const addChannel = useCallback(async (channel: Channel, includeCurrentUser: boolean) => {
         if (socket && channel) {
             if ((!channel.users || !channel.users.length) && channel.members) {
                 const users = await fetchUsers(channel.members)
@@ -76,7 +77,7 @@ export function useChannels() {
         }
     }, [socket, channelsDispatch])
 
-    const addChannelProtected = useCallback(async (channel: any, password: string, includeCurrentUser: boolean) => {
+    const addChannelProtected = useCallback(async (channel: Channel, password: string, includeCurrentUser: boolean) => {
         if (socket) {
             if (!channel.users || !channel.users.length && channel.members) {
                 const users = await fetchUsers(channel.members)
@@ -90,7 +91,7 @@ export function useChannels() {
         }
     }, [socket])
 
-    const joinChannel = useCallback((channel: any) => {
+    const joinChannel = useCallback((channel: Channel) => {
         if (socket) {
             socket.emit('joinChannel', {
                 channelId: channel.id
@@ -117,7 +118,7 @@ export function useChannels() {
             navigate("/chat");
     }, [currentChannel, user])
 
-    const leaveChannel = useCallback((channel: any) => {
+    const leaveChannel = useCallback((channel: Channel) => {
         if (channel && channel.id && socket) {
             channelsDispatch({ type: 'removeChannel', channelId: channel.id })
             socket.emit('leaveChannel', {
@@ -128,10 +129,10 @@ export function useChannels() {
     }, [socket])
 
 
-    const getChannelFromFriendName = useCallback((friend: any) => {
+    const getChannelFromFriendName = useCallback((friend: User) => {
         if (channels && channels.length) {
-            const whispers = channels.filter((c: any) => c.type === "WHISPER");
-            return (whispers.find((c: any) => {
+            const whispers = channels.filter((c: Channel) => c.type === "WHISPER");
+            return (whispers.find((c: Channel) => {
                 if (c.members && c.members.length)
                     return (c.members.find((id: number) => id === friend.id))
             }))
@@ -139,7 +140,7 @@ export function useChannels() {
     }, [channels])
 
 
-    const updateChannelInfos = useCallback((channel: any) => {
+    const updateChannelInfos = useCallback((channel: Channel) => {
         if (channels && channel) {
             channelsDispatch({
                 type: 'updateChannelInfos',
@@ -153,25 +154,25 @@ export function useChannels() {
         }
     }, [channelsDispatch, channels])
 
-    const channelAlreadyExists = useCallback((channel: any) => {
+    const channelAlreadyExists = useCallback((channel: Channel) => {
         if (channels) {
             if (!channels.length)
                 return (false);
-            return (channels.find((c: any) => c.id === channel.id))
+            return (channels.find((c: Channel) => c.id === channel.id))
         }
         return (false)
     }, [channels])
 
-    const isLocalChannel = useCallback((channel: any) => {
+    const isLocalChannel = useCallback((channel: Channel) => {
         if (channels && channels.length && channel) {
-            return (channels.find((c: any) => channel.id === c.id))
+            return (channels.find((c: Channel) => channel.id === c.id))
         }
         return (false);
     }, [channels])
 
-    const isLocalChannelsByName = useCallback((channel: any) => {
+    const isLocalChannelsByName = useCallback((channel: Channel) => {
         if (channels && channels.length && channel) {
-            return (channels.filter((c: any) => channel.name === c.name))
+            return (channels.filter((c: Channel) => channel.name === c.name))
         }
         return (false);
     }, [channels])

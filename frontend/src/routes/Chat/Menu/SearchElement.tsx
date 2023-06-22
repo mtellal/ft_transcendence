@@ -15,11 +15,12 @@ import { getUserProfilePictrue } from "../../../requests/user";
 import Icon from "../../../components/Icon";
 import ProfilePicture from "../../../components/users/ProfilePicture";
 import { UserInfos } from "../../../components/users/UserInfos";
+import { Block, Channel, User } from "../../../types";
 
 export const SearchedChannelLabelContext: React.Context<any> = createContext(null);
 
 type TUserProps = {
-    user: any
+    user: User
 }
 
 function SearchedUserIconProfile(props: TUserProps) {
@@ -48,7 +49,7 @@ function SearchedUserIconChat(props: TUserProps) {
     async function selectChannel() {
         let channel;
         if (channels && channels.length) {
-            channel = channels.find((c: any) =>
+            channel = channels.find((c: Channel) =>
                 c.type === "WHISPER" && c.members.find((id: number) => props.user.id === id))
         }
         if (!channel) {
@@ -100,7 +101,7 @@ function SearchedUserIconFriend(props: TUserProps) {
 
     async function loadBlockList() {
         const blockList = await getBlockList(props.user && props.user.id, token).then(res => res.data);
-        if (blockList && blockList.length && blockList.find((o: any) => o.userId === user.id))
+        if (blockList && blockList.length && blockList.find((o: Block) => o.userId === user.id))
             setCurrentUserBlocked(true);
     }
 
@@ -243,9 +244,12 @@ export function SearchedUser(props: TUserProps) {
 }
 
 
+type TSearchedChannel = {
+    channels: Channel[],
+    reset: any
+}
 
-
-function SearchedChannel(props: any) {
+function SearchedChannel(props: TSearchedChannel) {
 
     const [renderChannels, setRenderChannels] = useState([]);
     const { fetchUsers } = useFetchUsers();
@@ -254,7 +258,7 @@ function SearchedChannel(props: any) {
     const { channels } = useChannelsContext();
 
 
-    function joinChannel(channel: any) {
+    function joinChannel(channel: Channel) {
         if (channel.type !== 'WHISPER') {
             setAction(
                 <ConfirmView
@@ -267,7 +271,7 @@ function SearchedChannel(props: any) {
         }
     }
 
-    function _leaveChannel(channel: any) {
+    function _leaveChannel(channel: Channel) {
         setAction(
             <ConfirmView
                 type="leave"
@@ -282,7 +286,7 @@ function SearchedChannel(props: any) {
         if (props.channels && props.channels.length) {
             setRenderChannels(
                 await Promise.all(
-                    props.channels.map(async (c: any) => {
+                    props.channels.map(async (c: Channel) => {
                         c.users = await fetchUsers(c.members);
                         return (
                             <ChannelSearchLabel

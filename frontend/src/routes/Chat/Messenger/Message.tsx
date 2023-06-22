@@ -9,10 +9,11 @@ import { RawIcon } from "../../../components/Icon";
 import ResizeContainer from "../../../components/ResizeContainer";
 import useAdinistrators from "../../../hooks/Chat/useAdministrators";
 import { useNavigate } from "react-router-dom";
+import { User } from "../../../types";
 
 
 type TAuthorAccess = {
-    author: any,
+    author: User,
     id: number,
     type: string,
 }
@@ -53,7 +54,7 @@ function AuthorAccess(props: TAuthorAccess) {
 
 type TUserMessage = {
     lastMessage: boolean,
-    author: any,
+    author: User,
     id: number,
     content: string
 }
@@ -111,7 +112,7 @@ function AuthorMessage(props: TUserMessage) {
 
 
 type TMessengerCurrentUserLabel = {
-    author: any,
+    author: User,
     content: string
 }
 
@@ -172,7 +173,7 @@ type TMessage = {
     sendBy: number,
     lastMessage: boolean,
     displayUser: boolean,
-    author: any,
+    author: User,
     owner: boolean,
 }
 

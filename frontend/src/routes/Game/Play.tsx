@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import './Game.css'
 
-function SelectButton(props: any) {
+type TSelectButton = {
+  onClick: () => void,
+  label: string
+}
+
+function SelectButton(props: TSelectButton) {
     const [selected, setSelected] = useState(false);
     return (
       <button

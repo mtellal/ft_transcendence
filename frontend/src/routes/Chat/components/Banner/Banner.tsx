@@ -17,11 +17,12 @@ import './Banner.css'
 import { getBlockList } from "../../../../requests/block";
 import { SetInvitation } from "../Invitation";
 import { useNavigate } from "react-router-dom";
+import { Channel, User } from "../../../../types";
 
 
 type TIconsBanner = {
-    whisperUser: any,
-    channel: any,
+    whisperUser: User,
+    channel: Channel,
     setBlockedFriend: any,
     type: any,
     mobile?: any
@@ -148,8 +149,8 @@ function IconsBanner(props: TIconsBanner) {
 }
 
 type TBanner = {
-    whisperUser: any,
-    channel: any,
+    whisperUser: User,
+    channel: Channel,
     type: string,
     setBlockedFriend: any,
     profile: any,

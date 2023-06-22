@@ -7,8 +7,12 @@ import ResizeContainer from "../../components/ResizeContainer";
 
 import './Game.css'
 
+type TGameResult = {
+  gameResult: any, 
+  playAgain: () => void
+}
 
-export default function GameResult(props: any) {
+export default function GameResult(props: TGameResult) {
 
     const [player, setPlayer]: any = useState();
   
@@ -17,7 +21,6 @@ export default function GameResult(props: any) {
   
   
     async function loadPlayers(gameResult: any) {
-      let id;
       let oplayer;
       if (gameResult.player1Id === user.id)
         oplayer = await fetchUser(gameResult.player2Id);

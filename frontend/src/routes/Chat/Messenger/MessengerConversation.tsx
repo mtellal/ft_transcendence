@@ -6,14 +6,14 @@ import useFetchUsers from "../../../hooks/useFetchUsers";
 
 import Message from "./Message";
 import './Messenger.css'
-import { ConfirmViewButtons } from "../Profile/ChannelProfile/ConfirmAction";
 import { useInvitation } from "../../../hooks/Chat/useInvitation";
+import { Message as TMessage, User } from "../../../types";
 
 
-function MessageNotification(props: any) {
+function MessageNotification({ content } : any) {
     return (
         <div className="flex-center gray-c message-notification" >
-            {props.content}
+            {content}
         </div>
     )
 }
@@ -39,7 +39,7 @@ function NoMessages() {
 
 type TInvitationMessage = {
     message: any,
-    author: any
+    author: User
 }
 
 function InvitationMessage(props: TInvitationMessage) {
@@ -87,11 +87,11 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
     const [authors, setAuthors]: any = useState([]);
     const messagesContainerRef = useRef(null);
 
-    async function loadAuthors(messages: any[], membersId: number[]) {
-        let users: any[] = getMembersById(membersId);
+    async function loadAuthors(messages: TMessage[], membersId: number[]) {
+        let users: User[] = getMembersById(membersId);
         let ids: number[] = membersId;
         await Promise.all(
-            messages.map(async (m: any, index: number) => {
+            messages.map(async (m: TMessage, index: number) => {
                 if ((index + 1 !== messages.length &&
                     m.sendBy !== messages[index + 1].sendBy) || (index === messages.length - 1) || (m.type === "INVITE")) {
                     if (!ids.length || !ids.find((id: number) => id === m.sendBy)) {
@@ -123,15 +123,15 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
     const rendMessages = useCallback(() => {
         if (messages.length) {
             let displayUser: boolean;
-            let _author: any;
+            let _author: User;
             return (
-                messages.map((m: any, index: number) => {
+                messages.map((m: TMessage, index: number) => {
                     _author = null;
                     displayUser = false;
                     if ((index + 1 !== messages.length && m.sendBy !== messages[index + 1].sendBy) ||
                         (index === messages.length - 1) || (m.type === "INVITE")) {
                         displayUser = true;
-                        _author = authors.find((u: any) => u.id === m.sendBy)
+                        _author = authors.find((u: User) => u.id === m.sendBy)
                     }
 
                     if (m.type === "NOTIF")

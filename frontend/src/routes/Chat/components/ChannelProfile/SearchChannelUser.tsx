@@ -8,13 +8,13 @@ import useMembers from "../../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { getBlockList } from "../../../../requests/block";
 import { useCurrentUser } from "../../../../hooks/Hooks";
+import { Block, User } from "../../../../types";
 
 
 type TSearchChannelUser = {
     title: string
     inputTitle: string,
-    members: any[],
-    bannedUsers?: any[]
+    members: User[],
 }
 
 export default function SearchChannelUser(props: TSearchChannelUser) {
@@ -33,14 +33,14 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
     async function search() {
         let searchedUser;
         if (props.members && props.members.length) {
-            searchedUser = props.members.find((u: any) => u.username === searchUserValue.trim());
+            searchedUser = props.members.find((u: User) => u.username === searchUserValue.trim());
         }
         if (!searchedUser)
             searchedUser = await fetchUserByUsername(searchUserValue);
         if (searchedUser && (isUserMember(searchedUser) || isCurrentUserAdmin)) {
             setSearchUser(searchedUser);
             const userBlockList = await getBlockList(searchedUser.id, token).then(res => res.data);
-            if (userBlockList && userBlockList.length && userBlockList.find((o: any) => o.userId === user.id))
+            if (userBlockList && userBlockList.length && userBlockList.find((o: Block) => o.userId === user.id))
                 setBlockedUser(true);
             setError("");
         }

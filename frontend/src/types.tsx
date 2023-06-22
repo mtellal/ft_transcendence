@@ -90,6 +90,7 @@ export type Message = {
     content: string,
     type: string, 
     channelId: number, 
+    createdAt: any,
     
     gameType?: string,
 }

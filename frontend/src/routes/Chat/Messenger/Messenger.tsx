@@ -9,6 +9,7 @@ import {
 import './Messenger.css'
 import MessengerInput from "./MessengerInput";
 import MessengerConversation from "./MessengerConversation";
+import { Block, Message, User } from "../../../types";
 
 const MessengerContext: React.Context<any> = createContext(null);
 
@@ -16,7 +17,7 @@ const MessengerContext: React.Context<any> = createContext(null);
 type TMessenger = {
     blockedFriend: boolean,
     hidden: boolean,
-    whisperUser: any,
+    whisperUser: User,
 }
 
 export default function Messenger(props: TMessenger) {
@@ -27,10 +28,10 @@ export default function Messenger(props: TMessenger) {
     const [messages, setMessages] = useState([]);
     const [showUserMenu, setShowUserMenu] = useState({ show: false });
 
-    const filterMessages = useCallback((messages: any[]) => {
+    const filterMessages = useCallback((messages: Message[]) => {
         if (user.blockList.length) {
-            messages = messages.filter((m: any) => {
-                let blockObject = user.blockList.find((o: any) => o.userId === m.sendBy);
+            messages = messages.filter((m: Message) => {
+                let blockObject = user.blockList.find((o: Block) => o.userId === m.sendBy);
                 if (!blockObject || (blockObject && new Date(m.createdAt) < new Date(blockObject.createdAt)))
                     return (m)
             })
@@ -40,7 +41,7 @@ export default function Messenger(props: TMessenger) {
 
 
     const initMessages = useCallback(async () => {
-        let messages: any = currentChannel.messages;
+        let messages: Message[] = currentChannel.messages;
         if (messages && messages.length && currentChannel.users) {
             messages = filterMessages(messages);
             setMessages(messages);

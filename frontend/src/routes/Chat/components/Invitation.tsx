@@ -4,7 +4,11 @@ import PickMenu from "../../../components/PickMenu";
 import { ChatInterfaceContext } from "../Chat/Chat";
 import { useInvitation } from "../../../hooks/Chat/useInvitation";
 
-export function SetInvitation(props: any) {
+type TSetInvitation = {
+    channelId: number
+}
+
+export function SetInvitation(props: TSetInvitation) {
     const [selected, setSelected] = useState("CLASSIC");
     const { setAction } = useContext(ChatInterfaceContext);
     const { sendInvitation } = useInvitation();

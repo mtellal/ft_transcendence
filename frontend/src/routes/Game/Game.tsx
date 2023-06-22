@@ -19,8 +19,13 @@ function useImage(image: any) {
   return marioImage
 }
 
+type TGame = {
+  gameRoom: any, 
+  socket: any,
+  customization: string, 
+}
 
-export default function Game(props: any) {
+export default function Game(props: TGame) {
   const canvasRef: any = React.useRef();
 
   const marioImage = useImage(mario);

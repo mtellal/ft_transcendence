@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
 import useMembers from "./useMembers";
+import { Channel, Mute, User } from "../../types";
 
 
 export default function useMuteUser() {
@@ -9,11 +10,11 @@ export default function useMuteUser() {
 
     const { getMembersById } = useMembers(); 
 
-    const isUserMuted = useCallback((user: any, channel: any) => {
+    const isUserMuted = useCallback((user: User, channel: Channel) => {
         if (channels && channels.length && 
             channel && channel.muteList && channel.muteList.length && user)
         {
-            const muteObject = channel.muteList.find((o : any) => o.userId === user.id); 
+            const muteObject = channel.muteList.find((o : Mute) => o.userId === user.id); 
             if (muteObject && muteObject.duration)
             {
                 if (muteObject.duration && new Date(muteObject.duration) > new Date())
@@ -25,17 +26,17 @@ export default function useMuteUser() {
         return (false);
     }, [channels])
 
-    const getUsersMuted = useCallback( async (channel: any) => {
+    const getUsersMuted = useCallback( async (channel: Channel) => {
         if (channels && channels.length && 
             channel && channel.muteList && channel.muteList.length)
         {
-            const mutedIds = channel.muteList.map((o: any) => o.userId); 
+            const mutedIds = channel.muteList.map((o: Mute) => o.userId); 
             return (getMembersById(mutedIds))
         }
         return ([]);
     }, [channels])
 
-    const muteUser = useCallback((user: any, channel: any, duration: number) => {
+    const muteUser = useCallback((user: User, channel: Channel, duration: number) => {
         if (channels && channels.length && socket && user && channel) {
             socket.emit('muteUser', {
                 channelId: channel.id,
@@ -47,7 +48,7 @@ export default function useMuteUser() {
     }, [socket, channels])
 
 
-    const unmuteUser = useCallback((user: any, channel: any) => {
+    const unmuteUser = useCallback((user: User, channel: Channel) => {
         if (channels && channels.length && socket && user && channel) {
             socket.emit('unmuteUser', {
                 channelId: channel.id,

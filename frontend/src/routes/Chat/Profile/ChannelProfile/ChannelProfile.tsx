@@ -13,10 +13,19 @@ import ChannelPassword from "../../components/ChannelProfile/ChannelPassword";
 import PickMenuAccess from "../../components/ChannelProfile/PickMenuAccess";
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import useMembers from "../../../../hooks/Chat/useMembers";
+import { Channel, User } from "../../../../types";
 
 export const PofileChannelContext = createContext({});
 
-export default function ChannelProfile(props: any) {
+type TChannelProfile = {
+    name: string, 
+    members: User[],
+    administrators: number[],
+    owner: number,
+    channel: Channel 
+}
+
+export default function ChannelProfile(props: TChannelProfile) {
 
     const { user } = useCurrentUser();
     const { channels, currentChannel } = useChannelsContext();
@@ -26,7 +35,7 @@ export default function ChannelProfile(props: any) {
     const { getAdministrators } = useAdinistrators();
     const { getUsersMuted } = useMuteUser();
 
-    const [owner, setOwner] = useState();
+    const [owner, setOwner]: any = useState();
     const [admins, setAdmins] = useState([]);
     const [muted, setMuted] = useState([]);
     const [banned, setBanned] = useState([])
@@ -104,7 +113,6 @@ export default function ChannelProfile(props: any) {
                         title="Banned"
                         users={banned}
                         currentUser={user}
-                        bannedUsers={true}
                     />
                 </div>
 

@@ -1,36 +1,27 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useLoaderData, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import Banner from "../components/Banner/Banner";
 import Profile from "../Profile/Profile";
 import Messenger from "../Messenger/Messenger";
 
-import { useChannelsContext, useChatSocket, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
-import { blockUserRequest, unblockUserRequest } from "../../../requests/block";
-import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
-import './Interface.css'
-import { useBlock } from "../../../hooks/Chat/useBlock";
-import { ConfirmPage, ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
-import { createChannel, getChannel, getWhisperChannel } from "../../../requests/chat";
-import { useChannels } from "../../../hooks/Chat/useChannels";
-import { convertTypeAcquisitionFromJson } from "typescript";
-import useFetchUsers from "../../../hooks/useFetchUsers";
-import useBanUser from "../../../hooks/Chat/useBanUser";
-import useMembers from "../../../hooks/Chat/useMembers";
+import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 
+import { useBlock } from "../../../hooks/Chat/useBlock";
+import useFetchUsers from "../../../hooks/useFetchUsers";
+
+import './Interface.css'
+import { Channel, User } from "../../../types";
 
 export const InterfaceContext: React.Context<any> = createContext(null);
 
 export default function Interface() {
     const params:any = useParams();
-    const navigate = useNavigate();
 
-    const { token } = useCurrentUser();
     const { fetchUser } = useFetchUsers();
     const { user }: any = useCurrentUser();
-    const { addChannel } = useChannels();
     const { isUserBlocked } = useBlock();
-    const { friends}: any = useFriendsContext();
+    const { friends }: any = useFriendsContext();
 
     const { currentChannel, setCurrentChannel, channels } = useChannelsContext();
 
@@ -40,25 +31,16 @@ export default function Interface() {
 
     const [whisperUser, setWhisperUser] = useState();
 
-    const selectWhisper = useCallback(async (_user: any) => {
+    const selectWhisper = useCallback(async (_user: User) => {
         let channel;
         if (channels && channels.length) {
-            channel = channels.find((c: any) =>
+            channel = channels.find((c: Channel) =>
                 c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
         }
-        /* if (!channel) {
-            await getWhisperChannel(user.id, _user.id, token)
-                .then(res => {
-                    if (res.data) {
-                        channel = res.data
-                    }
-                })
-            await addChannel(channel, false);
-        } */
         return (channel);
     }, [channels]);
 
-    const isCurrentUserMember = useCallback((channel: any) => {
+    const isCurrentUserMember = useCallback((channel: Channel) => {
         if (user && channel && channel.members && channel.members.find((id: number) => id === user.id))
             return (true);
         return (false);
@@ -69,7 +51,7 @@ export default function Interface() {
             setWhisperUser(null);
             let channel;
             if (channels && channels.length)
-                channel = channels.find((c: any) => c.id === Number(params.channelId));
+                channel = channels.find((c: Channel) => c.id === Number(params.channelId));
             if (isCurrentUserMember(channel))
                 return (setCurrentChannel(channel));
         }

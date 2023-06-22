@@ -6,7 +6,13 @@ import {
 } from "../../../hooks/Hooks";
 import './Messenger.css'
 
-export default function MessengerInput(props: any) {
+type TMessengerInput = {
+    blockedFriend: boolean, 
+    hidden: boolean
+}
+
+
+export default function MessengerInput(props: TMessengerInput) {
     const { socket } = useChatSocket();
     const { currentChannel } = useChannelsContext();
 

@@ -5,8 +5,16 @@ import ResizeContainer from "../../../../components/ResizeContainer";
 import './ConfirmAction.css'
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
+import { Channel, User } from "../../../../types";
 
-export function ConfirmAction(props: any) {
+type TConfirmAction = {
+    setUserAction: any, 
+    setConfirmView: any
+    userAction: any
+    channel: Channel
+}
+
+export function ConfirmAction(props: TConfirmAction) {
 
     function cancelAction() {
         props.setConfirmView((p: boolean) => !p);
@@ -28,7 +36,6 @@ export function ConfirmAction(props: any) {
                             props.userAction.type === "mute" &&
                             <ConfirmViewMuteAction
                                 channel={props.channel}
-                                type={props.userAction.type}
                                 user={props.userAction && props.userAction.user}
                                 username={props.userAction.user && props.userAction.user.username}
                                 setConfirmView={props.setConfirmView}
@@ -81,7 +88,15 @@ export function ConfirmView(props: TConfirmView) {
     )
 }
 
-export function ConfirmViewMuteAction(props: any) {
+type TConfirmViewMuteAction = {
+    channel: Channel,
+    user: User,
+    setConfirmView: any,
+    username: string, 
+    cancel: any
+}
+
+export function ConfirmViewMuteAction(props: TConfirmViewMuteAction) {
 
     const { muteUser } = useMuteUser();
 
@@ -131,7 +146,13 @@ export function ConfirmViewMuteAction(props: any) {
     )
 }
 
-export function ConfirmViewTypeProteced(props: any) {
+type TConfirmViewTypeProteced = {
+    channel: Channel,
+    setConfirmView: any,
+    cancel: any
+}
+
+export function ConfirmViewTypeProteced(props: TConfirmViewTypeProteced) {
 
     const [password, setPassword]: any = useState("")
 
