@@ -490,18 +490,6 @@ export class GamesService {
     return newGame;
   }
 
-  async userhasPendingInvites(userId: number) {
-    const game_exist = await this.prisma.game.findFirst({
-      where: {
-        player1Id: userId,
-        status: GameStatus.INVITE
-      }
-    })
-    if (game_exist)
-      return (true);
-    return (false);
-  }
-
   async acceptInvite(userId: number, gameId: number) {
     const joinedGame = await this.prisma.game.update({
       where: {id: gameId},
