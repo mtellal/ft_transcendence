@@ -2,11 +2,8 @@ import React, { useCallback } from "react";
 import { useChannelsContext, useCurrentUser, useFriendsContext } from "../../Hooks";
 import useFetchUsers from "../../useFetchUsers";
 import { removeUserFriend } from "../../../requests/friends";
-import { useNavigate } from "react-router-dom";
-import { useChannels } from "../useChannels";
 
 export function useFriends() {
-    const navigate = useNavigate();
     const { token } = useCurrentUser();
     const { fetchUserProfilePicture } = useFetchUsers();
     const { friends, friendsDispatch, currentFriend } = useFriendsContext();

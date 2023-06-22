@@ -196,14 +196,6 @@ export default function ChannelsEvents({ children }: any) {
                 } */
             })
 
-            socket.on('acceptedInvite', (res: any) => {
-                console.log("UPDATE USER CHANNEL FRIEND EVENT => ", res)
-                if (res)
-                {
-                    navigate("/game", {state: {gameId: res.id}})
-                }
-            })
-
             return () => {
                 if (socket) {
                     socket.off('newChannel')
@@ -221,7 +213,6 @@ export default function ChannelsEvents({ children }: any) {
                     socket.off('mutedUser')
                     socket.off('unmutedUser')
                     socket.off('updatedMember')
-                    socket.off('acceptedInvite')
                 }
             }
         }

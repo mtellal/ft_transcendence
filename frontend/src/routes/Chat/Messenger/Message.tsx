@@ -119,7 +119,7 @@ function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
     return (
         <div style={{padding: '0 2%'}}>
             <div className="flex-column">
-                <div className="flex" style={{ justifyContent: 'flex-end' }} >
+                <div className="flex" style={{ justifyContent: 'flex-end', alignItems: 'flex-end' }} >
 
                     <p className="message"
                         style={props.author ?

@@ -223,6 +223,7 @@ export default function LaunchGame() {
   const searchGame = useCallback((mode: string = "CLASSIC") => {
     if (socket && user) {
       setSearchingGame(true);
+      console.log("emited join with ", mode)
       socket.emit('join', {
         gametype: mode
       });
@@ -230,10 +231,14 @@ export default function LaunchGame() {
   }, [socket, user]);
 
 
+  console.log(location)
+
   useEffect(() => {
     if (socket && user)
     {
+      console.log("listenning on joinedGame ")
       socket.on('joinedGame', (joinedGame: any) => {
+        console.log(joinedGame)
         if (joinedGame && joinedGame.player1Id && joinedGame.player2Id) {
           setGameFound(true);
           setSearchingGame(false);
@@ -280,11 +285,11 @@ export default function LaunchGame() {
       }
     }
 
-  }, [socket, user])
+  }, [socket, user, location])
 
 
   useEffect(() => {
-    if (token) {
+    if (token && user) {
       const s = io('http://localhost:3000/game', {
         transports: ['websocket'],
         extraHeaders: {
@@ -298,7 +303,7 @@ export default function LaunchGame() {
         s.disconnect();
       }
     }
-  }, [token]);
+  }, [token, user]);
 
 
   const cancelSearchGame = useCallback(() => {

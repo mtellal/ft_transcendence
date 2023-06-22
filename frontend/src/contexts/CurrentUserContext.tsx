@@ -14,9 +14,8 @@ function reducer(user: any, action: any) {
             return ({ ...user, userStatus: "OFFLINE" })
         }
         case ('updateUser'): {
-            if (user && action.user)
-            {
-                return ({...user, ...action.user})
+            if (user && action.user) {
+                return ({ ...user, ...action.user })
             }
         }
         case ('updateProfilePicture'): {
@@ -27,16 +26,14 @@ function reducer(user: any, action: any) {
             return ({ ...user, blockList: action.blockList });
         }
         case ('addBlockList'): {
-            if (user && user.blockList && action.block && 
-                    (!user.blockList.length || !user.blockList.find((o: any) => o.userId === action.block.userId) ))
-            {
+            if (user && user.blockList && action.block &&
+                (!user.blockList.length || !user.blockList.find((o: any) => o.userId === action.block.userId))) {
                 user.blockList.push(action.block);
             }
             return (user);
         }
-        case('removeBlockList'): {
-            if (user && user.blockList && user.blockList.length && action.userId)
-            {
+        case ('removeBlockList'): {
+            if (user && user.blockList && user.blockList.length && action.userId) {
                 user.blockList = user.blockList.filter((obj: any) => obj.userId !== action.userId)
             }
             return (user)
@@ -50,18 +47,26 @@ export const CurrentUserContext: React.Context<any> = createContext(0);
 export function CurrentUserProvider({ children, ...props }: any) {
     const [user, userDispatch]: any = useReducer(reducer, props.user);
     const [socket, setSocket]: any = useState();
-
+    const navigate = useNavigate();
 
     React.useEffect(() => {
 
         const s = io('http://localhost:3000/users', {
             transports: ['websocket'],
             extraHeaders: {
-              'Authorization': `Bearer ${props.token}`
+                'Authorization': `Bearer ${props.token}`
             }
-          });
-    
-          setSocket(s);
+        });
+
+        setSocket(s);
+
+
+        s.on('acceptedInvite', (res: any) => {
+            console.log("ACCEPTED INVITE EVENT => ", res)
+            if (res) {
+                navigate("/game", { state: { gameId: res.id } })
+            }
+        })
 
         userDispatch({ type: 'login' })
         login(user, props.token);
