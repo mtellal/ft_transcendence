@@ -80,6 +80,9 @@ The Users Gateway doesn't listen to any events, however it emits:
 
 - removedFriend: will be sent to the user if he has been removed from a friend list
 
+- blockedUser: will be sent to the user who blocked someone with the blocked object
+
+- unblockedUser: will be sent to the user who unblocked someone with the userId of the unblocked user
 
 #### Chat Gateway
 
