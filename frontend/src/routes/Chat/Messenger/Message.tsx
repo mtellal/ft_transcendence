@@ -8,6 +8,7 @@ import ProfilePicture from "../../../components/users/ProfilePicture";
 import { RawIcon } from "../../../components/Icon";
 import ResizeContainer from "../../../components/ResizeContainer";
 import useAdinistrators from "../../../hooks/Chat/useAdministrators";
+import { useNavigate } from "react-router-dom";
 
 
 type TAuthorAccess = {
@@ -17,12 +18,14 @@ type TAuthorAccess = {
 }
 
 function AuthorAccess(props: TAuthorAccess) {
+    const navigate = useNavigate();
     const { currentChannel } = useChannelsContext();
     const { isUserAdministrators } = useAdinistrators();
 
     return (
         <div
-            className="flex"
+            className="flex pointer"
+            onClick={() => navigate(`/user/${props.author.id}`)}
             style={{ alignItems: 'flex-end' }}
         >
 
@@ -57,6 +60,7 @@ type TUserMessage = {
 
 function AuthorMessage(props: TUserMessage) {
 
+    const navigate = useNavigate();
     const { currentChannel } = useChannelsContext();
 
     let type = currentChannel && currentChannel.type;
@@ -75,7 +79,7 @@ function AuthorMessage(props: TUserMessage) {
                 <div className="flex" style={{ alignItems: 'flex-end' }}>
                     {
                         props.author &&
-                        <div className="relative">
+                        <div className="relative pointer" onClick={() => navigate(`/user/${props.author.id}`)}>
                             <ResizeContainer height="30px" width="30px" >
                                 <ProfilePicture image={props.author.url} />
                             </ResizeContainer>

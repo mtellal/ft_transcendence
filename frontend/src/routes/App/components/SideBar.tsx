@@ -65,8 +65,8 @@ export default function Sidebar() {
         },
         {
             id: 3,
-            title: "History",
-            icon: "history"
+            title: "Ladder",
+            icon: "groups"
         },
         {
             id: 4,

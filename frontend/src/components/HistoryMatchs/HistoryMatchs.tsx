@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import s from './style.module.css'
 import { getMatchHistory } from "../../requests/user";
 import { HistoryMatchsList } from "../HistoryMatchsList/HistoryMatchsList";
+import { useCurrentUser } from "../../hooks/Hooks";
 
 interface UserProfileProps {
 	id: number;
@@ -9,11 +10,12 @@ interface UserProfileProps {
 
 export function HistoryMatchs({ id }: UserProfileProps) {
 
+	const { token } = useCurrentUser();
 	const [history, setHistory] = useState<any>(null);
 
 
 	async function getInfoUser() {
-		const dataHistory = await getMatchHistory(id);
+		const dataHistory = await getMatchHistory(id, token);
 		setHistory(dataHistory.data);
 	}
 

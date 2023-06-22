@@ -38,12 +38,16 @@ const router = createBrowserRouter([
                 element: <LaunchGame />
             },
             {
+                path: "/ladder",
+                element: <Ladder />
+            },
+            {
                 path: "profile",
                 element: <Profile />
             },
 			{
-                path: "userprofile",
-                element: <UserProfile id={2}/>
+                path: "user/:userId",
+                element: <UserProfile />
             },
 			{
 				path: "ladder",

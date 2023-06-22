@@ -16,6 +16,7 @@ import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendReques
 import './Banner.css'
 import { getBlockList } from "../../../../requests/block";
 import { SetInvitation } from "../Invitation";
+import { useNavigate } from "react-router-dom";
 
 
 type TIconsBanner = {
@@ -29,6 +30,7 @@ type TIconsBanner = {
 
 function IconsBanner(props: TIconsBanner) {
 
+    const navigate = useNavigate();
     const { user, token } = useCurrentUser();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
     const { removeFriend, updateFriend } = useFriends();
@@ -51,14 +53,11 @@ function IconsBanner(props: TIconsBanner) {
         }
     }, [props.whisperUser]);
 
-
-
     async function loadBlockList() {
         const blockList = await getBlockList(props.whisperUser && props.whisperUser.id, token).then(res => res.data);
         if (blockList && blockList.length && blockList.find((o: any) => o.userId === user.id))
             setCurrentUserBlocked(true);
     }
-
 
     useEffect(() => {
         if (props.whisperUser && props.whisperUser.id) {
@@ -66,10 +65,16 @@ function IconsBanner(props: TIconsBanner) {
         }
     })
 
-
     return (
         <>
-            <Icon icon="person" onClick={props.profile} description="Profile" />
+            {
+                props.type === "WHISPER" && props.whisperUser &&
+                <Icon icon="person" onClick={() => { navigate(`/user/${props.whisperUser.id}`) }} description="Profile" />
+            }
+            {
+                props.type !== "WHISPER" &&
+                <Icon icon="person" onClick={props.profile} description="Profile" />
+            }
             <Icon
                 icon="sports_esports"
                 onClick={() => {

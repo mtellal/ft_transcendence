@@ -22,6 +22,21 @@ type TUserProps = {
     user: any
 }
 
+function SearchedUserIconProfile(props: TUserProps) {
+
+    const navigate = useNavigate();
+
+    return (
+        <div style={{ padding: '0 5px' }}>
+            <Icon
+                icon="person"
+                onClick={async () => props.user && navigate(`/user/${props.user.id}`)}
+                description="profile"
+            />
+        </div>
+    )
+}
+
 function SearchedUserIconChat(props: TUserProps) {
 
     const navigate = useNavigate();
@@ -207,6 +222,9 @@ export function SearchedUser(props: TUserProps) {
                 {
                     props.user && props.user.id && user && props.user.id !== user.id &&
                     <>
+                        <SearchedUserIconProfile 
+                            user={props.user}
+                        />
                         <SearchedUserIconChat
                             user={props.user}
                         />
