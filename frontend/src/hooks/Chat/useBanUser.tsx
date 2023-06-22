@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useChannelsContext, useChatSocket } from "../Hooks";
 import useFetchUsers from "../useFetchUsers";
+import { User, Channel } from "../../types";
 
 
 export default function useBanUser() {
@@ -8,7 +9,7 @@ export default function useBanUser() {
     const { channelsDispatch, channels } = useChannelsContext();
     const { fetchUsers } = useFetchUsers();
 
-    const banUser = useCallback((user: any, channel: any) => {
+    const banUser = useCallback((user: User, channel: Channel) => {
         if (channels && channels.length && socket && channel && user) {
             socket.emit('banUser', {
                 channelId: channel.id,
@@ -20,7 +21,7 @@ export default function useBanUser() {
         }
     }, [socket, channels])
 
-    const unbanUser = useCallback((user: any, channel: any) => {
+    const unbanUser = useCallback((user: User, channel: Channel) => {
         if (channels && channels.length && socket && channel && user) {
             socket.emit('unbanUser', {
                 channelId: channel.id,
@@ -30,13 +31,13 @@ export default function useBanUser() {
         }
     }, [socket, channels])
 
-    const isUserBanned = useCallback((user: any, channel: any) => {
+    const isUserBanned = useCallback((user: User, channel: Channel) => {
         if (channel && channel.banList && channel.banList.length)
             return (channel.banList.find((id: number) => id === user.id))
         return (false);
     }, [])
 
-    const getUsersBanned = useCallback(async (channel: any) => {
+    const getUsersBanned = useCallback(async (channel: Channel) => {
         if (channel && channel.banList) {
             return (await Promise.all(await fetchUsers(channel.banList)));
         }

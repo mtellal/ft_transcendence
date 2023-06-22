@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import imgUser from '../../assets/user.png'
 import ProfilePicture from './ProfilePicture';
 import './UserInfos.css'
+import { User } from '../../types';
 
 
 export type TUserInfos = {
-    user: any
+    user: User
     onClick?: () => {} | any
 }
 

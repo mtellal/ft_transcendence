@@ -5,9 +5,7 @@ import { io } from "socket.io-client";
 export const ChatSocketContext: React.Context<any> = createContext(null);
 
 export function SocketProvider({ children }: any) {
-    const {
-        token
-    }: any = useCurrentUser();
+    const { token }: any = useCurrentUser();
     const [socket, setSocket]: any = useState();
 
     useEffect(() => {

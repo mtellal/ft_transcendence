@@ -3,9 +3,10 @@ import { getBlockList } from "../requests/block";
 import { login, logout } from "../requests/user";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
+import { Block, User } from "../types";
 
 
-function reducer(user: any, action: any) {
+function reducer(user: User, action: any) {
     switch (action.type) {
         case ('login'): {
             return ({ ...user, userStatus: "ONLINE" })
@@ -27,14 +28,14 @@ function reducer(user: any, action: any) {
         }
         case ('addBlockList'): {
             if (user && user.blockList && action.block &&
-                (!user.blockList.length || !user.blockList.find((o: any) => o.userId === action.block.userId))) {
+                (!user.blockList.length || !user.blockList.find((o: Block) => o.userId === action.block.userId))) {
                 user.blockList.push(action.block);
             }
             return (user);
         }
         case ('removeBlockList'): {
             if (user && user.blockList && user.blockList.length && action.userId) {
-                user.blockList = user.blockList.filter((obj: any) => obj.userId !== action.userId)
+                user.blockList = user.blockList.filter((obj: Block) => obj.userId !== action.userId)
             }
             return (user)
         }
@@ -51,7 +52,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
 
     React.useEffect(() => {
 
-        const s = io('http://localhost:3000/users', {
+        const s = io(`${process.env.REACT_APP_BACK}/users`, {
             transports: ['websocket'],
             extraHeaders: {
                 'Authorization': `Bearer ${props.token}`
@@ -86,7 +87,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
         userDispatch({ type: 'updateProfilePicture', url })
     }, [user])
 
-    const updateCurrentUser = useCallback((user: any) => {
+    const updateCurrentUser = useCallback((user: User) => {
         userDispatch({ type: 'updateUser', user })
     }, [user])
 

@@ -5,7 +5,14 @@ import Icon from "../Icon";
 
 import './CollectionElement.css'
 
-export function CollectionElement(props: any) {
+type TCollectionElement = {
+    title: string, 
+    add?: any, 
+    removeNotif?: any,
+    collection: any[]
+}
+
+export function CollectionElement(props: TCollectionElement) {
 
     return (
         <div className="collection-element">

@@ -4,10 +4,13 @@ import { getUserByUsername } from "../../requests/user";
 import InfoInput from "../Input/InfoInput";
 import { UserLabelSearch } from "../users/UserLabel";
 import { CollectionElement } from "./CollectionElement";
+import { User } from "../../types";
+
+
 
 type TUsersCollection = {
     title: string,
-    users: any[],
+    users: User[],
     setUsers: (u : any) => {} | any,
     blackList?: any[]
 }

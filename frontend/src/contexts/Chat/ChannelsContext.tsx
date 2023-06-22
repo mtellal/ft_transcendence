@@ -2,65 +2,9 @@ import React, { createContext, useCallback, useEffect, useReducer, useState } fr
 import { getChannels } from "../../requests/chat";
 import { useChatSocket, useCurrentUser } from "../../hooks/Hooks";
 import useFetchUsers from "../../hooks/useFetchUsers";
+import { Channel, Mute, User } from "../../types";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
-
-/*
-id              Int             @id @default(autoincrement())
-  username        String          @unique
-  password        String
-  email           String?         @unique
-  avatar          String?
-  oauth_code      String?         @unique
-  oauth_exp       DateTime?
-  twoFactorSecret String?
-  twoFactorStatus Boolean         @default(false)
-  twoFactorOtpUrl String?
-  userStatus      Status          @default(OFFLINE)
-  friendRequest   FriendRequest[]
-  friendList      Int[]           @default([])
-  blockList     BlockedUser[]
-  channelList     Int[]           @default([])
-  createdAt       DateTime        @default(now())
-*/
-
-type User = {
-    id: number,
-    username: string,
-    password: string,
-    email?: string,
-    avatar?: string,
-    userStatus?: any[],
-    friendRequest?: any[],
-    friendList: number[],
-    blockList: number[],
-    channelList: number[],
-    createdAt?: string,
-
-    oauth_code?: any,
-    oauth_exp?: any,
-    twoFactorSecret?: any,
-    twoFactorStatus?: any,
-    twoFactorOtpUrl?: any
-}
-
-type Channel = {
-    id: number
-    name?: string,
-    password?: string,
-    messages?: any[],
-    ownerId: number,
-    administrators: any[],
-    members: number[],
-    banList: number[],
-    muteList: any[],
-    type: string,
-    createdAt?: string
-
-    users?: User[],
-    notifs: number
-}
-
 
 function formatChannel(channel: Channel) {
     return (
@@ -68,16 +12,15 @@ function formatChannel(channel: Channel) {
             ...channel,
             messages: channel.messages || [],
             users: channel.users || [],
-            notifs: channel.notifs || 0
         }
     )
 }
 
-function reducer(channels: any, action: any) {
+function reducer(channels: Channel[], action: any) {
     switch (action.type) {
         case ('initChannels'): {
             if (action.channels.length) {
-                return (action.channels.map((c: any) => formatChannel(c)))
+                return (action.channels.map((c: Channel) => formatChannel(c)))
             }
             return (action.channels);
         }
@@ -85,13 +28,13 @@ function reducer(channels: any, action: any) {
             if (!channels.length) {
                 return ([formatChannel(action.channel)])
             }
-            if (action.channel && !channels.find((c: any) => c.id === action.channel.id)) {
+            if (action.channel && !channels.find((c: Channel) => c.id === action.channel.id)) {
                 return ([...channels, formatChannel(action.channel)])
             }
         }
         case ('removeChannel'): {
             if (channels.length && action.channelId) {
-                return (channels.filter((c: any) => c.id !== action.channelId))
+                return (channels.filter((c: Channel) => c.id !== action.channelId))
             }
         }
         case ('updateChannelInfos'): {
@@ -150,8 +93,8 @@ function reducer(channels: any, action: any) {
             if (channels.length && action.channelId && action.userId && action.mute) {
                 return (channels.map((c: Channel) => {
                     if (c.id === action.channelId && c.muteList) {
-                        if (c.muteList.length && c.muteList.find((o: any) => o.userId === action.userId)) {
-                            c.muteList = c.muteList.map((o: any) => o.userId === action.userId ? action.mute : o)
+                        if (c.muteList.length && c.muteList.find((o: Mute) => o.userId === action.userId)) {
+                            c.muteList = c.muteList.map((o: Mute) => o.userId === action.userId ? action.mute : o)
                         }
                         else
                             c.muteList.push(action.mute);
@@ -166,7 +109,7 @@ function reducer(channels: any, action: any) {
                 return (channels.map((c: Channel) => {
                     if (c.id === action.channelId &&
                         c.muteList && c.muteList.length) {
-                        c.muteList = c.muteList.filter((o: any) => o.userId !== action.userId);
+                        c.muteList = c.muteList.filter((o: Mute) => o.userId !== action.userId);
                     }
                     return (c)
                 }
@@ -227,7 +170,7 @@ function reducer(channels: any, action: any) {
             const messages = action.messages;
             if (channels.length && messages && messages.length) {
                 return (
-                    channels.map((c: any) => {
+                    channels.map((c: Channel) => {
                         if (c.id === messages[0].channelId && !c.messages.length) {
                             c.messages = messages;
                         }
@@ -240,7 +183,7 @@ function reducer(channels: any, action: any) {
             const message = action.message;
             if (channels.length && message) {
                 return (
-                    channels.map((c: any, i: number) => {
+                    channels.map((c: Channel) => {
                         if (c.id === message.channelId) {
                             c.messages = [...c.messages, message];
                         }
@@ -268,10 +211,10 @@ export function ChannelsProvider({ children }: any) {
         let users;
         if (channelList && channelList.length) {
             return (
-                await Promise.all(channelList.map(async (c: any) => {
+                await Promise.all(channelList.map(async (c: Channel) => {
                     if (c.members && c.members.length) {
                         users = await fetchUsers(c.members);
-                        users = users.filter((u: any) => u);
+                        users = users.filter((u: User) => u);
                         return ({ ...c, users })
                     }
                 }))
@@ -306,25 +249,23 @@ export function ChannelsProvider({ children }: any) {
     //               C U R R E N T    C H A N N E L               //
     ////////////////////////////////////////////////////////////////
 
-    const setCurrentChannel = useCallback((channel: any) => {
+    const setCurrentChannel = useCallback((channel: Channel) => {
         let pickChannel;
         if (!channels.length)
             pickChannel = channel;
         else if (channel) {
-            pickChannel = channels.find((c: any) => c.id === channel.id)
+            pickChannel = channels.find((c: Channel) => c.id === channel.id)
             if (!pickChannel)
                 pickChannel = channel
         }
         setCurrentChannelLocal(pickChannel);
     }, [channels])
 
-    /*
-        when events in channels[] are triggered currentChannel need to be updated
-    */
+
     useEffect(() => {
         if (channels) {
             if (channels.length)
-                setCurrentChannelLocal((p: any) => p ? channels.find((c: any) => c.id == p.id) : null)
+                setCurrentChannelLocal((p: any) => p ? channels.find((c: Channel) => c.id == p.id) : null)
             else
                 setCurrentChannelLocal(null)
         }

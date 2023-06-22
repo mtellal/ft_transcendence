@@ -2,28 +2,29 @@ import React, { useCallback } from "react";
 import { useChannelsContext, useCurrentUser, useFriendsContext } from "../../Hooks";
 import useFetchUsers from "../../useFetchUsers";
 import { removeUserFriend } from "../../../requests/friends";
+import { User } from "../../../types";
 
 export function useFriends() {
     const { token } = useCurrentUser();
     const { fetchUserProfilePicture } = useFetchUsers();
     const { friends, friendsDispatch, currentFriend } = useFriendsContext();
 
-    const isUserFriend = useCallback((user: any) => {
+    const isUserFriend = useCallback((user: User) => {
         if (friends && friends.length && user) {
-            return (friends.find((u: any) => u.id === user.id))
+            return (friends.find((u: User) => u.id === user.id))
         }
         return (false);
     }, [friends])
 
-    const isUserFriendByUsername = useCallback((user: any) => {
+    const isUserFriendByUsername = useCallback((user: User) => {
         if (friends && friends.length && user) {
-            return (friends.find((u: any) => u.username === user.username))
+            return (friends.find((u: User) => u.username === user.username))
         }
         return (false);
     }, [friends])
 
 
-    const updateFriend = useCallback(async (friend: any) => {
+    const updateFriend = useCallback(async (friend: User) => {
         if (friends && friend) {
             if (!friend.url) {
                 const url = await fetchUserProfilePicture(friend.id);
@@ -34,7 +35,7 @@ export function useFriends() {
     }, [friends])
 
 
-    const removeFriend = useCallback((friend: any) => {
+    const removeFriend = useCallback((friend: User) => {
         if (friends && friends.length && friend) {
             removeUserFriend(friend.id, token);
             friendsDispatch({ type: 'removeFriend', friend })

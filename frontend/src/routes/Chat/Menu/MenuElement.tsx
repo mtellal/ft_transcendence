@@ -114,7 +114,6 @@ export default function MenuElement() {
             <CollectionElement
                 title="Friends"
                 collection={friendsList}
-                friend={true}
             />
         </div>
     )
