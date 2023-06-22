@@ -17,8 +17,7 @@ import defaultPP from '../../assets/user.png'
 import './App.css';
 
 
-export async function loader(p : any) {
-  console.log("app loader")
+export async function loader() {
   const token = extractCookie("access_token");
   if (token) {
     let id = jwtDecode<any>(token).id;

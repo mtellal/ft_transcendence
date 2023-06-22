@@ -31,7 +31,6 @@ export function useChannels() {
 
     const updateChannelName = useCallback((channelId: number, name: string) => {
         if (socket && channels && channels.length && channelId && name) {
-            console.log("update channel name", channelId, name)
             socket.emit('updateChannel', {
                 channelId: channelId,
                 name: name,
@@ -42,7 +41,6 @@ export function useChannels() {
 
     const updateChannelPassword = useCallback((channelId: number, password: string) => {
         if (socket && channels && channels.length && channelId && password) {
-            console.log("update channel password", channelId, password)
             socket.emit('updateChannel', {
                 channelId,
                 password,
@@ -54,7 +52,6 @@ export function useChannels() {
 
     const updateChannelType = useCallback((channelId: number, type: string, password: string = "") => {
         if (socket && channels && channels.length && channelId && type) {
-            console.log("update channel type", channelId, type)
             socket.emit('updateChannel', {
                 channelId,
                 type,
@@ -116,7 +113,6 @@ export function useChannels() {
         channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId });
         if (res.userId === user.id)
             channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
-        console.log("forced to leave", res, currentChannel)
         if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
             navigate("/chat");
     }, [currentChannel, user])

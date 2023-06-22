@@ -78,9 +78,6 @@ function ProfilePicture({ token, image, setImage }: any) {
         if (file.type.match("image.*")) {
             let url = window.URL.createObjectURL(e.target.files[0])
             setImage(url);
-            const fileRes = await updateProfilePicture(e.target.files[0], token);
-            if (fileRes.status !== 201 && fileRes.statusText !== "OK")
-                console.log("Error => ", fileRes);
         }
         else
             setError("Wrong format file");
@@ -154,7 +151,6 @@ function Enable2FA(props: any) {
                     if (res.data) {
                         let blob = convertBase64ToBlob(res.data.qrcode);
                         const url = window.URL.createObjectURL(blob)
-                        console.log(url);
                         setQrCode(url);
                         const updatedUser = await fetchUser(user.id);
                         updateCurrentUser(updatedUser);

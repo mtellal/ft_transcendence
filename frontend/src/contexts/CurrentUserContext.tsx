@@ -62,7 +62,6 @@ export function CurrentUserProvider({ children, ...props }: any) {
 
 
         s.on('acceptedInvite', (res: any) => {
-            console.log("ACCEPTED INVITE EVENT => ", res)
             if (res) {
                 navigate("/game", { state: { gameId: res.id } })
             }

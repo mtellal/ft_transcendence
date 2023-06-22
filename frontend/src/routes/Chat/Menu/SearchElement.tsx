@@ -403,8 +403,6 @@ export default function SearchElement() {
         setValue("")
     }
 
-    // console.log(user && user.blockList);
-
     return (
         <div className="">
             <MenuInput

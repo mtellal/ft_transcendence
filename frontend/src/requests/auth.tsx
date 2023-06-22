@@ -18,7 +18,6 @@ export async function getTokenRequest(oauth_code: string, otp_code: string) {
 }
 
 export async function signinRequest(username: string, password: string, code?: string, twoFa: string = "false") {
-    console.log("signin request with => ", `signin?twoFA=${twoFa}`, code, twoFa)
     return (
         axios.post(`${back}/auth/signin?twoFA=${twoFa}`, {
             username,

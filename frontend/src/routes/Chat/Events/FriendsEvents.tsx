@@ -1,8 +1,7 @@
 import { useEffect } from "react";
-import { useChannelsContext, useChatSocket, useCurrentUser, useFriendsContext } from "../../../hooks/Hooks";
+import { useCurrentUser, useFriendsContext } from "../../../hooks/Hooks";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
-import { useChannels } from "../../../hooks/Chat/useChannels";
 
 export default function FriendEvents({ children }: any) {
     const { userSocket } = useCurrentUser();
@@ -15,12 +14,10 @@ export default function FriendEvents({ children }: any) {
         if (userSocket) {
 
             userSocket.on('receivedRequest', (request: any) => {
-                console.log("REQUEST FRIEND EVENT => ", request)
                 addFriendRequest(request)
             })
 
             userSocket.on('addedFriend', (friend: any) => {
-                console.log("ADDED FRIEND EVENT => ")
                 if (friend && !isUserFriend(friend))
                 {
                     updateFriend(friend);
@@ -28,13 +25,11 @@ export default function FriendEvents({ children }: any) {
             })
 
             userSocket.on('updatedFriend', (friend: any) => {
-                console.log("UPDATED FRIEND EVENT => ")
                 if (friend)
                     updateFriend(friend);
             })
 
             userSocket.on('removedFriend', (friend: any) => {
-                console.log("REMOVE FRIEND EVENT")
                 if (friend)
                 {
                     removeFriend(friend);

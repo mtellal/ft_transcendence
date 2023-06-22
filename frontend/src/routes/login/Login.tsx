@@ -46,34 +46,27 @@ export default function Login() {
     const navigate = useNavigate();
 
     async function loader() {
-        console.log(location)
         let validLogin = false;
         let oauth_code = searchParams.get("oauth_code");
         let step = searchParams.get("step");
-        console.log("step =>", step)
         if (oauth_code) {
             if (step === "true") {
-                console.log("redirection 2fa")
                 return (navigate("/login/2fa", { state: { oauth_code } }));
             }
             if (oauth_code) {
-                console.log("normal oauth_code ", oauth_code)
                 await getTokenRequest(oauth_code, "")
                     .then(res => {
-                        console.log(res && res.data)
                         if (res && res.data) {
                             setCookie("access_token", res.data.access_token);
                             validLogin = true;
                         }
                     })
-                    .catch(err => console.log(err))
             }
         }
         else
             setCookie("access_token", "")
         if (validLogin)
         {
-            console.log("redirection app loader")
             return (navigate("/"))
         }
     }

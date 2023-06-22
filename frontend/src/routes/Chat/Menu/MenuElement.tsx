@@ -1,10 +1,9 @@
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from "react";
+import {  useNavigate } from "react-router-dom";
 
 import UserLabel from "../../../components/users/UserLabel";
 import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
-import { useWindow } from "../../../hooks/useWindow";
 
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { FriendRequests } from "../components/FriendRequests/FriendRequests";
@@ -12,20 +11,12 @@ import ChannelInfos from "../../../components/channels/ChannelInfos";
 import { CollectionElement } from "../../../components/collections/CollectionElement";
 import SearchElement from "./SearchElement";
 import './MenuElement.css'
-import { ChatInterfaceContext } from "../Chat/Chat";
 
 
-
-/*
-    2 setCurrentxxxxx in parent and child === bad approach
-    1 setXXX in parent and called in child (parent will be updated as child)
-*/
 
 export default function MenuElement() {
 
-    const location = useLocation();
     const navigate = useNavigate();
-    const { isMobileDisplay } = useWindow();
 
     const { user } = useCurrentUser();
     const { fetchUser } = useFetchUsers();
@@ -43,7 +34,6 @@ export default function MenuElement() {
                 channels.map(async (channel: any) => {
                     if (channel.type === "WHISPER" && channel.members.length === 2) {
                         let _user = channel.members.find((id: number) => id !== user.id);
-                        console.log(_user)
                         _user = await fetchUser(_user);
                         return (
                             <UserLabel

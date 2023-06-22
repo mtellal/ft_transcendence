@@ -8,7 +8,7 @@ import Login, { ChooseLogin } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
 import Profile from './routes/Profile/Profile';
-import LaunchGame from './routes/Game/Game';
+import LaunchGame from './routes/Game/LaunchGame';
 import History from './routes/History/History';
 
 import Interface from './routes/Chat/Interface/Interface';

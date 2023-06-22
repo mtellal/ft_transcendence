@@ -17,12 +17,9 @@ export default function TwoFactor() {
     const location = useLocation();
 
     useEffect(() => {
-        console.log('INSIDE 2FA')
         if (!location || !location.state) {
             navigate("/signin")
         }
-        else
-            console.log("2FA CORRECT", location.state)
     }, [location])
 
 
