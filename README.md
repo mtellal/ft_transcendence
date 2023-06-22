@@ -84,6 +84,8 @@ The Users Gateway doesn't listen to any events, however it emits:
 
 - unblockedUser: will be sent to the user who unblocked someone with the userId of the unblocked user
 
+- acceptedInvite: will be sent to both users once a game invite has been accepted with the corresponding Game object
+
 #### Chat Gateway
 
 Channel creation is done through a request, once a channel is created, a 'newChannel' event is emitted to every member of the newly created Channel
@@ -116,6 +118,9 @@ The backend listens to these events:
 - 'sendInvite': Takes a channelId and a gametype in the dto. Can't send an invite if muted. Emits the invite as a message with the type INVITE and the gameId of the newly created game room as content
 
 - 'acceptInvite': Takes a message id as a parameter. If it's a valid invite, will emit 'acceptedInvite' to both players with the game room object containing relevant info
+
+- 'updatedInvite': Will send the updated invite after it has been accepted to the Channel OR when it has been made invalid.
+For instance, if a user sends 20 invites in a Channel and one is accepted, the Channel will receive 19 updatedInvite with the invalid invite (acceptedBy set to -1) and the accepted invite (acceptedBy set to the correct userId)
 
 #### Games Gateway
 
