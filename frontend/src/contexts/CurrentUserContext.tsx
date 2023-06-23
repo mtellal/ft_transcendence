@@ -54,6 +54,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
 
         const s = io(`${process.env.REACT_APP_BACK}/users`, {
             transports: ['websocket'],
+            upgrade: false,
             extraHeaders: {
                 'Authorization': `Bearer ${props.token}`
             }
