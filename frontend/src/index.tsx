@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Navigate, Route }from 'react-router-dom'
-import './index.css';
 import App, { loader as appLoader, loader } from './routes/App/App';
 
+import './index.css';
 import Login, { ChooseLogin } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
 import Profile from './routes/Profile/Profile';
 import LaunchGame from './routes/Game/LaunchGame';
-import History from './routes/History/History';
 
 import Interface from './routes/Chat/Interface/Interface';
 
@@ -57,11 +56,6 @@ const router = createBrowserRouter([
                 path: "game",
                 loader: appLoader,
                 element: <LaunchGame />
-            },
-            {
-                path: "history",
-                loader: appLoader,
-                element: <History />
             },
             {
                 path: "chat",

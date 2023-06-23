@@ -7,6 +7,7 @@ export const ChatSocketContext: React.Context<any> = createContext(null);
 export function SocketProvider({ children }: any) {
     const { token }: any = useCurrentUser();
     const [socket, setSocket]: any = useState();
+    const [connected, setConnected] = useState(false);
 
     useEffect(() => {
         let s = io(`${process.env.REACT_APP_BACK}/chat`, {
@@ -17,6 +18,8 @@ export function SocketProvider({ children }: any) {
         });
 
         setSocket(s);
+        s.on('connect', () => {setConnected(true)})
+        s.on('disconnect', () => {setConnected(false)})
 
         return (() => {
             s.disconnect();
@@ -25,7 +28,10 @@ export function SocketProvider({ children }: any) {
 
     return (
         <ChatSocketContext.Provider value={{ socket }}>
-            {children}
+            {
+                connected && 
+                children
+            }
         </ChatSocketContext.Provider>
     )
 }

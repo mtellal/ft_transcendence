@@ -10,6 +10,9 @@ import PickMenu from "../../components/PickMenu";
 import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
 import useFetchUsers from "../../hooks/useFetchUsers";
 import './Profile.css'
+import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
+import { Stats } from "../../components/Stats/Stats";
+import { Achievements } from "../../components/Achievements/Achievements";
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const { token } = useCurrentUser();
@@ -23,14 +26,14 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
         setUpdated(false);
         if (!username || !username.trim())
             return setError("Username required and can't be empty");
-        if (username.trim().length > 15)
+        if (username.trim().length > 20)
             return setError("Username too long (20 chars max)");
         if (username.trim().match(/[^a-zA-Z0-9 ]/g))
             return setError("Username invalid (only alphanumeric characters)")
 
-        if (prevUsernameRef.current !== username) {
+        if (prevUsernameRef.current.trim() !== username.trim()) {
             updateUser({
-                username: username,
+                username: username.trim(),
                 userStatus: "ONLINE"
             }, id, token)
                 .then(d => {
@@ -39,6 +42,7 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
                     setUpdated(true);
                     updateCurrentUser(d.data);
                 })
+                .catch(() => setError("Bad username"))
             prevUsernameRef.current = username;
         }
     }
@@ -76,11 +80,12 @@ function ProfilePicture({ token, image, setImage }: any) {
         setError("");
         const file = e.target.files[0];
         if (file.type.match("image.*")) {
-            let url = window.URL.createObjectURL(e.target.files[0])
+            let url = window.URL.createObjectURL(e.target.files[0]);
             setImage(url);
+            updateProfilePicture(file, token)
         }
         else
-            setError("Wrong format file");
+            setError("Invalid file");
     }
 
     async function disconnect() {
@@ -120,7 +125,7 @@ function ProfilePicture({ token, image, setImage }: any) {
     )
 }
 
-function Enable2FA(props: any) {
+function Enable2FA() {
     const { user, token, updateCurrentUser } = useCurrentUser();
     const { fetchUser } = useFetchUsers();
     const [selected, setSelected] = useState("false");
@@ -172,8 +177,7 @@ function Enable2FA(props: any) {
                 setUpdated(true);
                 if (s === "true")
                     enable2FA();
-                else
-                {
+                else {
                     setQrCode(null);
                     enable2FARequest(false, token)
                 }
@@ -227,6 +231,16 @@ export default function Profile() {
                 />
             </div>
             <Enable2FA />
+            {
+                user &&
+                <>
+                    <div >
+                        <HistoryMatchs id={user.id} />
+                        <Stats id={user.id} />
+                    </div>
+                    <Achievements id={user.id} />
+                </>
+            }
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, Outlet, redirect, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { setCookie } from "../../Cookie";
 
 import userImg from '../../assets/icon-login.png'
@@ -40,7 +40,6 @@ export function ChooseLogin() {
 
 export default function Login() {
 
-    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
     const navigate = useNavigate();
@@ -71,12 +70,9 @@ export default function Login() {
         }
     }
 
-
     useEffect(() => {
         loader();
     }, [])
-
-
 
     return (
         <div className="flex-center login-page">
