@@ -116,6 +116,7 @@ export default function LaunchGame() {
     if (token && user) {
       const s = io(`${process.env.REACT_APP_BACK}/game`, {
         transports: ['websocket'],
+        upgrade: false,
         extraHeaders: {
           'Authorization': `Bearer ${token}`
         }

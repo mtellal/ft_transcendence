@@ -12,6 +12,7 @@ export function SocketProvider({ children }: any) {
     useEffect(() => {
         let s = io(`${process.env.REACT_APP_BACK}/chat`, {
             transports: ['websocket'],
+            upgrade: false,
             extraHeaders: {
                 'Authorization': `Bearer ${token}`
             }
