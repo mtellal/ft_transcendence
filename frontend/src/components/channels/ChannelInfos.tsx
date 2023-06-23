@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { useChannelsContext, useCurrentUser } from "../../hooks/Hooks";
+import { useChannelsContext } from "../../hooks/Hooks";
 import ProfilePicture from "../../components/users/ProfilePicture";
 
 import './ChannelInfos.css'
@@ -27,7 +27,6 @@ export default function ChannelInfos(props: TChannelInfos) {
                                 <ProfilePicture image={user.url} />
                             </div>
                         )
-
                     }
                 }
                 )

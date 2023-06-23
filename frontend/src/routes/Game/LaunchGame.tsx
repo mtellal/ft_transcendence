@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { io } from 'socket.io-client';
 import { useLocation } from "react-router-dom";
@@ -69,7 +69,7 @@ export default function LaunchGame() {
           setGameFound(true);
           setSearchingGame(false);
           setGameRoom(joinedGame);
-          if (user) {
+          if (user && token) {
             updateUser({ userStatus: "INGAME" }, user.id, token)
           }
           socket.off('joinedGame')
@@ -79,7 +79,7 @@ export default function LaunchGame() {
         socket.off('joinedGame');
       }
     }
-  }, [socket, user, searchingGame])
+  }, [socket, user, searchingGame, token])
 
 
 
@@ -101,7 +101,7 @@ export default function LaunchGame() {
     }
 
     return () => {
-      if (user)
+      if (user && token)
         updateUser({ userStatus: "ONLINE" }, user.id, token)
 
       if (socket) {
@@ -109,11 +109,11 @@ export default function LaunchGame() {
       }
     }
 
-  }, [socket, user, location])
+  }, [socket, user, location, token])
 
 
   useEffect(() => {
-    if (token && user) {
+    if (token && user && !localStorage.getItem("chatSocket")) {
       const s = io(`${process.env.REACT_APP_BACK}/game`, {
         transports: ['websocket'],
         upgrade: false,
@@ -123,8 +123,8 @@ export default function LaunchGame() {
       });
 
       setSocket(s);
-      s.on('connect', () => {setConnected(true)})
-      s.on('disconnect', () => {setConnected(false)})
+      s.on('connect', () => { setConnected(true) })
+      s.on('disconnect', () => { setConnected(false) })
 
       return () => {
         s.disconnect();
@@ -138,7 +138,7 @@ export default function LaunchGame() {
       setSearchingGame(false);
       socket.emit('cancel');
     }
-  }, [socket, user]);
+  }, [socket]);
 
 
   function playAgain() {
@@ -152,7 +152,7 @@ export default function LaunchGame() {
   return (
     <div className="launchgame relative">
       {
-        connected && 
+        connected &&
         <>
           {
             gameFound && socket && !gameResult &&

@@ -18,7 +18,7 @@ import './ChannelSearchLabel.css'
 import { Channel } from "../../../../types";
 
 type TProtectedChannelPassword = {
-    reset: any, 
+    reset: any,
     channel: Channel
 }
 
@@ -103,12 +103,12 @@ export function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
                 </ResizeContainer>
             </div>
         ))
-    }, [channel.members]);
+    }, [channel.members, fetchUserProfilePicture]);
 
     useEffect(() => {
         if (channel.members)
             loadUsersProfilePicture();
-    }, [channel.members])
+    }, [channel.members, loadUsersProfilePicture])
 
 
     const renderIcon = useCallback(() => {
@@ -148,7 +148,16 @@ export function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
                 </div>
             )
         }
-    }, [channel.members, user]);
+    }, [
+        channel,
+        isUserBanned,
+        isUserMemberFromChannel,
+        user,
+        props,
+        reset,
+        setAction
+    ]
+    );
 
     return (
         <div className="flex-ai channelsearch-container">

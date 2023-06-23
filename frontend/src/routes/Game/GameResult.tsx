@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { useCurrentUser } from "../../hooks/Hooks";
 import useFetchUsers from "../../hooks/useFetchUsers";
@@ -20,20 +20,20 @@ export default function GameResult(props: TGameResult) {
     const { fetchUser } = useFetchUsers();
   
   
-    async function loadPlayers(gameResult: any) {
+    const loadPlayers = useCallback(async (gameResult: any) => {
       let oplayer;
       if (gameResult.player1Id === user.id)
         oplayer = await fetchUser(gameResult.player2Id);
       else
         oplayer = await fetchUser(gameResult.player1Id);
       setPlayer(oplayer);
-    }
+    }, [fetchUser, user]);
   
     useEffect(() => {
       if (props.gameResult) {
         loadPlayers(props.gameResult);
       }
-    }, [props.gameResult])
+    }, [props.gameResult, loadPlayers])
   
     return (
       <div className="play-page">

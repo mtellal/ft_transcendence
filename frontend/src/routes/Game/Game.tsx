@@ -1,21 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useCurrentUser } from "../../hooks/Hooks";
+import React, { useState, useEffect, useCallback } from "react";
 
 import './Game.css'
 
 
 type TGame = {
-  gameRoom: any, 
+  gameRoom: any,
   socket: any,
-  customization: string, 
-  marioImage: any, 
+  customization: string,
+  marioImage: any,
   sanicImage: any
 }
 
 export default function Game(props: TGame) {
   const canvasRef: any = React.useRef();
 
-  const { user } = useCurrentUser();
   const [socket, setSocket] = useState(null);
   const [gameRoom, setGameRoom] = useState(null);
 
@@ -26,33 +24,6 @@ export default function Game(props: TGame) {
 
   const [ratioHeight, setRatioHeight] = useState(1);
   const [ratioWidth, setRatioWidth] = useState(1);
-
-  useEffect(() => {
-    initContext();
-  }, [])
-
-  useEffect(() => {
-    if (canvasRef && canvasRef.current) {
-      window.addEventListener('resize', initContext)
-      return () => window.removeEventListener('resize', initContext);
-    }
-  }, [canvasRef])
-
-  useEffect(() => {
-    if (props.gameRoom)
-      setGameRoom(props.gameRoom);
-  }, [props.gameRoom])
-
-  useEffect(() => {
-    if (props.socket && context) {
-      setSocket(props.socket);
-      props.socket.on('updatedState', (updatedGameState: any) => {
-        drawGameState(updatedGameState);
-      })
-      return () => props.socket.off('updatedState')
-    }
-  }, [props.socket, context, ratioHeight, ratioWidth]);
-
 
   function initContext() {
     const context = canvasRef.current.getContext('2d');
@@ -91,7 +62,7 @@ export default function Game(props: TGame) {
       context.fillStyle = 'black';
       context.fillRect(width / 2, 0, 1, height);
     }
-  }, [props.customization, user, props.marioImage, props.sanicImage]);
+  }, [props.customization, props.marioImage, props.sanicImage]);
 
   const drawGameState = useCallback((gameState: any) => {
     if (context && canvasRef && canvasRef.current && ratioHeight && ratioWidth) {
@@ -107,7 +78,15 @@ export default function Game(props: TGame) {
       setScoreP2((p: number) => p !== gameState.score.player2Score ? gameState.score.player2Score : p);
 
     }
-  }, [user, props.marioImage, props.sanicImage, context, canvasRef, ratioHeight, ratioWidth, props.customization]);
+  }, [
+    context,
+    canvasRef,
+    ratioHeight,
+    ratioWidth,
+    drawField
+  ]
+  );
+
 
   /* //////////   MOVEMENTS FUNCTIONS     //////////*/
 
@@ -129,17 +108,47 @@ export default function Game(props: TGame) {
     if (socket) {
       socket.emit("moveUp", gameRoom?.id);
     }
-  }, [socket]);
+  }, [socket, gameRoom]);
 
   const moveDown = useCallback(() => {
     if (socket)
       socket.emit("moveDown", gameRoom?.id);
-  }, [socket]);
+  }, [socket, gameRoom]);
 
   const stopMovement = useCallback(() => {
     if (socket)
       socket.emit("stopMove", gameRoom?.id);
-  }, [socket]);
+  }, [socket, gameRoom]);
+
+
+  useEffect(() => {
+    initContext();
+  }, [])
+
+  useEffect(() => {
+    if (canvasRef && canvasRef.current) {
+      window.addEventListener('resize', initContext)
+      return () => window.removeEventListener('resize', initContext);
+    }
+  }, [canvasRef])
+
+  useEffect(() => {
+    if (props.gameRoom)
+      setGameRoom(props.gameRoom);
+  }, [props.gameRoom])
+
+  useEffect(() => {
+    if (props.socket && context) {
+      setSocket(props.socket);
+      props.socket.on('updatedState', (updatedGameState: any) => {
+        drawGameState(updatedGameState);
+      })
+      return () => props.socket.off('updatedState')
+    }
+  }, [props.socket, context, ratioHeight, ratioWidth, drawGameState]);
+
+
+
 
   return (
     <div className="game relative">

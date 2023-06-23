@@ -20,7 +20,7 @@ export default function TwoFactor() {
         if (!location || !location.state) {
             navigate("/signin")
         }
-    }, [location])
+    }, [location, navigate])
 
 
     async function submit() {

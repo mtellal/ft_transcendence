@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { UserLabelSearch } from "../../../../components/users/UserLabel";
 
 import { useFriendsContext } from "../../../../hooks/Hooks";
@@ -23,7 +23,7 @@ export function FriendRequests() {
         const users = await fetchUsers(friendInvitations.map((r: FriendRequest) => r.sendBy));
         if (users && users.length)
             setUserInvitations(users);
-    }, [friendInvitations])
+    }, [friendInvitations, fetchUsers])
 
 
     React.useEffect(() => {
@@ -34,7 +34,7 @@ export function FriendRequests() {
             setInvitations([]);
             setUserInvitations([]);
         }
-    }, [friendInvitations])
+    }, [friendInvitations, loadInvitations])
 
 
     React.useEffect(() => {
@@ -52,7 +52,7 @@ export function FriendRequests() {
         }
         else
             setInvitations([]);
-    }, [userInvitations])
+    }, [userInvitations, acceptFriend, refuseFriend])
 
 
     return (

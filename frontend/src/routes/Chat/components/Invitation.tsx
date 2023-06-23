@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { ConfirmPage, ConfirmViewButtons } from "../Profile/ChannelProfile/ConfirmAction";
+import { ConfirmViewButtons } from "../Profile/ChannelProfile/ConfirmAction";
 import PickMenu from "../../../components/PickMenu";
 import { ChatInterfaceContext } from "../Chat/Chat";
 import { useInvitation } from "../../../hooks/Chat/useInvitation";

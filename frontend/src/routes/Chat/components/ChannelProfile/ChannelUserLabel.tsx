@@ -36,7 +36,7 @@ export function CollectionUsers(props: TCollectionUsers) {
                     isAddable={false}
                 />
             ))
-    }, [props.users, props.isAdmin, props.currentUser, channels])
+    }, [props.users, props.title, props.isAdmin, props.currentUser, channels])
 
     return (
         <CollectionElement
@@ -56,7 +56,7 @@ type TChannelUserLabel = {
 export function ChannelUserLabel(props: TChannelUserLabel) {
 
     const { user } = useCurrentUser();
-    const { currentChannel, channels } = useChannelsContext();
+    const { currentChannel } = useChannelsContext();
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
 
     const { kickUser } = useKickUser();
@@ -71,7 +71,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
 
     useEffect(() => {
         setMutedUser(isUserMuted(props.user, currentChannel));
-    }, [currentChannel && currentChannel.muteList])
+    }, [currentChannel, currentChannel.muteList, isUserMuted, props.user])
 
     function mutedIcon() {
         if (mutedUser)

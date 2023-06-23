@@ -31,12 +31,12 @@ export function UserProfile() {
 		const pp = await getUserProfilePictrue(userId, token);
 		if (pp)
 			setAvatar(window.URL.createObjectURL(new Blob([pp.data])));
-	}, [userId]);
+	}, [userId, token]);
 
 	useEffect(() => {
 		if (userId)
 			getInfoUser();
-	}, [userId])
+	}, [userId, getInfoUser])
 
 	return (
 		< div className={s.container}>

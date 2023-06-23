@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import IconInput from "../../components/Input/IconInput";
 import { setCookie } from "../../Cookie";
 import { signinRequest } from "../../requests/auth";

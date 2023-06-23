@@ -1,7 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
+import React, {  useState } from "react"
 
-import useBanUser from "../../../../hooks/Chat/useBanUser";
-import { ChannelUserLabel, CollectionUsers } from "./ChannelUserLabel";
+import { ChannelUserLabel } from "./ChannelUserLabel";
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import InfoInput from "../../../../components/Input/InfoInput";
 import useMembers from "../../../../hooks/Chat/useMembers";

@@ -13,26 +13,26 @@ export function ChooseLogin() {
 
     return (
         <div className="flex-column-center chooselogin-button-container">
-            <a
+            <button
                 className="flex-center button chooselogin-button"
                 onClick={() => navigate("/login/signin")}
             >
                 Signin
-            </a>
+            </button>
 
             <a
                 className="flex-center button chooselogin-button"
                 href={`${process.env.REACT_APP_BACK}/auth/42`}
             >
-                Signin as <img className="chooselogin-img" src="./assets/42_Logo.svg" />
+                Signin as <img alt="42" className="chooselogin-img" src="./assets/42_Logo.svg" />
             </a>
 
-            <a
+            <button
                 className="flex-center button chooselogin-button"
                 onClick={() => navigate("/login/signup")}
             >
                 Signup
-            </a>
+            </button>
         </div>
     )
 }
@@ -40,7 +40,7 @@ export function ChooseLogin() {
 
 export default function Login() {
 
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams]:any = useSearchParams();
 
     const navigate = useNavigate();
 

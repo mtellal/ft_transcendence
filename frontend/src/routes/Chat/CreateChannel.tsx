@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useChannelsContext, useCurrentUser } from "../../hooks/Hooks";
 import InfoInput from "../../components/Input/InfoInput";
 import { createChannel } from "../../requests/chat";
-import UsersCollection from "../../components/collections/UsersCollection";
 import PickMenu from "../../components/PickMenu";
 
 import ArrowBackMenu from "./components/ArrowBackMenu";

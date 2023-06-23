@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateProfilePicture, updateUser } from "../../requests/user";
 
@@ -37,10 +37,11 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
                 userStatus: "ONLINE"
             }, id, token)
                 .then(d => {
-                    if (d.status !== 200 || d.statusText !== "OK")
-                        throw "";
-                    setUpdated(true);
-                    updateCurrentUser(d.data);
+                    if (d.status === 200 || d.statusText === "OK")
+                    {
+                        setUpdated(true);
+                        updateCurrentUser(d.data);
+                    }
                 })
                 .catch(() => setError("Bad username"))
             prevUsernameRef.current = username;
@@ -96,7 +97,7 @@ function ProfilePicture({ token, image, setImage }: any) {
         <div className="flex-column-center">
             <div>
                 <div className="picture-container">
-                    <img className="profile-picture" src={image} />
+                    <img alt="user" className="profile-picture" src={image} />
                 </div>
                 <form >
                     <label
@@ -162,14 +163,14 @@ function Enable2FA() {
                     }
                 })
         }
-    }, [token]);
+    }, [token, fetchUser, updateCurrentUser, user]);
 
 
 
     const enable2FA = useCallback(async () => {
         await enable2FARequest(true, token);
         await generateQrCode();
-    }, [token]);
+    }, [token, generateQrCode]);
 
     const submit = useCallback(async (s: string) => {
         setSelected((p: string) => {
@@ -184,14 +185,14 @@ function Enable2FA() {
             }
             return (s);
         });
-    }, [token]);
+    }, [token, enable2FA]);
 
 
     return (
         <div>
             <h2>Authentifiaction</h2>
             <h4>Enable 2FA</h4>
-            {qrcode && <img src={qrcode} />}
+            {qrcode && <img alt="qrcode" src={qrcode} />}
             {updated && <p className="green-c" >updated</p>}
             <div style={{ width: '200px', marginBottom: '10px' }}>
                 <PickMenu
