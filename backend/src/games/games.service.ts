@@ -219,7 +219,6 @@ export class GamesService {
       game.player1.dir = 1
     }
     if (game.player2.id === userId) {
-      if (game.player2.y + 5 + game.player2.height < game.height)
         game.player2.dir  = 1;
     }
   }
@@ -230,7 +229,6 @@ export class GamesService {
       game.player1.dir = 0
     }
     if (game.player2.id === userId) {
-      if (game.player2.y + 5 + game.player2.height < game.height)
         game.player2.dir  = 0;
     }
   }
