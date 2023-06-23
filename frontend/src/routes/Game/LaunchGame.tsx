@@ -130,7 +130,7 @@ export default function LaunchGame() {
         s.disconnect();
       }
     }
-  }, [token, user]);
+  }, [token]);
 
 
   const cancelSearchGame = useCallback(() => {
