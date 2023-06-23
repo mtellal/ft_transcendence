@@ -18,17 +18,17 @@ import './Game.css'
 
 
 function useImage(image: any) {
-  const [marioImage, setMarioImage]: any = useState();
+  const [_image, setImage]: any = useState();
 
   useEffect(() => {
-    if (mario) {
+    if (image) {
       let img = new Image();
       img.src = image;
-      setMarioImage(img);
+      setImage(img);
     }
   }, [image]);
 
-  return marioImage
+  return _image
 }
 
 
