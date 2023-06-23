@@ -208,8 +208,7 @@ export class GamesService {
       game.player1.dir = -1;
     }
     if (game.player2.id === userId) {
-      if (game.player2.y - 5 > 0)
-        game.player2.dir = -1;
+      game.player2.dir = -1;
     }
   }
 
@@ -219,7 +218,7 @@ export class GamesService {
       game.player1.dir = 1
     }
     if (game.player2.id === userId) {
-        game.player2.dir  = 1;
+      game.player2.dir = 1;
     }
   }
 
@@ -229,7 +228,7 @@ export class GamesService {
       game.player1.dir = 0
     }
     if (game.player2.id === userId) {
-        game.player2.dir  = 0;
+      game.player2.dir = 0;
     }
   }
 
@@ -258,8 +257,8 @@ export class GamesService {
     const tickRate = 1000 / frameRate // Updates will be send at this interval
     setTimeout(() => {
       const gameLoopInterval = setInterval(async () => {
-        this.gameLoop(game);
         this.updatePlayer(game);
+        this.gameLoop(game);
         server.to(`room-${room.id}`).emit('updatedState', game);
         if (this.isGameOver(game)) {
           clearInterval(gameLoopInterval);
