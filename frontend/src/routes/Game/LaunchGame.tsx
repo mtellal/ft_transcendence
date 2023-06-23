@@ -11,7 +11,26 @@ import Play from "./Play";
 
 import Game from "./Game";
 
+import mario from '../../assets/mario.jpeg';
+import sanic from '../../assets/sanic.jpeg';
+
 import './Game.css'
+
+
+function useImage(image: any) {
+  const [marioImage, setMarioImage]: any = useState();
+
+  useEffect(() => {
+    if (mario) {
+      let img = new Image();
+      img.src = image;
+      setMarioImage(img);
+    }
+  }, [image]);
+
+  return marioImage
+}
+
 
 export default function LaunchGame() {
   const location = useLocation();
@@ -26,7 +45,12 @@ export default function LaunchGame() {
   const [gameFound, setGameFound] = useState(false);
   const [searchingGame, setSearchingGame] = useState(false);
 
-  const [customization, setCustomization] = useState();
+  const [customization, setCustomization]: any = useState();
+
+  const [connected, setConnected] = useState(false);
+
+  const marioImage = useImage(mario);
+  const sanicImage = useImage(sanic);
 
   const searchGame = useCallback((mode: string = "CLASSIC") => {
     if (socket && user) {
@@ -90,7 +114,7 @@ export default function LaunchGame() {
 
   useEffect(() => {
     if (token && user) {
-      const s = io('http://localhost:3000/game', {
+      const s = io(`${process.env.REACT_APP_BACK}/game`, {
         transports: ['websocket'],
         extraHeaders: {
           'Authorization': `Bearer ${token}`
@@ -98,6 +122,8 @@ export default function LaunchGame() {
       });
 
       setSocket(s);
+      s.on('connect', () => {setConnected(true)})
+      s.on('disconnect', () => {setConnected(false)})
 
       return () => {
         s.disconnect();
@@ -125,27 +151,34 @@ export default function LaunchGame() {
   return (
     <div className="launchgame relative">
       {
-        gameFound && socket && !gameResult &&
-        <Game
-          socket={socket}
-          gameRoom={gameRoom}
-          customization={customization}
-        />
-      }
-      {searchingGame && <SearchGame cancelSearchGame={() => cancelSearchGame()} />}
-      {
-        !play && !searchingGame && !gameFound &&
-        <Play
-          searchGame={(mode: string) => searchGame(mode)}
-          setCustomization={setCustomization}
-        />
-      }
-      {
-        gameResult &&
-        <GameResult
-          gameResult={gameResult}
-          playAgain={playAgain}
-        />
+        connected && 
+        <>
+          {
+            gameFound && socket && !gameResult &&
+            <Game
+              socket={socket}
+              gameRoom={gameRoom}
+              customization={customization}
+              marioImage={marioImage}
+              sanicImage={sanicImage}
+            />
+          }
+          {searchingGame && <SearchGame cancelSearchGame={() => cancelSearchGame()} />}
+          {
+            !play && !searchingGame && !gameFound &&
+            <Play
+              searchGame={(mode: string) => searchGame(mode)}
+              setCustomization={setCustomization}
+            />
+          }
+          {
+            gameResult &&
+            <GameResult
+              gameResult={gameResult}
+              playAgain={playAgain}
+            />
+          }
+        </>
       }
     </div>
   )

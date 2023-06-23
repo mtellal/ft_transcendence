@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import IconInput from "../../components/Input/IconInput";
 import { setCookie } from "../../Cookie";

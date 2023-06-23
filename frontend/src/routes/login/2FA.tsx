@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, Outlet, redirect, useLoaderData, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import IconInput from "../../components/Input/IconInput";
 
@@ -23,34 +23,34 @@ export default function TwoFactor() {
     }, [location])
 
 
-
     async function submit() {
         if (!secret || !secret.trim())
             return setError("Secret required")
-        if (location.state.username && location.state.password) {
-            await signinRequest(location.state.username, location.state.password, secret, "true")
+        if (location.state.username && location.state.username.trim() && 
+            location.state.password && location.state.password.trim()) {
+            await signinRequest(location.state.username.trim(), location.state.password.trim(), secret.trim(), "true")
                 .then(({ res }: any) => {
                     if (res && res.data) {
                         if (res.data.access_token) {
                             setCookie("access_token", res.data.access_token);
                             navigate("/");
+                            return ;
                         }
-                        else
-                            setError("Code invalid")
                     }
+                    setError("Code invalid")
                 })
         }
-        else if (location.state.oauth_code) {
-            await getTokenRequest(location.state.oauth_code, secret)
+        else if (location.state.oauth_code && location.state.oauth_code.trim() ) {
+            await getTokenRequest(location.state.oauth_code, secret.trim())
                 .then(res => {
                     if (res && res.data) {
                         if (res.data.access_token) {
                             setCookie("access_token", res.data.access_token);
                             navigate("/");
+                            return ;
                         }
-                        else
-                            setError("Code invalid")
                     }
+                    setError("Code invalid")
                 })
         }
     }

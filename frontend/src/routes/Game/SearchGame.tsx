@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import './Game.css'
 
+type TSearchGame = {
+  cancelSearchGame: () => void
+}
 
-export default function SearchGame(props: any) {
+export default function SearchGame(props: TSearchGame) {
 
     const [points, setPoints] = useState("");
   

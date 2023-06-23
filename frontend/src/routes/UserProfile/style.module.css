@@ -8,6 +8,7 @@
 
 .stats {
 	display: flex;
+	height: 50%;
 	justify-content: space-evenly;
 }
 

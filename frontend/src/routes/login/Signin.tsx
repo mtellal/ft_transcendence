@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import IconInput from "../../components/Input/IconInput";
 import { setCookie } from "../../Cookie";
-import { getTokenRequest, signinRequest } from "../../requests/auth";
+import { signinRequest } from "../../requests/auth";
 
 import './Sign.css'
 
@@ -10,7 +10,6 @@ export default function SignIn() {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [error, setError] = React.useState("");
-    const [secret, setSecret] = useState("");
 
     const navigate = useNavigate();
 
@@ -30,7 +29,7 @@ export default function SignIn() {
         if (!username || !username.trim()
             || !password || !password.trim())
             return (setError("userame or password empty"));
-        await signinRequest(username, password)
+        await signinRequest(username.trim(), password.trim())
             .then(({ error, errMessage, res }: any) => {
                 if (!error) {
                     handleResponse(res.data)

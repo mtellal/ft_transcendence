@@ -1,35 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useCurrentUser } from "../../hooks/Hooks";
-import mario from '../../assets/mario.jpeg';
-import sanic from '../../assets/sanic.jpeg';
 
 import './Game.css'
 
-function useImage(image: any) {
-  const [marioImage, setMarioImage]: any = useState();
-
-  useEffect(() => {
-    if (mario) {
-      let img = new Image();
-      img.src = image;
-      setMarioImage(img);
-    }
-  }, [image]);
-
-  return marioImage
-}
 
 type TGame = {
   gameRoom: any, 
   socket: any,
   customization: string, 
+  marioImage: any, 
+  sanicImage: any
 }
 
 export default function Game(props: TGame) {
   const canvasRef: any = React.useRef();
-
-  const marioImage = useImage(mario);
-  const sanicImage = useImage(sanic);
 
   const { user } = useCurrentUser();
   const [socket, setSocket] = useState(null);
@@ -94,10 +78,9 @@ export default function Game(props: TGame) {
   const drawField = useCallback((context: any, width: number, height: number) => {
     if (props.customization) {
       if (props.customization === "mario")
-        context.drawImage(marioImage, 0, 0, width, height);
+        context.drawImage(props.marioImage, 0, 0, width, height);
       if (props.customization === "sanic")
-        context.drawImage(sanicImage, 0, 0, width, height);
-
+        context.drawImage(props.sanicImage, 0, 0, width, height);
     }
     else {
       context.beginPath();
@@ -108,7 +91,7 @@ export default function Game(props: TGame) {
       context.fillStyle = 'black';
       context.fillRect(width / 2, 0, 1, height);
     }
-  }, [props.customization, user, marioImage]);
+  }, [props.customization, user, props.marioImage, props.sanicImage]);
 
   const drawGameState = useCallback((gameState: any) => {
     if (context && canvasRef && canvasRef.current && ratioHeight && ratioWidth) {
@@ -124,7 +107,7 @@ export default function Game(props: TGame) {
       setScoreP2((p: number) => p !== gameState.score.player2Score ? gameState.score.player2Score : p);
 
     }
-  }, [user, marioImage, context, canvasRef, ratioHeight, ratioWidth, props.customization]);
+  }, [user, props.marioImage, props.sanicImage, context, canvasRef, ratioHeight, ratioWidth, props.customization]);
 
   /* //////////   MOVEMENTS FUNCTIONS     //////////*/
 
