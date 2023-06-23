@@ -119,6 +119,11 @@ export default function Game(props: TGame) {
     }
   };
 
+  const handleKeyUp = (e: any) => {
+    if (e.key === "w" || e.key === "s") {
+      stopMovement();
+    }
+  };
 
   const moveUp = useCallback(() => {
     if (socket) {
@@ -131,12 +136,17 @@ export default function Game(props: TGame) {
       socket.emit("moveDown", gameRoom?.id);
   }, [socket]);
 
+  const stopMovement = useCallback(() => {
+    if (socket)
+      socket.emit("stopMove", gameRoom?.id);
+  }, [socket]);
+
   return (
     <div className="game relative">
       <canvas
         ref={canvasRef}
         className="game--canvas"
-        //onKeyUp={handleKeyUp}
+        onKeyUp={handleKeyUp}
         onKeyDown={handleKeyDown}
         tabIndex={0}
       />

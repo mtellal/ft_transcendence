@@ -205,24 +205,44 @@ export class GamesService {
   moveUp(gameId: number, userId: number) {
     const game = this.games.get(gameId);
     if (game.player1.id === userId) {
-      if (game.player1.y - 5 > 0)
-        game.player1.y -= 5 * game.player1.speed;
+      game.player1.dir = -1;
     }
     if (game.player2.id === userId) {
       if (game.player2.y - 5 > 0)
-        game.player2.y -= 5 * game.player2.speed;
+        game.player2.dir = -1;
     }
   }
 
   moveDown(gameId: number, userId: number) {
     const game = this.games.get(gameId);
     if (game.player1.id === userId) {
-      if (game.player1.y + 5 + game.player1.height < game.height)
-        game.player1.y += 5 * game.player1.speed;
+      game.player1.dir = 1
     }
     if (game.player2.id === userId) {
       if (game.player2.y + 5 + game.player2.height < game.height)
-        game.player2.y += 5 * game.player2.speed;
+        game.player2.dir  = 1;
+    }
+  }
+
+  stopMove(gameId: number, userId: number) {
+    const game = this.games.get(gameId);
+    if (game.player1.id === userId) {
+      game.player1.dir = 0
+    }
+    if (game.player2.id === userId) {
+      if (game.player2.y + 5 + game.player2.height < game.height)
+        game.player2.dir  = 0;
+    }
+  }
+
+  async updatePlayer(game: GameState) {
+    if (game.player1.y + 5 * game.player1.dir * game.player1.speed + game.player1.height < game.height &&
+      game.player1.y + 5 * game.player1.dir * game.player1.speed > 0) {
+      game.player1.y += 5 * game.player1.dir * game.player1.speed;
+    }
+    if (game.player2.y + 5 * game.player2.dir * game.player2.speed + game.player2.height < game.height &&
+      game.player2.y + 5 * game.player2.dir * game.player2.speed > 0) {
+      game.player2.y += 5 * game.player2.dir * game.player2.speed;
     }
   }
 
@@ -241,6 +261,7 @@ export class GamesService {
     setTimeout(() => {
       const gameLoopInterval = setInterval(async () => {
         this.gameLoop(game);
+        this.updatePlayer(game);
         server.to(`room-${room.id}`).emit('updatedState', game);
         if (this.isGameOver(game)) {
           clearInterval(gameLoopInterval);
