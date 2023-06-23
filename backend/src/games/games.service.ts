@@ -369,6 +369,12 @@ export class GamesService {
   }
 
   resetPlayer(game: GameState) {
+    if (game.gametype === GameType.HARDMODE) {
+      const defaultHeight = JSON.parse(JSON.stringify(defaultGameState.player1.height));
+      game.player1.height = defaultHeight;
+      game.player2.height = defaultHeight;
+    }
+
     game.player1.x = game.width * 0.02;
     game.player1.y = game.height / 2 - game.player1.height;
 
@@ -379,12 +385,19 @@ export class GamesService {
   initBall(game: GameState) {
     const signx = Math.floor(Math.random() * 10) % 2 === 0 ? 0 : 1;
     const signy = Math.floor(Math.random() * 10) % 2 === 0 ? 0 : 1;
-
+    
+    if (game.gametype !== GameType.CLASSIC) {
+      game.ball.speed = JSON.parse(JSON.stringify(defaultGameState.ball.speed));
+    }
+  
     game.ball.x = game.width / 2;
     game.ball.y = game.height / 2;
-    game.ball.speed = 1;
-    game.ball.velX = signx ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1)
-    game.ball.velY = signy ? Math.floor(Math.random() * 2) + 1 : -1 * (Math.floor(Math.random() * 2) + 1)
+    game.ball.velX = signx ? 1 * game.ball.speed : -1 * game.ball.speed;
+    game.ball.velY = signy ? 2 : -1 * 2;
+    console.log(signx);
+    console.log(game.ball.velX);
+    console.log(signy);
+    console.log(game.ball.velY);
   }
 
   gameLoop(game: GameState) {
@@ -394,12 +407,21 @@ export class GamesService {
     nextPosY += game.ball.velY > 0 ? game.ball.radius : -game.ball.radius;
 
     if ((nextPosX > game.player1.x && nextPosX < game.player1.x + game.player1.width &&
-      nextPosY > game.player1.y && nextPosY < game.player1.y + game.player1.height) ||
-      (nextPosX > game.player2.x && nextPosX < game.player2.x + game.player2.width &&
-        nextPosY > game.player2.y && nextPosY < game.player2.y + game.player2.height)) {
+      nextPosY > game.player1.y && nextPosY < game.player1.y + game.player1.height)) {
       game.ball.velX *= -1;
-      if (game.gametype === GameType.SPEEDUP)
-          game.ball.speed += 1;
+      if (game.gametype !== GameType.CLASSIC)
+          game.ball.speed += 0.25;
+      if (game.gametype === GameType.HARDMODE)
+          game.player1.height -= game.player1.height / 7;
+    }
+
+    if ((nextPosX > game.player2.x && nextPosX < game.player2.x + game.player2.width &&
+      nextPosY > game.player2.y && nextPosY < game.player2.y + game.player2.height)) {
+      game.ball.velX *= -1;
+      if (game.gametype !== GameType.CLASSIC)
+        game.ball.speed += 0.25;
+      if (game.gametype === GameType.HARDMODE)
+        game.player2.height -= game.player2.height / 7;
     }
 
     if (nextPosX < 0 || nextPosX > game.width) {
