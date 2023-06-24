@@ -2,14 +2,14 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Game, User } from '@prisma/client';
-import { Socket, Server } from 'socket.io';
+import { Socket, Server, Namespace } from 'socket.io';
 import { UsersService } from './users.service';
 
 @WebSocketGateway({ namespace: 'users' })
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
   @WebSocketServer()
-  server: Server;
+  io: Namespace;
 
   constructor(private jwtService: JwtService, private userService: UsersService){}
 
@@ -36,8 +36,12 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
       if (!user)
         throw new UnauthorizedException();
       if (this.connectedUsers.has(user.id)) {
-        this.server.to(client.id).emit('alreadyConnected', user.id);
-        throw new UnauthorizedException(`User ${user.username} is already connected to socket chat`)
+        this.io.to(client.id).emit('alreadyConnected', user.id);
+		const socketId = this.connectedUsers.get(user.id);
+		  if (socketId) {
+			  const socket = this.io.sockets.get(socketId);
+			  socket.disconnect();
+		  }
       }
       console.log("user => ", user);
     }
@@ -60,7 +64,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
   }
 
   async emitGame(userId: number, joinedGame: Game) {
-    this.server.to(this.getSocketId(userId)).emit('acceptedInvite', joinedGame);
+    this.io.to(this.getSocketId(userId)).emit('acceptedInvite', joinedGame);
   }
 
   getSocketId(userId: number) {

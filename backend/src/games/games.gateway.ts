@@ -1,6 +1,6 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { GamesService } from './games.service';
-import { Socket, Server } from 'socket.io';
+import { Socket, Server, Namespace } from 'socket.io';
 import { ForbiddenException, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -16,7 +16,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private userToSocket = new Map<number, string>();
 
   @WebSocketServer()
-  server: Server;
+  io: Namespace;
 
   async handleConnection(client: Socket) {
     
@@ -39,9 +39,12 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     if (this.userToSocket.has(decoded.id)) {
-      this.server.to(client.id).emit('alreadyConnected', decoded.id);
-      client.disconnect();
-      return ;
+      this.io.to(client.id).emit('alreadyConnected', decoded.id);
+	  const socketId = this.userToSocket.get(decoded.id);
+		if (socketId) {
+			const socket = this.io.sockets.get(socketId);
+			socket.disconnect()
+		}
     }
 
     this.userToSocket.set(decoded.id, client.id);
@@ -107,17 +110,17 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!newRoom)
         return;
       client.join(`room-${newRoom.id}`);
-      this.server.to(`room-${newRoom.id}`).emit('joinedGame', newRoom);
-      this.server.to(`room-${newRoom.id}`).emit('waitingforP2', newRoom);
-      //this.gamesService.startGame(room, this.server);
+      this.io.to(`room-${newRoom.id}`).emit('joinedGame', newRoom);
+      this.io.to(`room-${newRoom.id}`).emit('waitingforP2', newRoom);
+      //this.gamesService.startGame(room, this.io);
     } else {
       client.join(`room-${room.id}`);
-      this.server.to(`room-${room.id}`).emit('joinedGame', room);
-      this.server.to(`room-${room.id}`).emit('foundGame', room);
-      this.server.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
-      this.gamesService.startGame(room, this.server, this.userToSocket);
+      this.io.to(`room-${room.id}`).emit('joinedGame', room);
+      this.io.to(`room-${room.id}`).emit('foundGame', room);
+      this.io.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
+      this.gamesService.startGame(room, this.io, this.userToSocket);
       /* setTimeout(() => {
-        this.gamesService.startGame(room, this.server);
+        this.gamesService.startGame(room, this.io);
       }, 5000); */
     }
   }
@@ -131,7 +134,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new NotFoundException(`Game with id of ${gameId} does not exist`);
       }
       client.join(`room-${gameId}`);
-      this.server.to(`room-${gameId}`).emit('joinedGame', room);
+      this.io.to(`room-${gameId}`).emit('joinedGame', room);
       let otherPlayer: string | null = null;
       if (payload.id === room.player1Id) {
         otherPlayer = this.userToSocket.get(room.player2Id);
@@ -140,12 +143,12 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
         otherPlayer = this.userToSocket.get(room.player1Id);
       }
       if (!otherPlayer) {
-        this.server.to(`room-${room.id}`).emit('waitingforP2', room);
+        this.io.to(`room-${room.id}`).emit('waitingforP2', room);
       }
       else {
         /* await this.gamesService.changeGameStatus(gameId, GameStatus.ONGOING); */
-        this.server.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
-        this.gamesService.startGame(room, this.server, this.userToSocket);
+        this.io.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
+        this.gamesService.startGame(room, this.io, this.userToSocket);
       }
     }
     catch (e) {

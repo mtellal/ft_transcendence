@@ -64,7 +64,7 @@ export class ChatController {
     const channel = await this.chatService.createChannel(createChannelDto, user);
     const member = channel.members.filter((id) => id !== channel.ownerId);
     for (const memberId of member) {
-      this.chatGateway.server.to(this.chatGateway.getSocketId(memberId)).emit('newChannel', channel);
+      this.chatGateway.io.to(this.chatGateway.getSocketId(memberId)).emit('newChannel', channel);
     }
     return channel;
   }
@@ -116,14 +116,14 @@ export class ChatController {
       content: updateNotif
     }
     const message = await this.chatService.createNotif(notif);
-    this.chatGateway.server.to(channel.id.toString()).emit('message', message);
+    this.chatGateway.io.to(channel.id.toString()).emit('message', message);
     if (dto.name) {
-      this.chatGateway.server.to(channel.id.toString()).emit('updateChannelName', {
+      this.chatGateway.io.to(channel.id.toString()).emit('updateChannelName', {
         channelId: channel.id,
         name: dto.name
       });
     }
-    this.chatGateway.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+    this.chatGateway.io.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
     return updatedChannel;
   }
 

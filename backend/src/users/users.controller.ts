@@ -164,10 +164,10 @@ export class UsersController {
       avatar: file.path
     })
     for (const friendId of updatedUser.friendList) {
-      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
+      this.usersGateway.io.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
     }
     for (const channel of updatedUser.channelList) {
-      this.usersGateway.server.to(channel.toString()).emit('updatedMember', {
+      this.usersGateway.io.to(channel.toString()).emit('updatedMember', {
         channelId: channel,
         user: updatedUser
       })
@@ -274,7 +274,7 @@ export class UsersController {
     if (friend.friendList.includes(user.id))
        throw new NotAcceptableException(`Already friends!`);
     const newRequest = await this.usersService.sendFriendRequest(friend, user);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(friend.id)).emit('receivedRequest', newRequest);
+    this.usersGateway.io.to(this.usersGateway.getSocketId(friend.id)).emit('receivedRequest', newRequest);
   }
 
   @Post('friendRequest/:requestid')
@@ -282,7 +282,7 @@ export class UsersController {
   async acceptFriendRequest(@Param('requestid', ParseIntPipe) requestId: number, @Request() req) {
     const user: User = req.user;
     const newFriend = await this.usersService.acceptFriendRequest(user.id, requestId);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(newFriend.id)).emit('addedFriend', user);
+    this.usersGateway.io.to(this.usersGateway.getSocketId(newFriend.id)).emit('addedFriend', user);
   }
 
   @Delete('friendRequest/:requestid')
@@ -304,7 +304,7 @@ export class UsersController {
     if (await this.usersService.checkifUserblocked(user.id, id))
       throw new NotAcceptableException(`User is already blocked`);
     const newBlock = await this.usersService.blockUser(user, id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('blockedUser', newBlock);
+    this.usersGateway.io.to(this.usersGateway.getSocketId(user.id)).emit('blockedUser', newBlock);
     return newBlock;
   }
 
@@ -320,7 +320,7 @@ export class UsersController {
     if (id === user.id)
       throw new NotAcceptableException(`Can't unblock yourself`);
     const unblock = await this.usersService.unblockUser(user, id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(user.id)).emit('unblockedUser', {userId: id});
+    this.usersGateway.io.to(this.usersGateway.getSocketId(user.id)).emit('unblockedUser', {userId: id});
     return unblock;
   }
 
@@ -344,7 +344,7 @@ export class UsersController {
 
     const updatedUser = await this.usersService.removeFriend(user.id, id);
     await this.usersService.removeFriend(id, user.id);
-    this.usersGateway.server.to(this.usersGateway.getSocketId(id)).emit('removedFriend', updatedUser);
+    this.usersGateway.io.to(this.usersGateway.getSocketId(id)).emit('removedFriend', updatedUser);
   }
 
   @Patch(':id')
@@ -352,10 +352,10 @@ export class UsersController {
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
     const updatedUser = await this.usersService.update(id, updateUserDto);
     for (const friendId of updatedUser.friendList) {
-      this.usersGateway.server.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
+      this.usersGateway.io.to(this.usersGateway.getSocketId(friendId)).emit('updatedFriend', updatedUser);
     }
     for (const channel of updatedUser.channelList) {
-      this.usersGateway.server.to(channel.toString()).emit('updatedMember', {
+      this.usersGateway.io.to(channel.toString()).emit('updatedMember', {
         channelId: channel,
         user: updatedUser
       })

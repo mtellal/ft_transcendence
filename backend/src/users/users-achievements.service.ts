@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Stats } from "@prisma/client";
-import { Server, Socket } from "socket.io";
+import { Namespace, Server, Socket } from "socket.io";
 
 @Injectable()
 export class UsersAchievementsService {
@@ -54,7 +54,7 @@ export class UsersAchievementsService {
 		});
 	}
 
-	async checkAndUnlockAchievements(userId: number, server: Server, clientMap:  Map<number, string>) {
+	async checkAndUnlockAchievements(userId: number, server: Namespace, clientMap:  Map<number, string>) {
 		const userStats = await this.prisma.stats.findUnique({
 			where: { userId },
 		});

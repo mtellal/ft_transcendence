@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, NotAcceptableException, NotFoundException, Request, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, WsException } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io'
+import { Server, Socket, Namespace } from 'socket.io'
 import { User, MessageType, ChannelType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
@@ -13,7 +13,7 @@ import { UsersGateway } from 'src/users/users.gateway';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
-  server: Server;
+  io: Namespace;
 
   private connectedUsers = new Map<number, string>();
 
@@ -60,12 +60,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const message = await this.chatService.createMessage(messageDto, user);
       console.log(message);
-      this.server.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('message', message);
     }
     catch (error) {
       throw new WsException(error)
     }
-    //this.server.emit('message', message.content);
+    //this.io.emit('message', message.content);
     console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
   }
 
@@ -123,7 +123,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         gametype: dto.gametype,
         content: newGame.id.toString(),
       })
-      this.server.to(channel.id.toString()).emit('message', invite);
+      this.io.to(channel.id.toString()).emit('message', invite);
     }
     catch(e) {
       console.log(e);
@@ -192,19 +192,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const invitesP1 = await this.chatService.invalidInvite(joinedGame.player1Id);
       for (const inviteP1 of invitesP1) {
         console.log(inviteP1);
-        this.server.to(invite.channelId.toString()).emit('updatedInvite', inviteP1);
+        this.io.to(invite.channelId.toString()).emit('updatedInvite', inviteP1);
       }
       const invitesP2 = await this.chatService.invalidInvite(joinedGame.player2Id);
       console.log(invitesP2);
       for (const inviteP2 of invitesP2) {
         console.log(inviteP2);
-        this.server.to(invite.channelId.toString()).emit('updatedInvite', inviteP2);
+        this.io.to(invite.channelId.toString()).emit('updatedInvite', inviteP2);
       }
-      this.server.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
+      this.io.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
       this.usersGateway.emitGame(joinedGame.player1Id, joinedGame);
       this.usersGateway.emitGame(joinedGame.player2Id, joinedGame);
-      /* this.server.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
-      this.server.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame); */
+      /* this.io.to(this.getSocketId(joinedGame.player1Id)).emit('acceptedInvite', joinedGame);
+      this.io.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame); */
     }
     catch(e) {
       console.log(e);
@@ -261,8 +261,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           content: `${user.username} joined the channel`
         }
         const message = await this.chatService.createNotif(notif);
-        this.server.to(channel.id.toString()).emit('message', message);
-        this.server.to(channel.id.toString()).emit('joinedChannel', {
+        this.io.to(channel.id.toString()).emit('message', message);
+        this.io.to(channel.id.toString()).emit('joinedChannel', {
           channelId: channel.id,
           userId: user.id
         })
@@ -332,7 +332,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const socketId = this.connectedUsers.get(usertoAdd.id);
       if (socketId) {
         //Might need to send an event to notify the user that he has been added? So that the list of channel can be updated on the front end side?
-        this.server.to(socketId).emit('addedtoChannel', {
+        this.io.to(socketId).emit('addedtoChannel', {
           channelId: channel.id,
           userId: usertoAdd.id
         });
@@ -343,8 +343,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: `${usertoAdd.username} was added to the channel by ${user.username}`
       }
       const message = await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('addedtoChannel', {
+      this.io.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('addedtoChannel', {
         channelId: channel.id,
         userId: usertoAdd.id
       });
@@ -405,13 +405,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         console.log(updatedChannel);
         const message = await this.chatService.createNotif(leaveNotif);
-        this.server.to(updatedChannel.id.toString()).emit('message', message);
-        this.server.to(updatedChannel.id.toString()).emit('leftChannel', {
+        this.io.to(updatedChannel.id.toString()).emit('message', message);
+        this.io.to(updatedChannel.id.toString()).emit('leftChannel', {
           channelId: channel.id,
           userId: user.id
         });
         if (channel.ownerId !== updatedChannel.ownerId) {
-          this.server.to(updatedChannel.id.toString()).emit('ownerChanged', {
+          this.io.to(updatedChannel.id.toString()).emit('ownerChanged', {
             channelId: channel.id,
             userId: updatedChannel.ownerId
           })
@@ -470,13 +470,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(usertoKick.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't kick another administrator`)
       const updatedChannel = await this.chatService.kickUserfromChannel(channel, usertoKick);
-      this.server.to(channel.id.toString()).emit('kickedUser', {
+      this.io.to(channel.id.toString()).emit('kickedUser', {
         channelId: channel.id,
         userId: dto.userId
       });
       const socketId = this.connectedUsers.get(usertoKick.id);
       if (socketId) {
-        const socket = this.server.sockets.sockets.get(socketId);
+        const socket = this.io.sockets.get(socketId);
         if (socket.rooms.has(channel.id.toString()))
           socket.leave(channel.id.toString());
       }
@@ -489,7 +489,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: kickMessage
       }
       const message = await this.chatService.createNotif(kickNotif);
-      this.server.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
@@ -552,8 +552,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: muteNotif
       }
       const message = await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', message);
-      this.server.to(channel.id.toString()).emit('mutedUser', {
+      this.io.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('mutedUser', {
         channelId: channel.id,
         userId: usertoMute.id,
         mute: newMute
@@ -614,8 +614,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       content: unmuteNotif
     }
     const message = await this.chatService.createNotif(notif);
-    this.server.to(channel.id.toString()).emit('message', message);
-    this.server.to(channel.id.toString()).emit('unmutedUser', {
+    this.io.to(channel.id.toString()).emit('message', message);
+    this.io.to(channel.id.toString()).emit('unmutedUser', {
       channelId: channel.id,
       userId: usertoUnmute.id
     });
@@ -665,13 +665,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(usertoBan.id) && channel.ownerId !== user.id)
         throw new ForbiddenException(`You can't ban another administrator`)
       const updatedChannel = await this.chatService.banUser(channel, usertoBan);
-      this.server.to(channel.id.toString()).emit('bannedUser', {
+      this.io.to(channel.id.toString()).emit('bannedUser', {
         channelId: channel.id,
         userId: usertoBan.id
       });
       const socketId = this.connectedUsers.get(usertoBan.id);
       if (socketId) {
-        const socket = this.server.sockets.sockets.get(socketId);
+        const socket = this.io.sockets.get(socketId);
         if (socket.rooms.has(channel.id.toString()))
           socket.leave(channel.id.toString());
       }
@@ -684,7 +684,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: banNotif
       }
       const message = await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
@@ -733,13 +733,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel.banList.includes(usertoUnban.id)) 
         throw new NotFoundException(`${usertoUnban.username} is not banned on this channel`);
       const updatedChannel = await this.chatService.unbanUser(channel, usertoUnban);
-      this.server.to(channel.id.toString()).emit('unbannedUser', {
+      this.io.to(channel.id.toString()).emit('unbannedUser', {
         channelId: channel.id,
         userId: usertoUnban.id
       });
       const socketId = this.connectedUsers.get(usertoUnban.id);
       if (socketId) {
-        this.server.to(socketId).emit('unbannedUser', {
+        this.io.to(socketId).emit('unbannedUser', {
           channelId: channel.id,
           userId: usertoUnban.id
         });
@@ -751,7 +751,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: unbanNotif
       }
       const message = await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       console.log(error);
@@ -804,7 +804,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.administrators.includes(newAdmin.id))
         throw new ForbiddenException(`${newAdmin.username} is already an administrator`)
       const updatedChannel = await this.chatService.makeAdmin(channel, newAdmin);
-      this.server.to(channel.id.toString()).emit('madeAdmin', {
+      this.io.to(channel.id.toString()).emit('madeAdmin', {
         channelId: channel.id,
         userId: newAdmin.id
       })
@@ -815,7 +815,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: promoteNotif
       }
       const message = await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
@@ -866,7 +866,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel.administrators.includes(removedAdmin.id))
         throw new ForbiddenException(`${removedAdmin.username} is not an administrator`)
       const updatedChannel = await this.chatService.removeAdmin(channel, removedAdmin);
-      this.server.to(channel.id.toString()).emit('removedAdmin', {
+      this.io.to(channel.id.toString()).emit('removedAdmin', {
         channelId: channel.id,
         userId: removedAdmin.id
       })
@@ -877,7 +877,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: demoteNotif
       }
       const message = await this.chatService.createNotif(notif);
-      this.server.to(channel.id.toString()).emit('message', message);
+      this.io.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
       throw new WsException(error)
@@ -920,7 +920,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (channel.ownerId !== user.id)
       throw new ForbiddenException(`Only the owner can change the password and/or channel type`);
     const updatedChannel = await this.chatService.updateChannel(dto, channel);
-    this.server.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
+    this.io.to(channel.id.toString()).emit('updatedChannel', updatedChannel);
     let updateNotif = `${user.username} updated the channel:`;
     if (dto.name)
       updateNotif += ` ${channel.name} is now named ${updatedChannel.name}`
@@ -934,7 +934,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       content: updateNotif
     }
     const message = await this.chatService.createNotif(notif);
-    this.server.to(channel.id.toString()).emit('message', message);
+    this.io.to(channel.id.toString()).emit('message', message);
   }
 
   async handleConnection(client: Socket) {
@@ -957,8 +957,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user)
         throw new UnauthorizedException();
       if (this.connectedUsers.has(user.id)) {
-        this.server.to(client.id).emit('alreadyConnected', user.id);
-        throw new UnauthorizedException(`User ${user.username} is already connected to socket chat`)
+        const socketId = this.connectedUsers.get(user.id);
+		if (socketId) {
+			const socket = this.io.sockets.get(socketId);
+			socket.disconnect();
+		}
       }
       console.log("user => ", user);
     }
