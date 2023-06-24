@@ -57,7 +57,6 @@ export default function SignIn() {
                     setValue={setUsername}
                     submit={() => handleSubmit()}
                     maxLength={20}
-					password={false}
                 />
                 <IconInput
                     id="password"
@@ -68,7 +67,6 @@ export default function SignIn() {
                     setValue={setPassword}
                     submit={() => handleSubmit()}
                     maxLength={30}
-					password={true}
 				/>
             </div>
             {error && <p>error: {error}</p>}

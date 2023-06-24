@@ -12,7 +12,6 @@ type TIconInput = {
     setValue: (s: string) => {} | any,
     submit?: () => {} | any,
     maxLength: number,
-	password: boolean
 }
 
 export default function IconInput(props: TIconInput) {
@@ -36,23 +35,14 @@ export default function IconInput(props: TIconInput) {
                     {props.icon}
                 </span>
             </div>
-            {!props.password && <input
+            <input
                 id={props.id}
                 value={props.value}
                 onChange={handleChange}
                 className="inconinput--input"
                 placeholder={props.placeholder}
                 onKeyDown={onKeyDown}
-            />}
-			{props.password && <input
-                id={props.id}
-                value={props.value}
-                onChange={handleChange}
-                className="inconinput--input"
-                placeholder={props.placeholder}
-                onKeyDown={onKeyDown}
-				type="password"
-            />}
+            />
         </label>
     )
 }
