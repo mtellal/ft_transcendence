@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, Res, UseGuards, ParseBoolPipe } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, Res, UseGuards, ParseBoolPipe, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, SigninDto, TradeDto } from "./dto";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -14,6 +14,7 @@ export class AuthController{
 	@ApiOperation({ summary: 'Sign up',
 	description: 'Creates a new user with the specified username and password. The username must be unique. Returns a JWT corresponding to the user' })
 	@ApiBody({type: AuthDto})
+	@UsePipes(new ValidationPipe())
 	signup(@Body() dto: AuthDto) {
 		return this.authService.signup(dto);
 	}
@@ -22,6 +23,7 @@ export class AuthController{
 	@Post('signin')
 	@ApiOperation({ summary: 'Sign in', description: 'Sign in using existing user credentials. Returns a JWT corresponding to that user' })
 	@ApiBody({ type: SigninDto })
+	@UsePipes(new ValidationPipe())
 	async signin(@Body() body: SigninDto, @Query('twoFA', ParseBoolPipe) twoFA: boolean) {
 		let response;
 		if (twoFA)
@@ -50,6 +52,7 @@ export class AuthController{
 	}
 
 	@Post('42/trade')
+	@UsePipes(new ValidationPipe())
 	@ApiOperation({ summary: 'Trade 42 OAuth_code and 2fa code', description: 'Trade the 42 OAuth code and 2fa code if necessary for a JWT access token' })
 	@ApiBody({ type: TradeDto })
 	async ftAuthTrade(@Body() body: TradeDto) {
