@@ -123,7 +123,7 @@ function SearchedUserIconFriend(props: TUserProps) {
                                 <ConfirmView
                                     type="remove"
                                     username={props.user.username}
-                                    valid={() => { removeFriend(props.user); setAction(null) }}
+                                    valid={() => { removeFriend(props.user, true); setAction(null) }}
                                     cancel={() => setAction(null)}
                                 />
                             )

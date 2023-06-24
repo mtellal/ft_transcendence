@@ -117,7 +117,7 @@ function IconsBanner(props: TIconsBanner) {
                             <ConfirmView
                                 type="remove"
                                 username={props.whisperUser.username}
-                                valid={() => { removeFriend(props.whisperUser); setAction(null) }}
+                                valid={() => { removeFriend(props.whisperUser, true); setAction(null) }}
                                 cancel={() => setAction(null)}
                             />
                         )

@@ -32,7 +32,7 @@ export default function FriendEvents({ children }: any) {
             userSocket.on('removedFriend', (friend: any) => {
                 if (friend)
                 {
-                    removeFriend(friend);
+                    removeFriend(friend, false);
                 }
             })
         }
