@@ -227,6 +227,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.banList.includes(user.id)) {
         throw new ForbiddenException('User was banned from this channel');
       }
+	  if (channel.type === ChannelType.WHISPER && channel.members.length === 2) {
+		throw new ForbiddenException('A Whisper channel can only have two users');
+	  }
       if (client.rooms.has(channel.id.toString()))
         throw new NotAcceptableException('Client is already in the room');
       /* If it's the User first time joining the channel */
@@ -289,6 +292,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel.administrators.includes(user.id)) {
         throw new ForbiddenException(`User does not have permission to add a user to a channel`);
       }
+	  if (channel.type === ChannelType.WHISPER && channel.members.length === 2) {
+		throw new ForbiddenException('A Whisper channel can only have two users');
+	  }
       const usertoAdd = await this.userService.findOne(dto.userId);
       if (!usertoAdd) {
         throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
