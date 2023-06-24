@@ -70,9 +70,9 @@ export function useChannels() {
                 if (users)
                     channel = { ...channel, users }
             }
-            if (includeCurrentUser)
-                channel.users = [...channel.users, user];
             channelsDispatch({ type: 'addChannel', channel });
+            if (includeCurrentUser)
+                channelsDispatch({ type: 'addMember', channelId: channel.id, user: user });
             joinChannel(channel);
         }
     }, [socket, channelsDispatch])

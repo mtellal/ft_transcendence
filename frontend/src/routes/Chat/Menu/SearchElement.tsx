@@ -223,7 +223,7 @@ export function SearchedUser(props: TUserProps) {
                 {
                     props.user && props.user.id && user && props.user.id !== user.id &&
                     <>
-                        <SearchedUserIconProfile 
+                        <SearchedUserIconProfile
                             user={props.user}
                         />
                         <SearchedUserIconChat
@@ -362,8 +362,6 @@ function MenuInput(props: TMenuInput) {
     )
 }
 
-
-
 export default function SearchElement() {
     const { token } = useCurrentUser();
     const [value, setValue]: any = useState("");
@@ -385,20 +383,17 @@ export default function SearchElement() {
         if (user) {
             setSearchedUser(user);
         }
-        else {
-            await getChannelByName(value.trim(), token)
-                .then(res => {
-                    if (res.data) {
-                        channelArray = res.data;
-                    }
-                })
-            if (channelArray) {
-                setChannelList(channelArray);
-            }
-            else {
-                setError("User/Channel not found");
-            }
+        await getChannelByName(value.trim(), token)
+            .then(res => {
+                if (res.data) {
+                    channelArray = res.data;
+                }
+            })
+        if (channelArray) {
+            setChannelList(channelArray);
         }
+        if (!user && !channelArray)
+            setError("User/Channel not found");
     }
 
     function reset() {
