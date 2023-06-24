@@ -37,7 +37,6 @@ export function useFriends() {
 
     const removeFriend = useCallback((friend: User) => {
         if (friends && friends.length && friend) {
-            removeUserFriend(friend.id, token);
             friendsDispatch({ type: 'removeFriend', friend })
         }
     }, [friends, currentFriend])
