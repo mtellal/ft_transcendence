@@ -69,7 +69,6 @@ export class GamesService {
       })
       return game;
     } catch (e) {
-      console.log(e);
       throw e;
     }
   }
@@ -117,7 +116,6 @@ export class GamesService {
       })
       return game;
     } catch (e) {
-      console.log(e);
     }
   }
 
@@ -144,7 +142,6 @@ export class GamesService {
           ],
         }
       })
-      console.log(games);
       for (const game of games) {
         if (game.status === GameStatus.MATCHMAKING || game.status === GameStatus.INVITE) {
           await this.prisma.game.delete({
@@ -167,7 +164,6 @@ export class GamesService {
         }
       }
     } catch (e) {
-      console.log(e);
       throw(e);
     }
   }
@@ -188,7 +184,6 @@ export class GamesService {
         }
       })
     } catch (e) {
-      console.log(e);
     }
   }
 
@@ -198,7 +193,6 @@ export class GamesService {
 
       });
     } catch (e) {
-      console.log(e);
     }
   }
 
@@ -247,11 +241,9 @@ export class GamesService {
     let game = new GameState();
     game = JSON.parse(JSON.stringify(defaultGameState));
     game.gametype = room.gametype;
-    console.log(defaultGameState);
     this.games.set(room.id, game);
     this.initPlayer(game, room);
     this.initBall(game);
-    console.log(game);
     server.to(`room-${room.id}`).emit('updatedState', game);
     const frameRate = 60; //FPS that we want
     const tickRate = 1000 / frameRate // Updates will be send at this interval
@@ -412,10 +404,6 @@ export class GamesService {
     game.ball.y = game.height / 2;
     game.ball.velX = signx ? 1 * game.ball.speed : -1 * game.ball.speed;
     game.ball.velY = signy ? 2 : -1 * 2;
-    console.log(signx);
-    console.log(game.ball.velX);
-    console.log(signy);
-    console.log(game.ball.velY);
   }
 
   gameLoop(game: GameState) {
@@ -508,7 +496,6 @@ export class GamesService {
         ],
       }
     })
-    console.log(game_exist);
     if (game_exist) {
       return (true);
     }

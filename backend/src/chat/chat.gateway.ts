@@ -22,7 +22,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message')
   @UsePipes(new ValidationPipe())
   async handleMessage(@MessageBody() messageDto: MessageDto, @ConnectedSocket() client: Socket) {
-    console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -39,12 +38,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
     }
     catch(error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
       return ;
     }
     try {
@@ -59,20 +56,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new ForbiddenException('You have been muted');
       }
       const message = await this.chatService.createMessage(messageDto, user);
-      console.log(message);
       this.io.to(channel.id.toString()).emit('message', message);
     }
     catch (error) {
       throw new WsException(error)
     }
     //this.io.emit('message', message.content);
-    console.log("/////////////////////////////// EVENT MESSAGE ///////////////////////////////")
   }
 
   @SubscribeMessage('sendInvite')
   @UsePipes(new ValidationPipe())
   async sendInvite(@ConnectedSocket() client: Socket, @MessageBody() dto: InviteDto) {
-    console.log("/////////////////////////////// EVENT SENDINVITE ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -89,12 +83,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
     }
     catch(error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT SENDINVITE ///////////////////////////////")
       return ;
     }
     try {
@@ -116,7 +108,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new ForbiddenException(`User ${user.username} cannot send an invite (in game/matchmaking or pending invite)`);
       }
       const newGame = await this.gamesService.createInvite(user.id, dto);
-      console.log(newGame);
       const invite = await this.chatService.createInvite({
         channelId: channel.id,
         userId: user.id,
@@ -126,7 +117,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.io.to(channel.id.toString()).emit('message', invite);
     }
     catch(e) {
-      console.log(e);
       throw new WsException(e);
     }
   }
@@ -134,7 +124,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('acceptInvite')
   async acceptInvite(@ConnectedSocket() client: Socket, @MessageBody() messageId: number) {
-    console.log("/////////////////////////////// EVENT ACCEPT INVITE ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -151,17 +140,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
     }
     catch(error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT ACCEPT INVITE ///////////////////////////////")
       return ;
     }
     try {
       const invite = await this.chatService.findMessage(messageId);
-      console.log(invite);
       if (!invite) {
         throw new NotFoundException(`Message with ${messageId} does not exist`)
       }
@@ -191,13 +177,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       //Remove both players pending invite message
       const invitesP1 = await this.chatService.invalidInvite(joinedGame.player1Id);
       for (const inviteP1 of invitesP1) {
-        console.log(inviteP1);
         this.io.to(invite.channelId.toString()).emit('updatedInvite', inviteP1);
       }
       const invitesP2 = await this.chatService.invalidInvite(joinedGame.player2Id);
-      console.log(invitesP2);
       for (const inviteP2 of invitesP2) {
-        console.log(inviteP2);
         this.io.to(invite.channelId.toString()).emit('updatedInvite', inviteP2);
       }
       this.io.to(updatedInvite.channelId.toString()).emit('updatedInvite', updatedInvite);
@@ -207,7 +190,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.io.to(this.getSocketId(joinedGame.player2Id)).emit('acceptedInvite', joinedGame); */
     }
     catch(e) {
-      console.log(e);
       throw new WsException(e);
     }
   }
@@ -215,7 +197,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinChannel')
   @UsePipes(new ValidationPipe())
   async joinChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: JoinChannelDto) {
-    console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
 
     let user: User;
     let token = client.handshake.headers.cookie;
@@ -233,12 +214,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
     }
     catch (error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
       return ;
     }
     try {
@@ -248,7 +227,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.banList.includes(user.id)) {
         throw new ForbiddenException('User was banned from this channel');
       }
-      console.log(channel);
       if (client.rooms.has(channel.id.toString()))
         throw new NotAcceptableException('Client is already in the room');
       /* If it's the User first time joining the channel */
@@ -272,10 +250,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('message', messages);
     }
     catch (error) {
-      console.log(error);
       throw new WsException(error);
     }
-    console.log("/////////////////////////////// EVENT JOINCHANNEL ///////////////////////////////")
   }
 
   @SubscribeMessage('addtoChannel')
@@ -298,12 +274,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
     }
     catch (error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT ADDTOCHANNEL ///////////////////////////////")
       return ;
     }
 
@@ -350,7 +324,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
     catch(error) {
-      console.log(error);
       throw new WsException(error);
     }
   }
@@ -358,7 +331,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leaveChannel')
   @UsePipes(new ValidationPipe())
   async leaveChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: LeaveChannelDto) {
-    console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
 
     let user: User;
     let token = client.handshake.headers.cookie;
@@ -376,12 +348,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log(user);
     }
     catch (error) {
       console.error(error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
       return ;
     }
     try {
@@ -403,7 +373,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           type: MessageType.NOTIF,
           content: leaveMessage
         }
-        console.log(updatedChannel);
         const message = await this.chatService.createNotif(leaveNotif);
         this.io.to(updatedChannel.id.toString()).emit('message', message);
         this.io.to(updatedChannel.id.toString()).emit('leftChannel', {
@@ -419,15 +388,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
     catch(error) {
-      console.log(error);
       throw new WsException(error);
     }
-    console.log("/////////////////////////////// EVENT LEAVECHANNEL ///////////////////////////////")
   }
 
   @SubscribeMessage('kickUser')
   async kickfromChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
-    console.log("/////////////////////////////// EVENT KICKFROMCHANNEL ///////////////////////////////")
 
     let user: User;
     let token = client.handshake.headers.cookie;
@@ -446,12 +412,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT KICKUSER ///////////////////////////////")
       return ;
     }
     try {
@@ -499,7 +463,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('muteUser')
   @UsePipes(new ValidationPipe())
   async muteUser(@ConnectedSocket() client: Socket, @MessageBody() dto: MuteDto) {
-    console.log("/////////////////////////////// EVENT MUTEUSER ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -517,12 +480,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT MUTEUSER ///////////////////////////////")
       return ;
     }
     try {
@@ -583,7 +544,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
@@ -623,7 +583,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('banUser')
   async banUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
-    console.log("/////////////////////////////// EVENT BANUSER ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -641,12 +600,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT BANUSER ///////////////////////////////")
       return ;
     }
     try {
@@ -693,7 +650,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('unbanUser')
   async unbanUser(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
-    console.log("/////////////////////////////// EVENT UNBANUSER ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -711,12 +667,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT UNBANUSER ///////////////////////////////")
       return ;
     }
     try {
@@ -754,14 +708,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.io.to(channel.id.toString()).emit('message', message);
     }
     catch(error) {
-      console.log(error);
       throw new WsException(error)
     }
   }
 
   @SubscribeMessage('makeAdmin')
   async makeAdmin(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
-    console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -779,12 +731,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
       return ;
     }
     try {
@@ -796,7 +746,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (dto.userId === user.id)
         throw new ForbiddenException(`You're already the owner/administrator`);
       const newAdmin = await this.userService.findOne(dto.userId);
-      console.log(newAdmin);
       if (!newAdmin)
         throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
       if (!newAdmin.channelList.includes(channel.id)) 
@@ -824,7 +773,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('removeAdmin')
   async removeAdmin(@ConnectedSocket() client: Socket, @MessageBody() dto: AdminActionDto) {
-    console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -842,12 +790,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT MAKEADMIN ///////////////////////////////")
       return ;
     }
     try {
@@ -888,7 +834,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   //Change name to add
   @SubscribeMessage('updateChannel')
   async updateChannel(@ConnectedSocket() client: Socket, @MessageBody() dto: UpdateChannelDto) {
-    console.log("/////////////////////////////// EVENT UPDATECHANNEL ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -906,12 +851,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user = await this.userService.findOne(decodedToken.id);
       if (!user)
         throw new UnauthorizedException();
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT UPDATECHANNEL ///////////////////////////////")
       return ;
     }
     const channel = await this.chatService.findOne(dto.channelId);
@@ -938,7 +881,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
     let user: User;
     let token = client.handshake.headers.cookie;
     if (token)
@@ -963,25 +905,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.disconnect();
 		}
       }
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
       return ;
     }
     this.connectedUsers.set(user.id, client.id);
-    console.log(this.connectedUsers);
-    console.log("New client connected");
-    console.log("/////////////////////////////// EVENT HANDLECONNECTION ///////////////////////////////")
   }
 
   handleDisconnect(client: Socket) {
     this.removeSocketId(client.id);
-    console.log(this.connectedUsers);
     client.disconnect();
-    console.log("Client disconnected");
   }
 
   getSocketId(userId: number) {

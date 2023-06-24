@@ -59,7 +59,6 @@ export class ChatController {
   @UsePipes(new ValidationPipe())
   @ApiOperation({summary: 'Creates a channel and returns it'})
   async create(@Body() createChannelDto: CreateChannelDto, @Req() req) {
-    console.log("REQUEST => ", req.user)
     const user: User = req.user
     const channel = await this.chatService.createChannel(createChannelDto, user);
     const member = channel.members.filter((id) => id !== channel.ownerId);

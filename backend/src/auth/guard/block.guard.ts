@@ -10,10 +10,8 @@ export class BlockGuard extends AuthGuard('jwt') implements CanActivate {
 	}
 
 	canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-		console.log('IN BLOCK')
 		const request = context.switchToHttp().getRequest();
 		let token = request.headers.authorization;
-		console.log(request.headers)
 		if (token)
 			token = token.split(' ')[1];
 		if (token) {

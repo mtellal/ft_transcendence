@@ -71,7 +71,6 @@ export class AuthService {
 				token: code,
 				window: 1
 			})
-			console.log(code, verified);
 			if (!verified) {
 				return { step: '2fa', access_token: null };
 			}
@@ -102,7 +101,6 @@ export class AuthService {
 				})
 			}
 			const hash = await this.generateHash();
-			console.log(profile);
 			this.download42Pic(profile._json.image.link, profile.id + '.png');
 			try {
 			  const newuser = await this.prisma.user.create({
@@ -179,7 +177,6 @@ export class AuthService {
 				token: code,
 				window: 1
 			})
-			console.log(code, verified);
 			if (!verified) {
 				throw new ForbiddenException('2FA incorrect');
 			}

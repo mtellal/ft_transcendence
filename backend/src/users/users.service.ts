@@ -64,7 +64,6 @@ export class UsersService {
         friendRequest: true
       }
     })
-    console.log(user);
     const friendRequest = user.friendRequest.find((request) => request.id === requestId)
     if (!friendRequest) {
       throw new NotFoundException('Friend request not found');
@@ -99,7 +98,6 @@ export class UsersService {
         friendRequest: true
       }
     })
-    console.log(user);
     const friendRequest = user.friendRequest.find((request) => request.id === requestId)
     if (!friendRequest) {
       throw new NotFoundException('Friend request not found');
@@ -294,7 +292,6 @@ export class UsersService {
           userStatus: Status.ONLINE
         }
       })
-      console.log(updatedFriendList);
       return updatedUser;
     }
     catch (PrismaClientKnownRequestError) {
@@ -338,7 +335,6 @@ export class UsersService {
         console.error('Error deleting file:', err);
         return;
       }
-      console.log('File deleted successfully');
     });
   }
 }

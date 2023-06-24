@@ -18,6 +18,5 @@ export class GamesController {
 	@Get('delete')
 	async delAllGames() {
 		this.gamesService.deleteAllGames();
-		console.log('Deleting all Games');
 	}
 }

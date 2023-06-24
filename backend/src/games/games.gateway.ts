@@ -21,11 +21,9 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     
     ///Have to find a better way of doing this
-    console.log('Connection');
     const jwtService = this.jwtService;
     const cookie = client.handshake.headers?.cookie;
     if (!cookie) {
-      console.log('ERROR');
       client.disconnect();
       return ;
     }
@@ -33,7 +31,6 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 
     if (!decoded) {
-      console.log('game: decode error');
       client.disconnect();
       return ;
     }
@@ -48,14 +45,12 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.userToSocket.set(decoded.id, client.id);
-    console.log(`ID:${decoded.id} USER:${decoded.username} has connected to game socket`);
   }
 
   async handleDisconnect(client: Socket) {
     const jwtService = this.jwtService;
     const cookie = client.handshake.headers?.cookie;
     if (!cookie) {
-      console.log('ERROR');
       client.disconnect();
       return ;
     }
@@ -65,27 +60,23 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.userToSocket.delete(decoded.id);
     await this.gamesService.deleteMatchmakingGame(decoded);
     await this.gamesService.deleteUnfinishedGame(decoded);
-    console.log(`ID:${decoded.id} USER:${decoded.username} has disconnected to game socket`);
   }
 
   @SubscribeMessage('moveUp')
   @UseGuards(JwtWsGuard)
   async handleUp(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameRoom: number) {
-    console.log(`${payload.id} moved up!`)
     this.gamesService.moveUp(gameRoom, payload.id);
   }
 
   @SubscribeMessage('moveDown')
   @UseGuards(JwtWsGuard)
   async handleDown(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameRoom: number) {
-    console.log(`${payload.id} moved down!`)
     this.gamesService.moveDown(gameRoom, payload.id);
   }
 
   @SubscribeMessage('stopMove')
   @UseGuards(JwtWsGuard)
   async stopMove(@ConnectedSocket() client: any, @UserPayload() payload: JwtPayloadDto, @MessageBody() gameRoom: number) {
-    console.log(`${payload.id} moved up!`)
     this.gamesService.stopMove(gameRoom, payload.id);
   }
 
@@ -104,7 +95,6 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     await this.gamesService.removePendingInvite(payload.id);
     const room = await this.gamesService.findPendingGame(payload, gameDto);
-    console.log("event received");
     if (!room) {
       const newRoom = await this.gamesService.createGame(payload, gameDto);
       if (!newRoom)

@@ -16,7 +16,6 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
   private connectedUsers = new Map<number, string>();
 
   async handleConnection(client: Socket) {
-    console.log("/////////////////////////////// EVENT HANDLECONNECTION: UsersGateway ///////////////////////////////")
 
     let user: User;
     let token = client.handshake.headers.cookie;
@@ -43,22 +42,16 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
 			  socket.disconnect();
 		  }
       }
-      console.log("user => ", user);
     }
     catch(error) {
       console.error("error => ", error);
       client.disconnect();
-      console.log("/////////////////////////////// EVENT HANDLECONNECTION: UsersGateway ///////////////////////////////")
       return ;
     }
     this.connectedUsers.set(user.id, client.id);
-    console.log(this.connectedUsers);
-    console.log("New client connected");
-    console.log("/////////////////////////////// EVENT HANDLECONNECTION: UsersGateway ///////////////////////////////")
   }
 
   async handleDisconnect(client: Socket) {
-    console.log('Disconnect');
     this.removeSocketId(client.id);
     client.disconnect();
   }

@@ -152,7 +152,6 @@ export class ChatService {
     if (createChannelDto.members) {
       for (let i = 0; i < createChannelDto.members.length; i++) {
         const user = await this.userService.findOne(createChannelDto.members[i]);
-        console.log(user);
         if (user)
           if (!await this.userService.checkifUserblocked(user.id, owner.id))
             userArray.push(createChannelDto.members[i]);
