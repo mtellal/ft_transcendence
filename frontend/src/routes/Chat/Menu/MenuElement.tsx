@@ -60,6 +60,7 @@ export default function MenuElement() {
                     id={user.id}
                     user={user}
                     onClick={() => {}}
+                    disable={true}
                 />
             ))
         )

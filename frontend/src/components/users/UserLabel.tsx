@@ -80,24 +80,18 @@ type TUserLabel = TUserInfos & {
     id: number,
     notifs?: number,
     onClick?: () => {} | any
+    disable?: boolean
 }
 
 export default function UserLabel(props: TUserLabel) {
+
     return (
-        <NavLink to={`/chat/user/${props.id}`}
-            className={({ isActive }) =>
-                isActive ? "friend-element hover-fill-grey selected" : "friend-element hover-fill-grey"
-            }
+        <NavLink to={!props.disable &&  `/chat/user/${props.id}`}
+            className="friend-element"
+            style={props.disable ? {cursor:'default'} : {}}
             onClick={() => props.onClick}
         >
             <UserInfos {...props} />
-            {/* {
-                props.notifs !== 0 ?
-                    <div className='UserLabel-notifs'>
-                        <p>{props.notifs > 10 ? "10+" : props.notifs}</p>
-                    </div>
-                    : null
-            } */}
         </NavLink>
     )
 }
