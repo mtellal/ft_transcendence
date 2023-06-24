@@ -57,6 +57,7 @@ export default function SignUp() {
                     setValue={setUsername}
                     submit={handleSubmit}
                     maxLength={20}
+					password={false}
                 />
                 <IconInput
                     id="signup-password"
@@ -67,7 +68,8 @@ export default function SignUp() {
                     setValue={setPassword}
                     submit={handleSubmit}
                     maxLength={30}
-                />
+					password={true}
+				/>
                 <IconInput
                     id="signup-confirm"
                     style={iconInputStyle}
@@ -75,8 +77,9 @@ export default function SignUp() {
                     placeholder="Confirm password"
                     value={confirmPassword}
                     setValue={setConfirmPassword}
-                    submit={handleSubmit}                    
+                    submit={handleSubmit}
                     maxLength={30}
+					password={true}
                 />
             </div>
             {error && <p>error: {error}</p>}

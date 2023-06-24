@@ -72,6 +72,7 @@ export default function TwoFactor() {
                     setValue={setSecret}
                     submit={() => submit()}
                     maxLength={30}
+					password={false}
                 />
             </div>
             {error && <p className="red-c">{error}</p>}
