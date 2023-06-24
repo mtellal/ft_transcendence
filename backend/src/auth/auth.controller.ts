@@ -45,13 +45,8 @@ export class AuthController{
 	@UseGuards(FTOauthGuard)
 	@ApiOperation({ summary: 'ftAuthCallback', description: 'Endpoint description 42oauth service redirect endpoint, returns otp in query to use with 42/trade enpoint' })
 	async ftAuthCallback(@Req() req, @Res() res) {
-		try {
-			const code = await this.authService.oauthLogIn(req.user);
-			const redirectUrl = 'http://localhost:8080/login?oauth_code=' + code;
-			res.redirect(redirectUrl);
-		} catch (e) {
-			res.redirect('http://localhost:8080/login');
-		}
+		const code = await this.authService.oauthLogIn(req.user);
+		res.redirect(code);
 	}
 
 	@Post('42/trade')

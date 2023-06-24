@@ -121,7 +121,7 @@ export class AuthService {
 					},
 				  },
 			  });
-			  return newuser.oauth_code;
+			  return `http://${this.config.get('BACK_HOST')}:8080/login?oauth_code=${newuser.oauth_code}`;
 			}
 			catch (error) {
 			  if (error instanceof PrismaClientKnownRequestError) {
@@ -138,7 +138,7 @@ export class AuthService {
 				oauth_exp: expirationTime ? new Date(expirationTime) : null,
 			},
 		});
-		return `${updatedUser.oauth_code}&step=${updatedUser.twoFactorStatus}`;
+		return `http://${this.config.get('BACK_HOST')}:8080/login?oauth_code=${updatedUser.oauth_code}&step=${updatedUser.twoFactorStatus}`;
 	}
 
 	async generateHash() {
