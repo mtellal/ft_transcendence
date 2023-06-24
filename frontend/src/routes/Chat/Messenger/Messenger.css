@@ -37,7 +37,6 @@
 
 .message-div
 {
-    background-color: azure;
     display: flex;
     align-items: flex-end;
     justify-content: left;
