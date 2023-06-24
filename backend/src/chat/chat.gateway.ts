@@ -227,13 +227,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (channel.banList.includes(user.id)) {
         throw new ForbiddenException('User was banned from this channel');
       }
-	  if (channel.type === ChannelType.WHISPER && channel.members.length === 2) {
-		throw new ForbiddenException('A Whisper channel can only have two users');
-	  }
       if (client.rooms.has(channel.id.toString()))
         throw new NotAcceptableException('Client is already in the room');
       /* If it's the User first time joining the channel */
       if (!user.channelList.includes(channel.id)) {
+		if (channel.type === ChannelType.WHISPER && channel.members.length === 2) {
+			throw new ForbiddenException('A Whisper channel can only have two users');
+		}
         const updatedChannel = await this.chatService.join(dto, channel, user);
         //First time someone joins a channel
         const notif: MessageDto = {
@@ -292,9 +292,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!channel.administrators.includes(user.id)) {
         throw new ForbiddenException(`User does not have permission to add a user to a channel`);
       }
-	  if (channel.type === ChannelType.WHISPER && channel.members.length === 2) {
-		throw new ForbiddenException('A Whisper channel can only have two users');
-	  }
       const usertoAdd = await this.userService.findOne(dto.userId);
       if (!usertoAdd) {
         throw new NotFoundException(`User with id of ${dto.userId} does not exist`);
@@ -302,6 +299,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (usertoAdd.channelList.includes(channel.id)) {
         throw new NotAcceptableException(`User already on the channel`);
       }
+	  if (channel.type === ChannelType.WHISPER && channel.members.length === 2) {
+		throw new ForbiddenException('A Whisper channel can only have two users');
+	  }
       if (await this.userService.checkifUserblocked(usertoAdd.id, user.id)) {
         throw new ForbiddenException(`User has blocked you`);
       }
