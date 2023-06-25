@@ -21,32 +21,36 @@ function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const [updated, setUpdated] = React.useState(false);
     const prevUsernameRef = useRef(props.username);
 
-    async function updateProfile() {
-        setError("");
-        setUpdated(false);
-        if (!username || !username.trim())
-            return setError("Username required and can't be empty");
-        if (username.trim().length > 20)
-            return setError("Username too long (20 chars max)");
-        if (username.trim().match(/[^a-zA-Z0-9 ]/g))
-            return setError("Username invalid (only alphanumeric characters)")
+	async function updateProfile() {
+		setError("");
+		setUpdated(false);
+		if (!username || !username.trim())
+			return setError("Username required and can't be empty");
+		if (username.trim().length > 20)
+			return setError("Username too long (20 chars max)");
+		if (username.trim().match(/[^a-zA-Z0-9 ]/g))
+			return setError("Username invalid (only alphanumeric characters)")
 
-        if (prevUsernameRef.current.trim() !== username.trim()) {
-            updateUser({
-                username: username.trim(),
-                userStatus: "ONLINE"
-            }, id, token)
-                .then(d => {
-                    if (d.status === 200 || d.statusText === "OK")
-                    {
-                        setUpdated(true);
-                        updateCurrentUser(d.data);
-                    }
-                })
-                .catch(() => setError("Bad username"))
-            prevUsernameRef.current = username;
-        }
-    }
+		if (prevUsernameRef.current.trim() !== username.trim()) {
+			updateUser({
+				username: username.trim(),
+				userStatus: "ONLINE"
+			}, id, token)
+				.then(d => {
+					if (d.status === 200 || d.statusText === "OK") {
+						setUpdated(true);
+						updateCurrentUser(d.data);
+						prevUsernameRef.current = username;
+					}
+					else {
+						return setError("Username already taken by another user")
+					}
+				})
+				.catch(() => setError("Bad username"))
+		} else {
+			return setError("Same username")
+		}
+	}
 
     return (
         <div className="profileinfos-container">
