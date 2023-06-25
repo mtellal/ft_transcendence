@@ -26,9 +26,9 @@ export default function SignUp() {
             return (setError("Username too long (max 20 charcters)"))
         if (password.trim().length > 30)
             return (setError("Password too long (max 30 charcters)"))
-        if (password !== confirmPassword)
+        if (password.trim() !== confirmPassword.trim())
             return (setError("password and confirm password are different"))
-        await signupRequest(username, password)
+        await signupRequest(username.trim(), password.trim())
             .then(({ error, errMessage, res }: any) => {
                 if (error)
                     setError(errMessage)
