@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, UserRequestDto, FriendshipDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon from 'argon2';
-import { Prisma, ChannelType, FriendRequest, User, Status } from '@prisma/client';
+import { Prisma, ChannelType, FriendRequest, User, Status, GameType, GameStatus } from '@prisma/client';
 import * as fs from 'fs';
 import { UsersGateway } from './users.gateway';
 
@@ -329,6 +329,13 @@ export class UsersService {
       throw new ForbiddenException('User doesn\'t exists or has already been deleted');
   }
 
+  async deletePendingGames(userId: number) {
+    await this.prisma.game.deleteMany({
+      where: {player1Id: userId,
+      status: GameStatus.INVITE},
+    });
+  }
+
   async deleteImg(filePath: string): Promise<void> {
     fs.unlink(filePath, (err) => {
       if (err) {
@@ -337,4 +344,5 @@ export class UsersService {
       }
     });
   }
+
 }

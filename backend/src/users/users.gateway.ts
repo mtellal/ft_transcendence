@@ -63,20 +63,21 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
     const decoded: JwtPayloadDto = jwtService.decode(token) as JwtPayloadDto;
 	const user: User = await this.userService.findOne(decoded.id);
 	  if (user.userStatus === Status.ONLINE || user.userStatus === Status.INGAME) {
-		  const updatedUser = await this.userService.update(user.id, {
-			  userStatus: Status.OFFLINE
-		  });
-		  for (const friendId of user.friendList) {
-			  const socketId = this.getSocketId(friendId);
-			  this.io.to(socketId).emit('updatedFriend', updatedUser);
-		  }
-		  for (const channel of updatedUser.channelList) {
-			  this.io.to(channel.toString()).emit('updatedMember', {
-				  channelId: channel,
-				  user: updatedUser
-			  })
-		  }
-	  }
+      const updatedUser = await this.userService.update(user.id, {
+        userStatus: Status.OFFLINE
+      });
+      for (const friendId of user.friendList) {
+        const socketId = this.getSocketId(friendId);
+        this.io.to(socketId).emit('updatedFriend', updatedUser);
+      }
+      for (const channel of updatedUser.channelList) {
+        this.io.to(channel.toString()).emit('updatedMember', {
+          channelId: channel,
+          user: updatedUser
+        })
+      }
+    }
+    await this.userService.deletePendingGames(user.id);
     this.removeSocketId(client.id);
     client.disconnect();
   }
