@@ -84,9 +84,9 @@ export function useChannels() {
                 if (users)
                     channel = { ...channel, users }
             }
+             channelsDispatch({ type: 'addChannel', channel });
             if (includeCurrentUser)
-                channel.users = [...channel.users, user];
-            channelsDispatch({ type: 'addChannel', channel });
+                channelsDispatch({ type: 'addMember', channelId: channel.id, user: user });
             joinChannelProtected(channel.id, password);
         }
     }, [socket])
