@@ -64,7 +64,6 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect{
 	const user: User = await this.userService.findOne(decoded.id);
 	  if (user.userStatus === Status.ONLINE || user.userStatus === Status.INGAME) {
 		  const updatedUser = await this.userService.update(user.id, {
-			  avatar: undefined,
 			  userStatus: Status.OFFLINE
 		  });
 		  for (const friendId of user.friendList) {
