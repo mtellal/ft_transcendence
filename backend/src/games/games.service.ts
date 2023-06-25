@@ -247,6 +247,7 @@ export class GamesService {
     server.to(`room-${room.id}`).emit('updatedState', game);
     const frameRate = 60; //FPS that we want
     const tickRate = 1000 / frameRate // Updates will be send at this interval
+    console.log(game);
     setTimeout(() => {
       const gameLoopInterval = setInterval(async () => {
         this.updatePlayer(game);
@@ -255,9 +256,12 @@ export class GamesService {
         if (this.isGameOver(game)) {
           clearInterval(gameLoopInterval);
           const finishedGame = await this.updateGame(room, game);
+          console.log("Game over");
+          console.log(this.games);
           await this.updateStats(room, game);
           this.updateAchievement(finishedGame, server, userTosocket);
           server.to(`room-${room.id}`).emit('finishedGame', finishedGame);
+          server.socketsLeave(`room-${room.id}`);
         }
       }, tickRate);
     }, 3000);
@@ -269,8 +273,9 @@ export class GamesService {
   }
 
   async updateGame(room: Game, game: GameState) {
+    let finishedGame: Game;
     if (game.status === Status.P1WIN) {
-      return await this.prisma.game.update({
+      finishedGame = await this.prisma.game.update({
         where: {id: room.id},
         data: {
           player1Score: game.score.player1Score,
@@ -281,7 +286,7 @@ export class GamesService {
       })
     }
     if (game.status === Status.P2WIN) {
-      return await this.prisma.game.update({
+      finishedGame = await this.prisma.game.update({
         where: {id: room.id},
         data: {
           player1Score: game.score.player1Score,
@@ -292,6 +297,7 @@ export class GamesService {
       })
     }
     this.games.delete(room.id); //Delete the gameState associated with the room;
+    return (finishedGame);
   }
 
   async updateStats(room: Game, game: GameState) {

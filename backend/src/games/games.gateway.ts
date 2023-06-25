@@ -108,6 +108,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.io.to(`room-${room.id}`).emit('joinedGame', room);
       this.io.to(`room-${room.id}`).emit('foundGame', room);
       this.io.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
+      console.log("Starting game");
       this.gamesService.startGame(room, this.io, this.userToSocket);
       /* setTimeout(() => {
         this.gamesService.startGame(room, this.io);
@@ -123,20 +124,39 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!room) {
         throw new NotFoundException(`Game with id of ${gameId} does not exist`);
       }
+      if (room.status === GameStatus.FINISHED) {
+        this.io.to(`room-${room.id}`).emit('finishedGame', room);
+      }
       client.join(`room-${gameId}`);
       this.io.to(`room-${gameId}`).emit('joinedGame', room);
-      let otherPlayer: string | null = null;
-      if (payload.id === room.player1Id) {
-        otherPlayer = this.userToSocket.get(room.player2Id);
+      let otherPlayer: boolean = false
+      if (client.id === this.userToSocket.get(room.player1Id)) {
+        const socketIdP2 = this.userToSocket.get(room.player2Id);
+        if (!socketIdP2) {
+          return ;
+        }
+        const socketP2 = this.io.sockets.get(socketIdP2);
+        if (!socketP2.rooms.has(`room-${gameId}`)) {
+          this.io.to(`room-${room.id}`).emit('waitingforP2', room);
+          return ;
+        }
+        otherPlayer = true;
       }
-      if (payload.id === room.player2Id) {
-        otherPlayer = this.userToSocket.get(room.player1Id);
+      if (client.id === this.userToSocket.get(room.player2Id)) {
+        const socketIdP1 = this.userToSocket.get(room.player1Id);
+        if (!socketIdP1) {
+          return ;
+        }
+        const socketP1 = this.io.sockets.get(socketIdP1);
+        if (!socketP1.rooms.has(`room-${gameId}`)) {
+          this.io.to(`room-${room.id}`).emit('waitingforP2', room);
+          return ;
+        }
+        otherPlayer = true;
       }
-      if (!otherPlayer) {
-        this.io.to(`room-${room.id}`).emit('waitingforP2', room);
-      }
-      else {
+      if (otherPlayer) {
         /* await this.gamesService.changeGameStatus(gameId, GameStatus.ONGOING); */
+        this.io.to(`room-${gameId}`).emit('joinedGame', room);
         this.io.to(`room-${room.id}`).emit('GameStart', { message: 'Game is going to start in 5s' });
         this.gamesService.startGame(room, this.io, this.userToSocket);
       }
