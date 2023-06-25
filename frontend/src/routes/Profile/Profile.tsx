@@ -84,7 +84,9 @@ function ProfilePicture({ token, image, setImage }: any) {
     async function editProfilePicture(e: any) {
         setError("");
         const file = e.target.files[0];
-        if (file.type.match("image.*")) {
+        if (file && file.size > 5000000)
+           return setError("File too large (5 Mb max)")
+        if (file && file.type.match("image.*")) {
             let url = window.URL.createObjectURL(e.target.files[0]);
             setImage(url);
             updateProfilePicture(file, token)
