@@ -55,8 +55,8 @@ function InvitationMessage(props: TInvitationMessage) {
                 style={{ width: '80%', margin: '5px 0', border: '1px solid black', borderRadius: '5px', boxShadow: '1px 2px 5px black', padding: '3%' }}
             >
                 {
-                    props.author &&
-                    <p className="reset" >{props.author.username} wants to play a game in CLASSIC mode</p>
+                    props.author && props.message && 
+                    <p className="reset" >{props.author.username} wants to play a game in {props.message.gametype} mode</p>
 
                 }
                 {
