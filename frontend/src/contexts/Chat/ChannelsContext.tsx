@@ -12,6 +12,7 @@ function formatChannel(channel: Channel) {
             ...channel,
             messages: channel.messages || [],
             users: channel.users || [],
+			muteList: channel.muteList || []
         }
     )
 }
