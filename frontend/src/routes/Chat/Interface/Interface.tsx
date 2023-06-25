@@ -33,9 +33,9 @@ export default function Interface() {
 
     const selectWhisper = useCallback(async (_user: User) => {
         let channel;
-        if (channels && channels.length) {
-            channel = channels.find((c: Channel) =>
-                c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
+        if (channels && channels.length && _user) {
+            channel = channels.find((c: Channel) => 
+                c && c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
         }
         return (channel);
     }, [channels]);
@@ -58,7 +58,9 @@ export default function Interface() {
         else if (params.userId) {
             const user = await fetchUser(params.userId);
             setWhisperUser(user);
-            let channel = await selectWhisper(user);
+            let channel;
+            if (user)
+                channel = await selectWhisper(user);
             if (isCurrentUserMember(channel))
                 return (setCurrentChannel(channel));
             return;
