@@ -9,10 +9,10 @@ import { useCurrentUser } from "../../hooks/Hooks";
 import PickMenu from "../../components/PickMenu";
 import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
 import useFetchUsers from "../../hooks/useFetchUsers";
-import './Profile.css'
 import { HistoryMatchs } from "../../components/HistoryMatchs/HistoryMatchs";
 import { Stats } from "../../components/Stats/Stats";
 import { Achievements } from "../../components/Achievements/Achievements";
+import './Profile.css'
 
 function ProfileInfos({ id, updateCurrentUser, ...props }: any) {
     const { token } = useCurrentUser();

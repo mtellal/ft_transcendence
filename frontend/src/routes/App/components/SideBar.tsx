@@ -4,44 +4,123 @@ import './Sidebar.css'
 import { NavLink } from "react-router-dom";
 import { useWindow } from "../../../hooks/useWindow";
 
-function MenuElement(props: any) {
+import profile from '../../../assets/User.svg'
+import game from '../../../assets/Gamepad.svg'
+import ladder from '../../../assets/Users.svg'
+import chat from '../../../assets/Chat.svg'
+
+type TMenuElement = {
+    path: string,
+    image: any
+}
+
+function MenuElement(props: TMenuElement) {
+
+
     return (
         <NavLink
-            to={props.route}
-            className={({ isActive }) => isActive ? "menu--element selected" : "menu--element"}
+            to={props.path}
+            className={({ isActive }) => isActive ?
+                "selected flex-column-center pointer menu--element" :
+                "flex-column-center pointer menu--element"
+            }
         >
-            <span className="material-symbols-outlined">
-                {props.icon}
-            </span>
-            <p className="menu--element-title" >{props.title}</p>
+            <img
+                style={{ height: '40%' }}
+                src={props.image}
+            />
         </NavLink>
     )
 }
 
 
+type TMenuElementMobile = {
+    title: string,
+    path: string,
+    image: any,
+    setSelected: (s: string) => void
+}
+
+function MenuElementMobile(props: TMenuElementMobile) {
+
+    return (
+        <NavLink
+            onClick={() => props.setSelected(props.title)}
+            to={props.path}
+            className={({ isActive }) => isActive ?
+                "selected flex-ai pointer menu--element" :
+                "flex-ai pointer menu--element"
+            }
+        >
+            <img
+                style={{ height: '40%', padding: '0 10px' }}
+                src={props.image}
+            />
+            {props.title && <p>{props.title}</p>}
+        </NavLink>
+    )
+}
+
+
+
 function PickSideBar(props: any) {
     const [show, setShow] = useState(false);
 
+    console.log(props.selected)
+
+    function pickImage(s: string) {
+        if (s === "Profile")
+            return (profile)
+        else if (s === "Game")
+            return (game)
+        else if (s === "Ladder")
+            return (ladder)
+        else if (s === "Chat")
+            return (chat)
+        return (null)
+    }
+
+
     return (
-        <div className="fill">
-            <div className="flex-column" onClick={() => setShow(p => !p)}>
+        <div style={{ width: '100%', height: 'auto' }}>
+            <div className="flex-column pointer" onClick={() => setShow(p => !p)}>
+                <div className="flex-ai" style={show ? { borderBottom: '1px solid black' } : {}}>
+                    <img
+                        style={{ height: '40%', padding: '0 10px' }}
+                        src={pickImage(props.selected)}
+                    />
+                    <p>{props.selected || "Menu ..."}</p>
+                </div>
+
                 {
-                    <div className="picksidebar-option">
-                        <p>{props.selected || "Menu ..."}</p>
-                    </div>
-                }
-                {
-                    show && props.collection && props.collection.length &&
-                    props.collection.map((option: any) =>
-                        <div
-                            key={option.props.title}
-                            className="picksidebar-option hover-gray"
-                            style={{ borderTop: '0' }}
-                            onClick={() => props.setSelected(option.props.title)}
-                        >
-                            {option}
-                        </div>
-                    )
+                    show &&
+                    <>
+
+                        <MenuElementMobile
+                            title="Profile"
+                            path="/profile"
+                            image={profile}
+                            setSelected={props.setSelected}
+                        />
+                        <MenuElementMobile
+                            title="Game"
+                            path="/game"
+                            image={game}
+                            setSelected={props.setSelected}
+                        />
+                        <MenuElementMobile
+                            title="Ladder"
+                            path="/ladder"
+                            image={ladder}
+                            setSelected={props.setSelected}
+                        />
+                        <MenuElementMobile
+                            title="Chat"
+                            path="/chat"
+                            image={chat}
+                            setSelected={props.setSelected}
+                        />
+                    </>
                 }
             </div>
         </div>
@@ -52,50 +131,37 @@ export default function Sidebar() {
     const [selected, setSelected] = useState("Game");
     const { isMobileDisplay } = useWindow();
 
-    const menuElement = [
-        {
-            id: 0,
-            title: "Profile",
-            icon: "account_circle"
-        },
-        {
-            id: 2,
-            title: "Game",
-            icon: "sports_esports"
-        },
-        {
-            id: 3,
-            title: "Ladder",
-            icon: "groups"
-        },
-        {
-            id: 4,
-            title: "Chat",
-            icon: "chat"
-        }
-    ]
-
-    const menu = menuElement.map(e =>
-        <MenuElement
-            key={e.id}
-            title={e.title}
-            icon={e.icon}
-            route={`/${e.title.toLocaleLowerCase()}`}
-        />
-    )
 
     return (
         <span className="flex-column sidebar">
-            <h2 className="sidebar--title" >Menu</h2>
             {
                 isMobileDisplay ?
                     <PickSideBar
-                        collection={menu}
+                        collection={[]}
                         selected={selected}
                         setSelected={setSelected}
                     />
                     :
-                    menu
+
+                    <>
+                        <MenuElement
+                            path="/profile"
+                            image={profile}
+                        />
+                        <MenuElement
+                            path="/game"
+                            image={game}
+                        />
+                        <MenuElement
+                            path="/ladder"
+                            image={ladder}
+                        />
+                        <MenuElement
+                            path="/chat"
+                            image={chat}
+                        />
+                    </>
+
             }
         </span>
     )
