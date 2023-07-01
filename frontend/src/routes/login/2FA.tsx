@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import IconInput from "../../components/Input/IconInput";
-
 import { setCookie } from "../../Cookie";
 
-import './Sign.css'
 import { getTokenRequest, signinRequest } from "../../requests/auth";
 import { NavigationButton } from "./NavigationButton";
+import arrowLeft from '../../assets/ ArrowLeft.svg'
+import { LightInput } from "../../components/Input/LightInput";
+
+import './Sign.css'
 
 export default function TwoFactor() {
     const [secret, setSecret] = React.useState("");
@@ -23,10 +24,10 @@ export default function TwoFactor() {
     }, [location, navigate])
 
 
-    async function submit() {
+    async function handleSubmit() {
         if (!secret || !secret.trim())
             return setError("Secret required")
-        if (location.state.username && location.state.username.trim() && 
+        if (location.state.username && location.state.username.trim() &&
             location.state.password && location.state.password.trim()) {
             await signinRequest(location.state.username.trim(), location.state.password.trim(), secret.trim(), "true")
                 .then(({ res }: any) => {
@@ -34,20 +35,20 @@ export default function TwoFactor() {
                         if (res.data.access_token) {
                             setCookie("access_token", res.data.access_token);
                             navigate("/");
-                            return ;
+                            return;
                         }
                     }
                     setError("Code invalid")
                 })
         }
-        else if (location.state.oauth_code && location.state.oauth_code.trim() ) {
+        else if (location.state.oauth_code && location.state.oauth_code.trim()) {
             await getTokenRequest(location.state.oauth_code, secret.trim())
                 .then(res => {
                     if (res && res.data) {
                         if (res.data.access_token) {
                             setCookie("access_token", res.data.access_token);
                             navigate("/");
-                            return ;
+                            return;
                         }
                     }
                     setError("Code invalid")
@@ -55,33 +56,53 @@ export default function TwoFactor() {
         }
     }
 
-    const iconInputStyle = {
-        height: '40px',
-        width: '90%'
-    }
-
     return (
-        <div className="flex-column-center fill" style={{ width: '100%', height: '100%' }}>
-            <div className="flex-center" style={{ paddingTop: '25%' }}>
-                <IconInput
-                    id="submit"
-                    style={iconInputStyle}
-                    icon="verified_user"
-                    placeholder="Secret"
-                    value={secret}
-                    setValue={setSecret}
-                    submit={() => submit()}
-                    maxLength={30}
-                />
-            </div>
-            {error && <p className="red-c">{error}</p>}
-            <NavigationButton
-                mainTitle="Login"
-                secondTitle="Signin"
-                path="/login/signin"
-                onClick={() => submit()}
-            />
+        <div className="flex-center login-page">
+            <div className="flex-column container-form">
 
+                <img
+                    className="pointer"
+                    onClick={() => { navigate("/login") }}
+                    style={{ width: '20px', paddingBottom: '10px' }}
+                    src={arrowLeft}
+                    alt="back to login"
+                />
+
+                <div className="reset fill">
+                    <h2 className="reset login-title">2FA</h2>
+                    <p className="reset login-description">Verify your secret code to continue</p>
+                </div>
+
+                <div className="flex-column-center" style={{ padding: '0 10px' }}>
+                    <div style={{ paddingTop: '30px' }}>
+                        <LightInput
+                            placeholder="secret code"
+                            value={secret}
+                            setValue={setSecret}
+                            onClick={() => handleSubmit()}
+                            maxLength={30}
+                        />
+                        {
+                            error &&
+                            <p
+                                className="reset login-font1"
+                                style={{ paddingTop: '10px' }}
+                            >
+                                error: {error}
+                            </p>
+                        }
+                    </div>
+                </div>
+
+                <div className="reset fill flex-column-center" style={{ marginTop: 'auto' }}>
+                    <NavigationButton
+                        mainTitle="Login"
+                        secondTitle="sign in"
+                        path="/login/signin"
+                        onClick={() => handleSubmit()}
+                    />
+                </div>
+            </div>
         </div>
     )
 }
