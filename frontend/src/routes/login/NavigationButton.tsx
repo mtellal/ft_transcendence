@@ -11,7 +11,7 @@ type TNavigationButton = {
 
 export function NavigationButton(props: TNavigationButton) {
     return (
-        <div className="flex-column-center absolute " style={{width: '100%', bottom: '10px'}}>
+        <div className="flex-column-center" style={{width: '100%', bottom: '10px'}}>
             <button
                 className="sign--button"
                 onClick={props.onClick}

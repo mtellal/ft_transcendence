@@ -89,25 +89,19 @@ const router = createBrowserRouter([
     {
         path: "login",
         element: <Login />,
-        children: [
-            {
-                path: "",
-                element: <ChooseLogin />,
-            },
-            {
-                path: "signin",
-                element: <SignIn />,
-            },
-            {
-                path: "signup",
-                element: <SignUp />,
-            },
-            {
-                path: "2fa",
-                element: <TwoFactor />,
-            }
-        ]
     },
+    {
+        path: "login/signin",
+        element: <SignIn />,
+    },
+    {
+        path: "login/signup",
+        element: <SignUp />,
+    },
+    {
+        path: "login/2fa",
+        element: <TwoFactor />,
+    }
 ])
 
 

@@ -1,8 +1,12 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import IconInput from "../../components/Input/IconInput";
+import { useNavigate } from "react-router-dom";
 import { setCookie } from "../../Cookie";
 import { signinRequest } from "../../requests/auth";
+
+import { LightInput } from "../../components/Input/LightInput";
+import { NavigationButton } from "./NavigationButton";
+import arrowLeft from '../../assets/ ArrowLeft.svg'
+
 
 import './Sign.css'
 
@@ -39,49 +43,62 @@ export default function SignIn() {
             })
     }
 
-    const iconInputStyle = {
-        height: '40px',
-        width: '90%'
-    }
-
-
     return (
-        <div className="flex-column-center" style={{ minHeight: '250px' }}>
-            <div className="flex-column-center " style={{ minHeight: '150px' }}>
-                <IconInput
-                    id="submit"
-                    style={iconInputStyle}
-                    icon="person"
-                    placeholder="Username"
-                    value={username}
-                    setValue={setUsername}
-                    submit={() => handleSubmit()}
-                    maxLength={20}
+        <div className="flex-center login-page">
+            <div className="flex-column container-form">
+
+                <img
+                    className="pointer"
+                    onClick={() => { navigate("/login") }}
+                    style={{ width: '20px', paddingBottom: '10px'}}
+                    src={arrowLeft}
+                    alt="back to login"
                 />
-                <IconInput
-                    id="password"
-                    style={iconInputStyle}
-                    icon="lock"
-                    placeholder="Password"
-                    value={password}
-                    setValue={setPassword}
-                    submit={() => handleSubmit()}
-                    maxLength={30}
-				/>
+
+                <div className="reset fill">
+                    <h2 className="reset login-title">Sign in</h2>
+                    <p className="reset login-description">Please sign in to continue</p>
+                </div>
+
+                <div className="flex-column-center" style={{ padding: '0 10px' }}>
+                    <div style={{ paddingTop: '15px' }}>
+                        <LightInput
+                            placeholder="username"
+                            value={username}
+                            setValue={setUsername}
+                            onClick={() => handleSubmit()}
+                            maxLength={20}
+                        />
+                    </div>
+                    <div style={{ paddingTop: '15px' }}>
+                        <LightInput
+                            placeholder="password"
+                            value={password}
+                            setValue={setPassword}
+                            onClick={() => handleSubmit()}
+                            maxLength={30}
+                        />
+                        {
+                            error &&
+                            <p
+                                className="reset login-font1"
+                                style={{ paddingTop: '10px' }}
+                            >
+                                error: {error}
+                            </p>
+                        }
+                    </div>
+                </div>
+
+                <div className="reset fill flex-column-center" style={{marginTop: 'auto'}}>
+                    <NavigationButton
+                        mainTitle="Sign in"
+                        secondTitle="sign up"
+                        onClick={() => handleSubmit()}
+                        path="/login/signup"
+                    />
+                </div>
             </div>
-            {error && <p>error: {error}</p>}
-            <button
-                className="flex-center sign--button"
-                onClick={handleSubmit}
-            >
-                Sign in
-            </button>
-            <Link
-                to={"/login/signup"}
-                className="sign--link"
-            >
-                Sign up
-            </Link>
         </div>
     )
 }

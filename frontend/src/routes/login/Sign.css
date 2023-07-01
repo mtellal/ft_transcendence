@@ -1,5 +1,4 @@
-.login-page
-{
+.login-page {
     z-index: 2;
     position: absolute;
     width: 100%;
@@ -7,92 +6,125 @@
     background-color: rgba(0, 0, 0, 0.7);
 }
 
-.login-form
-{
+.container-form {
     width: 200px;
     min-height: 300px;
-    background-color: rgb(216, 216, 216);
+    background: #EFEFEF;
     border-radius: 5px;
-    align-items: center;
     padding: 20px;
     box-shadow: 0 5px 10px black;
 }
 
 
-.chooselogin-button-container
-{
+.chooselogin-button-container {
     margin-top: 10%;
     min-height: 200px;
     width: 100%;
 }
 
-.chooselogin-button
-{
+.chooselogin-button {
     margin-top: 10%;
     height: 40px;
     min-width: 80%;
-    font-size: medium;
-    font-weight: 500;
     text-decoration: none;
-    color: black;
     background-color: white;
     padding: 0px 0px;
+
+    color: #000;
+    font-size: 17px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
-.chooselogin-img
-{
+.chooselogin-img {
     height: 80%;
     padding: 0 5px;
 }
 
 
-.sign--img
-{
+.sign--img {
     width: 30%;
     align-self: center;
 }
 
 
-.sign--button
+
+.login-iconinput {
+    margin-top: 10%;
+    height: 200px;
+    width: 90%;
+}
+
+
+.login-font1
 {
+    color: #000000;
+    font-size: 15px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+
+/*  //////////////////      LOGIN       //////////////////// */
+
+.login-title-container
+{
+    padding-top: 30px;
+}
+
+.login-title {
+    color: #000;
+    font-size: 31px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    padding-bottom: 5px;
+}
+
+.login-description {
+    color: rgba(0, 0, 0, 0.53);
+    font-size: 15px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+
+
+
+/*  ///////////////     NAVIGATION BUTTONS  //////////////// */
+
+
+.sign--button {
     width: 50%;
     padding: 5%;
     margin-top: auto;
-    background-color: rgb(87, 87, 87);
+    background-color: rgba(0, 0, 0, 0.6);
     border: none;
     border-radius: 5px;
     color: white;
-    font-size: medium;
+    font-size: 17px;
     text-decoration: none;
     cursor: pointer;
 }
 
-.sign--button:hover
-{
-    box-shadow: 0 2px 4px rgb(0, 0, 0);
+.sign--button:hover {
+    box-shadow: 0 2px 3px rgb(0, 0, 0);
 }
 
-.sign--button:active
-{
-    background-color: rgb(163, 163, 163);
-    border: 1px solid black;
-}
-
-.sign--link
-{
+.sign--link {
     text-decoration: underline;
     color: black;
     padding-top: 1vh;
 }
 
-.login--link:hover
-{
+.login--link:hover {
     cursor: pointer;
-}
-
-.login-iconinput
-{
-    margin-top: 10%;
-    height: 200px;
-    width: 90%;
 }
