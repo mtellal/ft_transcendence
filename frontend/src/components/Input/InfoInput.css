@@ -1,19 +1,12 @@
-.infoinput-container
-{
-    width: 80%;
-    max-width: 400px;
-    min-height: 80px;
-}
 
 .infoinput-label
 {
-    margin-bottom: 2%;
+    margin-bottom: 7px;
 }
 
 .infoinput-input
 {
     height: 2rem;
-    width: 80%;
     padding: 5px 5px;
     align-items: center;
     font-size: medium;

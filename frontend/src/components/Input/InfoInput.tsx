@@ -34,7 +34,7 @@ export default function InfoInput(props: TInfoInput) {
     }
 
     return (
-        <div className="flex-column infoinput-container">
+        <div className="flex-column fill">
             <label htmlFor={props.id} className="infoinput-label" >{props.label}</label>
             <input
                 ref={inputRef}
