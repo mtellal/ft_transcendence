@@ -6,11 +6,20 @@ import { useCurrentUser } from "../../hooks/Hooks";
 import ProfilePicture from "../../components/users/ProfilePicture";
 
 import './Profile.css'
-import { Game, User } from "../../types";
+import { Achievements, Game, User } from "../../types";
 
 import ligntning from '../../assets/lightning.svg'
-import { getMatchHistory } from "../../requests/user";
+import { getAchievements, getMatchHistory } from "../../requests/user";
 import useFetchUsers from "../../hooks/useFetchUsers";
+import History from "./History";
+
+
+import novice from '../../assets/novice.png'
+import intermediate from '../../assets/intermediate.png';
+import expert from '../../assets/expert.png';
+import master from '../../assets/master.png';
+import onfire from '../../assets/fire.png';
+import tenacious from '../../assets/tenacious.png';
 
 
 function ProfileC1() {
@@ -98,137 +107,107 @@ export default function Profile() {
     )
 }
 
-function HistoryLabel({ game }: any) {
-
-    const { user } = useCurrentUser();
-    const { fetchUser } = useFetchUsers();
-    const [player2, setPlayer2] = useState(null);
-
-
-    const loadPLayer2 = useCallback(async () => {
-        let p2: any = game.player2Id === user.id ? game.player1Id : game.player2Id;
-        p2 = await fetchUser(p2);
-        setPlayer2(p2);
-    }, [game])
-
-    useEffect(() => {
-        if (game) {
-            loadPLayer2();
-        }
-    }, [game])
-
+function AchievementsLabel({ image, title, description, valid }: any) {
     return (
-        <div 
-            className="profile-history-label flex-ai"
-            style={user && user.id !== game.wonBy ? {backgroundColor: '#FFDBDB'} : {}}
-        >
-            <div
-                className="profile-history-label-side flex-ai"
+        <div
+            className="profile-achievements-label flex-center"
+            style={!valid ? {backgroundColor: '#CCC'} : {}}>
+            <img
+                className="profile-achievements-label-image"
+                style={{ height: '50px', padding: '5px' }}
+                src={image}
+            />
+            <div className="profile-achievements-label-infos flex-column"
+                style={{ padding: '5px', width:'70%' }}
             >
-                <p className="profile-history-label-username">{user && user.username}</p>
-                <div style={{ height: '50px', width: '50px' }}>
-                    <ProfilePicture
-                        image={user && user.url}
-                    />
-                </div>
-                <p className="profile-history-label-score"
+                <p className="profile-c1-font-username">{title}</p>
+                <p
+                    className="profile-2fa-text2 "
+                    style={{ marginTop: '5px'}}
                 >
-                    {user && game.player1Id === user.id ? game.player1Score : game.player2Score}
+                    {description}
                 </p>
             </div>
-
-            <div>
-                <img
-                    src={ligntning}
-                    style={{ flex: 1, height: '50px' }}
-                />
-                <p className="reset" style={{fontSize: '10px'}}>{game.gametype}</p>
-            </div>
-
-            <div
-                className="profile-history-label-side flex-ai"
-                style={{ flexDirection: 'row-reverse' }}
-            >
-                <p className="profile-history-label-username">{player2 && player2.username}</p>
-                <div style={{ height: '50px', width: '50px' }}>
-                    <ProfilePicture
-                        image={player2 && player2.url}
-                    />
-                </div>
-                <p className="profile-history-label-score"
-                >
-                    {player2 && game.player2Id === player2.id ? game.player2Score : game.player1Score}
-                </p>
-            </div>
-
         </div>
     )
 }
 
-export function History() {
+export function PageInformations() {
 
     const { user, token } = useCurrentUser();
 
-    const [history, setHistory] = useState([]);
+    const [achievement, setAchievement] = useState(null);
 
-    const loadHistory = useCallback(async () => {
-        await getMatchHistory(user.id, token)
+    const loadAchievements = useCallback(async () => {
+        await getAchievements(user.id, token)
             .then(res => {
-                if (res.data) {
-                    setHistory(res.data);
-                }
+                if (res && res.data && res.data.length)
+                    setAchievement(res.data[0])
             })
-    }, [user, token]);
+    }, [user, token])
 
     useEffect(() => {
         if (user && token)
-            loadHistory();
+            loadAchievements();
     }, [user, token])
 
     return (
         <div
             className="flex"
-            style={{ flex: '5', gap: '30px', minWidth: '700px' }}
+            style={{ flex: '5', gap: '30px', minWidth: '800px' }}
         >
 
+            <History />
+
             <div
-                className="profile-history"
-                style={{}}
+                className="profile-achievements"
+                style={{ width: '300px'}}
             >
-                <p className="profile-history-title">History</p>
-
-                <div className="flex-column-center" style={{ marginTop: '15px' }}>
-
-                    {
-                        history && history.length ?
-                            <div className="fill flex-column" style={{ gap: '10px' }}>
-                                {
-                                    history.map((e: Game) =>
-                                        <HistoryLabel
-                                            key={e.id}
-                                            game={e}
-                                        />
-                                    )
-                                }
-                            </div>
-                            : null
-                    }
-
-                    {/*                     <HistoryLabel
-                        user1={user}
-                        user2={user}
-                        score1={10}
-                        score2={8}
-                    /> */}
+                <p className="profile-history-title">Achievements</p>
+                <div
+                    className="flex-column"
+                    style={{ marginTop: '15px', gap: '10px', alignItems: 'center'}}
+                >
+                    <AchievementsLabel
+                        image={novice}
+                        title="Novice"
+                        description="Play 1 pong match"
+                        valid={achievement && achievement.Novice}
+                    />
+                    <AchievementsLabel
+                        image={intermediate}
+                        title="Intermediate"
+                        description="Play 5 pong matches"
+                        valid={achievement && achievement.Intermediate}
+                    />
+                    <AchievementsLabel
+                        image={expert}
+                        title="Expert"
+                        description="Play 10 pong matches"
+                        valid={achievement && achievement.Expert}
+                    />
+                    <AchievementsLabel
+                        image={master}
+                        title="Master"
+                        description="Play 20 pong matches"
+                        valid={achievement && achievement.Master}
+                    />
+                    <AchievementsLabel
+                        image={onfire}
+                        title="On fire"
+                        description="Achieve 5 wins in a row"
+                        valid={achievement && achievement.OnFire}
+                    />
+                    <AchievementsLabel
+                        image={tenacious}
+                        title="Tenacious"
+                        description="Experience 5 losses in a row"
+                        valid={achievement && achievement.Tenacious}
+                    />
                 </div>
-
-            </div>
-
-
-            <div className="red" style={{ flex: 1 }}>
-
             </div>
 
         </div>
     )
 }
+

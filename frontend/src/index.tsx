@@ -7,7 +7,7 @@ import './index.css';
 import Login, { ChooseLogin } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
-import Profile, {History} from './routes/Profile/Profile';
+import Profile, {PageInformations} from './routes/Profile/Profile';
 import Settings from './routes/Profile/Settings';
 import LaunchGame from './routes/Game/LaunchGame';
 
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: "",
-                        element: <History />
+                        element: <PageInformations />
                     },
                     {
                         path: "settings",
