@@ -8,6 +8,8 @@ import useFetchUsers from "../../hooks/useFetchUsers";
 
 import './Profile.css'
 
+import './History.css'
+
 function HistoryLabel({ game, player2, player1 }: any) {
 
     return (

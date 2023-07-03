@@ -10,9 +10,9 @@ import master from '../../assets/master.png';
 import onfire from '../../assets/fire.png';
 import tenacious from '../../assets/tenacious.png';
 
-import './Profile.css'
 import { User } from "../../types";
 
+import './Achievements.css'
 
 function AchievementsLabel({ image, title, description, valid }: any) {
     return (
@@ -25,11 +25,8 @@ function AchievementsLabel({ image, title, description, valid }: any) {
             />
             <div className="profile-achievements-label-infos flex-column"
             >
-                <p className="profile-c1-font-username">{title}</p>
-                <p
-                    className="profile-2fa-text2"
-                    style={{ marginTop: '5px' }}
-                >
+                <p className="profile-achievements-label-title">{title}</p>
+                <p className="profile-achievements-label-description">
                     {description}
                 </p>
             </div>
@@ -41,7 +38,7 @@ type TAchievements = {
     user: User
 }
 
-export function Achievements({user}: TAchievements) {
+export function Achievements({ user }: TAchievements) {
 
     const { token } = useCurrentUser();
 
@@ -63,9 +60,8 @@ export function Achievements({user}: TAchievements) {
     return (
         <div
             className="profile-achievements"
-            style={{ width: '300px' }}
         >
-            <p className="profile-history-title">Achievements</p>
+            <p className="profile-achievements-title">Achievements</p>
             <div
                 className="flex-column"
                 style={{ marginTop: '15px', gap: '10px', alignItems: 'center' }}

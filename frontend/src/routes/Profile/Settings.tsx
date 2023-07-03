@@ -1,20 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { updateProfilePictureRequest, updateUser } from "../../requests/user";
-
 import InfoInput from "../../components/Input/InfoInput";
-
 import { useCurrentUser } from "../../hooks/Hooks";
-
 import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
-
-
 import Switch from 'react-switch';
-
 import arrowRight from '../../assets/ArrowRight.svg'
 import arrowBottom from '../../assets/ArrowBottom.svg'
-
 import { User } from "../../types";
-import './Profile.css'
+
+import './Settings.css'
+
 
 type TUpdateProfileUsername = {
     id: number,
@@ -83,7 +78,7 @@ function UpdateProfileUsername({ id, updateCurrentUser, ...props }: TUpdateProfi
 
             <button
                 onClick={updateProfile}
-                className="profile-c1-button"
+                className="profile-settings-username-button"
                 style={{ alignSelf: 'flex-end' }}
             >
                 Update
@@ -118,7 +113,7 @@ function UpdateProfilePicture({ token, setImage }: any) {
                 <form >
                     <label
                         htmlFor="edit"
-                        className="profil-picture-label"
+                        className="profil-settings-picture-label"
                     >
                         choose a file
                     </label>
@@ -126,7 +121,7 @@ function UpdateProfilePicture({ token, setImage }: any) {
                         id="edit"
                         type="file"
                         placeholder="edit"
-                        className="profile-picture-input"
+                        className="profile-settings-picture-input"
                         onChange={editProfilePicture}
                     />
                 </form>
@@ -170,8 +165,13 @@ function Authentification2FA() {
 
     return (
         <div className="flex-column" style={{ padding: '4%' }}>
-            <p className="reset profile-2fa-text1">Don’t forget to register this qr code and get access to the secret code associated.</p>
-            <p className="reset profile-2fa-text2" style={{ marginBottom: '10px' }}>You can’t login without the secret code.</p>
+            <p className="reset profile-settings-2fa-text">Don’t forget to register this qr code and get access to the secret code associated.</p>
+            <p
+                className="reset profile-settings-2fa-text"
+                style={{ color: 'rgba(0, 0, 0, 0.7)', marginBottom: '10px' }}
+            >
+                You can't login without the secret code.
+            </p>
             {
                 qrcode &&
                 <div>
@@ -181,9 +181,6 @@ function Authentification2FA() {
         </div >
     )
 }
-
-
-
 
 type TProfileSettingsLabel = {
     title: string,
@@ -199,9 +196,9 @@ function ProfileSettingsLabel({ children, ...props }: TProfileSettingsLabel) {
 
     return (
         <div
-            className="profile-c2-label"
+            className="profile-settings-label"
         >
-            <div className="fill profile-c2-label-title"
+            <div className="fill profile-settings-label-title"
                 onClick={async () => {
                     if (props.switch) {
                         setShow(!enable2FA)
@@ -236,8 +233,6 @@ function ProfileSettingsLabel({ children, ...props }: TProfileSettingsLabel) {
     )
 }
 
-
-
 export default function Settings() {
     const {
         token,
@@ -245,9 +240,10 @@ export default function Settings() {
         updateCurrentUser,
         updateCurrentProfilePicture
     }: any = useCurrentUser();
+
     return (
-        <div style={{ flex: '5' }}>
-            <div className="flex-column profile-c2" style={{ maxWidth: '700px' }}>
+        <div className="profile-settings1" style={{ flex: 5 }}>
+            <div className="profile-settings2 flex-column" >
                 <ProfileSettingsLabel
                     title="Update your username"
                 >
@@ -273,7 +269,6 @@ export default function Settings() {
                     <Authentification2FA />
                 </ProfileSettingsLabel>
             </div>
-
         </div>
     )
 }

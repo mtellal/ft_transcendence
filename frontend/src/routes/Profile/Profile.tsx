@@ -65,46 +65,48 @@ function ProfileMenu({ _user }: any) {
 
     return (
         <div
-            className="flex-column"
-            style={{ flex: '1', marginRight: '5%' }}
+            className="flex-column profile-menu"
         >
 
-            <div style={{ height: '150px', width: '150px' }}>
-                <ProfilePicture
-                    image={_user && _user.url}
-                />
-            </div>
-            <div
-                className="flex-column reset"
-            >
-                <p className="profile-menu-font-username reset">
-                    {_user && _user.username}
-                </p>
-                {
-                    user && Number(userId) === user.id &&
-                    <>
-                        <p
-                            className="reset profile-menu-font-menu pointer"
-                            style={settings ? { marginTop: '20px' } : { marginTop: '20px', color: 'black' }}
-                            onClick={() => { setSettings(false); navigate(`/user/${user.id}`) }}
-                        >
-                            Profile
-                        </p>
-                        <p
-                            className="reset profile-menu-font-menu pointer"
-                            style={settings ? { marginTop: '8px', color: 'black' } : { marginTop: '8px' }}
-                            onClick={() => { setSettings(true); navigate(`/user/${user.id}/settings`) }}
-                        >
-                            Settings
-                        </p>
-                        <button
-                            className="profile-menu-button"
-                            onClick={() => navigate("/login")}
-                        >
-                            Logout
-                        </button>
-                    </>
-                }
+            <div>
+
+                <div style={{ height: '150px', width: '150px' }}>
+                    <ProfilePicture
+                        image={_user && _user.url}
+                    />
+                </div>
+                <div
+                    className="flex-column reset"
+                >
+                    <p className="profile-menu-font-username reset">
+                        {_user && _user.username}
+                    </p>
+                    {
+                        user && Number(userId) === user.id &&
+                        <>
+                            <p
+                                className="reset profile-menu-font-menu pointer"
+                                style={settings ? { marginTop: '20px' } : { marginTop: '20px', color: 'black' }}
+                                onClick={() => { setSettings(false); navigate(`/user/${user.id}`) }}
+                            >
+                                Profile
+                            </p>
+                            <p
+                                className="reset profile-menu-font-menu pointer"
+                                style={settings ? { marginTop: '8px', color: 'black' } : { marginTop: '8px' }}
+                                onClick={() => { setSettings(true); navigate(`/user/${user.id}/settings`) }}
+                            >
+                                Settings
+                            </p>
+                            <button
+                                className="profile-menu-button"
+                                onClick={() => navigate("/login")}
+                            >
+                                Logout
+                            </button>
+                        </>
+                    }
+                </div>
             </div>
 
             {!settings && <Statistics user={_user} />}
@@ -142,12 +144,12 @@ export default function Profile() {
     return (
         <div className="profile flex scroll">
             <ProfileMenu _user={_user} />
-            <Outlet context={{user: _user}} />
+            <Outlet context={{ user: _user }} />
         </div>
     )
 }
 
-type outlenContext = {user: User}
+type outlenContext = { user: User }
 
 export function PageInformations() {
 
@@ -155,8 +157,7 @@ export function PageInformations() {
 
     return (
         <div
-            className="flex"
-            style={{ flex: '5', gap: '30px', minWidth: '800px' }}
+            className="flex profile-informations"
         >
             <History user={user} />
             <Achievements user={user} />

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { Link } from 'react-router-dom';
 import { useCurrentUser } from '../../../hooks/Hooks';
@@ -15,7 +15,7 @@ export default function Header() {
             <div className='header-userinfos-container'>
                 <Link
                     className='pp-link'
-                    to={"/profile"}
+                    to={`/user/${user.id}`}
                 >
                     <div style={{width: '40px', height: '40px', padding: '0 5px'}}>
                         <ProfilePicture image={user && user.url} />
