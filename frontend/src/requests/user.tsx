@@ -56,7 +56,7 @@ export async function logout(user: any, token: string) {
     )
 }
 
-export async function updateProfilePicture(image: any, token: string) {
+export async function updateProfilePictureRequest(image: any, token: string) {
     const formData = new FormData();
     formData.append('file', image);
     return (

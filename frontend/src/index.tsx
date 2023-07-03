@@ -7,7 +7,8 @@ import './index.css';
 import Login, { ChooseLogin } from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
-import Profile from './routes/Profile/Profile';
+import Profile, {History} from './routes/Profile/Profile';
+import Settings from './routes/Profile/Settings';
 import LaunchGame from './routes/Game/LaunchGame';
 
 import Interface from './routes/Chat/Interface/Interface';
@@ -42,7 +43,17 @@ const router = createBrowserRouter([
             },
             {
                 path: "profile",
-                element: <Profile />
+                element: <Profile />,
+                children: [
+                    {
+                        path: "",
+                        element: <History />
+                    },
+                    {
+                        path: "settings",
+                        element: <Settings />
+                    }
+                ]
             },
 			{
                 path: "user/:userId",
