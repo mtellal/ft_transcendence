@@ -1,53 +1,32 @@
-import React, { VoidFunctionComponent, useCallback, useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-
+import React, { useCallback, useEffect, useState } from "react";
 import { useCurrentUser } from "../../hooks/Hooks";
-
 import ProfilePicture from "../../components/users/ProfilePicture";
-
-import './Profile.css'
 import { Game, User } from "../../types";
-
 import ligntning from '../../assets/lightning.svg'
 import { getMatchHistory } from "../../requests/user";
 import useFetchUsers from "../../hooks/useFetchUsers";
 
-function HistoryLabel({ game }: any) {
+import './Profile.css'
 
-    const { user } = useCurrentUser();
-    const { fetchUser } = useFetchUsers();
-    const [player2, setPlayer2] = useState(null);
-
-
-    const loadPLayer2 = useCallback(async () => {
-        let p2: any = game.player2Id === user.id ? game.player1Id : game.player2Id;
-        p2 = await fetchUser(p2);
-        setPlayer2(p2);
-    }, [game])
-
-    useEffect(() => {
-        if (game) {
-            loadPLayer2();
-        }
-    }, [game])
+function HistoryLabel({ game, player2, player1 }: any) {
 
     return (
         <div
             className="profile-history-label flex-ai"
-            style={user && user.id !== game.wonBy ? { backgroundColor: '#FFDBDB' } : {}}
+            style={player1 && player1.id !== game.wonBy ? { backgroundColor: '#FFDBDB' } : {}}
         >
             <div
                 className="profile-history-label-side flex-ai"
             >
-                <p className="profile-history-label-username">{user && user.username}</p>
+                <p className="profile-history-label-username">{player1 && player1.username}</p>
                 <div style={{ height: '50px', width: '50px' }}>
                     <ProfilePicture
-                        image={user && user.url}
+                        image={player1 && player1.url}
                     />
                 </div>
                 <p className="profile-history-label-score"
                 >
-                    {user && game.player1Id === user.id ? game.player1Score : game.player2Score}
+                    {player1 && game.player1Id === player1.id ? game.player1Score : game.player2Score}
                 </p>
             </div>
 
@@ -79,20 +58,39 @@ function HistoryLabel({ game }: any) {
     )
 }
 
-export default function History() {
+type THistory = {
+    user: User
+}
 
-    const { user, token } = useCurrentUser();
+export default function History({user} : THistory) {
+
+    const { token } = useCurrentUser();
+    const { fetchUsers } = useFetchUsers();
 
     const [history, setHistory] = useState([]);
+    const [players, setPlayers] = useState([]);
 
+    const loadPlayers = useCallback(async (games: Game[]) => {
+        const ids: number[] = [];
+        games.map((e: Game) => {
+            if (e.player2Id !== user.id && !ids.find((id: number) => e.player2Id === id))
+                ids.push(e.player2Id)
+            if (e.player1Id !== user.id && !ids.find((id: number) => e.player1Id === id))
+                ids.push(e.player1Id)
+        });
+        setPlayers(await fetchUsers(ids));
+    }, [user])
 
     const loadHistory = useCallback(async () => {
+        let games: Game[];
         await getMatchHistory(user.id, token)
             .then(res => {
                 if (res.data) {
+                    games = res.data;
                     setHistory(res.data);
                 }
             })
+        loadPlayers(games);
     }, [user, token]);
 
     useEffect(() => {
@@ -103,12 +101,9 @@ export default function History() {
     return (
         <div
             className="profile-history"
-            style={{minWidth: '400px'}}
         >
             <p className="profile-history-title">History</p>
-
             <div className="flex-column-center" style={{ marginTop: '15px' }}>
-
                 {
                     history && history.length ?
                         <div className="fill flex-column" style={{ gap: '10px' }}>
@@ -117,6 +112,8 @@ export default function History() {
                                     <HistoryLabel
                                         key={e.id}
                                         game={e}
+                                        player1={user}
+                                        player2={players && players.find((p: User) => p.id === e.player1Id || p.id === e.player2Id)}
                                     />
                                 )
                             }

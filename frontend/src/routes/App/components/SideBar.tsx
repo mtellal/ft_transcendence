@@ -8,6 +8,7 @@ import profile from '../../../assets/User.svg'
 import game from '../../../assets/Gamepad.svg'
 import ladder from '../../../assets/Users.svg'
 import chat from '../../../assets/Chat.svg'
+import { useCurrentUser } from "../../../hooks/Hooks";
 
 type TMenuElement = {
     path: string,
@@ -65,8 +66,7 @@ function MenuElementMobile(props: TMenuElementMobile) {
 
 function PickSideBar(props: any) {
     const [show, setShow] = useState(false);
-
-    console.log(props.selected)
+    const {user} = useCurrentUser();
 
     function pickImage(s: string) {
         if (s === "Profile")
@@ -98,7 +98,7 @@ function PickSideBar(props: any) {
 
                         <MenuElementMobile
                             title="Profile"
-                            path="/profile"
+                            path={`/user/${user.id}`}
                             image={profile}
                             setSelected={props.setSelected}
                         />
@@ -130,7 +130,7 @@ function PickSideBar(props: any) {
 export default function Sidebar() {
     const [selected, setSelected] = useState("Game");
     const { isMobileDisplay } = useWindow();
-
+    const {user} = useCurrentUser();
 
     return (
         <span className="flex-column sidebar">
@@ -145,7 +145,7 @@ export default function Sidebar() {
 
                     <>
                         <MenuElement
-                            path="/profile"
+                            path={`/user/${user.id}`}
                             image={profile}
                         />
                         <MenuElement

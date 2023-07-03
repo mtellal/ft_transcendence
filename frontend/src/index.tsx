@@ -4,7 +4,7 @@ import { Navigate, Route }from 'react-router-dom'
 import App, { loader as appLoader, loader } from './routes/App/App';
 
 import './index.css';
-import Login, { ChooseLogin } from './routes/login/Login'
+import Login from './routes/login/Login'
 import SignIn from './routes/login/Signin';
 import SignUp from './routes/login/Signup';
 import Profile, {PageInformations} from './routes/Profile/Profile';
@@ -22,7 +22,6 @@ import Chat from './routes/Chat/Chat/Chat';
 import { CreateChannel } from './routes/Chat/CreateChannel';
 import MenuElement from './routes/Chat/Menu/MenuElement';
 import TwoFactor from './routes/login/2FA';
-import { UserProfile } from './routes/UserProfile/UserProfile';
 import { Ladder } from './routes/Ladder/Ladder';
 
 
@@ -42,7 +41,7 @@ const router = createBrowserRouter([
                 element: <Ladder />
             },
             {
-                path: "profile",
+                path: "user/:userId",
                 element: <Profile />,
                 children: [
                     {
@@ -54,10 +53,6 @@ const router = createBrowserRouter([
                         element: <Settings />
                     }
                 ]
-            },
-			{
-                path: "user/:userId",
-                element: <UserProfile />
             },
 			{
 				path: "ladder",
