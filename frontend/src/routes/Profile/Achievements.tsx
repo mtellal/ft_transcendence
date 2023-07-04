@@ -81,7 +81,7 @@ export function Achievements({ user }: TAchievements) {
                 <AchievementsLabel
                     image={expert}
                     title="Expert"
-                    description="Win 10 pong matches"
+                    description="Play 10 pong matches"
                     valid={achievement && achievement.Expert}
                 />
                 <AchievementsLabel

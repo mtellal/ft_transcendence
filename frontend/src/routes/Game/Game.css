@@ -25,6 +25,13 @@
     outline: none;
 }
 
+.game-score
+{
+    top: 10px;
+    font-size: x-large;
+    color: black;
+}
+
 
 
 /* ///////////  PLAY PAGE   ///////// */
@@ -41,6 +48,16 @@
     align-items: center;
 }
 
+.play-page-title {
+    color: #000;
+    font-size: 25px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+}
+
 .play-button
 {
     padding: 10px;
@@ -49,6 +66,8 @@
     cursor: pointer;
     font-family: 'inter', sans-serif;
     font-size: medium;
+    background-color: white;
+    box-shadow: 0 2px 3px black;
 }
 
 .play-button:hover

@@ -9,8 +9,11 @@ import useFetchUsers from "../../hooks/useFetchUsers";
 import './Profile.css'
 
 import './History.css'
+import { useNavigate } from "react-router-dom";
 
 function HistoryLabel({ game, player2, player1 }: any) {
+
+    const navigate = useNavigate();
 
     return (
         <div
@@ -44,13 +47,19 @@ function HistoryLabel({ game, player2, player1 }: any) {
                 className="profile-history-label-side flex-ai"
                 style={{ flexDirection: 'row-reverse' }}
             >
-                <p className="profile-history-label-username">{player2 && player2.username}</p>
-                <div style={{ height: '50px', width: '50px' }}>
+                <p className="profile-history-label-username">
+                    {player2 && player2.username}
+                </p>
+                <div
+                    className="pointer" style={{ height: '50px', width: '50px' }}
+                    onClick={() => navigate(`/user/${player2.id}`)}
+                >
                     <ProfilePicture
                         image={player2 && player2.url}
                     />
                 </div>
-                <p className="profile-history-label-score"
+                <p
+                    className="profile-history-label-score"
                 >
                     {player2 && game.player2Id === player2.id ? game.player2Score : game.player1Score}
                 </p>
@@ -64,7 +73,7 @@ type THistory = {
     user: User
 }
 
-export default function History({user} : THistory) {
+export default function History({ user }: THistory) {
 
     const { token } = useCurrentUser();
     const { fetchUsers } = useFetchUsers();
