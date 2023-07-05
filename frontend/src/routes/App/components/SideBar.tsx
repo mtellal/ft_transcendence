@@ -27,7 +27,7 @@ function MenuElement(props: TMenuElement) {
             }
         >
             <img
-                style={{ height: '40%' }}
+                style={{ height: '30%' }}
                 src={props.image}
             />
         </NavLink>

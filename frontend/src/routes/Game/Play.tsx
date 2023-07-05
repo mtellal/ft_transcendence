@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import './Game.css'
 
+import warning from '../../assets/warning.png'
 
 function Customization(props: any) {
 
    const [custom, setCustom] = useState("");
+   const [_warning, setWarning] = useState(false);
 
    return (
       <div
@@ -32,8 +34,10 @@ function Customization(props: any) {
                space
             </button>
             <button
-               className="button white"
+               className="reset button white flex-center relative"
                style={custom === "focus" ? { backgroundColor: 'gray', color: 'white' } : {}}
+               onMouseEnter={() => setWarning(true)}
+               onMouseLeave={() => setWarning(false)}
                onClick={() => {
                   if (custom && custom === "focus") {
                      setCustom("");
@@ -43,8 +47,16 @@ function Customization(props: any) {
                      setCustom("focus");
                      props.setCustomization("focus")
                   }
-               }}            >
-               focus
+               }}
+            >
+               <p className="reset"> focus </p>
+               <img src={warning} style={{ paddingLeft: '5px', height: '40%' }} alt="Photosensitive warning !" />
+               {
+                  _warning &&
+                  <p className="absolute player-customization-warning" >
+                     Photosensitive warning !
+                  </p>
+               }
             </button>
 
          </div>

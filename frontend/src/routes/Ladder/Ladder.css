@@ -1,0 +1,205 @@
+.ladder-container {
+	display: flex;
+	flex-direction: column;
+	grid-row: 2 / span 18;
+	grid-column: auto / span 20;
+	padding: 5%;
+	overflow: auto;
+}
+
+
+
+/*////////////		BEST PLAYERS	/////////////*/
+
+.bestplayers {
+	width: 90%;
+	min-width: auto;
+	background: #FFFDF6;
+	box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+	padding: 20px;
+}
+
+.bestplayers-title {
+	color: #000;
+	font-size: 25px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+}
+
+.bestplayers-users {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5%;
+
+}
+
+.bestplayers-user-label>p {
+	margin: 0;
+}
+
+.bestplayers-user-label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: auto;
+
+	flex: 1;
+	background: #FFF;
+	box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+	padding: 15px;
+}
+
+.bestplayers-rank {
+	position: absolute;
+	top: -10px;
+	left: -10px;
+	display: flex;
+	align-items: center;
+}
+
+.bestplayers-rank>p {
+	margin: 0;
+}
+
+.bestplayers-rank-hashtag {
+	color: #000;
+	font-size: 25px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+.bestplayers-rank-index {
+	color: #000;
+	font-size: 30px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+
+.bestplayers-user-username {
+	padding-top: 5px;
+	color: #000;
+	font-size: 21px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+}
+
+.bestplayers-user-elo {
+	padding-top: 15px;
+	color: #000;
+	font-size: 25px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+.bestplayers-user-stats>p {
+	margin: 0;
+
+	color: rgba(0, 0, 0, 0.90);
+	font-size: 12px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 500;
+	line-height: normal;
+}
+
+.bestplayers-user-stats {
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+
+/* //////////// 	LADDER USERS	//////////// */
+
+.ladder-users {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	gap: 10px;
+	margin-top: 5%;
+}
+
+.ladderuser-username {
+	color: #000;
+	font-size: 15px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+.ladderuser-elo {
+	color: #000;
+	font-size: 19px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+
+.ladderuser-rank {
+	position: absolute;
+	top: -15px;
+	right: -10px;
+	display: flex;
+	align-items: center;
+}
+
+.ladderuser-rank>p {
+	margin: 0;
+}
+
+.ladderuser-rank-hashtag {
+	color: #000;
+	font-size: 25px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+.ladderuser-rank-index {
+	color: #000;
+	font-size: 30px;
+	font-family: Inter;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
+}
+
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 700px) {
+	.ladder-container {
+		grid-row: auto / span 19;
+		grid-column: 1 / -1;
+	}
+}
+
+
+@media (max-height: 350px) {
+	.container {
+		display: none;
+	}
+}
