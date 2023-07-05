@@ -139,7 +139,7 @@ export default function Profile() {
     useEffect(() => {
         if (userId)
             loadUser();
-    }, [userId])
+    }, [userId, user])
 
     return (
         <div className="profile flex scroll">

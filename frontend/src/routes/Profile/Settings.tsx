@@ -99,7 +99,7 @@ function UpdateProfilePicture({ token, setImage }: any) {
         if (file && file.type.match("image.*")) {
             let url = window.URL.createObjectURL(e.target.files[0]);
             setImage(url);
-            updateProfilePictureRequest(file, token)
+            updateProfilePictureRequest(file, token);
         }
         else
             setError("Invalid file");

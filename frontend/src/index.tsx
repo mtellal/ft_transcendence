@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Navigate, Route }from 'react-router-dom'
-import App, { loader as appLoader, loader } from './routes/App/App';
+import { Navigate }from 'react-router-dom'
+import App, { loader as appLoader } from './routes/App/App';
 
 import './index.css';
 import Login from './routes/login/Login'

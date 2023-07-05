@@ -1,4 +1,4 @@
-.ladder-container {
+.ladder{
 	display: flex;
 	flex-direction: column;
 	grid-row: 2 / span 18;
@@ -7,119 +7,12 @@
 	overflow: auto;
 }
 
-
-
-/*////////////		BEST PLAYERS	/////////////*/
-
-.bestplayers {
-	width: 90%;
-	min-width: auto;
-	background: #FFFDF6;
-	box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-	padding: 20px;
+.ladder-container
+{
+	min-width: 450px;
+	max-width: 900px; 
+	width: 70%;
 }
-
-.bestplayers-title {
-	color: #000;
-	font-size: 25px;
-	font-family: Inter;
-	font-style: normal;
-	font-weight: 700;
-	line-height: normal;
-}
-
-.bestplayers-users {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 5%;
-
-}
-
-.bestplayers-user-label>p {
-	margin: 0;
-}
-
-.bestplayers-user-label {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	margin-bottom: auto;
-
-	flex: 1;
-	background: #FFF;
-	box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-	padding: 15px;
-}
-
-.bestplayers-rank {
-	position: absolute;
-	top: -10px;
-	left: -10px;
-	display: flex;
-	align-items: center;
-}
-
-.bestplayers-rank>p {
-	margin: 0;
-}
-
-.bestplayers-rank-hashtag {
-	color: #000;
-	font-size: 25px;
-	font-family: Inter;
-	font-style: normal;
-	font-weight: 600;
-	line-height: normal;
-}
-
-.bestplayers-rank-index {
-	color: #000;
-	font-size: 30px;
-	font-family: Inter;
-	font-style: normal;
-	font-weight: 600;
-	line-height: normal;
-}
-
-
-.bestplayers-user-username {
-	padding-top: 5px;
-	color: #000;
-	font-size: 21px;
-	font-family: Inter;
-	font-style: normal;
-	font-weight: 700;
-	line-height: normal;
-}
-
-.bestplayers-user-elo {
-	padding-top: 15px;
-	color: #000;
-	font-size: 25px;
-	font-family: Inter;
-	font-style: normal;
-	font-weight: 600;
-	line-height: normal;
-}
-
-.bestplayers-user-stats>p {
-	margin: 0;
-
-	color: rgba(0, 0, 0, 0.90);
-	font-size: 12px;
-	font-family: Inter;
-	font-style: normal;
-	font-weight: 500;
-	line-height: normal;
-}
-
-.bestplayers-user-stats {
-	margin-top: 10px;
-	display: flex;
-	flex-direction: column;
-}
-
 
 /* //////////// 	LADDER USERS	//////////// */
 
@@ -139,6 +32,7 @@
 	font-style: normal;
 	font-weight: 600;
 	line-height: normal;
+	padding: 0 10px;
 }
 
 .ladderuser-elo {
@@ -148,12 +42,14 @@
 	font-style: normal;
 	font-weight: 600;
 	line-height: normal;
+	margin-left: auto; 
+	padding: 0 10px;
 }
 
 
 .ladderuser-rank {
 	position: absolute;
-	top: -15px;
+	top: -10px;
 	right: -10px;
 	display: flex;
 	align-items: center;
@@ -165,7 +61,7 @@
 
 .ladderuser-rank-hashtag {
 	color: #000;
-	font-size: 25px;
+	font-size: 20px;
 	font-family: Inter;
 	font-style: normal;
 	font-weight: 600;
@@ -174,7 +70,7 @@
 
 .ladderuser-rank-index {
 	color: #000;
-	font-size: 30px;
+	font-size: 25px;
 	font-family: Inter;
 	font-style: normal;
 	font-weight: 600;
@@ -182,24 +78,11 @@
 }
 
 
-
-
-
-
-
-
-
-
 @media screen and (max-width: 700px) {
-	.ladder-container {
+	.ladder {
 		grid-row: auto / span 19;
 		grid-column: 1 / -1;
 	}
 }
 
 
-@media (max-height: 350px) {
-	.container {
-		display: none;
-	}
-}
