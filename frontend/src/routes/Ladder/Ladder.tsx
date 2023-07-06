@@ -60,6 +60,7 @@ function LadderUsers({ ladder }: any) {
 
 						ladder.map((e: any, i: number) => i > 2 &&
 							<LadderUser
+								key={e.id}
 								user={e}
 								stats={e && e.stats}
 								index={i + 1}

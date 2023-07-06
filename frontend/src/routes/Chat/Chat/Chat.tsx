@@ -22,9 +22,10 @@ function ChatInterface() {
         <ChatInterfaceContext.Provider value={{ setAction }}>
             <div className="chat">
                 <div className="chat-container relative">
+                    <MenuElement />
                     <Outlet />
                     {
-                        action && 
+                        action &&
                         <ConfirmPage>
                             {action}
                         </ConfirmPage>

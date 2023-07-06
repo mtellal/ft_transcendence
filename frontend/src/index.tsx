@@ -69,18 +69,12 @@ const router = createBrowserRouter([
                 errorElement: <Navigate to="/chat" replace/>,
                 children: [
                     {
-                        path: "",
-                        errorElement: <Navigate to="/chat" replace/>,
-                        element:  <MenuElement />
-                    },
-                    {
                         path: "channel/create",
                         errorElement: <Navigate to="/chat" replace/>,
                         element:  <CreateChannel />
                     },
                     {
-                        path: "channel/:channelId",
-                        errorElement: <Navigate to="/chat" replace/>,
+                        path: "",
                         element:  <Interface />
                     },
                     {

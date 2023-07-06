@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom'
+import { NavLink, useParams } from 'react-router-dom'
 
 import Icon from '../Icon';
 import { getUserProfilePictrue } from '../../requests/user'
@@ -51,13 +51,13 @@ export function UserLabelSearch(props: TUserLabelSearch) {
 
     return (
         <div className='flex-ai UserLabelSearch-container'>
-            <UserInfos {...props}  />
+            <UserInfos {...props} />
             {
                 currentUserBlocked && !props.delete && !props.invitation &&
                 <p>Blocked</p>
             }
             {
-                !currentUserBlocked &&  props.add && !invitation &&
+                !currentUserBlocked && props.add && !invitation &&
                 <Icon
                     icon="add"
                     onClick={() => { props.onClick(); setInvitation(true) }}
@@ -79,16 +79,22 @@ export function UserLabelSearch(props: TUserLabelSearch) {
 type TUserLabel = TUserInfos & {
     id: number,
     notifs?: number,
+    message?: string,
     onClick?: () => {} | any
     disable?: boolean
 }
 
 export default function UserLabel(props: TUserLabel) {
 
+    const { userId } = useParams();
+    const [hover, setHover] = useState(false);
+
     return (
-        <NavLink to={!props.disable &&  `/chat/user/${props.id}`}
-            className="friend-element"
-            style={props.disable ? {cursor:'default'} : {}}
+        <NavLink to={!props.disable && `/chat/user/${props.id}`}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            className="user-label"
+            style={Number(userId) === props.id || hover ? { backgroundColor: '#fff3e6' } : { backgroundColor: 'white' }}
             onClick={() => props.onClick}
         >
             <UserInfos {...props} />

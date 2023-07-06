@@ -12,15 +12,23 @@ import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
 import { useNavigate } from "react-router-dom";
 import { getBlockList } from "../../../requests/block";
 import { getUserProfilePictrue } from "../../../requests/user";
-import Icon from "../../../components/Icon";
+import Icon, { CheckedIcon } from "../../../components/Icon";
 import ProfilePicture from "../../../components/users/ProfilePicture";
 import { UserInfos } from "../../../components/users/UserInfos";
 import { Block, Channel, User } from "../../../types";
 
+import search from '../../../assets/search.svg'
+import useradd from '../../../assets/User_Add.svg'
+import moreVertical from '../../../assets/moreVertical.svg'
+
+import './SearchElement.css'
+import useOutsideClick from "../../../hooks/useOutsideClick";
+
 export const SearchedChannelLabelContext: React.Context<any> = createContext(null);
 
 type TUserProps = {
-    user: User
+    user: User, 
+    resetInput?: () => void
 }
 
 function SearchedUserIconProfile(props: TUserProps) {
@@ -116,8 +124,8 @@ function SearchedUserIconFriend(props: TUserProps) {
         <div style={{ padding: '0 5px' }}>
             {
                 isUserFriend(props.user) ?
-                    <Icon
-                        icon="person_remove"
+                    <CheckedIcon
+                        icon={useradd}
                         onClick={() => {
                             setAction(
                                 <ConfirmView
@@ -133,19 +141,9 @@ function SearchedUserIconFriend(props: TUserProps) {
                     <>
                         {
                             !currentUserBlocked &&
-                            <Icon
-                                icon="person_add"
-                                onClick={() => {
-                                    setAction(
-                                        <ConfirmView
-                                            type="add"
-                                            username={props.user.username}
-                                            valid={() => { sendRequest(props.user); setAction(null) }}
-                                            cancel={() => setAction(null)}
-                                        />
-                                    )
-                                }}
-                                description="add"
+                            <CheckedIcon
+                                icon={useradd}
+                                onClick={() => sendRequest(props.user)}
                             />
                         }
                     </>
@@ -208,36 +206,76 @@ function SearchUserIconBlock(props: TUserProps) {
 }
 
 export function SearchedUser(props: TUserProps) {
-    const { user } = useCurrentUser();
+    const [showActions, setShowActions] = useState(false);
+    const ref = useOutsideClick(() => setShowActions(false))
+
+    const navigate = useNavigate();
+
+    const { user, token } = useCurrentUser();
+    const { channels } = useChannelsContext();
+    const { addChannel } = useChannels();
+
+    async function selectChannel() {
+        let channel;
+        if (channels && channels.length) {
+            channel = channels.find((c: Channel) =>
+                c.type === "WHISPER" && c.members.find((id: number) => props.user.id === id))
+        }
+        if (!channel) {
+            await getWhisperChannel(user.id, props.user.id, token)
+                .then(res => {
+                    if (res.data) {
+                        channel = res.data
+                    }
+                })
+        }
+        return (channel);
+    }
 
     return (
-        <div className='flex-ai UserLabelSearch-container'>
-            <UserInfos
-                user={props.user}
-            />
-
+        <div
+            className='flex-ai menu-searcheduser absolute white'
+            style={{ bottom: '-50px' }}
+        >
+            <div style={{ minWidth: 'auto' }}>
+                <UserInfos user={props.user} />
+            </div>
             <div
-                className="flex"
-                style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-start' }}
+                ref={ref}
+                className="flex relative"
+                style={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}
             >
                 {
                     props.user && props.user.id && user && props.user.id !== user.id &&
-                    <>
-                        <SearchedUserIconProfile
-                            user={props.user}
-                        />
-                        <SearchedUserIconChat
-                            user={props.user}
-                        />
-
-                        <SearchedUserIconFriend
-                            user={props.user}
-                        />
-                        <SearchUserIconBlock
-                            user={props.user}
-                        />
-                    </>
+                    <Icon icon={moreVertical} onClick={() => setShowActions((p: boolean) => !p)} />
                 }
+                <div
+                    className="absolute menu-searcheduser-actons"
+                    style={showActions ? { visibility: 'visible' } : { visibility: 'hidden' }}
+                    onClick={() => setShowActions((p: boolean) => !p)}
+                >
+                    <p className="menu-searcheduser-acton">add</p>
+                    <p 
+                        className="menu-searcheduser-acton"
+                        onClick={async () => {
+                            let channel = await selectChannel();
+                            if (!channel) {
+                                await createChannel({
+                                    name: "privateMessage",
+                                    type: "WHISPER",
+                                    members: [
+                                        props.user.id
+                                    ],
+                                }, token)
+                                    .then(res => { channel = res.data })
+                            }
+                            await addChannel(channel, false);
+                            navigate(`/chat/user/${props.user.id}`);
+                            props.resetInput();
+                        }}
+                    >message</p>
+                    <p className="menu-searcheduser-acton">block</p>
+                </div>
             </div>
         </div>
     )
@@ -318,21 +356,20 @@ function SearchedChannel(props: TSearchedChannel) {
 }
 
 
-type TMenuInput = {
+type TSearchInput = {
     id: number | any,
     blur?: boolean,
     value: string,
     setValue: (s: string) => {},
     submit?: () => {} | any,
-    onChange?: any
+    onChange?: any,
 }
 
-function MenuInput(props: TMenuInput) {
+function SearchInput(props: TSearchInput) {
     const inputRef: any = React.useRef();
 
     function onChange(e: any) {
         if (e.target.value.length <= 20) {
-
             props.setValue(e.target.value);
             if (props.onChange)
                 props.onChange(e)
@@ -348,12 +385,15 @@ function MenuInput(props: TMenuInput) {
     }
 
     return (
-        <div className="flex-column fill" style={{ paddingBottom: '15px' }}>
+        <div className="menu-searchinput" >
+            <div className="" style={{ marginRight: '5px' }}>
+                <img src={search} alt="search" />
+            </div>
             <input
+
+                id="menu-searchinput-input"
                 ref={inputRef}
-                id={props.id}
-                className="menuinput-input"
-                placeholder="Search ..."
+                placeholder="Search"
                 value={props.value}
                 onChange={onChange}
                 onKeyDown={handleKeyDown}
@@ -403,16 +443,20 @@ export default function SearchElement() {
     }
 
     return (
-        <div className="">
-            <MenuInput
+        <div
+            className="menu-searchelement relative"
+
+        >
+            <SearchInput
                 id="searchUser"
                 value={value}
                 setValue={setValue}
                 submit={() => searchUser()}
+                onChange={() => { setSearchedUser(null); setChannelList([]) }}
             />
             {error && <p className="reset red-c">{error}</p>}
             {
-                searchedUser && <SearchedUser user={searchedUser} />
+                searchedUser && <SearchedUser resetInput={() => reset()} user={searchedUser} />
             }
             {
                 channelList && channelList.length ?

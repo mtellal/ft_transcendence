@@ -8,11 +8,12 @@ import { User } from '../../types';
 
 
 export type TUserInfos = {
-    user: User
+    user: User,
+    message?: string,
     onClick?: () => {} | any
 }
 
-export function UserInfos({ user, onClick }: TUserInfos) {
+export function UserInfos({ user, message, onClick }: TUserInfos) {
 
     function selectStatusDiv() {
         if (user && user.userStatus === "ONLINE")
@@ -49,7 +50,7 @@ export function UserInfos({ user, onClick }: TUserInfos) {
                     <div className="flex-column user-infos">
                         <p className="userinfos-username" >{user && user.username}</p>
                         <p className="userinfos-status">
-                            {selectStatusText()}
+                            {message || selectStatusText()}
                         </p>
                     </div>
                 </>

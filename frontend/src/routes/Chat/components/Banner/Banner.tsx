@@ -20,6 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { Channel, User } from "../../../../types";
 
 
+import userIcon from '../../../../assets/User.svg'
+import useraddIcon from '../../../../assets/addUser.svg'
+import gameIcon from '../../../../assets/Gamepad.svg'
+import stopIcon from '../../../../assets/stop.svg'
+
+
+
 type TIconsBanner = {
     whisperUser: User,
     channel: Channel,
@@ -70,14 +77,14 @@ function IconsBanner(props: TIconsBanner) {
         <>
             {
                 props.type === "WHISPER" && props.whisperUser &&
-                <Icon icon="person" onClick={() => { navigate(`/user/${props.whisperUser.id}`) }} description="Profile" />
+                <Icon icon={userIcon} onClick={() => { navigate(`/user/${props.whisperUser.id}`) }} description="Profile" />
             }
             {
                 props.type !== "WHISPER" &&
-                <Icon icon="person" onClick={props.profile} description="Profile" />
+                <Icon icon={userIcon} onClick={props.profile} description="Profile" />
             }
             <Icon
-                icon="sports_esports"
+                icon={gameIcon}
                 onClick={() => {
                     setAction(
                         <SetInvitation
@@ -89,12 +96,12 @@ function IconsBanner(props: TIconsBanner) {
             />
             {
                 props.type === "WHISPER" && props.whisperUser &&
-                <Icon icon="block" onClick={bannerBlock} description="Block" />
+                <Icon icon={stopIcon} onClick={bannerBlock} description="Block" />
             }
             {
                 props.type === "WHISPER" && !isUserFriend(props.whisperUser) && !currentUserBlocked &&
                 <Icon
-                    icon="person_add"
+                    icon={useraddIcon}
                     onClick={() => {
                         setAction(
                             <ConfirmView
@@ -165,7 +172,7 @@ export default function Banner({ ...props }: TBanner) {
         <>
             <div className="banner">
                 <div className="flex-center" style={{ maxWidth: '100%' }} >
-                    <ArrowBackMenu />
+                   {/*  <ArrowBackMenu /> */}
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?
                             <UserInfos

@@ -49,9 +49,11 @@
     white-space: nowrap;
 }
 
-
 .userinfos-status {
-    display: flex;
     font-size: small;
     color: grey;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

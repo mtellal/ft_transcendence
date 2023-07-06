@@ -83,6 +83,9 @@
 	font-style: normal;
 	font-weight: 700;
 	line-height: normal;
+	max-width: 110px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .bestplayers-user-elo {

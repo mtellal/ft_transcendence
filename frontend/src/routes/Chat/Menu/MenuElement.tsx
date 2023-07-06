@@ -1,6 +1,6 @@
 
 import React, { useCallback, useState } from "react";
-import {  useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import UserLabel from "../../../components/users/UserLabel";
 import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
@@ -8,11 +8,17 @@ import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { FriendRequests } from "../components/FriendRequests/FriendRequests";
 import ChannelInfos from "../../../components/channels/ChannelInfos";
-import { CollectionElement } from "../../../components/collections/CollectionElement";
 import SearchElement from "./SearchElement";
 import './MenuElement.css'
 import { Channel, User } from "../../../types";
+import Icon from "../../../components/Icon";
 
+import edit from '../../../assets/Edit.png'
+import join from '../../../assets/Login.png'
+
+import arrowTop from '../../../assets/arrowTop.svg'
+import arrowBot from '../../../assets/arrowBot.svg'
+import ProfilePicture from "../../../components/users/ProfilePicture";
 
 
 export default function MenuElement() {
@@ -28,7 +34,6 @@ export default function MenuElement() {
     const [channelsList, setChannelsList] = useState([]);
     const [whispersList, setWhispersList] = useState([]);
 
-
     const setWhispers = useCallback(async () => {
         if (channels && channels.length) {
             const whispers = await Promise.all(
@@ -41,8 +46,12 @@ export default function MenuElement() {
                                 key={_user.id}
                                 id={_user.id}
                                 user={_user}
-                                onClick={() => {}}
+                                onClick={() => { }}
                                 notifs={_user.notifs}
+                                message={
+                                    channel.messages && channel.messages.length && 
+                                    channel.messages[channel.messages.length - 1].content
+                                }
                             />
                         )
                     }
@@ -59,7 +68,7 @@ export default function MenuElement() {
                     key={user.id}
                     id={user.id}
                     user={user}
-                    onClick={() => {}}
+                    onClick={() => { }}
                     disable={true}
                 />
             ))
@@ -74,7 +83,7 @@ export default function MenuElement() {
             setWhispers();
 
             setChannelsList(
-                channels.map((channel: Channel) =>
+                channels.filter((channel: Channel) =>
                     channel.type !== "WHISPER" && (
                         <div
                             key={channel.id}
@@ -99,25 +108,59 @@ export default function MenuElement() {
 
     }, [friends, channels])
 
+    console.log(channelsList)
+
     return (
-        <div className="menu-container fill">
-            <SearchElement />
+        <div className="menu-container">
+            <SearchElement 
+            />
             <FriendRequests />
-            <CollectionElement
-                title="Channels"
-                collection={channelsList}
-                add={true}
-            />
-            <CollectionElement
-                title="Whispers"
+            <MenuCollectionElement
+                title="Messages"
                 collection={whispersList}
+                borderTop={true}
             />
-            <CollectionElement
+            <MenuCollectionElement
                 title="Friends"
                 collection={friendsList}
+            />
+            <MenuCollectionElement
+                title="Channels"
+                collection={channelsList}
             />
         </div>
     )
 }
 
 
+
+type TCollectionElement = {
+    title: string,
+    collection: any[],
+    borderTop?: boolean,
+}
+
+export function MenuCollectionElement(props: TCollectionElement) {
+    const [show, setShow] = useState(props.title === "Messages");
+    return (
+        <div className="menu-collection">
+            <div className="menu-collection-label pointer"
+                onClick={() => setShow((p: boolean) => !p)}
+            >
+                <h2 className="reset menu-collection-title">{props.title}</h2>
+                <p className="menu-collection-length"
+                    style={{}}
+                >{props.collection && props.collection.length}</p>
+                <div className="flex" style={{ marginLeft: 'auto' }}>
+                    <img src={show ? arrowBot : arrowTop} style={{ marginLeft: '10px' }} />
+                </div>
+            </div>
+            {
+                show &&
+                <div className="flex-column">
+                    {props.collection}
+                </div>
+            }
+        </div>
+    )
+}

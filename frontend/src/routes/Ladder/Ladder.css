@@ -4,7 +4,8 @@
 	grid-row: 2 / span 18;
 	grid-column: auto / span 20;
 	padding: 5%;
-	overflow: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .ladder-container

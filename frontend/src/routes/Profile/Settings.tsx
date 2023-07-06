@@ -5,7 +5,7 @@ import { useCurrentUser } from "../../hooks/Hooks";
 import { enable2FARequest, getQRCodeRequest } from "../../requests/2fa";
 import Switch from 'react-switch';
 import arrowRight from '../../assets/ArrowRight.svg'
-import arrowBottom from '../../assets/ArrowBottom.svg'
+import arrowBottom from '../../assets/arrowBot.svg'
 import { User } from "../../types";
 
 import './Settings.css'

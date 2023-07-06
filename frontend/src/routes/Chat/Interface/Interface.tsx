@@ -83,6 +83,7 @@ export default function Interface() {
         }
     }, [whisperUser, user, currentChannel])
 
+    console.log(currentChannel)
 
     return (
         <>
@@ -105,7 +106,7 @@ export default function Interface() {
                         />
                     </div>
                     :
-                    <div className="fill flex-center">
+                    <div className="interface-container flex-center">
                         <p>No conversation found</p>
                     </div>
             }
