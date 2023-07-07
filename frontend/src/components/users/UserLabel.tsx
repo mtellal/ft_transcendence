@@ -117,14 +117,11 @@ type TUserLabel = TUserInfos & {
 export default function UserLabel(props: TUserLabel) {
 
     const { userId } = useParams();
-    const [hover, setHover] = useState(false);
 
     return (
         <NavLink to={`/chat/user/${props.id}`}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
             className="user-label"
-            style={(Number(userId) === props.id || hover) && !props.disable ? { backgroundColor: '#fff3e6' } : { backgroundColor: 'white' }}
+            style={Number(userId) === props.id && !props.disable ? { backgroundColor: '#fff3e6' } : { }}
             onClick={() => props.onClick}
         >
             <UserInfos {...props} />

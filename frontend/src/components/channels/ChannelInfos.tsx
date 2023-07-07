@@ -67,15 +67,12 @@ type TChannelLabel = {
 
 export function ChannelLabel(props: TChannelLabel) {
 
-    const { userId } = useParams();
-    const [hover, setHover] = useState(false);
+    const { channelId } = useParams();
 
     return (
         <NavLink to={`/chat/channel/${props.channel && props.channel.id}`}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
             className="user-label"
-            style={props.channel && (Number(userId) === props.channel.id || hover) && !props.disable ? { backgroundColor: '#fff3e6' } : { backgroundColor: 'white' }}
+            style={props.channel && Number(channelId) === props.channel.id && !props.disable ? { backgroundColor: '#fff3e6' } : { }}
             onClick={props.onClick && props.onClick}
         >
             <ChannelInfos {...props} />

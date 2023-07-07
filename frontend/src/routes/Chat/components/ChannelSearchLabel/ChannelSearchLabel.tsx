@@ -75,8 +75,7 @@ type TChannelSearch = {
     join: () => {} | any,
     leaveChannel: () => {} | any
 }
-
-export function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
+ function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
 
     const { user } = useCurrentUser();
     const { isChannelPrivate, isChannelProtected } = useChannels();
@@ -160,7 +159,10 @@ export function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
     );
 
     return (
-        <div className="flex-ai channelsearch-container">
+        <div
+            className='flex-ai menu-searcheduser absolute white'
+            style={{ bottom: '-50px' }}
+        >
             <h3 className="no-wrap">{channel.name} - </h3>
             {
                 isChannelPrivate(channel) &&

@@ -1,11 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { createChannel, getChannelByName, getWhisperChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 import { ChatInterfaceContext } from "../Chat/Chat";
 import { useChannelsContext, useCurrentUser } from "../../../hooks/Hooks";
 import { ConfirmView } from "../Profile/ChannelProfile/ConfirmAction";
-import { ChannelSearchLabel } from "../components/ChannelSearchLabel/ChannelSearchLabel";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import { useBlock } from "../../../hooks/Chat/useBlock";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
@@ -23,6 +22,7 @@ import moreVertical from '../../../assets/moreVertical.svg'
 
 import './SearchElement.css'
 import useOutsideClick from "../../../hooks/useOutsideClick";
+import ChannelInfos from "../../../components/channels/ChannelInfos";
 
 export const SearchedChannelLabelContext: React.Context<any> = createContext(null);
 
@@ -31,185 +31,15 @@ type TUserProps = {
     resetInput?: () => void
 }
 
-function SearchedUserIconProfile(props: TUserProps) {
+export function SearchedUser(props: TUserProps) {
 
     const navigate = useNavigate();
-
-    return (
-        <div style={{ padding: '0 5px' }}>
-            <Icon
-                icon="person"
-                onClick={async () => props.user && navigate(`/user/${props.user.id}`)}
-                description="profile"
-            />
-        </div>
-    )
-}
-
-function SearchedUserIconChat(props: TUserProps) {
-
-    const navigate = useNavigate();
-
-    const { user, token } = useCurrentUser();
-    const { channels } = useChannelsContext();
-    const { addChannel } = useChannels();
-
-    async function selectChannel() {
-        let channel;
-        if (channels && channels.length) {
-            channel = channels.find((c: Channel) =>
-                c.type === "WHISPER" && c.members.find((id: number) => props.user.id === id))
-        }
-        if (!channel) {
-            await getWhisperChannel(user.id, props.user.id, token)
-                .then(res => {
-                    if (res.data) {
-                        channel = res.data
-                    }
-                })
-        }
-        return (channel);
-    }
-
-    return (
-        <div style={{ padding: '0 5px' }}>
-            <Icon
-                icon="chat"
-                onClick={async () => {
-                    let channel = await selectChannel();
-                    if (!channel) {
-                        await createChannel({
-                            name: "privateMessage",
-                            type: "WHISPER",
-                            members: [
-                                props.user.id
-                            ],
-                        }, token)
-                            .then(res => { channel = res.data })
-                    }
-                    await addChannel(channel, false);
-                    navigate(`/chat/user/${props.user.id}`)
-                }}
-                description="chat"
-            />
-        </div>
-    )
-}
-
-
-function SearchedUserIconFriend(props: TUserProps) {
-
-    const { user, token } = useCurrentUser();
-    const { setAction } = useContext(ChatInterfaceContext);
-
-    const { sendRequest } = useFriendRequest();
-    const { isUserFriend, removeFriend } = useFriends();
-
-    const [currentUserBlocked, setCurrentUserBlocked] = useState(false);
-
-    async function loadBlockList() {
-        const blockList = await getBlockList(props.user && props.user.id, token).then(res => res.data);
-        if (blockList && blockList.length && blockList.find((o: Block) => o.userId === user.id))
-            setCurrentUserBlocked(true);
-    }
-
-
-    useEffect(() => {
-        if (props.user && props.user.id) {
-            loadBlockList();
-        }
-    }, [props.user])
-
-    return (
-        <div style={{ padding: '0 5px' }}>
-            {
-                isUserFriend(props.user) ?
-                    <CheckedIcon
-                        icon={useradd}
-                        onClick={() => {
-                            setAction(
-                                <ConfirmView
-                                    type="remove"
-                                    username={props.user.username}
-                                    valid={() => { removeFriend(props.user, true); setAction(null) }}
-                                    cancel={() => setAction(null)}
-                                />
-                            )
-                        }}
-                        description="remove"
-                    /> :
-                    <>
-                        {
-                            !currentUserBlocked &&
-                            <CheckedIcon
-                                icon={useradd}
-                                onClick={() => sendRequest(props.user)}
-                            />
-                        }
-                    </>
-
-            }
-        </div>
-    )
-}
-
-function SearchUserIconBlock(props: TUserProps) {
-
     const { setAction } = useContext(ChatInterfaceContext);
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
 
-    const [userBlocked, setUserBlocked] = useState(isUserBlocked(props.user));
-
-    const block = useCallback(() => {
-        if (userBlocked) {
-            setUserBlocked(false);
-            setAction(
-                <ConfirmView
-                    type="unblock"
-                    username={props.user.username}
-                    valid={() => { unblockUser(props.user); setAction(null) }}
-                    cancel={() => setAction(null)}
-                />
-            )
-        }
-        else {
-            setUserBlocked(true);
-            setAction(
-                <ConfirmView
-                    type="block"
-                    username={props.user.username}
-                    valid={() => { blockUser(props.user); setAction(null) }}
-                    cancel={() => setAction(null)}
-                />
-            )
-        }
-    }, [userBlocked])
-
-
-    return (
-        <div style={{ padding: '0 5px' }}>
-            {
-                userBlocked ?
-                    <Icon
-                        icon="block"
-                        onClick={() => block()}
-                        description="unblock"
-                    /> :
-                    <Icon
-                        icon="block"
-                        onClick={() => block()}
-                        description="block"
-                    />
-            }
-        </div>
-    )
-}
-
-export function SearchedUser(props: TUserProps) {
     const [showActions, setShowActions] = useState(false);
     const ref = useOutsideClick(() => setShowActions(false))
 
-    const navigate = useNavigate();
 
     const { user, token } = useCurrentUser();
     const { channels } = useChannelsContext();
@@ -266,13 +96,75 @@ export function SearchedUser(props: TUserProps) {
                             props.resetInput();
                         }}
                     >message</p>
-                    <p className="menu-searcheduser-acton">block</p>
+                    <p
+                        className="menu-searcheduser-acton"
+                        onClick={() => {
+                            setAction(
+                                <ConfirmView
+                                    type="block"
+                                    username={props.user.username}
+                                    valid={() => { blockUser(props.user); setAction(null) }}
+                                    cancel={() => setAction(null)}
+                                />
+                            )
+                        }}
+
+                    >block</p>
+                </div>
+            </div>
+        </div >
+    )
+}
+
+type TChannelSearchLabel = {
+    channel: Channel,
+    notifs?: number,
+    onClick?: () => {} | any
+    disable?: boolean
+}
+
+export function ChannelSearchLabel(props: TChannelSearchLabel) {
+
+    const settingsRef: any = useRef();
+
+    const navigate = useNavigate();
+    const { setAction } = useContext(ChatInterfaceContext);
+
+    const [showActions, setShowActions] = useState(false);
+    const ref = useOutsideClick(() => setShowActions(false))
+
+    return (
+        <div className="flex-ai menu-searcheduser white"
+            style={{ margin: '5px auto 0 auto', }}
+            onClick={props.onClick && props.onClick}
+        >
+            <ChannelInfos {...props} />
+            <div
+                ref={ref}
+                className="flex"
+                style={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}
+            >
+                <div ref={settingsRef} style={{ height: '30px', marginLeft: '5px' }}>
+                    <Icon icon={moreVertical} onClick={() => setShowActions((p: boolean) => !p)} />
+                </div>
+                <div
+                    className="absolute menu-searcheduser-actons-channel"
+                    style={showActions ? { visibility: 'visible', zIndex: '5', bottom: `${settingsRef.current.offsetBottom}px` } : { visibility: 'hidden' }}
+                    onClick={() => setShowActions((p: boolean) => !p)}
+                >
+                    <p
+                        className="menu-searcheduser-acton"
+                    >
+                        Join
+                    </p>
+                    <p
+                        className="menu-searcheduser-acton"
+                    >Message</p>
                 </div>
             </div>
         </div>
     )
 }
-
 
 type TSearchedChannel = {
     channels: Channel[],
@@ -322,10 +214,7 @@ function SearchedChannel(props: TSearchedChannel) {
                             <ChannelSearchLabel
                                 key={c.id}
                                 channel={c}
-                                join={() => joinChannel(c)}
-                                leaveChannel={() => _leaveChannel(c)}
                             />
-
                         )
                     })
                 )
@@ -337,12 +226,14 @@ function SearchedChannel(props: TSearchedChannel) {
         load();
     }, [props.channels, channels])
 
-
     return (
         <SearchedChannelLabelContext.Provider value={{ reset: props.reset }}>
-            {
-                renderChannels
-            }
+            <div className="absolute"
+                style={{ zIndex: '3', width: '100%', bottom: `-${renderChannels.length * 60}px`, alignItems: 'center' }}>
+                {
+                    renderChannels
+                }
+            </div>
         </SearchedChannelLabelContext.Provider>
     )
 }

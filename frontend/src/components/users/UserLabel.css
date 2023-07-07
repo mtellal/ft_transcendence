@@ -10,6 +10,11 @@
     text-decoration: none;
     color: black;
     align-items: center;
+    background-color: white;
+}
+
+.user-label:hover {
+    background-color: #fff3e6;
 }
 
 /*   U S E R    L A B E L   S E A R C H   */

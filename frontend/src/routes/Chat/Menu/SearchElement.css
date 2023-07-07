@@ -48,11 +48,22 @@
 
 .menu-searcheduser-actons {
     bottom: -70px;
-    right: 40px;
-    z-index: 3;
+    right: 30px;
     border: 1px solid black;
     border-radius: 3px;
 }
+
+.menu-searcheduser-actons-channel {
+    right: 50px;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+
+.menu-searcheduser-actons-channel>p {
+    margin: 0;
+    padding: 10px 15px;
+}
+
 
 .menu-searcheduser-actons>p {
     margin: 0;

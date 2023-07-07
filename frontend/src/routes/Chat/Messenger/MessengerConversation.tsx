@@ -172,7 +172,7 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
     }, [messagesContainerRef, authors, hidden])
 
     return (
-        <div className={hidden ? "messages-display hidden" : "messages-display visible"} ref={messagesContainerRef}>
+        <div style={{paddingBottom: '60px'}} className={hidden ? "messages-display hidden " : "messages-display visible"} ref={messagesContainerRef}>
             {
                 !messages.length || !authors.length ?
                     <NoMessages />

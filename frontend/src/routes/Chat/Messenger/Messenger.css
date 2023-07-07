@@ -8,6 +8,7 @@
 
 .messages-input
 {
+    background-color: none;
     padding: 10px 0;
     word-wrap: break-word;
     display: flex;
@@ -19,7 +20,12 @@
 
 .messenger-input
 {
-    margin: 0;
+    position: absolute;
+    bottom: 0;
+    background-color: white;
+    align-self: center;
+
+    margin-bottom: 10px;
     padding: 10px 10px;
     align-items: center;
     font-family: 'inter', sans-serif;

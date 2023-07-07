@@ -44,8 +44,6 @@ export default function MessengerInput(props: TMessengerInput) {
 
 
     return (
-        <div className={props.hidden ? "messages-input hidden" : "messages-input visible"}
-        >
             <form className="messenger-input flex-ai">
                 <input
                     style={{width: '100%', height: '100%', border: 'none'}}
@@ -57,6 +55,5 @@ export default function MessengerInput(props: TMessengerInput) {
                 />
                 <img src={sendIcon} />
             </form>
-        </div>
     )
 }
