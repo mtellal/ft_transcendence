@@ -47,12 +47,14 @@ export function CreateChannel() {
             password,
         }, token)
             .then(res => {
+                console.log(res);
                 if (res.data) {
                     channel = res.data;
                     addChannel(res.data, false)
                     setCurrentChannel(res.data);
                 }
             })
+        console.log("Channel created => ", channel)
         if (channel)
             navigate(`/chat/channel/${channel.id}`)
         else
@@ -60,24 +62,26 @@ export function CreateChannel() {
     }
 
     return (
-        <div className="scroll"
-            style={{padding: '5%', height: '90%'}}
+        <div className="scroll flex-column"
+            style={{ padding: '5%', flex: 3 }}
         >
-            <div className="flex">
+            {/* <div className="flex">
                 <ArrowBackMenu
                     title="Channel"
                     path="/chat"
                 />
-            </div>
+            </div> */}
             <h2>Create a channel</h2>
-            <InfoInput
-                id="name"
-                label="Name"
-                value={name}
-                setValue={setName}
-                submit={() => {}}
-                maxLength={20}
-            />
+            <div>
+                <InfoInput
+                    id="name"
+                    label="Name"
+                    value={name}
+                    setValue={setName}
+                    submit={() => { }}
+                    maxLength={20}
+                />
+            </div>
             {
                 type === "protected" &&
                 <InfoInput
@@ -89,9 +93,9 @@ export function CreateChannel() {
                     maxLength={30}
                 />
             }
-            <div style={{ paddingBottom: '20px', overflow: 'visible' }}>
+            <div style={{ paddingBottom: '20px' }}>
 
-                <h2>Access</h2>
+                <h3>Access</h3>
                 <PickMenu
                     title="Visibility"
                     collection={["public", "protected", "private"]}

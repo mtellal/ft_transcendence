@@ -1,0 +1,17 @@
+.channeluserlabel {
+    height: 60px;
+    padding: 0 2%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgb(112, 112, 112);
+    text-decoration: none;
+    color: black;
+    align-items: center;
+}
+
+.channeluserlabel-icons {}
+
+.channeluserlabel-icons>div {
+    height: 40px;
+}

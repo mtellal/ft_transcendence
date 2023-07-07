@@ -1,6 +1,6 @@
 
 import React, { useCallback, useState } from "react";
-import { UserLabelSearch } from "../../../../components/users/UserLabel";
+import { UserLabelFriendRequest, UserLabelSearch } from "../../../../components/users/UserLabel";
 
 import { useFriendsContext } from "../../../../hooks/Hooks";
 
@@ -9,6 +9,7 @@ import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendReques
 import './FriendRequests.css'
 import { CollectionElement } from "../../../../components/collections/CollectionElement";
 import { FriendRequest, User } from "../../../../types";
+import { MenuCollectionElement } from "../../Menu/MenuElement";
 
 export function FriendRequests() {
 
@@ -17,7 +18,6 @@ export function FriendRequests() {
     const { acceptFriend, refuseFriend } = useFriendRequest();
 
     const [userInvitations, setUserInvitations]: [any, any] = useState([]);
-    const [invitations, setInvitations]: [any, any] = useState([]);
 
     const loadInvitations = useCallback(async () => {
         const users = await fetchUsers(friendInvitations.map((r: FriendRequest) => r.sendBy));
@@ -25,43 +25,31 @@ export function FriendRequests() {
             setUserInvitations(users);
     }, [friendInvitations, fetchUsers])
 
-
     React.useEffect(() => {
         if (friendInvitations && friendInvitations.length) {
             loadInvitations();
         }
         else {
-            setInvitations([]);
             setUserInvitations([]);
         }
     }, [friendInvitations, loadInvitations])
-
-
-    React.useEffect(() => {
-        if (userInvitations && userInvitations.length) {
-            setInvitations(userInvitations.map((u: User) =>
-                <UserLabelSearch
-                    key={u.id}
-                    id={u.id}
-                    user={u}
-                    invitation={true}
-                    accept={() => acceptFriend(u)}
-                    refuse={() => refuseFriend(u)}
-                />
-            ))
-        }
-        else
-            setInvitations([]);
-    }, [userInvitations, acceptFriend, refuseFriend])
-
 
     return (
         <>
             {
                 userInvitations.length ?
-                    <CollectionElement
+                    <MenuCollectionElement
                         title="Invitations"
-                        collection={invitations}
+                        collection={
+                            userInvitations.map((u: User) =>
+                                <UserLabelFriendRequest
+                                    key={u.id}
+                                    user={u}
+                                    accept={() => acceptFriend(u)}
+                                    refuse={() => refuseFriend(u)}
+                                />
+                            )
+                        }
                     />
                     :
                     null

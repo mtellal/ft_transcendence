@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom'
 
 import Icon from '../Icon';
@@ -9,6 +9,11 @@ import { TUserInfos, UserInfos } from './UserInfos';
 import './UserLabel.css'
 import { getBlockList } from '../../requests/block';
 import { useCurrentUser } from '../../hooks/Hooks';
+
+import check from '../../assets/Check.svg'
+import cross from '../../assets/Cross.svg'
+import { User } from '../../types';
+
 
 type TUserLabelSearch = TUserInfos & {
     id: number,
@@ -65,7 +70,7 @@ export function UserLabelSearch(props: TUserLabelSearch) {
             }
             {props.invitation &&
                 <>
-                    <Icon icon="done" onClick={props.accept} />
+                    <Icon icon={check} onClick={props.accept} />
                     <Icon icon="close" onClick={props.refuse} />
                 </>
             }
@@ -75,6 +80,31 @@ export function UserLabelSearch(props: TUserLabelSearch) {
         </div>
     )
 }
+
+
+type TUserLabelFriendRequest = TUserInfos & {
+    user: User,
+    accept: () => {} | any,
+    refuse: () => {} | any,
+}
+
+export function UserLabelFriendRequest(props: TUserLabelFriendRequest) {
+    return (
+        <div className='flex-ai user-label'>
+            <UserInfos user={props.user} />
+            <div className='userlabel-friend-request'>
+                <div>
+                    <Icon icon={check} onClick={props.accept} />
+                </div>
+                <div>
+                    <Icon icon={cross} onClick={props.refuse} />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
 
 type TUserLabel = TUserInfos & {
     id: number,
@@ -90,11 +120,11 @@ export default function UserLabel(props: TUserLabel) {
     const [hover, setHover] = useState(false);
 
     return (
-        <NavLink to={!props.disable && `/chat/user/${props.id}`}
+        <NavLink to={`/chat/user/${props.id}`}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
             className="user-label"
-            style={Number(userId) === props.id || hover ? { backgroundColor: '#fff3e6' } : { backgroundColor: 'white' }}
+            style={(Number(userId) === props.id || hover) && !props.disable ? { backgroundColor: '#fff3e6' } : { backgroundColor: 'white' }}
             onClick={() => props.onClick}
         >
             <UserInfos {...props} />

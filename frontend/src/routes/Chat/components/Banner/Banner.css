@@ -1,8 +1,9 @@
 .banner
 {
+    min-height: 70px;
     border-bottom: 1px solid black;
     display: flex;
-    padding: 10px 10px;
+    padding: 0 10px;
     flex-wrap: wrap;
 }
 
@@ -26,6 +27,11 @@
     width: 100%;
 }
 
+.banner-icons-container > div
+{
+    height: 60px;
+}
+
 .mobile-iconsbanner
 {
     padding: 5px 0;
@@ -34,4 +40,9 @@
     align-items: center;
     justify-content: space-around;
     width: 100%;
+}
+
+.iconsbanner > div {
+    height: 40px;
+    align-self: center;
 }

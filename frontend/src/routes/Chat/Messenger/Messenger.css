@@ -2,7 +2,7 @@
 /*  ////////    CHAT MESSAGES   ///////// */
 .messages-display
 {
-    flex: 7;
+    height: 100%;
     overflow-y: scroll;
 }
 

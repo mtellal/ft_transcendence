@@ -1,3 +1,22 @@
+.channelinfos
+{
+
+}
+
+.channelinfos-infos
+{
+
+}
+
+.channelinfos-infos > p {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.channelinfos-infos-members {
+    
+}
+
 .channelinfos-pp-container
 {
     height: 35px;

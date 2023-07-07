@@ -7,7 +7,7 @@ import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../
 
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { FriendRequests } from "../components/FriendRequests/FriendRequests";
-import ChannelInfos from "../../../components/channels/ChannelInfos";
+import ChannelInfos, { ChannelLabel } from "../../../components/channels/ChannelInfos";
 import SearchElement from "./SearchElement";
 import './MenuElement.css'
 import { Channel, User } from "../../../types";
@@ -20,13 +20,14 @@ import arrowTop from '../../../assets/arrowTop.svg'
 import arrowBot from '../../../assets/arrowBot.svg'
 import ProfilePicture from "../../../components/users/ProfilePicture";
 
+import plusIcon from '../../../assets/Plus.svg'
+import joinIcon from '../../../assets/Login.svg'
 
 export default function MenuElement() {
 
     const navigate = useNavigate();
 
     const { user } = useCurrentUser();
-    const { fetchUser } = useFetchUsers();
     const { friends } = useFriendsContext();
     const { channels } = useChannelsContext();
 
@@ -34,29 +35,38 @@ export default function MenuElement() {
     const [channelsList, setChannelsList] = useState([]);
     const [whispersList, setWhispersList] = useState([]);
 
+    function extractLastMessage(channel: Channel) {
+        if (channel.messages && channel.messages.length)
+        {
+            for (let i = channel.messages.length - 1 ; i >= 0; i--)
+            {
+                if (channel.messages[i].type === "MESSAGE")
+                    return (channel.messages[i].content)
+            }
+        }
+    }
+
     const setWhispers = useCallback(async () => {
         if (channels && channels.length) {
-            const whispers = await Promise.all(
+            let whispers = await Promise.all(
                 channels.map(async (channel: Channel) => {
                     if (channel.type === "WHISPER" && channel.members.length === 2) {
-                        const _userId = channel.members.find((id: number) => id !== user.id);
-                        const _user = await fetchUser(_userId);
+                        const _friend = channel.users.find((f: User) => f.id !== user.id);
+                        if (!_friend)
+                            return (null);
                         return (
                             <UserLabel
-                                key={_user.id}
-                                id={_user.id}
-                                user={_user}
+                                key={_friend.id}
+                                id={_friend.id}
+                                user={_friend}
                                 onClick={() => { }}
-                                notifs={_user.notifs}
-                                message={
-                                    channel.messages && channel.messages.length && 
-                                    channel.messages[channel.messages.length - 1].content
-                                }
+                                message={extractLastMessage(channel)}
                             />
                         )
                     }
                 })
             )
+            whispers = whispers.filter((c: Channel) => c);
             setWhispersList(whispers)
         }
     }, [channels]);
@@ -82,24 +92,15 @@ export default function MenuElement() {
         if (channels && channels.length) {
             setWhispers();
 
-            setChannelsList(
-                channels.filter((channel: Channel) =>
-                    channel.type !== "WHISPER" && (
-                        <div
-                            key={channel.id}
-                            className="pointer"
-                            style={{ borderTop: '1px solid black' }}
-                            onClick={() => {
-                                navigate(`/chat/channel/${channel.id}`)
-                            }}
-                        >
-                            <ChannelInfos
-                                key={channel.id}
-                                channel={channel}
-                            />
-                        </div>
-                    ))
-            )
+            let c = channels.map((channel: Channel) =>
+                channel.type !== "WHISPER" && (
+                    <ChannelLabel
+                        key={channel.id}
+                        channel={channel}
+                    />
+                ))
+            c = c.filter((c: Channel) => c)
+            setChannelsList(c);
         }
 
         if (friends && friends.length) {
@@ -108,11 +109,10 @@ export default function MenuElement() {
 
     }, [friends, channels])
 
-    console.log(channelsList)
 
     return (
         <div className="menu-container">
-            <SearchElement 
+            <SearchElement
             />
             <FriendRequests />
             <MenuCollectionElement
@@ -124,9 +124,10 @@ export default function MenuElement() {
                 title="Friends"
                 collection={friendsList}
             />
-            <MenuCollectionElement
+            <MenuCollectionChannel
                 title="Channels"
                 collection={channelsList}
+                icon={plusIcon}
             />
         </div>
     )
@@ -138,6 +139,7 @@ type TCollectionElement = {
     title: string,
     collection: any[],
     borderTop?: boolean,
+    icon?: any
 }
 
 export function MenuCollectionElement(props: TCollectionElement) {
@@ -152,6 +154,55 @@ export function MenuCollectionElement(props: TCollectionElement) {
                     style={{}}
                 >{props.collection && props.collection.length}</p>
                 <div className="flex" style={{ marginLeft: 'auto' }}>
+                    <img src={show ? arrowBot : arrowTop} style={{ marginLeft: '10px' }} />
+                </div>
+            </div>
+            {
+                show &&
+                <div className="flex-column">
+                    {props.collection}
+                </div>
+            }
+        </div>
+    )
+}
+
+type TCollectionChannel = {
+    title: string,
+    collection: any[],
+    borderTop?: boolean,
+    icon?: any
+}
+
+export function MenuCollectionChannel(props: TCollectionChannel) {
+    const navigate = useNavigate();
+    const [show, setShow] = useState(false);
+
+    return (
+        <div className="menu-collection">
+            <div className="menu-collection-label pointer"
+                onClick={() => setShow((p: boolean) => !p)}
+            >
+                <h2 className="reset menu-collection-title">{props.title}</h2>
+                <p className="menu-collection-length"
+                    style={{}}
+                >{props.collection && props.collection.length}</p>
+                <div className="flex" style={{ marginLeft: 'auto' }}>
+                    <div className="flex " style={{ height: '30px', gap: '5px' }}>
+                        <Icon
+                            icon={plusIcon}
+                            hoverColor="white"
+                            onClick={() => {
+                                setShow((p: boolean) => !p);
+                                navigate("/chat/channel/create")
+                            }}
+                        />
+                        <Icon
+                            icon={joinIcon}
+                            hoverColor="white"
+                            onClick={() => { setShow((p: boolean) => !p); }}
+                        />
+                    </div>
                     <img src={show ? arrowBot : arrowTop} style={{ marginLeft: '10px' }} />
                 </div>
             </div>

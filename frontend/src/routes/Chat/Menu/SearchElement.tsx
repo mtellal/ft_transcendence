@@ -27,7 +27,7 @@ import useOutsideClick from "../../../hooks/useOutsideClick";
 export const SearchedChannelLabelContext: React.Context<any> = createContext(null);
 
 type TUserProps = {
-    user: User, 
+    user: User,
     resetInput?: () => void
 }
 
@@ -213,24 +213,9 @@ export function SearchedUser(props: TUserProps) {
 
     const { user, token } = useCurrentUser();
     const { channels } = useChannelsContext();
-    const { addChannel } = useChannels();
+    const { addChannel, selectWhisperChannel } = useChannels();
+    const { sendRequest } = useFriendRequest();
 
-    async function selectChannel() {
-        let channel;
-        if (channels && channels.length) {
-            channel = channels.find((c: Channel) =>
-                c.type === "WHISPER" && c.members.find((id: number) => props.user.id === id))
-        }
-        if (!channel) {
-            await getWhisperChannel(user.id, props.user.id, token)
-                .then(res => {
-                    if (res.data) {
-                        channel = res.data
-                    }
-                })
-        }
-        return (channel);
-    }
 
     return (
         <div
@@ -254,11 +239,18 @@ export function SearchedUser(props: TUserProps) {
                     style={showActions ? { visibility: 'visible' } : { visibility: 'hidden' }}
                     onClick={() => setShowActions((p: boolean) => !p)}
                 >
-                    <p className="menu-searcheduser-acton">add</p>
-                    <p 
+                    <p
+                        className="menu-searcheduser-acton"
+                        onClick={() => sendRequest(props.user)}
+                    >
+                        add
+                    </p>
+
+
+                    <p
                         className="menu-searcheduser-acton"
                         onClick={async () => {
-                            let channel = await selectChannel();
+                            let channel = await selectWhisperChannel(props.user);
                             if (!channel) {
                                 await createChannel({
                                     name: "privateMessage",

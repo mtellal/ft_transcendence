@@ -6,8 +6,10 @@ import {
 } from "../../../hooks/Hooks";
 import './Messenger.css'
 
+import sendIcon from '../../../assets/Paper_Plane.svg'
+
 type TMessengerInput = {
-    blockedFriend: boolean, 
+    blockedFriend: boolean,
     hidden: boolean
 }
 
@@ -19,8 +21,7 @@ export default function MessengerInput(props: TMessengerInput) {
     const [value, setValue] = React.useState("");
 
     const handleChange = useCallback((e: any) => {
-        if (e.target.value.length <= 200)
-        {
+        if (e.target.value.length <= 200) {
             setValue(e.target.value)
         }
     }, []);
@@ -45,14 +46,17 @@ export default function MessengerInput(props: TMessengerInput) {
     return (
         <div className={props.hidden ? "messages-input hidden" : "messages-input visible"}
         >
-            <input
-                className={props.hidden ? "messenger-input hidden" : "messenger-input visible"}
-                value={value}
-                onChange={handleChange}
-                placeholder={canSendMessages()}
-                onKeyDown={submit}
-                disabled={props.blockedFriend}
-            />
+            <form className="messenger-input flex-ai">
+                <input
+                    style={{width: '100%', height: '100%', border: 'none'}}
+                    value={value}
+                    onChange={handleChange}
+                    placeholder={canSendMessages()}
+                    onKeyDown={submit}
+                    disabled={props.blockedFriend}
+                />
+                <img src={sendIcon} />
+            </form>
         </div>
     )
 }

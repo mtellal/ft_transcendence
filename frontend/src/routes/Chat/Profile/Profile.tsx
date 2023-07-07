@@ -9,7 +9,7 @@ export default function Profile() {
     const { currentChannel } = useChannelsContext();
 
     return (
-        <div className="scroll">
+        <div className="scroll fill">
             {
                 currentChannel && currentChannel.users && currentChannel.type !== "WHISPER" &&
                 <ChannelProfile

@@ -12,33 +12,28 @@ import useFetchUsers from "../../../hooks/useFetchUsers";
 
 import './Interface.css'
 import { Channel, User } from "../../../types";
+import { createChannel } from "../../../requests/chat";
+import { useChannels } from "../../../hooks/Chat/useChannels";
 
 export const InterfaceContext: React.Context<any> = createContext(null);
 
 export default function Interface() {
-    const params:any = useParams();
+    const params: any = useParams();
 
     const { fetchUser } = useFetchUsers();
-    const { user }: any = useCurrentUser();
+    const { user, token }: any = useCurrentUser();
     const { isUserBlocked } = useBlock();
     const { friends }: any = useFriendsContext();
+    const { selectWhisperChannel, createWhisperChannel } = useChannels();
 
-    const { currentChannel, setCurrentChannel, channels } = useChannelsContext();
+    const { currentChannel, setCurrentChannel, channels, channelsLoaded } = useChannelsContext();
 
-    const [blockedFriend, setBlockedFriend]: [any, any] = React.useState(false);
+    const [blockedFriend, setBlockedFriend]: [any, any] = useState(false);
 
     const [profile, setProfile] = useState(false);
 
     const [whisperUser, setWhisperUser] = useState();
 
-    const selectWhisper = useCallback(async (_user: User) => {
-        let channel;
-        if (channels && channels.length && _user) {
-            channel = channels.find((c: Channel) => 
-                c && c.type === "WHISPER" && c.members.find((id: number) => _user.id === id))
-        }
-        return (channel);
-    }, [channels]);
 
     const isCurrentUserMember = useCallback((channel: Channel) => {
         if (user && channel && channel.members && channel.members.find((id: number) => id === user.id))
@@ -47,10 +42,10 @@ export default function Interface() {
     }, [user]);
 
     const loadInterface = useCallback(async () => {
+        let channel;
         if (params.channelId) {
             setWhisperUser(null);
-            let channel;
-            if (channels && channels.length)
+            if (channelsLoaded)
                 channel = channels.find((c: Channel) => c.id === Number(params.channelId));
             if (isCurrentUserMember(channel))
                 return (setCurrentChannel(channel));
@@ -58,22 +53,25 @@ export default function Interface() {
         else if (params.userId) {
             const user = await fetchUser(params.userId);
             setWhisperUser(user);
-            let channel;
-            if (user)
-                channel = await selectWhisper(user);
-            if (isCurrentUserMember(channel))
-                return (setCurrentChannel(channel));
+            if (user && channelsLoaded) {
+                channel = await selectWhisperChannel(user);
+                if (!channel)
+                    channel = await createWhisperChannel(Number(params.userId));
+                if (isCurrentUserMember(channel))
+                    return (setCurrentChannel(channel));
+            }
             return;
         }
-    }, [channels, friends]);
+    }, [channels, friends, channelsLoaded, params]);
 
- 
+
     useEffect(() => {
         loadInterface();
     }, [channels, friends, params])
 
 
     React.useEffect(() => {
+        setProfile(false);
         if (whisperUser && user && currentChannel && currentChannel.type === "WHISPER") {
             if (isUserBlocked(whisperUser))
                 setBlockedFriend(true);
@@ -82,8 +80,6 @@ export default function Interface() {
             setBlockedFriend(false)
         }
     }, [whisperUser, user, currentChannel])
-
-    console.log(currentChannel)
 
     return (
         <>

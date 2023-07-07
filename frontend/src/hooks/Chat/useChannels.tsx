@@ -3,6 +3,7 @@ import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
 import { useNavigate } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
 import { Channel, User } from "../../types";
+import { createChannel, getWhisperChannel } from "../../requests/chat";
 
 
 export function useChannels() {
@@ -178,6 +179,40 @@ export function useChannels() {
     }, [channels])
 
 
+    const selectWhisperChannel = useCallback(async (friend: User) => {
+        let channel = null;
+        if (channels && channels.length && friend) {
+            channel = channels.find((c: Channel) =>
+                c.type === "WHISPER" && c.members.find((id: number) => friend.id === id))
+        }
+        if (!channel && friend && user && token) {
+            await getWhisperChannel(user.id, Number(friend.id), token)
+                .then(res => {
+                    if (res.data) {
+                        channel = res.data
+                    }
+                })
+        }
+        return (channel);
+    }, [channels, user, token]);
+
+
+    const createWhisperChannel = useCallback(async (friendId: number) => {
+        let channel = null;
+        if (token && friendId)
+        {
+            await createChannel({
+                name: "privateMessage",
+                type: "WHISPER",
+                members: [
+                    friendId
+                ],
+            }, token)
+            .then(res => { channel = res.data })
+        }
+        return (channel);
+    }, [token])
+
     return (
         {
             isChannelPublic,
@@ -196,7 +231,9 @@ export function useChannels() {
             channelAlreadyExists,
             isLocalChannel,
             isLocalChannelsByName,
-            getChannelFromFriendName
+            getChannelFromFriendName,
+            selectWhisperChannel,
+            createWhisperChannel
         }
     )
 }

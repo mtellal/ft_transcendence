@@ -46,7 +46,7 @@ export default function Messenger(props: TMessenger) {
             messages = filterMessages(messages);
             setMessages(messages);
         }
-    }, [currentChannel, currentChannel.messages,  user])
+    }, [currentChannel, currentChannel.messages, user])
 
     useEffect(() => {
         if (currentChannel && currentChannel.messages && currentChannel.messages.length) {
@@ -65,15 +65,21 @@ export default function Messenger(props: TMessenger) {
         }
         >
             {
-                messages && currentChannel &&
-                <MessengerConversation
-                    messages={messages}
-                    {...props}
-                />
+                props.hidden ?
+                    null :
+                    <>
+                        {
+                            messages && currentChannel &&
+                            <MessengerConversation
+                                messages={messages}
+                                {...props}
+                            />
+                        }
+                        <MessengerInput
+                            {...props}
+                        />
+                    </>
             }
-            <MessengerInput
-                {...props}
-            />
         </MessengerContext.Provider>
     )
 }

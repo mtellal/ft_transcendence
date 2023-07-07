@@ -1,6 +1,5 @@
 .menu-searchelement {
-    height: 15%;
-
+    height: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
-import Icon from "../../../../components/Icon";
+import Icon, { CheckedIcon } from "../../../../components/Icon";
 import { UserInfos } from "../../../../components/users/UserInfos";
 import ChannelInfos from "../../../../components/channels/ChannelInfos";
 import { useChannelsContext, useCurrentUser } from "../../../../hooks/Hooks";
@@ -22,8 +22,10 @@ import { Channel, User } from "../../../../types";
 
 import userIcon from '../../../../assets/User.svg'
 import useraddIcon from '../../../../assets/addUser.svg'
+import userRemoveIcon from '../../../../assets/UserRemove.svg'
 import gameIcon from '../../../../assets/Gamepad.svg'
 import stopIcon from '../../../../assets/stop.svg'
+import exitIcon from '../../../../assets/Exit.svg'
 
 
 
@@ -74,83 +76,88 @@ function IconsBanner(props: TIconsBanner) {
     })
 
     return (
-        <>
+        <div className="iconsbanner flex" style={{ marginLeft: 'auto', gap: '20px' }}>
             {
                 props.type === "WHISPER" && props.whisperUser &&
-                <Icon icon={userIcon} onClick={() => { navigate(`/user/${props.whisperUser.id}`) }} description="Profile" />
+                <div>
+                    <Icon icon={userIcon} onClick={() => { navigate(`/user/${props.whisperUser.id}`) }} description="profile" />
+                </div>
             }
             {
                 props.type !== "WHISPER" &&
-                <Icon icon={userIcon} onClick={props.profile} description="Profile" />
+                <div>
+                    <Icon icon={userIcon} onClick={props.profile} description="profile" />
+                </div>
             }
-            <Icon
-                icon={gameIcon}
-                onClick={() => {
-                    setAction(
-                        <SetInvitation
-                            channelId={props.channel && props.channel.id}
-                        />
-                    )
-                }}
-                description="Invitation"
-            />
+            <div>
+                <Icon
+                    icon={gameIcon}
+                    onClick={() => {
+                        setAction(
+                            <SetInvitation
+                                channelId={props.channel && props.channel.id}
+                            />
+                        )
+                    }}
+                    description="invitation"
+                />
+            </div>
             {
                 props.type === "WHISPER" && props.whisperUser &&
-                <Icon icon={stopIcon} onClick={bannerBlock} description="Block" />
+                <div>
+                    <Icon icon={stopIcon} onClick={bannerBlock} description="block" />
+                </div>
             }
             {
                 props.type === "WHISPER" && !isUserFriend(props.whisperUser) && !currentUserBlocked &&
-                <Icon
-                    icon={useraddIcon}
-                    onClick={() => {
-                        setAction(
-                            <ConfirmView
-                                type="send a request friend to"
-                                username={props.whisperUser.username}
-                                valid={() => { sendRequest(props.whisperUser); setAction(null) }}
-                                cancel={() => setAction(null)}
-                            />
-                        )
-                    }}
-                    description="Leave"
-                />
+                <div>
+                    <CheckedIcon
+                        icon={useraddIcon}
+                        onClick={() => sendRequest(props.whisperUser)}
+                        description="add"
+                    />
+                </div>
             }
             {
                 props.type === "WHISPER" && isUserFriend(props.whisperUser) && !currentUserBlocked &&
-                <Icon
-                    icon="person_remove"
-                    onClick={() => {
-                        setAction(
-                            <ConfirmView
-                                type="remove"
-                                username={props.whisperUser.username}
-                                valid={() => { removeFriend(props.whisperUser, true); setAction(null) }}
-                                cancel={() => setAction(null)}
-                            />
-                        )
-                    }}
-                    description="Leave"
-                />
+                <div>
+                    <Icon
+                        icon={userRemoveIcon}
+                        onClick={() => {
+                            setAction(
+                                <ConfirmView
+                                    type="remove"
+                                    username={props.whisperUser.username}
+                                    valid={() => { removeFriend(props.whisperUser, true); setAction(null) }}
+                                    cancel={() => setAction(null)}
+                                />
+                            )
+                        }}
+                        description="remove"
+                    />
+                </div>
             }
             {
                 props.type !== "WHISPER" &&
-                <Icon
-                    icon="logout"
-                    onClick={() => {
-                        setAction(
-                            <ConfirmView
-                                type="leave"
-                                username={props.channel.name}
-                                valid={() => { leaveChannel(props.channel); setAction(null) }}
-                                cancel={() => setAction(null)}
-                            />
+                <div>
+                    <Icon
+                        icon={exitIcon}
+                        onClick={() => {
+                            setAction(
+                                <ConfirmView
+                                    type="leave"
+                                    username={props.channel.name}
+                                    valid={() => { leaveChannel(props.channel); setAction(null) }}
+                                    cancel={() => setAction(null)}
+                                />
 
-                        )
-                    }}
-                    description="Leave"
-                />
+                            )
+                        }}
+                        description="leave"
+                    />
+                </div>
             }
-        </>
+        </div>
     )
 
 }
@@ -172,7 +179,7 @@ export default function Banner({ ...props }: TBanner) {
         <>
             <div className="banner">
                 <div className="flex-center" style={{ maxWidth: '100%' }} >
-                   {/*  <ArrowBackMenu /> */}
+                    {/*  <ArrowBackMenu /> */}
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?
                             <UserInfos
@@ -190,7 +197,6 @@ export default function Banner({ ...props }: TBanner) {
                         <div className="mobile-iconsbanner">
                             <IconsBanner
                                 channel={currentChannel}
-                                whisperUser={props.whisperUser}
                                 mobile={true}
                                 {...props}
                             />
@@ -198,7 +204,6 @@ export default function Banner({ ...props }: TBanner) {
                         :
                         <IconsBanner
                             channel={currentChannel}
-                            whisperUser={props.whisperUser}
                             {...props}
                         />
                 }

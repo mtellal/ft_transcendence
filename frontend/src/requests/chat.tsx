@@ -66,6 +66,8 @@ export async function createChannel(channel: any, token: number | string) {
                 'Authorization': `Bearer ${token}`
             }
         })
+        .then(res => res)
+        .catch(err => err)
     )
 }
 
@@ -80,3 +82,18 @@ export async function getChannels(id: string | number, token: string) {
             .catch(err => err)
     )
 }
+
+
+
+export async function deleteChannelRequest(id: string | number, token: string) {
+    return (
+        axios.delete(`${back}/chat/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => res)
+            .catch(err => err)
+    )
+}
+

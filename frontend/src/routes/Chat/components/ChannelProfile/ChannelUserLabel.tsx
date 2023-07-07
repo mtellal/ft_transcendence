@@ -14,11 +14,24 @@ import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import { CollectionElement } from "../../../../components/collections/CollectionElement";
 import { User } from "../../../../types";
 
+
+import muteIcon from '../../../../assets/Chat_Close.svg'
+import unmuteIcon from '../../../../assets/Chat_Check.svg'
+import userAddIcon from '../../../../assets/User_Add.svg'
+import exitIcon from '../../../../assets/Exit.svg'
+import adminIcon from '../../../../assets/ShieldCheck.svg'
+import unadminIcon from '../../../../assets/ShieldCross.svg'
+import banIcon from '../../../../assets/User_Close.svg'
+import unbanIcon from '../../../../assets/User_Check.svg'
+
+
+import './ChannelUserLabel.css'
+
 type TCollectionUsers = {
     title: string,
-    users: User[], 
-    isAdmin?: boolean, 
-    currentUser?: User, 
+    users: User[],
+    isAdmin?: boolean,
+    currentUser?: User,
 }
 
 export function CollectionUsers(props: TCollectionUsers) {
@@ -78,7 +91,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
             return (
 
                 <Icon
-                    icon="cancel_schedule_send"
+                    icon={unmuteIcon}
                     description="Unmute"
                     onClick={() => {
                         setConfirmView(true);
@@ -96,7 +109,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
             return (
 
                 <Icon
-                    icon="schedule_send"
+                    icon={muteIcon}
                     description="Mute"
                     onClick={() => {
                         setConfirmView(true);
@@ -117,71 +130,72 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
             currentChannel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
             if (isUserBanned(props.user)) {
                 return (
-                    <Icon
-                        icon="lock_open"
-                        description="Unban"
-                        onClick={() => {
-                            setConfirmView(true);
-                            setUserAction(
-                                {
-                                    user: props.user,
-                                    function: unbanUser,
-                                    type: "unban"
-                                }
-                            )
-                        }}
-                    />
-                )
-            }
-            else if (props.user && !isUserMember(props.user)) {
-                if (props.isAddable) {
-                    return (
+                    <div>
                         <Icon
-                            icon="add"
-                            description="Add"
+                            icon={unbanIcon}
+                            description="Unban"
                             onClick={() => {
                                 setConfirmView(true);
                                 setUserAction(
                                     {
                                         user: props.user,
-                                        function: addMember,
-                                        type: "add"
+                                        function: unbanUser,
+                                        type: "unban"
                                     }
                                 )
                             }}
                         />
-                    )
-                }
-                else 
-                    return (<p>Blocked</p>)
+                    </div>
+                )
             }
-            else if (props.user) {
-                return (
-                    <div
-                        className="flex-center fill"
-                        style={{ justifyContent: 'space-around' }}
-                    >
-                        {
-                            isCurrentUserOwner && !isUserAdministrators(props.user) &&
+            else if (props.user && !isUserMember(props.user)) {
+                if (props.isAddable) {
+                    return (
+                        <div>
                             <Icon
-                                icon="add_moderator"
-                                description="make admin"
+                                icon={userAddIcon}
+                                description="Add"
                                 onClick={() => {
                                     setConfirmView(true);
                                     setUserAction(
                                         {
                                             user: props.user,
-                                            function: makeAdmin,
-                                            type: "make admin"
+                                            function: addMember,
+                                            type: "add"
                                         }
                                     )
                                 }}
                             />
+                        </div>
+                    )
+                }
+                else
+                    return (<p>Blocked</p>)
+            }
+            else if (props.user) {
+                return (
+                    <>
+                        {
+                            isCurrentUserOwner && !isUserAdministrators(props.user) &&
+                                <Icon
+                                    icon={adminIcon}
+                                    description="make admin"
+                                    onClick={() => {
+                                        setConfirmView(true);
+                                        setUserAction(
+                                            {
+                                                user: props.user,
+                                                function: makeAdmin,
+                                                type: "make admin"
+                                            }
+                                        )
+                                    }}
+                                />
                         }
                         {
                             isCurrentUserOwner && isUserAdministrators(props.user) &&
                             <Icon
-                                icon="remove_moderator"
+                                icon={unadminIcon}
                                 description="remove admin"
                                 onClick={() => {
                                     setConfirmView(true);
@@ -196,7 +210,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                             />
                         }
                         <Icon
-                            icon="logout"
+                            icon={exitIcon}
                             description="Kick"
                             onClick={() => {
                                 setConfirmView(true);
@@ -213,7 +227,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                             mutedIcon()
                         }
                         <Icon
-                            icon="person_off"
+                            icon={banIcon}
                             description="Ban"
                             onClick={() => {
                                 setConfirmView(true);
@@ -226,7 +240,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                                 )
                             }}
                         />
-                    </div>
+                    </>
                 )
             }
         }
@@ -254,17 +268,21 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
     }
 
     return (
-        <div className="friend-element">
+        <div className="channeluserlabel label">
             <UserInfos
                 user={props.user}
             />
-
-            {
-                props.showChannelStatus ?
-                    showChannelStatus()
-                    :
-                    functionalities()
-            }
+            <div className="channeluserlabel-icons flex-center"
+                style={{gap: '10px'}}
+            >
+                {
+                    props.showChannelStatus ?
+                        showChannelStatus()
+                        :
+                        functionalities()
+                }
+            </div>
         </div>
     )
 }
+

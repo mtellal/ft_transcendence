@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { getChannels } from "../../requests/chat";
+import { deleteChannelRequest, getChannels } from "../../requests/chat";
 import { useChatSocket, useCurrentUser } from "../../hooks/Hooks";
 import useFetchUsers from "../../hooks/useFetchUsers";
 import { Channel, Mute, User } from "../../types";
@@ -207,6 +207,7 @@ export function ChannelsProvider({ children }: any) {
     const [channels, channelsDispatch] = useReducer(reducer, []);
     const [currentChannel, setCurrentChannelLocal]: any = useState();
     const [channelsLoading, setChannelsLoading] = useState(false);
+    const [channelsLoaded, setChannelsLoaded] = useState(false);
 
     async function loadUsersChannels(channelList: Channel[]) {
         let users;
@@ -226,7 +227,8 @@ export function ChannelsProvider({ children }: any) {
 
 
     const loadChannels = useCallback(async () => {
-        setChannelsLoading(true)
+        setChannelsLoading(true);
+        setChannelsLoaded(false);
         let channelList;
         channelList = await getChannels(user.id, token).then(res => res.data);
         channelList = await loadUsersChannels(channelList);
@@ -236,7 +238,9 @@ export function ChannelsProvider({ children }: any) {
                 channelId: channel.id
             })
         });
-        setChannelsLoading(false)
+        // channelList.forEach((channel: Channel) => deleteChannelRequest(channel.id, token));
+        setChannelsLoading(false);
+        setChannelsLoaded(true);
     }, [user, socket])
 
     useEffect(() => {
@@ -278,7 +282,8 @@ export function ChannelsProvider({ children }: any) {
             channels,
             channelsDispatch,
             currentChannel,
-            setCurrentChannel
+            setCurrentChannel,
+            channelsLoaded
         }}>
             {children}
         </ChannelsContext.Provider>

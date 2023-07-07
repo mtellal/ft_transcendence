@@ -9,8 +9,11 @@ import './Messenger.css'
 import { useInvitation } from "../../../hooks/Chat/useInvitation";
 import { Message as TMessage, User } from "../../../types";
 
+import ligntningIcon from '../../../assets/lightning.svg'
+import gameIcon from '../../../assets/Gamepad.svg'
 
-function MessageNotification({ content } : any) {
+
+function MessageNotification({ content }: any) {
     return (
         <div className="flex-center gray-c message-notification" >
             {content}
@@ -52,26 +55,31 @@ function InvitationMessage(props: TInvitationMessage) {
         <div className="flex-center">
             <div
                 className="flex-ai"
-                style={{ width: '80%', margin: '5px 0', border: '1px solid black', borderRadius: '5px', boxShadow: '1px 2px 5px black', padding: '3%' }}
+                style={{ width: '80%', margin: '5px 0', border: '1px solid black', borderRadius: '5px', boxShadow: '1px 2px 5px black', padding: '2%' }}
             >
-                {
-                    props.author && props.message && 
-                    <p className="reset" >{props.author.username} wants to play a game in {props.message.gametype} mode</p>
+                <img src={gameIcon} style={{ height: '25px' }} />
+                <div className="fill flex-center">
 
-                }
-                {
-                    props.message && !accepted && user && props.message.sendBy !== user.id &&
-                    <button
-                        className="button"
-                        style={{ width: '100px', fontSize: 'medium', fontWeight: '500' }}
-                        onClick={() => {
-                            acceptInvitation(props.message.id);
-                            setAccepted(true);
-                        }}
-                    >
-                        Join
-                    </button>
-                }
+                    {
+                        props.author && props.message &&
+                        <p className="reset" style={{paddingRight: '10px'}} >{props.author.username} sends a game invitation in {props.message.gametype}</p>
+
+                    }
+                    {
+                        props.message && !accepted && user && props.message.sendBy !== user.id &&
+                        <button
+                            className="button"
+                            style={{ backgroundColor: '#fff3e6',  width: '100px', fontSize: 'medium', fontWeight: '500' }}
+                            onClick={() => {
+                                acceptInvitation(props.message.id);
+                                setAccepted(true);
+                            }}
+                        >
+                            Join
+                        </button>
+                    }
+                </div>
+                <img src={ligntningIcon} style={{ height: '25px' }} />
             </div>
         </div>
     )
