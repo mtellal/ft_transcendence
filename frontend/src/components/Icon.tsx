@@ -43,12 +43,3 @@ export function CheckedIcon(props: TIcon) {
         </div>
     )
 }
-
-
-export function RawIcon({ icon }: any) {
-    return (
-        <span className="material-symbols-outlined">
-            {icon}
-        </span>
-    )
-}

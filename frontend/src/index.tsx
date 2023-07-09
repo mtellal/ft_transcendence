@@ -23,6 +23,7 @@ import { CreateChannel } from './routes/Chat/CreateChannel';
 import MenuElement from './routes/Chat/Menu/MenuElement';
 import TwoFactor from './routes/login/2FA';
 import { Ladder } from './routes/Ladder/Ladder';
+import JoinChannel from './routes/Chat/JoinChannel';
 
 
 const router = createBrowserRouter([
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
                     {
                         path: "channel/:channelId",
                         element: <Interface />
+                    },
+                    {
+                        path: "channel/join",
+                        element: <JoinChannel />
                     }
                 ]
             },

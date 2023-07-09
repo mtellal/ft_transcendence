@@ -7,6 +7,7 @@ import {
 import './Messenger.css'
 
 import sendIcon from '../../../assets/Paper_Plane.svg'
+import Icon from "../../../components/Icon";
 
 type TMessengerInput = {
     blockedFriend: boolean,
@@ -32,8 +33,9 @@ export default function MessengerInput(props: TMessengerInput) {
         return ("Write your message")
     }, [currentChannel, props.blockedFriend]);
 
-    const submit = useCallback((e: any) => {
-        if (e.key === "Enter" && value && !props.blockedFriend && currentChannel && socket) {
+
+    const sendMessage = useCallback(() => {
+        if (value && !props.blockedFriend && currentChannel && socket) {
             socket.emit('message', {
                 channelId: currentChannel.id,
                 content: value
@@ -42,18 +44,26 @@ export default function MessengerInput(props: TMessengerInput) {
         }
     }, [value, currentChannel, socket])
 
+    const submit = useCallback((e: any) => {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    }, [value, currentChannel, socket])
+
 
     return (
-            <form className="messenger-input flex-ai">
-                <input
-                    style={{width: '100%', height: '100%', border: 'none'}}
-                    value={value}
-                    onChange={handleChange}
-                    placeholder={canSendMessages()}
-                    onKeyDown={submit}
-                    disabled={props.blockedFriend}
-                />
-                <img src={sendIcon} />
-            </form>
+        <div className="messenger-input flex-ai">
+            <input
+                style={{ width: '100%', fontSize: '15px',  height: '100%', border: 'none', outline: 'none' }}
+                value={value}
+                onChange={handleChange}
+                placeholder={canSendMessages()}
+                onKeyDown={submit}
+                disabled={props.blockedFriend}
+            />
+            <div style={{height: '30px'}}>
+                <Icon icon={sendIcon} onClick={() => sendMessage()} />
+            </div>
+        </div>
     )
 }

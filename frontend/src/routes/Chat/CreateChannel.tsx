@@ -71,39 +71,44 @@ export function CreateChannel() {
                     path="/chat"
                 />
             </div> */}
-            <h2>Create a channel</h2>
-            <div>
-                <InfoInput
-                    id="name"
-                    label="Name"
-                    value={name}
-                    setValue={setName}
-                    submit={() => { }}
-                    maxLength={20}
-                />
-            </div>
-            {
-                type === "protected" &&
-                <InfoInput
-                    id="password"
-                    label="Password"
-                    value={password}
-                    setValue={setPassword}
-                    submit={() => { }}
-                    maxLength={30}
-                />
-            }
-            <div style={{ paddingBottom: '20px' }}>
+            <h2 className="interface-page-title">Create a channel</h2>
+            <div className="flex-column" style={{ gap: '10px' }}>
 
-                <h3>Access</h3>
-                <PickMenu
-                    title="Visibility"
-                    collection={["public", "protected", "private"]}
-                    selected={type}
-                    setSelected={setType}
-                />
+                <div>
+                    <InfoInput
+                        id="name"
+                        label="Name"
+                        value={name}
+                        setValue={setName}
+                        submit={() => { }}
+                        maxLength={20}
+                    />
+                </div>
+                {
+                    type === "protected" &&
+                    <div>
+                        <InfoInput
+                            id="password"
+                            label="Password"
+                            value={password}
+                            setValue={setPassword}
+                            submit={() => { }}
+                            maxLength={30}
+                        />
+                    </div>
+                }
+                <div style={{ paddingBottom: '20px' }}>
+
+                    <h3>Access</h3>
+                    <PickMenu
+                        title="Visibility"
+                        collection={["public", "protected", "private"]}
+                        selected={type}
+                        setSelected={setType}
+                    />
+                    {error && <p className="red-c" >{error}</p>}
+                </div>
             </div>
-            {error && <p className="red-c" >{error}</p>}
             <button
                 className="button white"
                 style={{ width: '100px', height: '40px', fontSize: 'medium' }}

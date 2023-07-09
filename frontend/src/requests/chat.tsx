@@ -6,6 +6,19 @@ const back = process.env.REACT_APP_BACK;
 //                     C H A T        R E Q U E S T S                  //
 /////////////////////////////////////////////////////////////////////////
 
+
+export async function getAllChannels(token: string)
+{
+    return (
+        axios.get(`${back}/chat`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+    )
+}
+
 export async function getChannel(id: number, token: string) {
     return (
         axios.get(`${back}/chat/${id}`, {

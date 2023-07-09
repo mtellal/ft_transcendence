@@ -36,10 +36,8 @@ export default function MenuElement() {
     const [whispersList, setWhispersList] = useState([]);
 
     function extractLastMessage(channel: Channel) {
-        if (channel.messages && channel.messages.length)
-        {
-            for (let i = channel.messages.length - 1 ; i >= 0; i--)
-            {
+        if (channel.messages && channel.messages.length) {
+            for (let i = channel.messages.length - 1; i >= 0; i--) {
                 if (channel.messages[i].type === "MESSAGE")
                     return (channel.messages[i].content)
             }
@@ -60,6 +58,15 @@ export default function MenuElement() {
                                 id={_friend.id}
                                 user={_friend}
                                 onClick={() => { }}
+                                message={extractLastMessage(channel)}
+                            />
+                        )
+                    }
+                    else if (channel.messages && channel.messages.length) {
+                        return (
+                            <ChannelLabel
+                                key={channel.id}
+                                channel={channel}
                                 message={extractLastMessage(channel)}
                             />
                         )
@@ -199,7 +206,10 @@ export function MenuCollectionChannel(props: TCollectionChannel) {
                         <Icon
                             icon={joinIcon}
                             hoverColor="white"
-                            onClick={() => { setShow((p: boolean) => !p); }}
+                            onClick={() => {
+                                setShow((p: boolean) => !p);
+                                navigate("/chat/channel/join")
+                            }}
                         />
                     </div>
                     <img src={show ? arrowBot : arrowTop} style={{ marginLeft: '10px' }} />

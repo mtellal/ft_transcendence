@@ -6,8 +6,9 @@ import InfoInput from "../../../../components/Input/InfoInput";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { getBlockList } from "../../../../requests/block";
-import { useCurrentUser } from "../../../../hooks/Hooks";
+import { useChannelsContext, useCurrentUser } from "../../../../hooks/Hooks";
 import { Block, User } from "../../../../types";
+import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 type TSearchChannelUser = {
@@ -24,6 +25,8 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
     const [error, setError] = useState("");
     const { isUserMember } = useMembers();
 
+    const { currentChannel } = useChannelsContext();
+
     const { fetchUserByUsername } = useFetchUsers();
     const { isCurrentUserAdmin, getUserAccess } = useUserAccess();
 
@@ -36,7 +39,7 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
         }
         if (!searchedUser)
             searchedUser = await fetchUserByUsername(searchUserValue);
-        if (searchedUser && (isUserMember(searchedUser) || isCurrentUserAdmin)) {
+        if (searchedUser && (isUserMember(searchedUser, currentChannel) || isCurrentUserAdmin)) {
             setSearchUser(searchedUser);
             const userBlockList = await getBlockList(searchedUser.id, token).then(res => res.data);
             if (userBlockList && userBlockList.length && userBlockList.find((o: Block) => o.userId === user.id))

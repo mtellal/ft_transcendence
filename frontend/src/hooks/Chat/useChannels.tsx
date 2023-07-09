@@ -125,9 +125,10 @@ export function useChannels() {
             socket.emit('leaveChannel', {
                 channelId: channel.id
             })
-            navigate("/chat");
+            if (currentChannel && channel.id === currentChannel.id)
+                navigate("/chat");
         }
-    }, [socket])
+    }, [socket, currentChannel])
 
 
     const getChannelFromFriendName = useCallback((friend: User) => {

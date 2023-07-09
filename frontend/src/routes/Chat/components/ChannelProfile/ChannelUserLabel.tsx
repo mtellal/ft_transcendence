@@ -23,6 +23,7 @@ import adminIcon from '../../../../assets/ShieldCheck.svg'
 import unadminIcon from '../../../../assets/ShieldCross.svg'
 import banIcon from '../../../../assets/User_Close.svg'
 import unbanIcon from '../../../../assets/User_Check.svg'
+import ownerIcon from '../../../../assets/House.svg'
 
 
 import './ChannelUserLabel.css'
@@ -148,7 +149,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                     </div>
                 )
             }
-            else if (props.user && !isUserMember(props.user)) {
+            else if (props.user && !isUserMember(props.user, currentChannel)) {
                 if (props.isAddable) {
                     return (
                         <div>
@@ -252,15 +253,11 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                 <>
                     {
                         isUserAdministrators(props.user) &&
-                        <span className="material-symbols-outlined">
-                            shield_person
-                        </span>
+                        <img src={adminIcon} />
                     }
                     {
                         isUserOwner(props.user) &&
-                        <span className="material-symbols-outlined">
-                            location_away
-                        </span>
+                        <img src={ownerIcon} />
                     }
                 </>
             )

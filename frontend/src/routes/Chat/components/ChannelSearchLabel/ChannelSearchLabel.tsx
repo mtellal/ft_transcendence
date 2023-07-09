@@ -1,18 +1,16 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useCurrentUser } from "../../../../hooks/Hooks";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
-import useBanUser from "../../../../hooks/Chat/useBanUser";
-import useMembers from "../../../../hooks/Chat/useMembers";
-import useFetchUsers from "../../../../hooks/useFetchUsers";
-import ResizeContainer from "../../../../components/ResizeContainer";
-import ProfilePicture from "../../../../components/users/ProfilePicture";
-import Icon, { RawIcon } from "../../../../components/Icon";
 
 import { getChannelProtected } from "../../../../requests/chat";
 import InfoInput from "../../../../components/Input/InfoInput";
 import { ChatInterfaceContext } from "../../Chat/Chat";
 import { ConfirmViewButtons } from "../../Profile/ChannelProfile/ConfirmAction";
 import { SearchedChannelLabelContext } from "../../Menu/SearchElement";
+
+import ownerIcon from '../../../../assets/House.svg';
+import adminIcon from '../../../../assets/ShieldCheck.svg';
+
 
 import './ChannelSearchLabel.css'
 import { Channel } from "../../../../types";
@@ -69,116 +67,3 @@ function ProtectedChannelPassword(props: TProtectedChannelPassword) {
     )
 }
 
-
-type TChannelSearch = {
-    channel: Channel,
-    join: () => {} | any,
-    leaveChannel: () => {} | any
-}
- function ChannelSearchLabel({ channel, ...props }: TChannelSearch) {
-
-    const { user } = useCurrentUser();
-    const { isChannelPrivate, isChannelProtected } = useChannels();
-    const { isUserBanned } = useBanUser()
-
-    const { setAction } = useContext(ChatInterfaceContext);
-    const { reset } = useContext(SearchedChannelLabelContext)
-
-
-    const { fetchUserProfilePicture } = useFetchUsers();
-    const [members, setMembers] = useState([]);
-
-    const { isUserMemberFromChannel } = useMembers();
-
-
-    const loadUsersProfilePicture = useCallback(async () => {
-        const pps = await Promise.all(channel.members.map(async (id: any) =>
-            await fetchUserProfilePicture(id)
-        ))
-        setMembers(pps.map((url: any) =>
-            <div key={url} className="channelsearch-pp-container flex-center">
-                <ResizeContainer height="40px" width="40px">
-                    <ProfilePicture image={url} />
-                </ResizeContainer>
-            </div>
-        ))
-    }, [channel.members, fetchUserProfilePicture]);
-
-    useEffect(() => {
-        if (channel.members)
-            loadUsersProfilePicture();
-    }, [channel.members, loadUsersProfilePicture])
-
-
-    const renderIcon = useCallback(() => {
-        if (isUserBanned(user, channel)) {
-            return (
-                <div style={{ marginLeft: 'auto' }}>
-                    <p className="red-c">Banned</p>
-                </div>
-            )
-        }
-        else if (user && isUserMemberFromChannel(user, channel)) {
-            return (
-                <div style={{ marginLeft: 'auto' }}>
-                    <Icon icon="logout" description="leave" onClick={() => props.leaveChannel()} />
-                </div>
-            )
-        }
-        else if (channel.type !== "PRIVATE") {
-            return (
-                <div style={{ marginLeft: 'auto' }}>
-                    <Icon
-                        icon="login"
-                        description="Join"
-                        onClick={() => {
-                            if (channel.type === "PROTECTED") {
-                                setAction(
-                                    <ProtectedChannelPassword
-                                        reset={reset}
-                                        channel={channel}
-                                    />
-                                )
-                            }
-                            else
-                                props.join();
-                        }}
-                    />
-                </div>
-            )
-        }
-    }, [
-        channel,
-        isUserBanned,
-        isUserMemberFromChannel,
-        user,
-        props,
-        reset,
-        setAction
-    ]
-    );
-
-    return (
-        <div
-            className='flex-ai menu-searcheduser absolute white'
-            style={{ bottom: '-50px' }}
-        >
-            <h3 className="no-wrap">{channel.name} - </h3>
-            {
-                isChannelPrivate(channel) &&
-                <RawIcon icon="lock" />
-            }
-            {
-                isChannelProtected(channel) &&
-                <RawIcon icon="shield" />
-            }
-            <p className="channelsearch-members gray-c flex-center no-wrap">{channel.members.length} members</p>
-            <div className="channelsearch-pps flex-center">
-                {members}
-            </div>
-            {
-                renderIcon()
-            }
-        </div>
-    )
-}

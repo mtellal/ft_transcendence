@@ -8,9 +8,9 @@ export default function useMembers() {
     const { socket } = useChatSocket();
     const { fetchUser } = useFetchUsers();
 
-    const isUserMember = useCallback((user: User) => {
-        if (user && channels && currentChannel) {
-            return (currentChannel.members.find((id: number) => id === user.id))
+    const isUserMember = useCallback((user: User, channel: Channel) => {
+        if (user && channel && channel) {
+            return (channel.members.find((id: number) => id === user.id))
         }
         return (false);
     }, [currentChannel, channels])

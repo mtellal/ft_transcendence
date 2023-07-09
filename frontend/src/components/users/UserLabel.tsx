@@ -90,7 +90,9 @@ type TUserLabelFriendRequest = TUserInfos & {
 
 export function UserLabelFriendRequest(props: TUserLabelFriendRequest) {
     return (
-        <div className='flex-ai user-label'>
+        <div className='flex-ai user-label'
+            style={{backgroundColor: 'white'}}
+        >
             <UserInfos user={props.user} />
             <div className='userlabel-friend-request'>
                 <div>

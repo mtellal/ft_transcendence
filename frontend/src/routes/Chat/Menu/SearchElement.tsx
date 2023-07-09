@@ -23,6 +23,7 @@ import moreVertical from '../../../assets/moreVertical.svg'
 import './SearchElement.css'
 import useOutsideClick from "../../../hooks/useOutsideClick";
 import ChannelInfos from "../../../components/channels/ChannelInfos";
+import useMembers from "../../../hooks/Chat/useMembers";
 
 export const SearchedChannelLabelContext: React.Context<any> = createContext(null);
 
@@ -120,7 +121,8 @@ type TChannelSearchLabel = {
     channel: Channel,
     notifs?: number,
     onClick?: () => {} | any
-    disable?: boolean
+    disable?: boolean,
+    resetInput: () => void
 }
 
 export function ChannelSearchLabel(props: TChannelSearchLabel) {
@@ -128,10 +130,17 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
     const settingsRef: any = useRef();
 
     const navigate = useNavigate();
+
+    const { user } = useCurrentUser();
+    const { isUserMember } = useMembers();
+
     const { setAction } = useContext(ChatInterfaceContext);
 
     const [showActions, setShowActions] = useState(false);
     const ref = useOutsideClick(() => setShowActions(false))
+
+    const { addChannel, leaveChannel } = useChannels();
+
 
     return (
         <div className="flex-ai menu-searcheduser white"
@@ -152,14 +161,42 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
                     style={showActions ? { visibility: 'visible', zIndex: '5', bottom: `${settingsRef.current.offsetBottom}px` } : { visibility: 'hidden' }}
                     onClick={() => setShowActions((p: boolean) => !p)}
                 >
-                    <p
-                        className="menu-searcheduser-acton"
-                    >
-                        Join
-                    </p>
-                    <p
-                        className="menu-searcheduser-acton"
-                    >Message</p>
+                    {
+                        isUserMember(user, props.channel) ?
+                            <>
+                                <p className="menu-searcheduser-acton"
+                                    onClick={() => {
+                                        setAction(
+                                            <ConfirmView
+                                                type="leave"
+                                                username={props.channel.name}
+                                                valid={() => { leaveChannel(props.channel); setAction(null) }}
+                                                cancel={() => setAction(null)}
+                                            />
+                                        );
+                                        props.resetInput();
+                                    }}
+                                >
+                                    Leave
+                                </p>
+                                <p
+                                    className="menu-searcheduser-acton"
+                                    onClick={() => {
+                                        navigate(`/chat/channel/${props.channel.id}`);
+                                        props.resetInput();
+                                    }}
+                                >Message</p>
+                            </>
+                            :
+                            <p className="menu-searcheduser-acton"
+                                onClick={() => {
+                                    addChannel(props.channel, true)
+                                    props.resetInput();
+                                }}
+                            >
+                                Join
+                            </p>
+                    }
                 </div>
             </div>
         </div>
@@ -171,7 +208,7 @@ type TSearchedChannel = {
     reset: any
 }
 
-function SearchedChannel(props: TSearchedChannel) {
+export function SearchedChannel(props: TSearchedChannel) {
 
     const [renderChannels, setRenderChannels] = useState([]);
     const { fetchUsers } = useFetchUsers();
@@ -214,6 +251,7 @@ function SearchedChannel(props: TSearchedChannel) {
                             <ChannelSearchLabel
                                 key={c.id}
                                 channel={c}
+                                resetInput={props.reset}
                             />
                         )
                     })
@@ -240,7 +278,6 @@ function SearchedChannel(props: TSearchedChannel) {
 
 
 type TSearchInput = {
-    id: number | any,
     blur?: boolean,
     value: string,
     setValue: (s: string) => {},
@@ -248,7 +285,7 @@ type TSearchInput = {
     onChange?: any,
 }
 
-function SearchInput(props: TSearchInput) {
+export function SearchInput(props: TSearchInput) {
     const inputRef: any = React.useRef();
 
     function onChange(e: any) {
@@ -273,7 +310,6 @@ function SearchInput(props: TSearchInput) {
                 <img src={search} alt="search" />
             </div>
             <input
-
                 id="menu-searchinput-input"
                 ref={inputRef}
                 placeholder="Search"
@@ -331,11 +367,10 @@ export default function SearchElement() {
 
         >
             <SearchInput
-                id="searchUser"
                 value={value}
                 setValue={setValue}
                 submit={() => searchUser()}
-                onChange={() => { setSearchedUser(null); setChannelList([]) }}
+                onChange={() => { setSearchedUser(null); setChannelList([]); setError("") }}
             />
             {error && <p className="reset red-c">{error}</p>}
             {

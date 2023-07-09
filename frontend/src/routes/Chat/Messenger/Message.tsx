@@ -5,11 +5,13 @@ import {
     useCurrentUser
 } from "../../../hooks/Hooks";
 import ProfilePicture from "../../../components/users/ProfilePicture";
-import { RawIcon } from "../../../components/Icon";
 import ResizeContainer from "../../../components/ResizeContainer";
 import useAdinistrators from "../../../hooks/Chat/useAdministrators";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../../types";
+
+import ownerIcon from '../../../assets/House.svg';
+import adminIcon from '../../../assets/ShieldCheck.svg'
 
 
 type TAuthorAccess = {
@@ -43,9 +45,9 @@ function AuthorAccess(props: TAuthorAccess) {
                 {
                     currentChannel.type !== "WHISPER" && props.author &&
                     currentChannel.ownerId === props.author.id &&
-                    <RawIcon icon="location_away" />
+                    <img src={ownerIcon} style={{height: '20px'}} />
                 }
-                {props.author && isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
+                {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
             </ResizeContainer>
         </div>
     )
@@ -148,9 +150,9 @@ function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
                             {
                                 currentChannel.type !== "WHISPER" && props.author &&
                                 currentChannel.ownerId === props.author.id &&
-                                <RawIcon icon="location_away" />
+                                <img src={ownerIcon} style={{height: '20px'}} />
                             }
-                            {props.author && isUserAdministrators(props.author) && <RawIcon icon="shield_person" />}
+                            {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
                         </ResizeContainer>
                     }
                     {
