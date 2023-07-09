@@ -63,7 +63,7 @@ export function CreateChannel() {
 
     return (
         <div className="scroll flex-column"
-            style={{ padding: '5%', flex: 3 }}
+            style={{ padding: '3%', flex: 3 }}
         >
             {/* <div className="flex">
                 <ArrowBackMenu

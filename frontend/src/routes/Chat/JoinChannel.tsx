@@ -127,10 +127,11 @@ export default function JoinChannel() {
                     setValue={setValue}
                     submit={() => searchUser()}
                     onChange={() => { setChannelList([]); setError("") }}
+                    setInputRef={null}
                 />
                 {error && <p className="reset red-c" style={{ marginTop: '10px' }}>{error}</p>}
             </div>
-            <div className="relative" style={{ marginTop: '20px', width: 'auto' }}>
+            <div className="relative scroll" style={{ maxHeight: '400px', marginTop: '20px', width: 'auto' }}>
                 {
                     channelList
                 }

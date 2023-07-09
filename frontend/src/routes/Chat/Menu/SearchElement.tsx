@@ -205,41 +205,25 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
 
 type TSearchedChannel = {
     channels: Channel[],
-    reset: any
+    reset: any, 
+    inputRef?: any
 }
 
 export function SearchedChannel(props: TSearchedChannel) {
 
     const [renderChannels, setRenderChannels] = useState([]);
     const { fetchUsers } = useFetchUsers();
-    const { setAction } = useContext(ChatInterfaceContext)
-    const { addChannel, leaveChannel } = useChannels();
     const { channels } = useChannelsContext();
 
-
-    function joinChannel(channel: Channel) {
-        if (channel.type !== 'WHISPER') {
-            setAction(
-                <ConfirmView
-                    type="join"
-                    username={channel.name}
-                    valid={() => { addChannel(channel, true); setAction(null); props.reset() }}
-                    cancel={() => setAction(null)}
-                />
-            )
+    const positionBottomChannelList = useCallback(() =>
+    {   
+        if (renderChannels && renderChannels) {
+            if (renderChannels.length < 4)
+                return (renderChannels.length * 60 + 5);
+            else
+                return (4*60 + 10);
         }
-    }
-
-    function _leaveChannel(channel: Channel) {
-        setAction(
-            <ConfirmView
-                type="leave"
-                username={channel.name}
-                valid={() => { leaveChannel(channel); setAction(null); props.reset() }}
-                cancel={() => setAction(null)}
-            />
-        )
-    }
+    }, [renderChannels, props.inputRef]);
 
     const load = useCallback(async () => {
         if (props.channels && props.channels.length) {
@@ -266,8 +250,8 @@ export function SearchedChannel(props: TSearchedChannel) {
 
     return (
         <SearchedChannelLabelContext.Provider value={{ reset: props.reset }}>
-            <div className="absolute"
-                style={{ zIndex: '3', width: '100%', bottom: `-${renderChannels.length * 60}px`, alignItems: 'center' }}>
+            <div className={renderChannels && renderChannels.length > 4 ? "absolute scroll label white" : "absolute label white"}
+                style={{ zIndex: '3', maxHeight: '250px', width: '90%', bottom: `-${props.inputRef && (props.inputRef.current.offsetHeight +  positionBottomChannelList())}px`, alignItems: 'center' }}>
                 {
                     renderChannels
                 }
@@ -283,10 +267,16 @@ type TSearchInput = {
     setValue: (s: string) => {},
     submit?: () => {} | any,
     onChange?: any,
+    setInputRef: (p: any) => void
 }
 
 export function SearchInput(props: TSearchInput) {
     const inputRef: any = React.useRef();
+
+    useEffect(() => {
+        if (props.setInputRef)
+            props.setInputRef(inputRef);
+    }, [props.setInputRef])
 
     function onChange(e: any) {
         if (e.target.value.length <= 20) {
@@ -327,6 +317,8 @@ export default function SearchElement() {
     const [error, setError] = useState("");
     const [searchedUser, setSearchedUser] = useState();
     const [channelList, setChannelList] = useState([]);
+
+    const [inputRef, setInputRef] = useState();
 
     const { fetchUserByUsername } = useFetchUsers();
 
@@ -371,6 +363,7 @@ export default function SearchElement() {
                 setValue={setValue}
                 submit={() => searchUser()}
                 onChange={() => { setSearchedUser(null); setChannelList([]); setError("") }}
+                setInputRef={setInputRef}
             />
             {error && <p className="reset red-c">{error}</p>}
             {
@@ -381,6 +374,7 @@ export default function SearchElement() {
                     <SearchedChannel
                         channels={channelList}
                         reset={reset}
+                        inputRef={inputRef}
                     />
                     : null
             }
