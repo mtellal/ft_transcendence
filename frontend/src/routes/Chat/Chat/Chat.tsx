@@ -21,6 +21,8 @@ function ChatInterface() {
     const [action, setAction]: any = useState(null);
     const { isMobileDisplay } = useWindow();
 
+    console.log("chat interface render")
+
     return (
         <ChatInterfaceContext.Provider value={{ setAction }}>
             <div className="chat">

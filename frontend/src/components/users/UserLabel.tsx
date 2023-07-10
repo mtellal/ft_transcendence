@@ -1,6 +1,6 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { NavLink, useParams } from 'react-router-dom'
+import { NavLink, useNavigate, useParams } from 'react-router-dom'
 
 import Icon from '../Icon';
 import { getUserProfilePictrue } from '../../requests/user'
@@ -118,15 +118,16 @@ type TUserLabel = TUserInfos & {
 
 export default function UserLabel(props: TUserLabel) {
 
+    const navigate = useNavigate();
     const { userId } = useParams();
 
     return (
-        <NavLink to={`/chat/user/${props.id}`}
-            className="user-label"
+        <div
+            onClick={() => navigate(`/chat/user/${props.id}`)}
+            className="user-label pointer"
             style={Number(userId) === props.id && !props.disable ? { backgroundColor: '#fff3e6' } : { }}
-            onClick={() => props.onClick}
         >
             <UserInfos {...props} />
-        </NavLink>
+        </div>
     )
 }

@@ -21,8 +21,6 @@ import joinIcon from '../../../assets/Login.svg'
 
 export default function MenuElement() {
 
-    const navigate = useNavigate();
-
     const { user } = useCurrentUser();
     const { friends } = useFriendsContext();
     const { channels } = useChannelsContext();
@@ -53,7 +51,6 @@ export default function MenuElement() {
                                 key={_friend.id}
                                 id={_friend.id}
                                 user={_friend}
-                                onClick={() => { }}
                                 message={extractLastMessage(channel)}
                             />
                         )
@@ -81,7 +78,6 @@ export default function MenuElement() {
                     key={user.id}
                     id={user.id}
                     user={user}
-                    onClick={() => { }}
                 />
             ))
         )
@@ -91,6 +87,7 @@ export default function MenuElement() {
         setChannelsList([]);
         setFriendsList([]);
 
+        console.log("menuelement render")
         if (channels && channels.length) {
             setWhispers();
 
@@ -110,6 +107,7 @@ export default function MenuElement() {
         }
 
     }, [friends, channels])
+
 
 
     return (
@@ -193,7 +191,6 @@ export function MenuCollectionChannel(props: TCollectionChannel) {
                     <div className="flex " style={{ height: '30px', gap: '5px' }}>
                         <Icon
                             icon={plusIcon}
-                            hoverColor="white"
                             onClick={() => {
                                 setShow((p: boolean) => !p);
                                 navigate("/chat/channel/create")
@@ -201,7 +198,6 @@ export function MenuCollectionChannel(props: TCollectionChannel) {
                         />
                         <Icon
                             icon={joinIcon}
-                            hoverColor="white"
                             onClick={() => {
                                 setShow((p: boolean) => !p);
                                 navigate("/chat/channel/join")
