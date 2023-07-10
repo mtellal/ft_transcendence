@@ -54,7 +54,6 @@ export function CreateChannel() {
                     setCurrentChannel(res.data);
                 }
             })
-        console.log("Channel created => ", channel)
         if (channel)
             navigate(`/chat/channel/${channel.id}`)
         else

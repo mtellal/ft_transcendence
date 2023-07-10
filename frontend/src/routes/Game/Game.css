@@ -2,8 +2,9 @@
 .launchgame
 {
     grid-row: auto / span 18;
-    grid-column: 2 / -1;
+    grid-column: auto / span auto;
     overflow: hidden;
+    width: 100%;
 }
 
 .game

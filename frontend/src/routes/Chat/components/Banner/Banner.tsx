@@ -178,7 +178,7 @@ export default function Banner({ ...props }: TBanner) {
     return (
         <>
             <div className="banner">
-                <div className="flex-center" style={{ maxWidth: '100%' }} >
+                <div className="flex-center" style={{ maxWidth: '100%', overflow: 'hidden', flex: '1' }} >
                     {/*  <ArrowBackMenu /> */}
                     {
                         currentChannel && currentChannel.type === "WHISPER" ?

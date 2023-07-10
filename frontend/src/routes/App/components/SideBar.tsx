@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import './Sidebar.css'
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useWindow } from "../../../hooks/useWindow";
 
 import profile from '../../../assets/User.svg'
@@ -16,7 +16,6 @@ type TMenuElement = {
 }
 
 function MenuElement(props: TMenuElement) {
-
 
     return (
         <NavLink

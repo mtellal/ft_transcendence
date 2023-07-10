@@ -3,7 +3,7 @@
   width: 100vw;
   margin: 0;
   display: grid;
-  grid-template: repeat(20, 1fr) / repeat(20, 1fr);
+  grid-template: repeat(20, 1fr) / 60px auto;
   min-width: 300px;
 }
 

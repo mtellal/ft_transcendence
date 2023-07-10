@@ -11,19 +11,28 @@ import FriendEvents from "../Events/FriendsEvents";
 import ChannelsEvents from "../Events/ChannelsEvents";
 import { ConfirmPage } from "../Profile/ChannelProfile/ConfirmAction";
 import './Chat.css'
+import { useWindow } from "../../../hooks/useWindow";
 
 export const ChatInterfaceContext: React.Context<any> = createContext(null);
 
 function ChatInterface() {
 
+    const  location = useLocation();
     const [action, setAction]: any = useState(null);
+    const { isMobileDisplay } = useWindow();
 
     return (
         <ChatInterfaceContext.Provider value={{ setAction }}>
             <div className="chat">
                 <div className="chat-container relative">
-                    <MenuElement />
-                    <Outlet />
+                    {
+                        isMobileDisplay ?
+                            location.pathname === "/chat" ? <MenuElement /> : <Outlet /> :
+                            <>
+                                <MenuElement />
+                                <Outlet />
+                            </>
+                    }
                     {
                         action &&
                         <ConfirmPage>

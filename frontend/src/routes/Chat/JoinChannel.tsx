@@ -31,6 +31,7 @@ function PublicChannels() {
                                 key={c.id}
                                 channel={c}
                                 resetInput={() => {}}
+                                style={{margin: '0 auto 3px auto'}}
                             />
                         )
                     })
@@ -103,6 +104,7 @@ export default function JoinChannel() {
                             key={c.id}
                             channel={c}
                             resetInput={() => resetInput()}
+                            style={{margin: '0 auto 3px auto'}}
                         />
                     )
                 })
@@ -112,8 +114,6 @@ export default function JoinChannel() {
         if (!channelArray)
             setError("Channel not found");
     }
-
-    console.log("join channel render")
 
     return (
         <div

@@ -3,7 +3,7 @@
     border-right: 1px solid rgb(0, 0, 0);
     overflow-x: hidden;
     min-height: 200px;
-    min-width: 60px;
+    width: 60px;
 }
 
 .menu--element {
@@ -13,6 +13,9 @@
     color: black;
 }
 
+.menu--element:hover {
+    background-color: #fff3e6;
+}
 
 .menu--element-title {
     font-size: large;

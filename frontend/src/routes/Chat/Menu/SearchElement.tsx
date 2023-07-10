@@ -50,12 +50,10 @@ export function SearchedUser(props: TUserProps) {
 
     return (
         <div
-            className='flex-ai menu-searcheduser absolute white'
-            style={{ bottom: '-50px' }}
+            className='flex-ai menu-searcheduser white red'
+            style={{ margin: '0 auto 3px auto' }}
         >
-            <div style={{ minWidth: 'auto' }}>
-                <UserInfos user={props.user} />
-            </div>
+            <UserInfos user={props.user} />
             <div
                 ref={ref}
                 className="flex relative"
@@ -122,7 +120,8 @@ type TChannelSearchLabel = {
     notifs?: number,
     onClick?: () => {} | any
     disable?: boolean,
-    resetInput: () => void
+    resetInput: () => void, 
+    style?: any
 }
 
 export function ChannelSearchLabel(props: TChannelSearchLabel) {
@@ -144,7 +143,7 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
 
     return (
         <div className="flex-ai menu-searcheduser white"
-            style={{ margin: '5px auto 0 auto', }}
+            style={props.style}
             onClick={props.onClick && props.onClick}
         >
             <ChannelInfos {...props} />
@@ -205,7 +204,7 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
 
 type TSearchedChannel = {
     channels: Channel[],
-    reset: any, 
+    reset: any,
     inputRef?: any
 }
 
@@ -214,16 +213,6 @@ export function SearchedChannel(props: TSearchedChannel) {
     const [renderChannels, setRenderChannels] = useState([]);
     const { fetchUsers } = useFetchUsers();
     const { channels } = useChannelsContext();
-
-    const positionBottomChannelList = useCallback(() =>
-    {   
-        if (renderChannels && renderChannels) {
-            if (renderChannels.length < 4)
-                return (renderChannels.length * 60 + 5);
-            else
-                return (4*60 + 10);
-        }
-    }, [renderChannels, props.inputRef]);
 
     const load = useCallback(async () => {
         if (props.channels && props.channels.length) {
@@ -236,6 +225,7 @@ export function SearchedChannel(props: TSearchedChannel) {
                                 key={c.id}
                                 channel={c}
                                 resetInput={props.reset}
+                                style={{margin: '0 auto 3px auto'}}
                             />
                         )
                     })
@@ -249,14 +239,11 @@ export function SearchedChannel(props: TSearchedChannel) {
     }, [props.channels, channels])
 
     return (
-        <SearchedChannelLabelContext.Provider value={{ reset: props.reset }}>
-            <div className={renderChannels && renderChannels.length > 4 ? "absolute scroll label white" : "absolute label white"}
-                style={{ zIndex: '3', maxHeight: '250px', width: '90%', bottom: `-${props.inputRef && (props.inputRef.current.offsetHeight +  positionBottomChannelList())}px`, alignItems: 'center' }}>
-                {
-                    renderChannels
-                }
-            </div>
-        </SearchedChannelLabelContext.Provider>
+        <>
+            {
+                renderChannels
+            }
+        </>
     )
 }
 
@@ -318,7 +305,7 @@ export default function SearchElement() {
     const [searchedUser, setSearchedUser] = useState();
     const [channelList, setChannelList] = useState([]);
 
-    const [inputRef, setInputRef] = useState();
+    const [inputRef, setInputRef]: any = useState();
 
     const { fetchUserByUsername } = useFetchUsers();
 
@@ -353,10 +340,10 @@ export default function SearchElement() {
         setValue("")
     }
 
+
     return (
         <div
             className="menu-searchelement relative"
-
         >
             <SearchInput
                 value={value}
@@ -365,17 +352,29 @@ export default function SearchElement() {
                 onChange={() => { setSearchedUser(null); setChannelList([]); setError("") }}
                 setInputRef={setInputRef}
             />
-            {error && <p className="reset red-c">{error}</p>}
+            {error && <p className="reset red-c absolute white" style={{ bottom: '-2px', fontSize: '12px' }}>{error}</p>}
+
             {
-                searchedUser && <SearchedUser resetInput={() => reset()} user={searchedUser} />
-            }
-            {
-                channelList && channelList.length ?
-                    <SearchedChannel
-                        channels={channelList}
-                        reset={reset}
-                        inputRef={inputRef}
-                    />
+                (searchedUser || (channelList && channelList.length)) ?
+                    <div className="absolute scroll label white"
+                        style={{
+                            zIndex: '3', height: '250px', width: '90%',
+                            bottom: `-${inputRef && (inputRef.current.offsetHeight + 250)}px`, alignItems: 'center'
+                        }}>
+
+                        {
+                            searchedUser && <SearchedUser resetInput={() => reset()} user={searchedUser} />
+                        }
+                        {
+                            channelList && channelList.length ?
+                                <SearchedChannel
+                                    channels={channelList}
+                                    reset={reset}
+                                    inputRef={inputRef}
+                                />
+                                : null
+                        }
+                    </div>
                     : null
             }
         </div>
