@@ -84,7 +84,7 @@ function AuthorMessage(props: TUserMessage) {
                         props.author &&
                         <div className="relative pointer" onClick={() => navigate(`/user/${props.author.id}`)}>
                             <ResizeContainer height="30px" width="30px" >
-                                <ProfilePicture image={props.author.url} />
+                                <ProfilePicture image={props.author.url} boxShadow={true} />
                             </ResizeContainer>
                         </div>
                     }

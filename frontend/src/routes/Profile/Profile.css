@@ -13,26 +13,16 @@
     margin-right: 5%; 
 }
 
+.profilemenu-pp {
+    height: 150px;
+    width: 150px;
+}
+
 .profile-menu-font-username {
-    color: #000;
-    font-size: 25px;
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
     margin-top: 15px;
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis; 
-}
-
-.profile-menu-font-menu {
-    color: rgba(0, 0, 0, 0.55);
-    font-size: 19px;
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .profile-menu-button {
@@ -44,12 +34,6 @@
     background: #FFF1E0;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.90);
-    font-size: 16px;
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     margin-top: 22px;
 }
 
@@ -97,6 +81,67 @@
 }
 
 
+/* ///////////////////// FONT ///////////// */
+
+.profile-font-title1
+{
+    color: #000;
+    font-size: 25px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.profile-font-title2
+{
+    color: rgba(0, 0, 0, 0.55);
+    font-size: 19px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.profile-font-button1
+{
+    color: rgba(0, 0, 0, 0.90);
+    font-size: 16px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.profile-font1
+{
+    color: #000;
+    font-size: 15px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.profile-font2
+{
+    color: #000;
+    font-size: 14px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.profile-font3
+{
+    color: rgba(0, 0, 0, 0.90);
+    font-size: 12px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
 
 @media screen and (max-width: 700px) {
 
@@ -117,9 +162,31 @@
         align-items: center;
     }
 
+    .profilemenu-pp {
+        height: 100px;
+        width: 100px;
+    }
+
+
+    .profile-menu-font-menu {
+        font-size: 17px;
+    }
+
+    .profile-menu-font-username {
+        font-size: 21px;
+    }
+
     .profile-statistics
     {
         margin: 0;
+    }
+
+    .profile-statistics-title {
+        font-size: 21px;
+    }
+
+    .profile-statistics-elements>p {
+        font-size: 12px;
     }
 
     .profile-informations
@@ -129,5 +196,6 @@
         align-items: center;
         min-width: 100%;
     }
+
 
 }

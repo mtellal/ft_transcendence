@@ -1,34 +1,37 @@
-.icon-container
-{
+.icon-container {
     position: relative;
     align-self: center;
-    justify-self: center ;
+    justify-self: center;
     border-radius: 5px;
     height: 100%;
     aspect-ratio: 1 / 1;
 }
 
-.icon-container:hover div
-{
+.icon-container:hover {
+    background-color: rgb(231, 231, 231);
+}
+
+.icon-container:hover div {
     visibility: visible;
 }
 
-.icon-container:active
-{
+.icon-container:active {
     background-color: white;
 }
 
-.description
-{
-    position:absolute;
+.description {
+    position: absolute;
     bottom: -15px;
     visibility: hidden;
 }
 
-@media screen and (max-width: 700px)
-{
-    .icon-container {
-        height: auto;
-        padding: 5px;
+@media screen and (max-width: 700px) {
+    .icon-container:hover {
+        background-color: unset;
     }
+
+    .icon-container:hover div {
+        visibility: hidden;
+    }
+
 }

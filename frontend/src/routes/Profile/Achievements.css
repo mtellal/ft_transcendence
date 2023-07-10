@@ -10,16 +10,6 @@
     width: 300px;
 }
 
-.profile-achievements-title {
-    color: #000;
-    font-size: 31px;
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    margin: 0;
-}
-
 .profile-achievements-label {
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.50);

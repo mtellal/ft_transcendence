@@ -5,6 +5,8 @@ import { useChannelsContext, useCurrentUser } from "../../hooks/Hooks";
 import { getAllChannels, getChannelByName, getChannels } from "../../requests/chat";
 import { ChannelLabel } from "../../components/channels/ChannelInfos";
 import { Channel } from "../../types";
+import ArrowBackMenu from "./components/ArrowBackMenu";
+import { useWindow } from "../../hooks/useWindow";
 
 
 function PublicChannels() {
@@ -30,8 +32,8 @@ function PublicChannels() {
                             <ChannelSearchLabel
                                 key={c.id}
                                 channel={c}
-                                resetInput={() => {}}
-                                style={{margin: '0 auto 3px auto'}}
+                                resetInput={() => { }}
+                                style={{ margin: '0 auto 3px auto' }}
                             />
                         )
                     })
@@ -50,11 +52,11 @@ function PublicChannels() {
         <div>
             <h4 className="interface-page-title" style={{ fontSize: '17px' }}>Public channels</h4>
             {
-                channelList && channelList.length ? 
-                channelList : 
-                <div className="fill">
-                    <p>No public channels</p>
-                </div>
+                channelList && channelList.length ?
+                    channelList :
+                    <div className="fill">
+                        <p>No public channels</p>
+                    </div>
             }
         </div>
     )
@@ -71,13 +73,14 @@ export default function JoinChannel() {
 
     const { fetchUsers } = useFetchUsers();
 
+    const { isMobileDisplay } = useWindow();
+
 
     useEffect(() => {
         setCurrentChannel(null);
     }, [])
 
-    function resetInput()
-    {
+    function resetInput() {
         setValue("");
         setChannelList([]);
     }
@@ -104,7 +107,7 @@ export default function JoinChannel() {
                             key={c.id}
                             channel={c}
                             resetInput={() => resetInput()}
-                            style={{margin: '0 auto 3px auto'}}
+                            style={{ margin: '0 auto 3px auto' }}
                         />
                     )
                 })
@@ -120,7 +123,10 @@ export default function JoinChannel() {
             className="scroll"
             style={{ flex: '3', padding: '3%' }}
         >
-            <h2 className="interface-page-title">Join a channel</h2>
+            <div className="flex">
+                {isMobileDisplay && <ArrowBackMenu />}
+                <h2 className="interface-page-title">Join a channel</h2>
+            </div>
             <div className="flex-column-center" style={{ marginTop: '30px' }}>
                 <SearchInput
                     value={value}

@@ -26,9 +26,8 @@ function LadderUser({ user, stats, index }: any) {
 
 	return (
 		<div
-			className="flex-ai relative label reset pointer"
+			className="flex-ai relative label reset"
 			style={{ padding: '5px 20px', width: '60%' }}
-			onClick={() => navigate(`/user/${user.id}`)}
 		>
 			<div className="ladderuser-rank absolute">
 				<p className="ladderuser-rank-hashtag">#</p>
@@ -38,10 +37,10 @@ function LadderUser({ user, stats, index }: any) {
 
 				>{index}</p>
 			</div>
-			<div style={{ height: '50px', width: '50px' }}>
-				<ProfilePicture
-					image={url}
-				/>
+			<div className="pointer" style={{ height: '50px', width: '50px' }}
+				onClick={() => navigate(`/user/${user.id}`)}
+			>
+				<ProfilePicture image={url} boxShadow={true} />
 			</div>
 			<p className="ladderuser-username">{user.username}</p>
 			<p className="ladderuser-elo">{stats.eloRating}</p>

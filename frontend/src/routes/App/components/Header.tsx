@@ -18,7 +18,7 @@ export default function Header() {
                     to={`/user/${user.id}`}
                 >
                     <div style={{width: '40px', height: '40px', padding: '0 5px'}}>
-                        <ProfilePicture image={user && user.url} />
+                        <ProfilePicture image={user && user.url} boxShadow={true} />
                     </div>
                     <p className='pp-username'>{user.username}</p>
                 </Link>

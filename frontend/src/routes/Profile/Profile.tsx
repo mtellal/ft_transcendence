@@ -70,7 +70,7 @@ function ProfileMenu({ _user }: any) {
 
             <div>
 
-                <div style={{ height: '150px', width: '150px' }}>
+                <div className="profilemenu-pp">
                     <ProfilePicture
                         image={_user && _user.url}
                     />
@@ -78,28 +78,28 @@ function ProfileMenu({ _user }: any) {
                 <div
                     className="flex-column reset"
                 >
-                    <p className="profile-menu-font-username reset">
+                    <p className="profile-font-title1 profile-menu-font-username reset">
                         {_user && _user.username}
                     </p>
                     {
                         user && Number(userId) === user.id &&
                         <>
                             <p
-                                className="reset profile-menu-font-menu pointer"
+                                className="reset profile-font-title2 pointer"
                                 style={settings ? { marginTop: '20px' } : { marginTop: '20px', color: 'black' }}
                                 onClick={() => { setSettings(false); navigate(`/user/${user.id}`) }}
                             >
                                 Profile
                             </p>
                             <p
-                                className="reset profile-menu-font-menu pointer"
+                                className="reset profile-font-title2 pointer"
                                 style={settings ? { marginTop: '8px', color: 'black' } : { marginTop: '8px' }}
                                 onClick={() => { setSettings(true); navigate(`/user/${user.id}/settings`) }}
                             >
                                 Settings
                             </p>
                             <button
-                                className="profile-menu-button"
+                                className="profile-menu-button profile-font-button1"
                                 onClick={() => navigate("/login")}
                             >
                                 Logout

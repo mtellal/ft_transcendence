@@ -9,6 +9,7 @@ import PickMenu from "../../components/PickMenu";
 
 import ArrowBackMenu from "./components/ArrowBackMenu";
 import { useChannels } from "../../hooks/Chat/useChannels";
+import { useWindow } from "../../hooks/useWindow";
 
 
 export function CreateChannel() {
@@ -25,6 +26,7 @@ export function CreateChannel() {
 
     const [error, setError] = useState("");
 
+    const { isMobileDisplay } = useWindow();
 
     async function submit() {
         if (!type)
@@ -64,13 +66,10 @@ export function CreateChannel() {
         <div className="scroll flex-column"
             style={{ padding: '3%', flex: 3 }}
         >
-            {/* <div className="flex">
-                <ArrowBackMenu
-                    title="Channel"
-                    path="/chat"
-                />
-            </div> */}
-            <h2 className="interface-page-title">Create a channel</h2>
+            <div className="flex">
+                {isMobileDisplay && <ArrowBackMenu />}
+                <h2 className="interface-page-title">Create a channel</h2>
+            </div>
             <div className="flex-column" style={{ gap: '10px' }}>
 
                 <div>

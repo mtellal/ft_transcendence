@@ -34,7 +34,7 @@ function BestPlayer({ user, stats, index }: any) {
 				>{index}</p>
 			</div>
 			<div style={{ height: '90px', width: '90px' }}>
-				<ProfilePicture image={url} />
+				<ProfilePicture image={url} boxShadow={true} />
 			</div>
 			<p className="bestplayers-user-username">{user.username}</p>
 			<p className="bestplayers-user-elo">{stats.eloRating}</p>

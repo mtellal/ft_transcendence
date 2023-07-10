@@ -5,11 +5,12 @@ import './ProfilePicture.css'
 
 type TProfilePicture = {
     image: string
+    boxShadow?: boolean
 }
 
-export default function ProfilePicture({image} : TProfilePicture) {
+export default function ProfilePicture({image, boxShadow} : TProfilePicture) {
     return (
-        <div className='pp-round flex-center'>
+        <div className={boxShadow ? 'pp-round flex-center shadow': 'pp-round flex-center'}>
             <img
                 className='pp'
                 src={image}

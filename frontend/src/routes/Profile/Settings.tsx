@@ -62,8 +62,8 @@ function UpdateProfileUsername({ id, updateCurrentUser, ...props }: TUpdateProfi
             style={{ padding: '4%', gap: '20px' }}
         >
             <div>
-                {error && <p className='reset red-c' style={{ marginBottom: '10px' }} >{error}</p>}
-                {updated && <p className='reset green-c' style={{ marginBottom: '10px' }} >Profile updated</p>}
+                {error && <p className='profile-font2 reset' style={{ marginBottom: '10px', color: 'red' }} >{error}</p>}
+                {updated && <p className='profile-font2 reset' style={{ marginBottom: '10px', color:'green' }} >profile updated</p>}
                 <div style={{ width: '150px' }}>
                     <InfoInput
                         id={id}
@@ -107,13 +107,13 @@ function UpdateProfilePicture({ token, setImage }: any) {
 
     return (
         <div className="flex-column" style={{ padding: "4%" }}>
-            {error && <p className="red-c reset" >{error}</p>}
+            {error && <p className="profile-font2 reset" style={{color: 'red'}}>{error}</p>}
             <div className="flex" style={{ justifyContent: 'space-between', marginTop: '10px' }}>
-                <p className="reset">Import a new profile picture</p>
+                <p className="reset profile-font2">Import a new profile picture</p>
                 <form >
                     <label
                         htmlFor="edit"
-                        className="profil-settings-picture-label"
+                        className="profile-font2 profil-settings-picture-label"
                     >
                         choose a file
                     </label>
@@ -165,9 +165,9 @@ function Authentification2FA() {
 
     return (
         <div className="flex-column" style={{ padding: '4%' }}>
-            <p className="reset profile-settings-2fa-text">Don’t forget to register this qr code and get access to the secret code associated.</p>
+            <p className="reset profile-font3">Don’t forget to register this qr code and get access to the secret code associated.</p>
             <p
-                className="reset profile-settings-2fa-text"
+                className="reset profile-font3"
                 style={{ color: 'rgba(0, 0, 0, 0.7)', marginBottom: '10px' }}
             >
                 You can't login without the secret code.
@@ -198,7 +198,7 @@ function ProfileSettingsLabel({ children, ...props }: TProfileSettingsLabel) {
         <div
             className="profile-settings-label"
         >
-            <div className="fill profile-settings-label-title"
+            <div className="fill profile-font1 profile-settings-label-title"
                 onClick={async () => {
                     if (props.switch) {
                         setShow(!enable2FA)

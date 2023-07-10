@@ -9,19 +9,9 @@
     overflow-y: auto;
     padding: 20px;
     min-width: 400px;
+    max-width: 800px;
     /* border: 1px solid black; */
 }
-
-.profile-history-title {
-    color: #000;
-    font-size: 31px;
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    margin: 0;
-}
-
 
 .profile-history-label {
     border-radius: 5px;
@@ -70,5 +60,10 @@
         flex: 1;
         margin-top: 50px;
         max-height: 600px ;
+        min-width: 100%;
+    }
+
+    .profile-history-title {
+        font-size: 25px;
     }
 }

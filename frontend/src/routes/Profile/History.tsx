@@ -56,6 +56,7 @@ function HistoryLabel({ game, player2, player1 }: any) {
                 >
                     <ProfilePicture
                         image={player2 && player2.url}
+                        boxShadow={true}
                     />
                 </div>
                 <p
@@ -113,7 +114,7 @@ export default function History({ user }: THistory) {
         <div
             className="profile-history"
         >
-            <p className="profile-history-title">History</p>
+            <p className="profile-font-title1" style={{ margin: '0' }}>History</p>
             <div className="flex-column-center" style={{ marginTop: '15px' }}>
                 {
                     history && history.length ?
@@ -130,7 +131,9 @@ export default function History({ user }: THistory) {
                             }
                         </div>
                         :
-                        null
+                        <div>
+                            <p className="profile-font-button1">No history</p>
+                        </div>
                 }
             </div>
 

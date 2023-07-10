@@ -16,7 +16,7 @@ export default function Icon(props: TIcon) {
     const [hover, setHover] = useState(false);
 
     return (
-        <div className="flex-center icon-container hover-fill-grey pointer"
+        <div className="flex-center icon-container pointer"
             onClick={props.onClick}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}

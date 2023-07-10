@@ -25,14 +25,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1% 4% 1% 4%;
+    padding: 0% 4%;
     cursor: pointer;
-    color: #000;
-    font-size: 14px;
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
 }
 
 .profile-settings-label-title:hover {
@@ -51,7 +45,7 @@
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     color: rgba(0, 0, 0, 0.90);
-    font-size: 16px;
+    font-size: 14px;
     font-family: Inter;
     font-style: normal;
     font-weight: 400;
@@ -95,5 +89,19 @@
 @media screen and (max-width: 700px) {
     .profile-settings1 {
         width: 100%;
+    }
+
+    .profile-settings-label-title {
+        font-size: 13px;
+    }
+
+    .profile-settings-username-button
+    {
+        font-size: 12px;
+    }
+
+    .profile-settings-username-button {
+        width: 65px;
+        height: 30px;
     }
 }

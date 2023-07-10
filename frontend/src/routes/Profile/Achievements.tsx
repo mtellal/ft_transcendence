@@ -61,7 +61,7 @@ export function Achievements({ user }: TAchievements) {
         <div
             className="profile-achievements"
         >
-            <p className="profile-achievements-title">Achievements</p>
+            <p className="profile-font-title1" style={{margin: '0'}}>Achievements</p>
             <div
                 className="flex-column"
                 style={{ marginTop: '15px', gap: '10px', alignItems: 'center' }}

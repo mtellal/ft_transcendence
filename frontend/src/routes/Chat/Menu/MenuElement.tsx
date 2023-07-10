@@ -1,24 +1,20 @@
 
 import React, { useCallback, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import UserLabel from "../../../components/users/UserLabel";
 import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 
-import useFetchUsers from "../../../hooks/useFetchUsers";
 import { FriendRequests } from "../components/FriendRequests/FriendRequests";
-import ChannelInfos, { ChannelLabel } from "../../../components/channels/ChannelInfos";
+import { ChannelLabel } from "../../../components/channels/ChannelInfos";
 import SearchElement from "./SearchElement";
 import './MenuElement.css'
 import { Channel, User } from "../../../types";
 import Icon from "../../../components/Icon";
 
-import edit from '../../../assets/Edit.png'
-import join from '../../../assets/Login.png'
 
 import arrowTop from '../../../assets/arrowTop.svg'
 import arrowBot from '../../../assets/arrowBot.svg'
-import ProfilePicture from "../../../components/users/ProfilePicture";
 
 import plusIcon from '../../../assets/Plus.svg'
 import joinIcon from '../../../assets/Login.svg'

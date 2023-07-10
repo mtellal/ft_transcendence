@@ -76,7 +76,7 @@ function IconsBanner(props: TIconsBanner) {
     })
 
     return (
-        <div className="iconsbanner flex" style={{ marginLeft: 'auto', gap: '20px' }}>
+        <div className="iconsbanner" style={props.mobile ? {width: '100%', justifyContent: 'space-around'} : { marginLeft: 'auto' }}>
             {
                 props.type === "WHISPER" && props.whisperUser &&
                 <div>
@@ -172,41 +172,30 @@ type TBanner = {
 
 export default function Banner({ ...props }: TBanner) {
 
-    const { currentChannel } = useChannelsContext();
     const { isMobileDisplay } = useWindow();
 
     return (
         <>
-            <div className="banner">
-                <div className="flex-center" style={{ maxWidth: '100%', overflow: 'hidden', flex: '1' }} >
-                    {/*  <ArrowBackMenu /> */}
+            <div className="banner" style={isMobileDisplay ? { padding: '5px' } : {}}>
+                <div className="flex-center" style={{ maxWidth: '100%', overflow: 'hidden' }} >
+                    {isMobileDisplay && <ArrowBackMenu />}
                     {
-                        currentChannel && currentChannel.type === "WHISPER" ?
+                        props.channel && props.channel.type === "WHISPER" ?
                             <UserInfos
                                 user={props.whisperUser}
                             />
                             :
                             <ChannelInfos
-                                channel={currentChannel}
+                                channel={props.channel}
                             />
                     }
                 </div>
-                {
-                    isMobileDisplay && currentChannel ?
+                <IconsBanner
+                    channel={props.channel}
+                    mobile={isMobileDisplay && props.channel}
+                    {...props}
+                />
 
-                        <div className="mobile-iconsbanner">
-                            <IconsBanner
-                                channel={currentChannel}
-                                mobile={true}
-                                {...props}
-                            />
-                        </div>
-                        :
-                        <IconsBanner
-                            channel={currentChannel}
-                            {...props}
-                        />
-                }
             </div>
         </>
     )
