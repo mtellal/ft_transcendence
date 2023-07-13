@@ -43,7 +43,7 @@ export default function MenuElement() {
                         return (null);
                     return (
                         <UserLabel
-                            key={_friend.id}
+                            key={'user' + _friend.id}
                             id={_friend.id}
                             user={_friend}
                             message={extractLastMessage(channel)}
@@ -53,7 +53,7 @@ export default function MenuElement() {
                 else if (channel.messages && channel.messages.length) {
                     return (
                         <ChannelLabel
-                            key={channel.id}
+                            key={'channel' + channel.id}
                             channel={channel}
                             message={extractLastMessage(channel)}
                         />
@@ -70,7 +70,7 @@ export default function MenuElement() {
         let c: Channel[] = channels.map((channel: Channel) =>
             channel.type !== "WHISPER" ?
                 <ChannelLabel
-                    key={channel.id}
+                    key={'channel' + channel.id}
                     channel={channel}
                 /> : null
         )

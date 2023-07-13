@@ -10,9 +10,9 @@ function formatChannel(channel: Channel) {
     return (
         {
             ...channel,
-            messages: channel.messages || [],
-            users: channel.users || [],
-            muteList: channel.muteList || []
+            messages: channel && channel.messages || [],
+            users: channel && channel.users || [],
+            muteList: channel && channel.muteList || []
         }
     )
 }
@@ -25,7 +25,7 @@ function reducer(channels: Channel[], action: any) {
             }
         }
         case ('addChannel'): {
-            if (!channels.length) {
+            if (!channels.length && action.channel) {
                 return ([formatChannel(action.channel)])
             }
             else if (action.channel && !channels.find((c: Channel) => c.id === action.channel.id)) {
@@ -186,6 +186,7 @@ function reducer(channels: Channel[], action: any) {
             }
         }
         case ('addMessage'): {
+            console.log("add message", action.message)
             if (channels.length && action.message) {
                 return (
                     channels.map((c: Channel) => {

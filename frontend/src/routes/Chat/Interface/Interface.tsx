@@ -57,14 +57,19 @@ export default function Interface() {
             if (user && channelsLoaded) {
                 channel = await selectWhisperChannel(user);
                 if (!channel)
+                {
                     channel = await createWhisperChannel(Number(params.userId));
-                if (isCurrentUserMember(channel))
+                    if (channel)
+                        setCurrentChannel(channel)
+                }
+                else if (isCurrentUserMember(channel))
                     return (setCurrentChannel(channel));
             }
             return;
         }
     }, [channels, friends, channelsLoaded, params]);
 
+    console.log(currentChannel)
 
     useEffect(() => {
         loadInterface();
