@@ -9,18 +9,18 @@ import {
 import './Messenger.css'
 import MessengerInput from "./MessengerInput";
 import MessengerConversation from "./MessengerConversation";
-import { Block, Message, User } from "../../../types";
+import { Block, Channel, Message, User } from "../../../types";
 
 type TMessenger = {
     blockedFriend: boolean,
     hidden: boolean,
     whisperUser: User,
+    channel: Channel
 }
 
 export default function Messenger(props: TMessenger) {
 
     const { user } = useCurrentUser();
-    const { currentChannel } = useChannelsContext();
 
     const filterMessages = useCallback((messages: Message[]) => {
         if (user.blockList.length) {
@@ -31,18 +31,18 @@ export default function Messenger(props: TMessenger) {
             })
         }
         return (messages)
-    }, [currentChannel, currentChannel.messages, user])
+    }, [props.channel, props.channel.messages, user])
 
     const initMessages = useCallback(() => {
-        if (currentChannel && currentChannel.messages && currentChannel.messages.length) {
-            let messages: Message[] = currentChannel.messages;
-            if (messages && messages.length && currentChannel.users) {
+        if (props.channel && props.channel.messages && props.channel.messages.length) {
+            let messages: Message[] = props.channel.messages;
+            if (messages && messages.length && props.channel.users) {
                 messages = filterMessages(messages);
                 return (messages)
             }
         }
         return ([]);
-    }, [currentChannel, currentChannel.messages, user])
+    }, [props.channel, props.channel.messages, user])
 
     return (
         <>
@@ -51,7 +51,7 @@ export default function Messenger(props: TMessenger) {
                     null :
                     <>
                         {
-                            currentChannel &&
+                            props.channel &&
                             <MessengerConversation
                                 messages={ initMessages() }
                                 {...props}

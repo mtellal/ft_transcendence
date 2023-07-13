@@ -7,7 +7,7 @@ import {
 import ProfilePicture from "../../../components/users/ProfilePicture";
 import useAdinistrators from "../../../hooks/Chat/useAdministrators";
 import { useNavigate } from "react-router-dom";
-import { User } from "../../../types";
+import { Channel, User } from "../../../types";
 
 import ownerIcon from '../../../assets/House.svg';
 import adminIcon from '../../../assets/ShieldCheck.svg'
@@ -15,14 +15,14 @@ import adminIcon from '../../../assets/ShieldCheck.svg'
 
 type TAuthorAccess = {
     author: User,
+    channel: Channel,
     id: number,
     type: string,
 }
 
 function AuthorAccess(props: TAuthorAccess) {
     const navigate = useNavigate();
-    const { currentChannel } = useChannelsContext();
-    const { isUserAdministrators } = useAdinistrators();
+    const { isUserAdministrators } = useAdinistrators(props.channel);
 
     return (
         <div
@@ -42,8 +42,8 @@ function AuthorAccess(props: TAuthorAccess) {
 
             <div className="flex" style={{ alignItems: 'flex-end' }}>
                 {
-                    currentChannel.type !== "WHISPER" && props.author &&
-                    currentChannel.ownerId === props.author.id &&
+                    props.channel.type !== "WHISPER" && props.author &&
+                    props.channel.ownerId === props.author.id &&
                     <img src={ownerIcon} style={{height: '20px'}} />
                 }
                 {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
@@ -58,14 +58,14 @@ type TUserMessage = {
     author: User,
     id: number,
     content: string
+    channel: Channel
 }
 
 function AuthorMessage(props: TUserMessage) {
 
     const navigate = useNavigate();
-    const { currentChannel } = useChannelsContext();
 
-    let type = currentChannel && currentChannel.type;
+    let type = props.channel && props.channel.type;
 
     function style() {
         let style: any = { scrollMargin: '30px' };
@@ -103,6 +103,7 @@ function AuthorMessage(props: TUserMessage) {
                         id={props.id}
                         author={props.author}
                         type={type}
+                        channel={props.channel}
                     />
                 }
             </div>
@@ -115,12 +116,12 @@ function AuthorMessage(props: TUserMessage) {
 type TMessengerCurrentUserLabel = {
     author: User,
     content: string
+    channel: Channel
 }
 
 function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
 
-    const { currentChannel } = useChannelsContext();
-    const { isUserAdministrators } = useAdinistrators();
+    const { isUserAdministrators } = useAdinistrators(props.channel);
 
     return (
         <div style={{padding: '0 2%'}}>
@@ -144,11 +145,11 @@ function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
 
                 <div className="flex" style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingBottom: '2px' }}>
                     {
-                        currentChannel && currentChannel.type !== "WHISPER" &&
+                        props.channel && props.channel.type !== "WHISPER" &&
                         <div>
                             {
-                                currentChannel.type !== "WHISPER" && props.author &&
-                                currentChannel.ownerId === props.author.id &&
+                                props.channel.type !== "WHISPER" && props.author &&
+                                props.channel.ownerId === props.author.id &&
                                 <img src={ownerIcon} style={{height: '20px'}} />
                             }
                             {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
@@ -176,6 +177,7 @@ type TMessage = {
     displayUser: boolean,
     author: User,
     owner: boolean,
+    channel: Channel
 }
 
 

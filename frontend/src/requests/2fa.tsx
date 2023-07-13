@@ -1,11 +1,9 @@
 import axios from "axios";
 
-const back = process.env.REACT_APP_BACK;
-
 export async function enable2FARequest(enable: boolean, token: string)
 {
     return (
-        axios.put(`${back}/auth/twofactor?enable=${enable}`, {}, {
+        axios.put(`${process.env.REACT_APP_BACK}/auth/twofactor?enable=${enable}`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -16,7 +14,7 @@ export async function enable2FARequest(enable: boolean, token: string)
 export async function getQRCodeRequest(token: string)
 {
     return (
-        axios.get(`${back}/auth/qrcode`, {
+        axios.get(`${process.env.REACT_APP_BACK}/auth/qrcode`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

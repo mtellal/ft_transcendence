@@ -28,12 +28,12 @@ type TChannelProfile = {
 export default function ChannelProfile(props: TChannelProfile) {
 
     const { user } = useCurrentUser();
-    const { channels, currentChannel } = useChannelsContext();
-    const { getOwner } = useMembers();
+    const { channels } = useChannelsContext();
+    const { getOwner } = useMembers(props.channel);
 
-    const { getUsersBanned } = useBanUser();
-    const { getAdministrators } = useAdinistrators();
-    const { getUsersMuted } = useMuteUser();
+    const { getUsersBanned } = useBanUser(props.channel);
+    const { getAdministrators } = useAdinistrators(props.channel);
+    const { getUsersMuted } = useMuteUser(props.channel);
 
     const [owner, setOwner]: any = useState();
     const [admins, setAdmins] = useState([]);
@@ -45,17 +45,17 @@ export default function ChannelProfile(props: TChannelProfile) {
 
     const init = useCallback(async () => {
         if (props.members && props.members.length) {
-            const administrators = getAdministrators(props.channel);
+            const administrators = getAdministrators();
             if (administrators && administrators.length)
                 setAdmins(administrators)
-            const owner = getOwner(props.channel);
+            const owner = getOwner();
             if (owner)
                 setOwner(owner);
 
-            const mutedUsers = await getUsersMuted(props.channel);
+            const mutedUsers = await getUsersMuted();
             setMuted(mutedUsers);
 
-            const bannesUsers = await getUsersBanned(props.channel);
+            const bannesUsers = await getUsersBanned();
             setBanned(bannesUsers)
         }
     }, [props.channel])
@@ -85,33 +85,39 @@ export default function ChannelProfile(props: TChannelProfile) {
                     />
                     <SearchChannelUser
                         title="Search"
+                        channel={props.channel}
                         inputTitle="Search user"
                         members={props.members}
                     />
                     <h2>Owner</h2>
                     <ChannelUserLabel
                         user={owner}
+                        channel={props.channel}
                         showChannelStatus={true}
                         isAddable={false}
                     />
                     <CollectionUsers
                         title="Administrators"
                         users={admins}
+                        channel={props.channel}
                         currentUser={user}
                     />
                     <CollectionUsers
                         title="Members"
                         users={props.members}
+                        channel={props.channel}
                         currentUser={user}
                     />
                     <CollectionUsers
                         title="Muted"
                         users={muted}
+                        channel={props.channel}
                         currentUser={user}
                     />
                     <CollectionUsers
                         title="Banned"
                         users={banned}
+                        channel={props.channel}
                         currentUser={user}
                     />
                 </div>

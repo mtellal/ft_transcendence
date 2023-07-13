@@ -131,7 +131,7 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
     const navigate = useNavigate();
 
     const { user } = useCurrentUser();
-    const { isUserMember } = useMembers();
+    const { isUserMember } = useMembers(props.channel);
 
     const { setAction } = useContext(ChatInterfaceContext);
 
@@ -161,7 +161,7 @@ export function ChannelSearchLabel(props: TChannelSearchLabel) {
                     onClick={() => setShowActions((p: boolean) => !p)}
                 >
                     {
-                        isUserMember(user, props.channel) ?
+                        isUserMember(user) ?
                             <>
                                 <p className="menu-searcheduser-acton"
                                     onClick={() => {

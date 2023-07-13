@@ -4,13 +4,13 @@ import useMembers from "./useMembers";
 import { Channel, Mute, User } from "../../types";
 
 
-export default function useMuteUser() {
+export default function useMuteUser(channel: Channel) {
     const { socket } = useChatSocket();
-    const { channels, channelsDispatch, currentChannel } = useChannelsContext();
+    const { channels, channelsDispatch } = useChannelsContext();
 
-    const { getMembersById } = useMembers(); 
+    const { getMembersById } = useMembers(channel); 
 
-    const isUserMuted = useCallback((user: User, channel: Channel) => {
+    const isUserMuted = useCallback((user: User) => {
         if (channels && channels.length && 
             channel && channel.muteList && channel.muteList.length && user)
         {
@@ -26,7 +26,7 @@ export default function useMuteUser() {
         return (false);
     }, [channels])
 
-    const getUsersMuted = useCallback( async (channel: Channel) => {
+    const getUsersMuted = useCallback( async () => {
         if (channels && channels.length && 
             channel && channel.muteList && channel.muteList.length)
         {
@@ -36,7 +36,7 @@ export default function useMuteUser() {
         return ([]);
     }, [channels])
 
-    const muteUser = useCallback((user: User, channel: Channel, duration: number) => {
+    const muteUser = useCallback((user: User, duration: number) => {
         if (channels && channels.length && socket && user && channel) {
             socket.emit('muteUser', {
                 channelId: channel.id,
@@ -48,7 +48,7 @@ export default function useMuteUser() {
     }, [socket, channels])
 
 
-    const unmuteUser = useCallback((user: User, channel: Channel) => {
+    const unmuteUser = useCallback((user: User) => {
         if (channels && channels.length && socket && user && channel) {
             socket.emit('unmuteUser', {
                 channelId: channel.id,

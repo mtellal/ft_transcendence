@@ -12,7 +12,6 @@ import useFetchUsers from "../../../hooks/useFetchUsers";
 
 import './Interface.css'
 import { Channel, User } from "../../../types";
-import { createChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 
 export const InterfaceContext: React.Context<any> = createContext(null);
@@ -26,7 +25,9 @@ export default function Interface() {
     const { friends }: any = useFriendsContext();
     const { selectWhisperChannel, createWhisperChannel } = useChannels();
 
-    const { currentChannel, setCurrentChannel, channels, channelsLoaded } = useChannelsContext();
+    const [currentChannel, setCurrentChannel]: any = useState(null);
+
+    const { channels, channelsLoaded } = useChannelsContext();
 
     const [blockedFriend, setBlockedFriend]: [any, any] = useState(false);
 
@@ -93,10 +94,11 @@ export default function Interface() {
                             profile={() => setProfile((p: boolean) => !p)}
                             setBlockedFriend={setBlockedFriend}
                         />
-                        {profile && <Profile />}
+                        {profile && <Profile channel={currentChannel} />}
 
                         <Messenger
                             whisperUser={whisperUser}
+                            channel={currentChannel}
                             blockedFriend={blockedFriend}
                             hidden={profile}
                         />

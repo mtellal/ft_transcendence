@@ -33,8 +33,8 @@ type TIconsBanner = {
     whisperUser: User,
     channel: Channel,
     setBlockedFriend: any,
-    type: any,
-    mobile?: any
+    type: string,
+    mobile?: boolean
     profile: any,
 }
 
@@ -43,7 +43,7 @@ function IconsBanner(props: TIconsBanner) {
     const navigate = useNavigate();
     const { user, token } = useCurrentUser();
     const { isUserBlocked, blockUser, unblockUser } = useBlock();
-    const { removeFriend, updateFriend } = useFriends();
+    const { removeFriend } = useFriends();
     const { leaveChannel } = useChannels();
     const { isUserFriend } = useFriends();
 
@@ -76,7 +76,11 @@ function IconsBanner(props: TIconsBanner) {
     })
 
     return (
-        <div key={props.channel.id} className="iconsbanner" style={props.mobile ? {width: '100%', justifyContent: 'space-around'} : { marginLeft: 'auto' }}>
+        <div 
+            key={props.channel.id} 
+            className="iconsbanner" 
+            style={props.mobile ? {width: '100%', justifyContent: 'space-around'} : {}}
+            >
             {
                 props.type === "WHISPER" && props.whisperUser &&
                 <div>
@@ -167,7 +171,7 @@ type TBanner = {
     channel: Channel,
     type: string,
     setBlockedFriend: any,
-    profile: any,
+    profile: () => void,
 }
 
 export default function Banner({ ...props }: TBanner) {
@@ -176,8 +180,11 @@ export default function Banner({ ...props }: TBanner) {
 
     return (
         <>
-            <div className="banner" style={isMobileDisplay ? { padding: '5px' } : {}}>
-                <div className="flex-center" style={{ maxWidth: '100%', overflow: 'hidden' }} >
+            <div 
+                className="banner" 
+                style={isMobileDisplay ? { padding: '5px' } : {}}
+            >
+                <div className="banner-infos">
                     {isMobileDisplay && <ArrowBackMenu />}
                     {
                         props.channel && props.channel.type === "WHISPER" ?
@@ -192,7 +199,7 @@ export default function Banner({ ...props }: TBanner) {
                 </div>
                 <IconsBanner
                     channel={props.channel}
-                    mobile={isMobileDisplay && props.channel}
+                    mobile={isMobileDisplay}
                     {...props}
                 />
             </div>

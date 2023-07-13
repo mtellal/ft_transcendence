@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser } from "../Hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useFetchUsers from "../useFetchUsers";
 import { Channel, User } from "../../types";
 import { createChannel, getWhisperChannel } from "../../requests/chat";
@@ -8,12 +8,15 @@ import { createChannel, getWhisperChannel } from "../../requests/chat";
 
 export function useChannels() {
     const navigate = useNavigate();
+    const { channelId } = useParams();
+
+    console.log(channelId)
 
     const { user, token } = useCurrentUser();
     const { socket } = useChatSocket();
     const { fetchUsers } = useFetchUsers();
 
-    const { channels, channelsDispatch, currentChannel } = useChannelsContext();
+    const { channels, channelsDispatch } = useChannelsContext();
 
     const isChannelPublic = useCallback((channel: Channel) => {
         if (channel)
@@ -115,9 +118,9 @@ export function useChannels() {
         channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId });
         if (res.userId === user.id)
             channelsDispatch({ type: 'removeChannel', channelId: res.channelId })
-        if (currentChannel && res.channelId === currentChannel.id && res.userId === user.id)
+        if (res.channelId === Number(channelId) && res.userId === user.id)
             navigate("/chat");
-    }, [currentChannel, user])
+    }, [user])
 
     const leaveChannel = useCallback((channel: Channel) => {
         if (channel && channel.id && socket) {
@@ -125,10 +128,10 @@ export function useChannels() {
             socket.emit('leaveChannel', {
                 channelId: channel.id
             })
-            if (currentChannel && channel.id === currentChannel.id)
+            if (channel.id === Number(channelId))
                 navigate("/chat");
         }
-    }, [socket, currentChannel])
+    }, [socket])
 
 
     const getChannelFromFriendName = useCallback((friend: User) => {

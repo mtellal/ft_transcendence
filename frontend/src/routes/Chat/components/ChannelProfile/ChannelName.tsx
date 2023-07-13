@@ -6,7 +6,7 @@ import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 export default function ChannelName({ channel }: any) {
-    const { isCurrentUserAdmin } = useUserAccess();
+    const { isCurrentUserAdmin } = useUserAccess(channel);
     const { updateChannelName } = useChannels();
 
     const [name, setName]: any = useState("")

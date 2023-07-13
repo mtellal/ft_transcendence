@@ -97,7 +97,7 @@ type TConfirmViewMuteAction = {
 
 export function ConfirmViewMuteAction(props: TConfirmViewMuteAction) {
 
-    const { muteUser } = useMuteUser();
+    const { muteUser } = useMuteUser(props.channel);
 
     const [seconds, setSeconds]: any = useState("")
     const [error, setError] = useState("");
@@ -108,7 +108,7 @@ export function ConfirmViewMuteAction(props: TConfirmViewMuteAction) {
         if (newSeconds && /^\d+$/.test(newSeconds)) {
             if (newSeconds.length > 5)
                 return (setError("Mute too long (seconds < 100 000)"));
-            muteUser(props.user, props.channel, Number(newSeconds));
+            muteUser(props.user, Number(newSeconds));
             props.setConfirmView(false);
         }
         else

@@ -3,11 +3,11 @@ import { useChannelsContext, useChatSocket } from "../Hooks";
 import { Channel, User } from "../../types";
 
 
-export default function useKickUser() {
+export default function useKickUser(channel: Channel) {
     const { socket } = useChatSocket();
     const { channelsDispatch } = useChannelsContext();
 
-    const kickUser = useCallback((user: User, channel: Channel) => {
+    const kickUser = useCallback((user: User) => {
         if (socket && channel && user) {
             socket.emit('kickUser', {
                 channelId: channel.id,

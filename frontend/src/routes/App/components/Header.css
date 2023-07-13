@@ -31,11 +31,6 @@
     align-items: center;
 }
 
-.pp-container > *
-{
-    cursor: pointer;
-}
-
 .pp-link
 {
     height: 100%;
@@ -52,4 +47,10 @@
     text-overflow: ellipsis;
     max-width: 100px;
     overflow: hidden;
+}
+
+.header-pp-container {
+    width: 40px;
+    height: 40px;
+    padding: 0 5px;
 }

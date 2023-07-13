@@ -17,8 +17,6 @@ export function CreateChannel() {
     const navigate = useNavigate();
     const { token } = useCurrentUser();
     const { addChannel } = useChannels();
-    const { setCurrentChannel } = useChannelsContext();
-
 
     const [name, setName]: [string, any] = useState("");
     const [type, setType]: [string, any] = useState("public")
@@ -27,10 +25,6 @@ export function CreateChannel() {
     const [error, setError] = useState("");
 
     const { isMobileDisplay } = useWindow();
-
-    useEffect(() => {
-        setCurrentChannel(null);
-    }, [])
 
     async function submit() {
         if (!type)
@@ -57,7 +51,6 @@ export function CreateChannel() {
                 if (res.data) {
                     channel = res.data;
                     addChannel(res.data, false)
-                    setCurrentChannel(res.data);
                 }
             })
         if (channel)

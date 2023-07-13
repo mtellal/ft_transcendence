@@ -7,12 +7,13 @@ import useMembers from "../../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { getBlockList } from "../../../../requests/block";
 import { useChannelsContext, useCurrentUser } from "../../../../hooks/Hooks";
-import { Block, User } from "../../../../types";
+import { Block, Channel, User } from "../../../../types";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 type TSearchChannelUser = {
-    title: string
+    title: string,
+    channel: Channel,
     inputTitle: string,
     members: User[],
 }
@@ -23,12 +24,10 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
     const [searchUserValue, setSearchUserValue]: any = useState("");
     const [searchUser, setSearchUser]: any = useState();
     const [error, setError] = useState("");
-    const { isUserMember } = useMembers();
-
-    const { currentChannel } = useChannelsContext();
+    const { isUserMember } = useMembers(props.channel);
 
     const { fetchUserByUsername } = useFetchUsers();
-    const { isCurrentUserAdmin, getUserAccess } = useUserAccess();
+    const { isCurrentUserAdmin, getUserAccess } = useUserAccess(props.channel);
 
     const [blockedUser, setBlockedUser] = useState(false);
 
@@ -39,7 +38,7 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
         }
         if (!searchedUser)
             searchedUser = await fetchUserByUsername(searchUserValue);
-        if (searchedUser && (isUserMember(searchedUser, currentChannel) || isCurrentUserAdmin)) {
+        if (searchedUser && (isUserMember(searchedUser) || isCurrentUserAdmin)) {
             setSearchUser(searchedUser);
             const userBlockList = await getBlockList(searchedUser.id, token).then(res => res.data);
             if (userBlockList && userBlockList.length && userBlockList.find((o: Block) => o.userId === user.id))
@@ -69,6 +68,7 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
                 searchUser &&
                 <ChannelUserLabel
                     user={searchUser}
+                    channel={props.channel}
                     showChannelStatus={!isCurrentUserAdmin && getUserAccess(searchUser)}
                     isAddable={!blockedUser}
                 />

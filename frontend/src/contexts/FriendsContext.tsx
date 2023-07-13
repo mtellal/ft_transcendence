@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
+import React, { createContext, useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useCurrentUser } from "../hooks/Hooks";
 import { getUserInvitations } from "../requests/friendsRequest";
 import useFetchUsers from "../hooks/useFetchUsers";
@@ -37,20 +37,20 @@ export function FriendsProvider({ children }: any) {
     const [friends, friendsDispatch]: any = useReducer(reducer, []);
     const [friendInvitations, setFriendInvitations]: [FriendRequest[], any] = useState([]);
 
-    const [friendsLoading, setFriendsLoading] = useState(false);
+    const friendsLoadingRef = useRef(null);
 
     async function loadFriendList() {
-        setFriendsLoading(true);
+        friendsLoadingRef.current = true;
         let friendList = await fetchUsers(user.friendList);
         if (friendList && friendList.length) {
             friendList = friendList.sort((a: User, b: User) => a.username > b.username ? 1 : -1);
             friendsDispatch({ type: 'setFriendList', friendList })
         }
-        setFriendsLoading(false);
+        friendsLoadingRef.current = true;
     }
 
     useEffect(() => {
-        if (user && user.friendList && !friendsLoading) {
+        if (user && user.friendList && !friendsLoadingRef.current) {
             loadFriendList();
             getUserInvitations(user.id, token)
                 .then(res => {
@@ -58,7 +58,7 @@ export function FriendsProvider({ children }: any) {
                         setFriendInvitations(res.data);
                 })
         }
-    }, [user, friendsLoading, token])
+    }, [user, token])
 
 
     return (

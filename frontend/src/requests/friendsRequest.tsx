@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const back = process.env.REACT_APP_BACK;
-
 /////////////////////////////////////////////////////////////////////////
 //                     F R I E N D    R E Q U E S T S                  //
 /////////////////////////////////////////////////////////////////////////
@@ -9,7 +7,7 @@ const back = process.env.REACT_APP_BACK;
 
 export async function getUserInvitations(id: number | string, token: string) {
     return (
-        axios.get(`${back}/users/${id}/friendRequest`, {
+        axios.get(`${process.env.REACT_APP_BACK}/users/${id}/friendRequest`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -21,7 +19,7 @@ export async function getUserInvitations(id: number | string, token: string) {
 
 export async function sendFriendRequest(friendId: number | string, token: string) {
     return (
-        axios.post(`${back}/users/friendRequest`, {
+        axios.post(`${process.env.REACT_APP_BACK}/users/friendRequest`, {
             id: friendId
         }, {
             headers: {
@@ -35,7 +33,7 @@ export async function sendFriendRequest(friendId: number | string, token: string
 
 export async function validFriendRequest(requestId: number | string, token: number | string) {
     return (
-        axios.post(`${back}/users/friendRequest/${requestId}`, {}, {
+        axios.post(`${process.env.REACT_APP_BACK}/users/friendRequest/${requestId}`, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -47,7 +45,7 @@ export async function validFriendRequest(requestId: number | string, token: numb
 
 export async function refuseFriendRequest(requestId: number | string, token: number | string) {
     return (
-        axios.delete(`${back}/users/friendRequest/${requestId}`, {
+        axios.delete(`${process.env.REACT_APP_BACK}/users/friendRequest/${requestId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

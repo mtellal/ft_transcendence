@@ -3,15 +3,14 @@ import { useChannelsContext, useChatSocket, useCurrentUser} from "../../../hooks
 import { getChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
 import useMembers from "../../../hooks/Chat/useMembers";
-
-
+import useFetchUsers from "../../../hooks/useFetchUsers";
 
 export default function ChannelsEvents({ children }: any) {
     const { user, token } = useCurrentUser();
     const { socket } = useChatSocket();
     const { channels, channelsDispatch } = useChannelsContext();
 
-    const { addedMember } = useMembers();
+    const { fetchUser } = useFetchUsers();
 
     const {
         addChannel,
@@ -34,7 +33,12 @@ export default function ChannelsEvents({ children }: any) {
 
             socket.on('joinedChannel', async (res: any) => {
                 if (res && res.userId && res.channelId)
-                    addedMember(res.userId, res.channelId)
+                {
+                    if (channels && channels.length) {
+                        const user = await fetchUser(res.userId);
+                        channelsDispatch({ type: 'addMember', channelId: res.channelId, user })
+                    }
+                }
             })
 
             socket.on('leftChannel', async (res: any) => {
@@ -59,7 +63,10 @@ export default function ChannelsEvents({ children }: any) {
                         }
                     }
                     else {
-                        addedMember(res.userId, res.channelId)
+                        if (channels && channels.length) {
+                            const user = await fetchUser(res.userId);
+                            channelsDispatch({ type: 'addMember', channelId: res.channelId, user })
+                        }
                     }
                 }
             })

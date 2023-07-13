@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const back = process.env.REACT_APP_BACK;
-
 /////////////////////////////////////////////////////////////////////////
 //                     C H A T        R E Q U E S T S                  //
 /////////////////////////////////////////////////////////////////////////
@@ -10,7 +8,7 @@ const back = process.env.REACT_APP_BACK;
 export async function getAllChannels(token: string)
 {
     return (
-        axios.get(`${back}/chat`, {
+        axios.get(`${process.env.REACT_APP_BACK}/chat`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -21,7 +19,7 @@ export async function getAllChannels(token: string)
 
 export async function getChannel(id: number, token: string) {
     return (
-        axios.get(`${back}/chat/${id}`, {
+        axios.get(`${process.env.REACT_APP_BACK}/chat/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -33,7 +31,7 @@ export async function getChannel(id: number, token: string) {
 
 export async function getWhisperChannel(userId: number, friendId: number, token: string) {
     return (
-        axios.get(`${back}/users/whispers?id=${userId}&friendId=${friendId}`, {
+        axios.get(`${process.env.REACT_APP_BACK}/users/whispers?id=${userId}&friendId=${friendId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -45,7 +43,7 @@ export async function getWhisperChannel(userId: number, friendId: number, token:
 
 export async function getChannelProtected(channelId: number, password: string, token: string) {
     return (
-        axios.post(`${back}/chat/`, {
+        axios.post(`${process.env.REACT_APP_BACK}/chat/`, {
             channelId,
             password
         },
@@ -62,7 +60,7 @@ export async function getChannelProtected(channelId: number, password: string, t
 
 export async function getChannelByName(name: string, token: string) {
     return (
-        axios.get(`${back}/chat?name=${name}`, {
+        axios.get(`${process.env.REACT_APP_BACK}/chat?name=${name}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -74,7 +72,7 @@ export async function getChannelByName(name: string, token: string) {
 
 export async function createChannel(channel: any, token: number | string) {
     return (
-        axios.put(`${back}/chat`, channel, {
+        axios.put(`${process.env.REACT_APP_BACK}/chat`, channel, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -86,7 +84,7 @@ export async function createChannel(channel: any, token: number | string) {
 
 export async function getChannels(id: string | number, token: string) {
     return (
-        axios.get(`${back}/users/${id}/channels`, {
+        axios.get(`${process.env.REACT_APP_BACK}/users/${id}/channels`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -100,7 +98,7 @@ export async function getChannels(id: string | number, token: string) {
 
 export async function deleteChannelRequest(id: string | number, token: string) {
     return (
-        axios.delete(`${back}/chat/${id}`, {
+        axios.delete(`${process.env.REACT_APP_BACK}/chat/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

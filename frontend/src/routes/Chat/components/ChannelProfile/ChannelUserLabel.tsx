@@ -12,7 +12,7 @@ import useMembers from "../../../../hooks/Chat/useMembers";
 import { PofileChannelContext } from '../../Profile/ChannelProfile/ChannelProfile';
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import { CollectionElement } from "../../../../components/collections/CollectionElement";
-import { User } from "../../../../types";
+import { Channel, User } from "../../../../types";
 
 
 import muteIcon from '../../../../assets/Chat_Close.svg'
@@ -33,6 +33,7 @@ type TCollectionUsers = {
     users: User[],
     isAdmin?: boolean,
     currentUser?: User,
+    channel: Channel,
 }
 
 export function CollectionUsers(props: TCollectionUsers) {
@@ -46,6 +47,7 @@ export function CollectionUsers(props: TCollectionUsers) {
                 <ChannelUserLabel
                     key={`${props.title}-${user.id}`}
                     user={user}
+                    channel={props.channel}
                     showChannelStatus={false}
                     isAddable={false}
                 />
@@ -62,6 +64,7 @@ export function CollectionUsers(props: TCollectionUsers) {
 
 type TChannelUserLabel = {
     user: User,
+    channel:Channel,
     showChannelStatus: boolean | number,
     isAddable: boolean,
 }
@@ -70,22 +73,21 @@ type TChannelUserLabel = {
 export function ChannelUserLabel(props: TChannelUserLabel) {
 
     const { user } = useCurrentUser();
-    const { currentChannel } = useChannelsContext();
-    const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess();
+    const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess(props.channel);
 
-    const { kickUser } = useKickUser();
-    const { muteUser, unmuteUser, isUserMuted } = useMuteUser();
-    const { banUser, unbanUser } = useBanUser();
-    const { makeAdmin, removeAdmin, isUserAdministrators } = useAdinistrators();
-    const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers();
+    const { kickUser } = useKickUser(props.channel);
+    const { muteUser, unmuteUser, isUserMuted } = useMuteUser(props.channel);
+    const { banUser, unbanUser } = useBanUser(props.channel);
+    const { makeAdmin, removeAdmin, isUserAdministrators } = useAdinistrators(props.channel);
+    const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers(props.channel);
 
     const { setUserAction, setConfirmView }: any = useContext(PofileChannelContext)
 
     const [mutedUser, setMutedUser] = useState(false);
 
     useEffect(() => {
-        setMutedUser(isUserMuted(props.user, currentChannel));
-    }, [currentChannel, currentChannel.muteList, isUserMuted, props.user])
+        setMutedUser(isUserMuted(props.user));
+    }, [props.channel, props.channel.muteList, isUserMuted, props.user])
 
     function mutedIcon() {
         if (mutedUser)
@@ -128,7 +130,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
 
     function functionalities() {
         if (props.user && isCurrentUserAdmin && props.user.username !== (user && user.username) &&
-            currentChannel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
+            props.channel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
             if (isUserBanned(props.user)) {
                 return (
                     <div>
@@ -149,7 +151,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                     </div>
                 )
             }
-            else if (props.user && !isUserMember(props.user, currentChannel)) {
+            else if (props.user && !isUserMember(props.user)) {
                 if (props.isAddable) {
                     return (
                         <div>

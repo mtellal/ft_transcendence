@@ -45,8 +45,8 @@ export default function Login() {
     async function loader() {
         let validLogin = false;
         let oauth_code = searchParams.get("oauth_code");
-        let step = searchParams.get("step");
         if (oauth_code) {
+            let step = searchParams.get("step");
             if (step === "true") {
                 return (navigate("/login/2fa", { state: { oauth_code } }));
             }

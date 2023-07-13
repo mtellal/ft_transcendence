@@ -1,24 +1,20 @@
 import React, { useCallback } from "react";
 
-import {
-    useChannelsContext,
-    useChatSocket,
-} from "../../../hooks/Hooks";
+import { useChatSocket, } from "../../../hooks/Hooks";
 import './Messenger.css'
 
 import sendIcon from '../../../assets/Paper_Plane.svg'
 import Icon from "../../../components/Icon";
+import { Channel } from "../../../types";
 
 type TMessengerInput = {
     blockedFriend: boolean,
-    hidden: boolean
+    hidden: boolean, 
+    channel: Channel
 }
-
 
 export default function MessengerInput(props: TMessengerInput) {
     const { socket } = useChatSocket();
-    const { currentChannel } = useChannelsContext();
-
     const [value, setValue] = React.useState("");
 
     const handleChange = useCallback((e: any) => {
@@ -31,24 +27,24 @@ export default function MessengerInput(props: TMessengerInput) {
         if (props.blockedFriend)
             return ("User blocked")
         return ("Write your message")
-    }, [currentChannel, props.blockedFriend]);
+    }, [props.channel, props.blockedFriend]);
 
 
     const sendMessage = useCallback(() => {
-        if (value && !props.blockedFriend && currentChannel && socket) {
+        if (value && !props.blockedFriend && props.channel && socket) {
             socket.emit('message', {
-                channelId: currentChannel.id,
+                channelId: props.channel.id,
                 content: value
             })
             setValue("")
         }
-    }, [value, currentChannel, socket])
+    }, [value, props.channel, socket])
 
     const submit = useCallback((e: any) => {
         if (e.key === "Enter") {
             sendMessage();
         }
-    }, [value, currentChannel, socket])
+    }, [value, props.channel, socket])
 
 
     return (

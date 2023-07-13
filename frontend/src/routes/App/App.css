@@ -6,11 +6,3 @@
   grid-template: repeat(20, 1fr) / 60px auto;
   min-width: 300px;
 }
-
-
-@media screen and (max-width: 700px){
-  
-  .main-content {
-  }
-}
-

@@ -6,7 +6,7 @@ import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 export default function ChannelPassword({ channel }: any) {
-    const { isCurrentUserAdmin } = useUserAccess();
+    const { isCurrentUserAdmin } = useUserAccess(channel);
     const [password, setPassword]: any = useState("")
 
     const [error, setError] = useState("");

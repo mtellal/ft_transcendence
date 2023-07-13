@@ -7,7 +7,7 @@ import useFetchUsers from "../../../hooks/useFetchUsers";
 import Message from "./Message";
 import './Messenger.css'
 import { useInvitation } from "../../../hooks/Chat/useInvitation";
-import { Message as TMessage, User } from "../../../types";
+import { Channel, Message as TMessage, User } from "../../../types";
 
 import ligntningIcon from '../../../assets/lightning.svg'
 import gameIcon from '../../../assets/Gamepad.svg'
@@ -86,17 +86,25 @@ function InvitationMessage(props: TInvitationMessage) {
 }
 
 
+type TMessengerConversation = {
+    messages: TMessage[],
+    whisperUser: User,
+    channel: Channel
+    blockedFriend: boolean,
+    hidden: boolean,
+}
 
-export default function MessengerConversation({ messages, blockedFriend, hidden, whisperUser }: any) {
+
+export default function MessengerConversation({ messages, whisperUser, channel, blockedFriend, hidden }: TMessengerConversation) {
 
     const { fetchUser } = useFetchUsers();
-    const { currentChannel } = useChannelsContext();
-    const { getMemberById, getMembersById, isUserIdMember } = useMembers();
+    const { getMemberById, getMembersById, isUserIdMember } = useMembers(channel);
     const [authors, setAuthors]: any = useState([]);
     const messagesContainerRef = useRef(null);
 
     async function loadAuthors(messages: TMessage[], membersId: number[]) {
         let users: User[] = getMembersById(membersId);
+        console.log(users)
         let ids: number[] = membersId;
         await Promise.all(
             messages.map(async (m: TMessage, index: number) => {
@@ -119,14 +127,13 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
     }
 
     useEffect(() => {
-        if (messages && messages.length && currentChannel && currentChannel.members) {
-            loadAuthors(messages, currentChannel.members);
+        if (messages && messages.length && channel && channel.members) {
+            loadAuthors(messages, channel.members);
         }
         else {
             setAuthors([]);
         }
-    }, [messages, currentChannel])
-
+    }, [messages, channel])
 
     const rendMessages = useCallback(() => {
         if (messages.length) {
@@ -157,7 +164,8 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
                                 sendBy={m.sendBy}
                                 author={_author}
                                 displayUser={displayUser}
-                                owner={currentChannel.type !== "WHISPER" && currentChannel.ownerId === m.sendBy}
+                                owner={channel.type !== "WHISPER" && channel.ownerId === m.sendBy}
+                                channel={channel}
                             />
                         )
                     }
@@ -178,8 +186,8 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
                     <NoMessages /> : rendMessages()
             }
             {
-                blockedFriend && currentChannel && currentChannel.type === "WHISPER" &&
-                <BlockMessage username={whisperUser.username || currentChannel.name} />
+                blockedFriend && channel && channel.type === "WHISPER" &&
+                <BlockMessage username={whisperUser.username || channel.name} />
             }
         </div>
     )

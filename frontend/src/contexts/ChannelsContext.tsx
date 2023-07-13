@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
+import React, { createContext, useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { deleteChannelRequest, getChannels } from "../requests/chat";
 import { useChatSocket, useCurrentUser } from "../hooks/Hooks";
 import useFetchUsers from "../hooks/useFetchUsers";
@@ -209,9 +209,9 @@ export function ChannelsProvider({ children }: any) {
     const { fetchUsers } = useFetchUsers();
 
     const [channels, channelsDispatch] = useReducer(reducer, []);
-    const [currentChannel, setCurrentChannelLocal]: any = useState();
-    const [channelsLoading, setChannelsLoading] = useState(false);
-    const [channelsLoaded, setChannelsLoaded] = useState(false);
+
+    const channelsLoadingRef = useRef(null);
+    const channelsLoadedRef = useRef(null);
 
     async function loadUsersChannels(channelList: Channel[]) {
         let users;
@@ -231,8 +231,8 @@ export function ChannelsProvider({ children }: any) {
 
 
     const loadChannels = useCallback(async () => {
-        setChannelsLoading(true);
-        setChannelsLoaded(false);
+        channelsLoadedRef.current = false;
+        channelsLoadingRef.current = true;
         let channelList;
         channelList = await getChannels(user.id, token).then(res => res.data);
         channelList = await loadUsersChannels(channelList);
@@ -243,51 +243,22 @@ export function ChannelsProvider({ children }: any) {
             })
         });
         // channelList.forEach((channel: Channel) => deleteChannelRequest(channel.id, token));
-        setChannelsLoading(false);
-        setChannelsLoaded(true);
+        channelsLoadedRef.current = true;
+        channelsLoadingRef.current = false;
     }, [user, socket])
 
     useEffect(() => {
-        if (user && socket && !channelsLoading && !channels.length) {
+        if (user && socket && !channelsLoadingRef.current && !channels.length) {
             loadChannels();
         }
     }, [socket, user])
-
-
-    ////////////////////////////////////////////////////////////////
-    //               C U R R E N T    C H A N N E L               //
-    ////////////////////////////////////////////////////////////////
-
-    const setCurrentChannel = useCallback((channel: Channel) => {
-        let pickChannel;
-        if (!channels.length)
-            pickChannel = channel;
-        else if (channel) {
-            pickChannel = channels.find((c: Channel) => c.id === channel.id)
-            if (!pickChannel)
-                pickChannel = channel
-        }
-        setCurrentChannelLocal(pickChannel);
-    }, [channels])
-
-
-    useEffect(() => {
-        if (channels) {
-            if (channels.length)
-                setCurrentChannelLocal((p: any) => p ? channels.find((c: Channel) => c.id == p.id) : null)
-            else
-                setCurrentChannelLocal(null)
-        }
-    }, [channels])
 
 
     return (
         <ChannelsContext.Provider value={{
             channels,
             channelsDispatch,
-            currentChannel,
-            setCurrentChannel,
-            channelsLoaded
+            channelsLoaded: channelsLoadedRef.current
         }}>
             {children}
         </ChannelsContext.Provider>

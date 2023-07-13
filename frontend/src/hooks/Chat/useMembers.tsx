@@ -3,19 +3,19 @@ import { useChannelsContext, useChatSocket } from "../Hooks";
 import useFetchUsers from "../useFetchUsers";
 import { Channel, User } from "../../types";
 
-export default function useMembers() {
-    const { currentChannel, channels, channelsDispatch } = useChannelsContext();
+export default function useMembers(channel: Channel) {
+    const { channels, channelsDispatch } = useChannelsContext();
     const { socket } = useChatSocket();
     const { fetchUser } = useFetchUsers();
 
-    const isUserMember = useCallback((user: User, channel: Channel) => {
+    const isUserMember = useCallback((user: User) => {
         if (user && channel && channel) {
             return (channel.members.find((id: number) => id === user.id))
         }
         return (false);
-    }, [currentChannel, channels])
+    }, [channels])
 
-    const isUserMemberFromChannel = useCallback((user: User, channel: Channel) => {
+    const isUserMemberFromChannel = useCallback((user: User) => {
         if (user && channels && channel) {
             return (channel.members.find((id: number) => id === user.id))
         }
@@ -23,27 +23,27 @@ export default function useMembers() {
     }, [channels])
 
     const isUserIdMember = useCallback((userId: number) => {
-        if (userId && channels && currentChannel) {
-            return (currentChannel.members.find((id: number) => id === userId))
+        if (userId && channels && channel) {
+            return (channel.members.find((id: number) => id === userId))
         }
         return (false);
-    }, [currentChannel, channels])
+    }, [channels])
 
     const isUserOwner = useCallback((user: User) => {
-        if (user && channels && currentChannel) {
-            return (currentChannel.ownerId === user.id)
+        if (user && channels && channel) {
+            return (channel.ownerId === user.id)
         }
         return (false);
-    }, [currentChannel, channels])
+    }, [channels])
 
     const isUserBanned = useCallback((user: User) => {
-        if (user && channels && currentChannel) {
-            return (currentChannel.banList.find((id: number) => id === user.id))
+        if (user && channels && channel) {
+            return (channel.banList.find((id: number) => id === user.id))
         }
         return (false);
-    }, [currentChannel, channels])
+    }, [channels])
 
-    const addMember = useCallback((user: User, channel: Channel) => {
+    const addMember = useCallback((user: User) => {
         if (socket && channels && channel && user) {
             socket.emit('addtoChannel', {
                 channelId: channel.id,
@@ -53,32 +53,31 @@ export default function useMembers() {
         }
     }, [channels, socket])
 
-
-    const addedMember = useCallback(async (userId: number, channelId: number) => {
-        if (channels && channels.length && channelId && userId) {
+    const addedMember = useCallback(async (userId: number) => {
+        if (channels && channels.length && channel && channel.id && userId) {
             const user = await fetchUser(userId);
-            channelsDispatch({ type: 'addMember', channelId, user })
+            channelsDispatch({ type: 'addMember', channelId: channel.id, user })
         }
     }, [channels])
 
     const getMemberById = useCallback((id: number) => {
-        if (channels && channels.length && currentChannel && currentChannel.users && currentChannel.users.length) {
-            return (currentChannel.users.find((u: User) => u.id === id))
+        if (channels && channels.length && channel && channel.users && channel.users.length) {
+            return (channel.users.find((u: User) => u.id === id))
         }
-    }, [channels, currentChannel])
+    }, [channels])
 
 
     const getMembersById = useCallback((userIds: number[]) => {
         if (channels && channels.length && userIds && userIds.length &&
-            currentChannel && currentChannel.users && currentChannel.users.length) {
-            let members = userIds.map((id: number) => currentChannel.users.find((u: User) => u.id === id))
+            channel && channel.users && channel.users.length) {
+            let members = userIds.map((id: number) => channel.users.find((u: User) => u.id === id))
             return (members.filter(u => u));
         }
         return ([]);
-    }, [channels, currentChannel])
+    }, [channels])
 
 
-    const getOwner = useCallback((channel: Channel) => {
+    const getOwner = useCallback(() => {
         if (channel && channels && channels.length &&
             channel.users && channel.users.length) {
             return (channel.users.find((u: User) => u.id === channel.ownerId))

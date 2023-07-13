@@ -69,16 +69,10 @@ export default function JoinChannel() {
     const [error, setError] = useState("");
     const [channelList, setChannelList] = useState([]);
 
-    const { setCurrentChannel } = useChannelsContext();
-
     const { fetchUsers } = useFetchUsers();
 
     const { isMobileDisplay } = useWindow();
 
-
-    useEffect(() => {
-        setCurrentChannel(null);
-    }, [])
 
     function resetInput() {
         setValue("");

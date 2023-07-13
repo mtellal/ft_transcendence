@@ -3,28 +3,28 @@ import { useChannelsContext, useCurrentUser } from "../Hooks";
 import { Channel, User } from "../../types";
 
 
-export default function useUserAccess() {
+export default function useUserAccess(channel: Channel) {
 
     const { user } = useCurrentUser();
-    const { channels, currentChannel } = useChannelsContext();
+    const { channels } = useChannelsContext();
     const [isCurrentUserOwner, setIsCurrentUserOwner] = useState(false);
     const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
 
     useEffect(() => {
-        if (currentChannel && user) {
-            setIsCurrentUserOwner(user.id === currentChannel.ownerId);
-            if (currentChannel.administrators)
-                setIsCurrentUserAdmin(currentChannel.administrators.find((id: number) => id === user.id) ? true : false)
+        if (channel && user) {
+            setIsCurrentUserOwner(user.id === channel.ownerId);
+            if (channel.administrators)
+                setIsCurrentUserAdmin(channel.administrators.find((id: number) => id === user.id) ? true : false)
         }
-    }, [currentChannel, user, channels])
+    }, [channel, user, channels])
 
-    const isUserOwner = useCallback((channel: Channel, user: User) => {
+    const isUserOwner = useCallback((user: User) => {
         if (channel && channel.ownerId && user && user.id === channel.ownerId)
             return (true);
         return (false);
     }, [])
 
-    const isUserAdmin = useCallback((channel: Channel, user: User) => {
+    const isUserAdmin = useCallback((user: User) => {
         if (channel && channel.administrators && channel.administrators.length && user)
             return (channel.administrators.find((id: number) => id === user.id))
         return (false);
@@ -39,14 +39,12 @@ export default function useUserAccess() {
     }, [isCurrentUserAdmin, isCurrentUserOwner])
 
     const getUserAccess = useCallback((user: User) => {
-        if (currentChannel && channels) {
-            if (isUserOwner(currentChannel, user))
-                return (1)
-            if (isUserAdmin(currentChannel, user))
-                return (2);
-            return (0)
-        }
-    }, [currentChannel, channels])
+        if (isUserOwner(user))
+            return (1)
+        if (isUserAdmin(user))
+            return (2);
+        return (0)
+    }, [])
 
     return (
         {

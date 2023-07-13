@@ -3,11 +3,11 @@ import { useChannelsContext, useChatSocket } from "../Hooks";
 import { User, Channel } from "../../types";
 
 
-export default function useAdinistrators() {
+export default function useAdinistrators(channel: Channel) {
     const { socket } = useChatSocket();
-    const { channelsDispatch, currentChannel, channels } = useChannelsContext();
+    const { channelsDispatch, channels } = useChannelsContext();
 
-    const makeAdmin = useCallback((user: User, channel: Channel ) => {
+    const makeAdmin = useCallback((user: User) => {
         if (socket && channel && user) {
             socket.emit('makeAdmin', {
                 channelId: channel.id,
@@ -17,7 +17,7 @@ export default function useAdinistrators() {
         }
     }, [socket])
 
-    const removeAdmin = useCallback((user: User, channel: Channel) => {
+    const removeAdmin = useCallback((user: User) => {
         if (socket && channel && user) {
             socket.emit('removeAdmin', {
                 channelId: channel.id,
@@ -29,12 +29,12 @@ export default function useAdinistrators() {
 
     const isUserAdministrators = useCallback((user: User) => {
         if (channels && channels.length &&
-            currentChannel && currentChannel.administrators && currentChannel.administrators.length)
-            return (currentChannel.administrators.find((id: number) => id === user.id))
+            channel && channel.administrators && channel.administrators.length)
+            return (channel.administrators.find((id: number) => id === user.id))
         return (false);
-    }, [channels, currentChannel])
+    }, [channels])
 
-    const getAdministrators = useCallback((channel: Channel) => {
+    const getAdministrators = useCallback(() => {
         if (channel && channels && channels.length &&
             channel.administrators && channel.administrators.length &&
             channel.users && channel.users.length) {
