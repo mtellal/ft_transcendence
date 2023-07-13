@@ -5,6 +5,27 @@
 ## FRONTEND 
 `http://localhost:8080`
 
+We decided to use a maximum of functionalities provided by react in order to understand the functionalities and the concepts used by this library.
+The application run on `http://localhost:8080` and is in production. 
+
+#### What we used
+- **Routing** </br>
+To route our application, we decided to use the library `react-router`. In fact, this library emerged from our research and imposed itself as a must-have for react single page application.</br>
+
+- **State management** </br>
+  As said previously, we wanted to use the native functionalities offered by the React library. That's why we choose to only use `context` and `reducer` to manage the states of our application.
+  After a few headaches and some incomprehensions, especially on the chat part, we finally managed to use these apis effectively.
+  </br>
+  
+- **Socket** </br>
+  For our first time to use sockets we decide to pick `socket.io` library, like react-router she stands out from our research, especially for conciseness and his simplicity.
+  </br>
+  
+- **HTTP Queries** </br>
+  For our calls with the backend API we decided to use `axios`, in particular because calls are less verbose than the XMLHtppRequest API of JavaScript, as well as for its simplicity in manipulating the fields of the header. After reflection, it would have been preferable to use the api in order to better understand, in details, how XMLHttpRequest requests and the ajax approach work.
+
+
+
 ## Docs:
 
 ### REACT
