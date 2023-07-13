@@ -3,14 +3,40 @@
 
 }
 
+.channelinfos-container {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    overflow: hidden;
+}
+
 .channelinfos-infos
 {
-
+    padding-left: 5px;
+    justify-content: space-around;
 }
 
 .channelinfos-infos > p {
     margin: 0;
     white-space: nowrap;
+}
+
+
+.channelinfos-infos-username {
+    font-size: large;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.channelinfos-infos-username-status {
+    font-size: small;
+    color: grey;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .channelinfos-infos-members {
@@ -24,11 +50,47 @@
     padding: 0 2px;
 }
 
+.channelinfos-pp-container-large
+{
+    height: 40px;
+    width: 40px;
+    padding: 0 2px;
+}
+
+
 .channelinfos-members-container
 {
+    display: flex;
+    align-items: center;
     padding: 0 5px;
-    flex-wrap: wrap;
-    width: 100%;
     overflow: hidden;
+}
 
+.channelinfos-infos-message {
+    margin: 0;
+    padding-top: 2px;
+    font-size: small;
+    color: grey;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.channel-label {
+    height: 60px;
+    padding: 0 2%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgb(112, 112, 112);
+    text-decoration: none;
+    color: black;
+    align-items: center;
+    background-color: white;
+}
+
+.channel-label:hover {
+    background-color: #fff3e6;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import './LightInput.css'
 
@@ -27,8 +27,6 @@ export function LightInput(props : TLightInput)
     function handleKeyDown(e: any) {
         if (e.key === 'Enter' && props.value) {
             props.onClick()
-            /* if (props.blur)
-                inputRef.current.blur(); */
         }
     }
 

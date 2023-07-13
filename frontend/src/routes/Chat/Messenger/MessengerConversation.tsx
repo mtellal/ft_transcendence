@@ -175,9 +175,7 @@ export default function MessengerConversation({ messages, blockedFriend, hidden,
         <div style={{paddingBottom: '70px'}} className={hidden ? "messages-display hidden " : "messages-display visible"} ref={messagesContainerRef}>
             {
                 !messages.length || !authors.length ?
-                    <NoMessages />
-                    :
-                    rendMessages()
+                    <NoMessages /> : rendMessages()
             }
             {
                 blockedFriend && currentChannel && currentChannel.type === "WHISPER" &&

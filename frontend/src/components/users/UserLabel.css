@@ -17,18 +17,6 @@
     background-color: #fff3e6;
 }
 
-/*   U S E R    L A B E L   S E A R C H   */
-
-.UserLabelSearch-container {
-    box-shadow: 0 1px 3px black;
-    border-radius: 5px;
-    width: 96%;
-    display: flex;
-    padding: 2% 2%;
-    justify-content: space-between;
-    align-items: center
-}
-
 .userlabel-friend-request
 {
     display: flex;

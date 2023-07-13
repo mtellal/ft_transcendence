@@ -267,6 +267,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
     return (
         <div className="channeluserlabel label">
             <UserInfos
+                profile={true}
                 user={props.user}
             />
             <div className="channeluserlabel-icons flex-center"

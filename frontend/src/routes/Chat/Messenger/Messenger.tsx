@@ -11,9 +11,6 @@ import MessengerInput from "./MessengerInput";
 import MessengerConversation from "./MessengerConversation";
 import { Block, Message, User } from "../../../types";
 
-const MessengerContext: React.Context<any> = createContext(null);
-
-
 type TMessenger = {
     blockedFriend: boolean,
     hidden: boolean,
@@ -24,9 +21,6 @@ export default function Messenger(props: TMessenger) {
 
     const { user } = useCurrentUser();
     const { currentChannel } = useChannelsContext();
-
-    const [messages, setMessages] = useState([]);
-    const [showUserMenu, setShowUserMenu] = useState({ show: false });
 
     const filterMessages = useCallback((messages: Message[]) => {
         if (user.blockList.length) {
@@ -39,47 +33,33 @@ export default function Messenger(props: TMessenger) {
         return (messages)
     }, [currentChannel, currentChannel.messages, user])
 
-
-    const initMessages = useCallback(async () => {
-        let messages: Message[] = currentChannel.messages;
-        if (messages && messages.length && currentChannel.users) {
-            messages = filterMessages(messages);
-            setMessages(messages);
-        }
-    }, [currentChannel, currentChannel.messages, user])
-
-    useEffect(() => {
+    const initMessages = useCallback(() => {
         if (currentChannel && currentChannel.messages && currentChannel.messages.length) {
-            initMessages();
-        }
-        else
-            setMessages([]);
-    }, [currentChannel, currentChannel.messages, user.blockList])
-
-    return (
-        <MessengerContext.Provider value={
-            {
-                showUserMenu,
-                setShowUserMenu,
+            let messages: Message[] = currentChannel.messages;
+            if (messages && messages.length && currentChannel.users) {
+                messages = filterMessages(messages);
+                return (messages)
             }
         }
-        >
+        return ([]);
+    }, [currentChannel, currentChannel.messages, user])
+
+    return (
+        <>
             {
                 props.hidden ?
                     null :
                     <>
                         {
-                            messages && currentChannel &&
+                            currentChannel &&
                             <MessengerConversation
-                                messages={messages}
+                                messages={ initMessages() }
                                 {...props}
                             />
                         }
-                        <MessengerInput
-                            {...props}
-                        />
+                        <MessengerInput {...props} />
                     </>
             }
-        </MessengerContext.Provider>
+        </>
     )
 }

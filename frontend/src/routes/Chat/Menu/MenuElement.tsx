@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import UserLabel from "../../../components/users/UserLabel";
@@ -23,11 +23,7 @@ export default function MenuElement() {
 
     const { user } = useCurrentUser();
     const { friends } = useFriendsContext();
-    const { channels } = useChannelsContext();
-
-    const [friendsList, setFriendsList] = React.useState([]);
-    const [channelsList, setChannelsList] = useState([]);
-    const [whispersList, setWhispersList] = useState([]);
+    const { channels, channelsLoaded } = useChannelsContext();
 
     function extractLastMessage(channel: Channel) {
         if (channel.messages && channel.messages.length) {
@@ -38,76 +34,49 @@ export default function MenuElement() {
         }
     }
 
-    const setWhispers = useCallback(async () => {
-        if (channels && channels.length) {
-            let whispers = await Promise.all(
-                channels.map(async (channel: Channel) => {
-                    if (channel.type === "WHISPER" && channel.members.length === 2) {
-                        const _friend = channel.users.find((f: User) => f.id !== user.id);
-                        if (!_friend)
-                            return (null);
-                        return (
-                            <UserLabel
-                                key={_friend.id}
-                                id={_friend.id}
-                                user={_friend}
-                                message={extractLastMessage(channel)}
-                            />
-                        )
-                    }
-                    else if (channel.messages && channel.messages.length) {
-                        return (
-                            <ChannelLabel
-                                key={channel.id}
-                                channel={channel}
-                                message={extractLastMessage(channel)}
-                            />
-                        )
-                    }
-                })
-            )
+    const getWhispers = useCallback(() => {
+        if (channels && channels.length && user) {
+            let whispers = channels.map((channel: Channel) => {
+                if (channel.type === "WHISPER" && channel.members.length === 2) {
+                    const _friend = channel.users.find((f: User) => f.id !== user.id);
+                    if (!_friend)
+                        return (null);
+                    return (
+                        <UserLabel
+                            key={_friend.id}
+                            id={_friend.id}
+                            user={_friend}
+                            message={extractLastMessage(channel)}
+                        />
+                    )
+                }
+                else if (channel.messages && channel.messages.length) {
+                    return (
+                        <ChannelLabel
+                            key={channel.id}
+                            channel={channel}
+                            message={extractLastMessage(channel)}
+                        />
+                    )
+                }
+            })
             whispers = whispers.filter((c: Channel) => c);
-            setWhispersList(whispers)
+            return (whispers);
         }
-    }, [channels]);
+    }, [channels, user]);
 
-    async function setFriendsLabel() {
-        setFriendsList(
-            friends.map((user: User) => (
-                <UserLabel
-                    key={user.id}
-                    id={user.id}
-                    user={user}
-                />
-            ))
+
+    const getChannels = useCallback(() => {
+        let c: Channel[] = channels.map((channel: Channel) =>
+            channel.type !== "WHISPER" ?
+                <ChannelLabel
+                    key={channel.id}
+                    channel={channel}
+                /> : null
         )
-    }
-
-    React.useEffect(() => {
-        setChannelsList([]);
-        setFriendsList([]);
-
-        console.log("menuelement render")
-        if (channels && channels.length) {
-            setWhispers();
-
-            let c = channels.map((channel: Channel) =>
-                channel.type !== "WHISPER" && (
-                    <ChannelLabel
-                        key={channel.id}
-                        channel={channel}
-                    />
-                ))
-            c = c.filter((c: Channel) => c)
-            setChannelsList(c);
-        }
-
-        if (friends && friends.length) {
-            setFriendsLabel();
-        }
-
-    }, [friends, channels])
-
+        c = c.filter((c: Channel) => c)
+        return (c);
+    }, [channels]);
 
 
     return (
@@ -117,16 +86,23 @@ export default function MenuElement() {
             <FriendRequests />
             <MenuCollectionElement
                 title="Messages"
-                collection={whispersList}
+                collection={getWhispers()}
                 borderTop={true}
             />
             <MenuCollectionElement
                 title="Friends"
-                collection={friendsList}
+                collection={
+                    friends.map((user: User) => (
+                        <UserLabel
+                            key={user.id}
+                            id={user.id}
+                            user={user}
+                        />
+                    ))}
             />
             <MenuCollectionChannel
                 title="Channels"
-                collection={channelsList}
+                collection={getChannels()}
                 icon={plusIcon}
             />
         </div>

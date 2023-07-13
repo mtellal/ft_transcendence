@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useCurrentUser } from "../../hooks/Hooks";
+import { useCurrentUser } from "../hooks/Hooks";
 import { io } from "socket.io-client";
 
 export const ChatSocketContext: React.Context<any> = createContext(null);
@@ -25,14 +25,11 @@ export function SocketProvider({ children }: any) {
         return (() => {
             s.disconnect();
         })
-    }, [])
+    }, [token])
 
     return (
         <ChatSocketContext.Provider value={{ socket }}>
-            {
-                connected && 
-                children
-            }
+            { connected && children }
         </ChatSocketContext.Provider>
     )
 }

@@ -1,4 +1,8 @@
 .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     position: relative;
     align-self: center;
     justify-self: center;
@@ -19,11 +23,16 @@
     background-color: white;
 }
 
-.description {
+.icon-description {
     position: absolute;
     bottom: -15px;
     visibility: hidden;
 }
+
+.icon-checked:hover {
+    background-color: unset;
+}
+
 
 @media screen and (max-width: 700px) {
     .icon-container:hover {

@@ -5,7 +5,6 @@ import {
     useCurrentUser
 } from "../../../hooks/Hooks";
 import ProfilePicture from "../../../components/users/ProfilePicture";
-import ResizeContainer from "../../../components/ResizeContainer";
 import useAdinistrators from "../../../hooks/Chat/useAdministrators";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../../types";
@@ -41,14 +40,14 @@ function AuthorAccess(props: TAuthorAccess) {
             >{props.author.username}</p>
 
 
-            <ResizeContainer height="auto" className="flex" style={{ alignItems: 'flex-end' }}>
+            <div className="flex" style={{ alignItems: 'flex-end' }}>
                 {
                     currentChannel.type !== "WHISPER" && props.author &&
                     currentChannel.ownerId === props.author.id &&
                     <img src={ownerIcon} style={{height: '20px'}} />
                 }
                 {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
-            </ResizeContainer>
+            </div>
         </div>
     )
 }
@@ -83,9 +82,9 @@ function AuthorMessage(props: TUserMessage) {
                     {
                         props.author &&
                         <div className="relative pointer" onClick={() => navigate(`/user/${props.author.id}`)}>
-                            <ResizeContainer height="30px" width="30px" >
+                            <div style={{height: '30px', width: '30px'}} >
                                 <ProfilePicture image={props.author.url} boxShadow={true} />
-                            </ResizeContainer>
+                            </div>
                         </div>
                     }
 
@@ -137,23 +136,23 @@ function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
                     </p>
                     {
                         props.author &&
-                        <ResizeContainer height="30px" width="30px">
-                            <ProfilePicture image={props.author && props.author.url} />
-                        </ResizeContainer>
+                        <div style={{height: '30px', width: '30px'}}>
+                            <ProfilePicture image={props.author.url} />
+                        </div>
                     }
                 </div>
 
                 <div className="flex" style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingBottom: '2px' }}>
                     {
                         currentChannel && currentChannel.type !== "WHISPER" &&
-                        <ResizeContainer height="auto">
+                        <div>
                             {
                                 currentChannel.type !== "WHISPER" && props.author &&
                                 currentChannel.ownerId === props.author.id &&
                                 <img src={ownerIcon} style={{height: '20px'}} />
                             }
                             {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
-                        </ResizeContainer>
+                        </div>
                     }
                     {
                         props.author &&

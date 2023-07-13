@@ -50,7 +50,18 @@ export function CurrentUserProvider({ children, ...props }: any) {
     const [socket, setSocket]: any = useState();
     const navigate = useNavigate();
 
-    React.useEffect(() => {
+
+    const loginHandle = useCallback(async () => {
+        userDispatch({ type: 'login' })
+        login(user, props.token);
+    }, [user])
+
+    const logoutHandle = useCallback(async () => {
+        logout(user, props.token);
+        userDispatch({ type: 'logout' })
+    }, [user])
+
+    useEffect(() => {
 
         const s = io(`${process.env.REACT_APP_BACK}/users`, {
             transports: ['websocket'],
@@ -61,6 +72,7 @@ export function CurrentUserProvider({ children, ...props }: any) {
         });
 
         setSocket(s);
+        loginHandle();
 
 
         s.on('acceptedInvite', (res: any) => {
@@ -69,18 +81,16 @@ export function CurrentUserProvider({ children, ...props }: any) {
             }
         })
 
-        userDispatch({ type: 'login' })
-        login(user, props.token);
 
         getBlockList(user.id, props.token)
             .then(res => {
-                userDispatch({ type: 'initblockList', blockList: res.data })
+                if (res && res.data)
+                    userDispatch({ type: 'initblockList', blockList: res.data })
             })
 
         return () => {
             s.disconnect();
-            logout(user, props.token);
-            userDispatch({ type: 'logout' })
+            logoutHandle();
         }
     }, [])
 

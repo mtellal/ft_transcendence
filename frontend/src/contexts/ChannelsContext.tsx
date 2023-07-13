@@ -1,8 +1,8 @@
 import React, { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { deleteChannelRequest, getChannels } from "../../requests/chat";
-import { useChatSocket, useCurrentUser } from "../../hooks/Hooks";
-import useFetchUsers from "../../hooks/useFetchUsers";
-import { Channel, Mute, User } from "../../types";
+import { deleteChannelRequest, getChannels } from "../requests/chat";
+import { useChatSocket, useCurrentUser } from "../hooks/Hooks";
+import useFetchUsers from "../hooks/useFetchUsers";
+import { Channel, Mute, User } from "../types";
 
 export const ChannelsContext: React.Context<any> = createContext([]);
 
@@ -12,7 +12,7 @@ function formatChannel(channel: Channel) {
             ...channel,
             messages: channel.messages || [],
             users: channel.users || [],
-			muteList: channel.muteList || []
+            muteList: channel.muteList || []
         }
     )
 }
@@ -20,16 +20,15 @@ function formatChannel(channel: Channel) {
 function reducer(channels: Channel[], action: any) {
     switch (action.type) {
         case ('initChannels'): {
-            if (action.channels.length) {
+            if (action.channels && action.channels.length) {
                 return (action.channels.map((c: Channel) => formatChannel(c)))
             }
-            return (action.channels);
         }
         case ('addChannel'): {
             if (!channels.length) {
                 return ([formatChannel(action.channel)])
             }
-            if (action.channel && !channels.find((c: Channel) => c.id === action.channel.id)) {
+            else if (action.channel && !channels.find((c: Channel) => c.id === action.channel.id)) {
                 return ([...channels, formatChannel(action.channel)])
             }
         }
@@ -39,7 +38,7 @@ function reducer(channels: Channel[], action: any) {
             }
         }
         case ('updateChannelInfos'): {
-            if (channels && channels.length && action.channelId && action.infos) {
+            if (channels.length && action.channelId && action.infos) {
                 return (
                     channels.map((c: Channel) => {
                         if (c.id === action.channelId) {
@@ -56,13 +55,13 @@ function reducer(channels: Channel[], action: any) {
             }
         }
         case ('ownerChanged'): {
-            if (channels && channels.length && action.channelId && action.userId) {
+            if (channels.length && action.channelId && action.userId) {
                 return (
                     channels.map((c: Channel) => {
                         if (c.id === action.channelId) {
                             c.ownerId = action.userId;
                             if (!c.administrators.find((id: number) => id === action.userId))
-                                c.administrators.push(action.userId);                        
+                                c.administrators = [...c.administrators, action.userId];
                         }
                         return (c);
                     })
@@ -71,72 +70,78 @@ function reducer(channels: Channel[], action: any) {
         }
         case ('addAdministrators'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId)
-                        if (!c.administrators.find((id: number) => id === action.userId))
-                            c.administrators.push(action.userId);
-                    return (c);
-                }
-                ))
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId &&
+                            !c.administrators.find((id: number) => id === action.userId))
+                            c.administrators = [...c.administrators, action.userId];
+                        return (c);
+                    }
+                    )
+                )
             }
         }
         case ('removeAdministrators'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && c.administrators && c.administrators.length)
-                        c.administrators = c.administrators.filter((id: number) => id !== action.userId)
-                    return (c)
-                }
-                ))
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId && c.administrators)
+                            c.administrators = c.administrators.filter((id: number) => id !== action.userId)
+                        return (c)
+                    })
+                )
             }
         }
         case ('addMuteList'): {
             if (channels.length && action.channelId && action.userId && action.mute) {
-                return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && c.muteList) {
-                        if (c.muteList.length && c.muteList.find((o: Mute) => o.userId === action.userId)) {
-                            c.muteList = c.muteList.map((o: Mute) => o.userId === action.userId ? action.mute : o)
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId) {
+                            if (c.muteList && c.muteList.find((o: Mute) => o.userId === action.userId)) {
+                                c.muteList = c.muteList.map((o: Mute) => o.userId === action.userId ? action.mute : o)
+                            }
+                            else
+                                c.muteList = [...c.muteList, action.mute];
                         }
-                        else
-                            c.muteList.push(action.mute);
+                        return (c);
                     }
-                    return (c);
-                }
-                ))
+                    )
+                )
             }
         }
         case ('removeMuteList'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId &&
-                        c.muteList && c.muteList.length) {
-                        c.muteList = c.muteList.filter((o: Mute) => o.userId !== action.userId);
-                    }
-                    return (c)
-                }
-                ))
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId && c.muteList.length) {
+                            c.muteList = c.muteList.filter((o: Mute) => o.userId !== action.userId);
+                        }
+                        return (c)
+                    })
+                )
             }
         }
         case ('addBanList'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId && !c.banList.find((id: number) => id === action.userId))
-                        c.banList.push(action.userId);
-                    return (c);
-                }
-                ))
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId && !c.banList.find((id: number) => id === action.userId))
+                            c.banList = [...c.banList, action.userId];
+                        return (c);
+                    })
+                )
             }
         }
         case ('removeBanList'): {
             if (channels.length && action.channelId && action.userId) {
-                return (channels.map((c: Channel) => {
-                    if (c.id === action.channelId &&
-                        c.banList && c.banList.length) {
-                        c.banList = c.banList.filter((id: number) => id !== action.userId)
-                    }
-                    return (c)
-                }
-                ))
+                return (
+                    channels.map((c: Channel) => {
+                        if (c.id === action.channelId && c.banList.length) {
+                            c.banList = c.banList.filter((id: number) => id !== action.userId)
+                        }
+                        return (c)
+                    })
+                )
             }
         }
         case ('addMember'): {
@@ -145,9 +150,9 @@ function reducer(channels: Channel[], action: any) {
                     channels.map((c: Channel) => {
                         if (c.id === action.channelId) {
                             if (!c.users.find((u: User) => u.id === action.user.id))
-                                c.users.push(action.user);
+                                c.users = [...c.users, action.user];
                             if (!c.members.find((id: number) => id === action.user.id))
-                                c.members.push(action.user.id)
+                                c.members = [...c.members, action.user.id];
                         }
                         return (c)
                     })
@@ -181,12 +186,11 @@ function reducer(channels: Channel[], action: any) {
             }
         }
         case ('addMessage'): {
-            const message = action.message;
-            if (channels.length && message) {
+            if (channels.length && action.message) {
                 return (
                     channels.map((c: Channel) => {
-                        if (c.id === message.channelId) {
-                            c.messages = [...c.messages, message];
+                        if (c.id === action.message.channelId) {
+                            c.messages = [...c.messages, action.message];
                         }
                         return (c);
                     })

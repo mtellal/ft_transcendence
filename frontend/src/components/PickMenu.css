@@ -1,8 +1,15 @@
-.pickmenu-option
+.pickmenu-options
 {
     padding: 0 5px;
     cursor: pointer;
     border: 1px solid black;
-    border-radius: 5px;
+    border-top: 0px;
+}
+
+.pickmenu-option-selected
+{
+    padding: 0 5px;
+    cursor: pointer;
+    border: 1px solid black;
 }
 

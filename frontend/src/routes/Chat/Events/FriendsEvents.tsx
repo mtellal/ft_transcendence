@@ -6,7 +6,7 @@ import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
 export default function FriendEvents({ children }: any) {
     const { userSocket } = useCurrentUser();
 
-    const { friends, currentFriend } = useFriendsContext();
+    const { friends } = useFriendsContext();
     const { removeFriend, isUserFriend, updateFriend } = useFriends();
     const { addFriendRequest } = useFriendRequest();
 
@@ -48,7 +48,7 @@ export default function FriendEvents({ children }: any) {
                 userSocket.off('removedFriend');
             }
         }
-    }, [userSocket, friends, currentFriend, userSocket])
+    }, [userSocket, friends, userSocket])
 
     return (children)
 }

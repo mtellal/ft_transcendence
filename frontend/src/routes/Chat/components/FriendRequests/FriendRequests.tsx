@@ -1,13 +1,12 @@
 
 import React, { useCallback, useState } from "react";
-import { UserLabelFriendRequest, UserLabelSearch } from "../../../../components/users/UserLabel";
+import { UserLabelFriendRequest } from "../../../../components/users/UserLabel";
 
 import { useFriendsContext } from "../../../../hooks/Hooks";
 
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
 import './FriendRequests.css'
-import { CollectionElement } from "../../../../components/collections/CollectionElement";
 import { FriendRequest, User } from "../../../../types";
 import { MenuCollectionElement } from "../../Menu/MenuElement";
 

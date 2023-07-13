@@ -76,7 +76,7 @@ function IconsBanner(props: TIconsBanner) {
     })
 
     return (
-        <div className="iconsbanner" style={props.mobile ? {width: '100%', justifyContent: 'space-around'} : { marginLeft: 'auto' }}>
+        <div key={props.channel.id} className="iconsbanner" style={props.mobile ? {width: '100%', justifyContent: 'space-around'} : { marginLeft: 'auto' }}>
             {
                 props.type === "WHISPER" && props.whisperUser &&
                 <div>
@@ -195,7 +195,6 @@ export default function Banner({ ...props }: TBanner) {
                     mobile={isMobileDisplay && props.channel}
                     {...props}
                 />
-
             </div>
         </>
     )

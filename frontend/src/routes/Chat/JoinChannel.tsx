@@ -28,19 +28,11 @@ function PublicChannels() {
                 const tab = await Promise.all(
                     c.map(async (c: Channel) => {
                         c.users = await fetchUsers(c.members);
-                        return (
-                            <ChannelSearchLabel
-                                key={c.id}
-                                channel={c}
-                                resetInput={() => { }}
-                                style={{ margin: '0 auto 3px auto' }}
-                            />
-                        )
+                        return (c)
                     })
                 )
                 setChannelList(tab);
             }
-
         }
     }, [token]);
 
@@ -53,7 +45,15 @@ function PublicChannels() {
             <h4 className="interface-page-title" style={{ fontSize: '17px' }}>Public channels</h4>
             {
                 channelList && channelList.length ?
-                    channelList :
+                    channelList.map((c: Channel) =>
+                        <ChannelSearchLabel
+                            key={c.id}
+                            channel={c}
+                            resetInput={() => { }}
+                            style={{ margin: '0 auto 3px auto' }}
+                        />
+                    )
+                    :
                     <div className="fill">
                         <p>No public channels</p>
                     </div>
@@ -88,28 +88,20 @@ export default function JoinChannel() {
     async function searchUser() {
         if (!value || !value.trim())
             return;
-        let channelArray: any[];
+        let channelArray: any[] = null;
         setError("");
         setChannelList([]);
 
         await getChannelByName(value.trim(), token)
             .then(res => {
-                if (res.data) {
+                if (res.data)
                     channelArray = res.data;
-                }
             })
         if (channelArray) {
             channelArray = await Promise.all(
                 channelArray.map(async (c: Channel) => {
                     c.users = await fetchUsers(c.members);
-                    return (
-                        <ChannelSearchLabel
-                            key={c.id}
-                            channel={c}
-                            resetInput={() => resetInput()}
-                            style={{ margin: '0 auto 3px auto' }}
-                        />
-                    )
+                    return (c);
                 })
             )
             setChannelList(channelArray);
@@ -139,7 +131,15 @@ export default function JoinChannel() {
             </div>
             <div className="relative scroll" style={{ maxHeight: '400px', marginTop: '20px', width: 'auto' }}>
                 {
-                    channelList
+                    channelList && channelList.length ?
+                        channelList.map((c: Channel) =>
+                            <ChannelSearchLabel
+                                key={c.id}
+                                channel={c}
+                                resetInput={() => resetInput()}
+                                style={{ margin: '0 auto 3px auto' }}
+                            />
+                        ) : null
                 }
             </div>
 

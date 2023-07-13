@@ -7,7 +7,7 @@ import { User } from "../../../types";
 export function useFriends() {
     const { token } = useCurrentUser();
     const { fetchUserProfilePicture } = useFetchUsers();
-    const { friends, friendsDispatch, currentFriend } = useFriendsContext();
+    const { friends, friendsDispatch } = useFriendsContext();
 
     const isUserFriend = useCallback((user: User) => {
         if (friends && friends.length && user) {
@@ -41,7 +41,7 @@ export function useFriends() {
                 removeUserFriend(friend.id, token);
             friendsDispatch({ type: 'removeFriend', friend })
         }
-    }, [friends, currentFriend])
+    }, [friends])
 
     return (
         {

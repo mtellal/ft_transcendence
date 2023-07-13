@@ -1,19 +1,21 @@
 
-import React, { useEffect, useState } from 'react';
-
-import imgUser from '../../assets/user.png'
+import React from 'react';
 import ProfilePicture from './ProfilePicture';
 import './UserInfos.css'
 import { User } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 
 export type TUserInfos = {
     user: User,
     message?: string,
-    onClick?: () => {} | any
+    onClick?: () => {} | any,
+    profile?: boolean
 }
 
-export function UserInfos({ user, message, onClick }: TUserInfos) {
+export function UserInfos({ user, message, onClick, profile }: TUserInfos) {
+
+    const navigate = useNavigate();
 
     function selectStatusDiv() {
         if (user && user.userStatus === "ONLINE")
@@ -37,24 +39,31 @@ export function UserInfos({ user, message, onClick }: TUserInfos) {
         <div className="userinfos-container" onClick={onClick} >
             {
                 user ?
-                <>
-                    <div className='userinfos-pp-container'>
-                        <ProfilePicture
-                            image={user && user.url}
+                    <>
+                        <div className={profile ? 'userinfos-pp-container pointer' : 'userinfos-pp-container'}
+                            onClick={() => {
+                                if (profile) {
+                                    navigate(`/user/${user.id}`)
+                                }
+                            }}
+                        >
+                            <ProfilePicture
+                                image={user && user.url}
+                                boxShadow={profile}
+                            />
+                        </div>
+                        <div
+                            className="userinfos-icon-status"
+                            style={selectStatusDiv()}
                         />
-                    </div>
-                    <div
-                        className="userinfos-icon-status"
-                        style={selectStatusDiv()}
-                    />
-                    <div className="flex-column user-infos">
-                        <p className="userinfos-username" >{user && user.username}</p>
-                        <p className="userinfos-status">
-                            {message || selectStatusText()}
-                        </p>
-                    </div>
-                </>
-                : null
+                        <div className="user-infos">
+                            <p className="userinfos-username" >{user && user.username}</p>
+                            <p className="userinfos-status">
+                                {message || selectStatusText()}
+                            </p>
+                        </div>
+                    </>
+                    : null
             }
         </div>
     )

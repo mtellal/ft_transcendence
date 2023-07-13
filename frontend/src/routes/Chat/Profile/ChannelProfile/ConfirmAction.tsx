@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react"
 import InfoInput from "../../../../components/Input/InfoInput";
 
-import ResizeContainer from "../../../../components/ResizeContainer";
 import './ConfirmAction.css'
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import { useChannels } from "../../../../hooks/Chat/useChannels";
@@ -136,12 +135,12 @@ export function ConfirmViewMuteAction(props: TConfirmViewMuteAction) {
                 submit={() => submit()}
                 onChange={onChange}
             />
-            <ResizeContainer width="60%" >
+            <div style={{width: '60%'}} >
                 <ConfirmViewButtons
                     valid={submit}
                     cancel={props.cancel}
                 />
-            </ResizeContainer>
+            </div>
         </div>
     )
 }
@@ -186,12 +185,12 @@ export function ConfirmViewTypeProteced(props: TConfirmViewTypeProteced) {
                 onChange={onChange}
             />
             {error && <p className="red-c reset">{error}</p>}
-            <ResizeContainer width="60%" >
+            <div style={{width: '60%'}}>
                 <ConfirmViewButtons
                     valid={submit}
                     cancel={props.cancel}
                 />
-            </ResizeContainer>
+            </div>
         </div>
     )
 }

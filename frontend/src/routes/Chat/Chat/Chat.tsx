@@ -3,10 +3,10 @@ import React, { createContext, useEffect, useState } from "react";
 import MenuElement from "../Menu/MenuElement";
 import { Outlet, useLocation } from "react-router-dom";
 
-import { FriendsProvider } from "../../../contexts/Chat/FriendsContext";
-import { SocketProvider } from "../../../contexts/Chat/ChatSocketContext";
+import { FriendsProvider } from "../../../contexts/FriendsContext";
+import { SocketProvider } from "../../../contexts/ChatSocketContext";
 
-import { ChannelsProvider } from "../../../contexts/Chat/ChannelsContext";
+import { ChannelsProvider } from "../../../contexts/ChannelsContext";
 import FriendEvents from "../Events/FriendsEvents";
 import ChannelsEvents from "../Events/ChannelsEvents";
 import { ConfirmPage } from "../Profile/ChannelProfile/ConfirmAction";
@@ -21,15 +21,14 @@ function ChatInterface() {
     const [action, setAction]: any = useState(null);
     const { isMobileDisplay } = useWindow();
 
-    console.log("chat interface render")
-
     return (
         <ChatInterfaceContext.Provider value={{ setAction }}>
             <div className="chat">
                 <div className="chat-container relative">
                     {
                         isMobileDisplay ?
-                            location.pathname === "/chat" ? <MenuElement /> : <Outlet /> :
+                            location.pathname === "/chat" ? <MenuElement /> : <Outlet /> 
+                            :
                             <>
                                 <MenuElement />
                                 <Outlet />
