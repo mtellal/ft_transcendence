@@ -2,11 +2,18 @@
 
 <hr/>
 
+## How to use
+
+- Clone the repository `git clone https://github.com/mtellal/ft_transcendence.git`
+- Run `docker compose up --build` </br> </br>
+- The frontend run on `http://localhost:8080`
+- The swagger backend api run on `http://localhost:3000`
+
+
 ## FRONTEND 
 `http://localhost:8080`
 
 We decided to use a maximum of functionalities provided by react in order to understand the functionalities and the concepts used by this library.
-The application run on `http://localhost:8080` and is in production. 
 
 #### What we used
 - **Routing** </br>
