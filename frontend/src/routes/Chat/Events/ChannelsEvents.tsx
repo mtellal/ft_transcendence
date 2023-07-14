@@ -2,8 +2,13 @@ import { useEffect } from "react";
 import { useChannelsContext, useChatSocket, useCurrentUser} from "../../../hooks/Hooks";
 import { getChannel } from "../../../requests/chat";
 import { useChannels } from "../../../hooks/Chat/useChannels";
-import useMembers from "../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../hooks/useFetchUsers";
+import { Channel, Message, Mute } from "../../../types";
+
+type TResSocketType = {
+    userId: number, 
+    channelId: number
+}
 
 export default function ChannelsEvents({ children }: any) {
     const { user, token } = useCurrentUser();
@@ -21,17 +26,17 @@ export default function ChannelsEvents({ children }: any) {
     useEffect(() => {
         if (socket && user) {
 
-            socket.on('newChannel', async (channel: any) => {
+            socket.on('newChannel', async (channel: Channel) => {
                 if (channel) {
                     addChannel(channel, false);
                 }
             })
 
-            socket.on('updatedChannel', (channel: any) => {
+            socket.on('updatedChannel', (channel: Channel) => {
                 updateChannelInfos(channel);
             })
 
-            socket.on('joinedChannel', async (res: any) => {
+            socket.on('joinedChannel', async (res: TResSocketType) => {
                 if (res && res.userId && res.channelId)
                 {
                     if (channels && channels.length) {
@@ -41,7 +46,7 @@ export default function ChannelsEvents({ children }: any) {
                 }
             })
 
-            socket.on('leftChannel', async (res: any) => {
+            socket.on('leftChannel', async (res: TResSocketType) => {
                 if (res && res.userId && res.channelId) {
                     channelsDispatch({ type: 'removeMember', channelId: res.channelId, userId: res.userId })
                     channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
@@ -49,12 +54,12 @@ export default function ChannelsEvents({ children }: any) {
             })
 
 
-            socket.on('ownerChanged', (res: any) => {
+            socket.on('ownerChanged', (res: TResSocketType) => {
                 if (res && res.channelId && res.userId)
                     channelsDispatch({ type: 'ownerChanged', channelId: res.channelId, userId: res.userId })
             })
 
-            socket.on('addedtoChannel', async (res: any) => {
+            socket.on('addedtoChannel', async (res: TResSocketType) => {
                 if (res && res.channelId && res.userId) {
                     if (res.userId === user.id) {
                         const channel = await getChannel(res.channelId, token).then(res => res.data);
@@ -71,13 +76,13 @@ export default function ChannelsEvents({ children }: any) {
                 }
             })
 
-            socket.on('madeAdmin', (res: any) => {
+            socket.on('madeAdmin', (res: TResSocketType) => {
                 if (res && res.channelId && res.userId) {
                     channelsDispatch({ type: 'addAdministrators', channelId: res.channelId, userId: res.userId })
                 }
             })
 
-            socket.on('removedAdmin', async (res: any) => {
+            socket.on('removedAdmin', async (res: TResSocketType) => {
                 if (res && res.channelId && res.userId) {
                     channelsDispatch({ type: 'removeAdministrators', channelId: res.channelId, userId: res.userId })
                 }
@@ -93,20 +98,20 @@ export default function ChannelsEvents({ children }: any) {
                 }
             })
 
-            socket.on('unmutedUser', async (res: any) => {
+            socket.on('unmutedUser', async (res: TResSocketType) => {
                 if (res && res.channelId && res.userId) {
                     channelsDispatch({ type: 'removeMuteList', channelId: res.channelId, userId: res.userId })
                 }
             })
 
-            socket.on('bannedUser', async (res: any) => {
+            socket.on('bannedUser', async (res: TResSocketType) => {
                 if (res && res.channelId && res.userId) {
                     channelsDispatch({ type: 'addBanList', channelId: res.channelId, userId: res.userId });
                     forceToLeaveChannel(res)
                 }
             })
 
-            socket.on('unbannedUser', (res: any) => {
+            socket.on('unbannedUser', (res: TResSocketType) => {
                 if (res && res.channelId && res.userId) {
                     channelsDispatch({ type: 'removeBanList', channelId: res.channelId, userId: res.userId })
                 }

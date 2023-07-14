@@ -5,7 +5,7 @@ import { Outlet, redirect, useLoaderData } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/SideBar';
-import { extractCookie } from '../../Cookie';
+import { extractCookie, setCookie } from '../../Cookie';
 
 import { getUser, getUserProfilePictrue } from '../../requests/user'
 
@@ -23,6 +23,7 @@ export async function loader() {
             decodedToken = jwtDecode<any>(token);
         }
         catch (e) {
+            setCookie("access_token", "");
             return (redirect("/login"));
         }
     }
@@ -49,6 +50,7 @@ export async function loader() {
         if (!err)
             return ({ user: { ...user, url: image }, token })
     }
+    setCookie("access_token", "");
     return (redirect("/login"));
 }
 

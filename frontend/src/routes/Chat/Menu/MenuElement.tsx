@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import UserLabel from "../../../components/users/UserLabel";
 import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
 
-import { FriendRequests } from "../components/FriendRequests/FriendRequests";
+import { FriendRequests } from "../components/FriendRequests";
 import { ChannelLabel } from "../../../components/channels/ChannelInfos";
 import SearchElement from "./SearchElement";
 import './MenuElement.css'
@@ -23,7 +23,7 @@ export default function MenuElement() {
 
     const { user } = useCurrentUser();
     const { friends } = useFriendsContext();
-    const { channels, channelsLoaded } = useChannelsContext();
+    const { channels } = useChannelsContext();
 
     function extractLastMessage(channel: Channel) {
         if (channel.messages && channel.messages.length) {
@@ -98,7 +98,8 @@ export default function MenuElement() {
                             id={user.id}
                             user={user}
                         />
-                    ))}
+                    ))
+                }
             />
             <MenuCollectionChannel
                 title="Channels"

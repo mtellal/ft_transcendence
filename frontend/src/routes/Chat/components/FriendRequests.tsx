@@ -1,14 +1,13 @@
 
-import React, { useCallback, useState } from "react";
-import { UserLabelFriendRequest } from "../../../../components/users/UserLabel";
+import React, { useEffect, useCallback, useState } from "react";
+import { UserLabelFriendRequest } from "../../../components/users/UserLabel";
 
-import { useFriendsContext } from "../../../../hooks/Hooks";
+import { useFriendsContext } from "../../../hooks/Hooks";
 
-import useFetchUsers from "../../../../hooks/useFetchUsers";
-import { useFriendRequest } from "../../../../hooks/Chat/Friends/useFriendRequest";
-import './FriendRequests.css'
-import { FriendRequest, User } from "../../../../types";
-import { MenuCollectionElement } from "../../Menu/MenuElement";
+import useFetchUsers from "../../../hooks/useFetchUsers";
+import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
+import { FriendRequest, User } from "../../../types";
+import { MenuCollectionElement } from "../Menu/MenuElement";
 
 export function FriendRequests() {
 
@@ -24,7 +23,7 @@ export function FriendRequests() {
             setUserInvitations(users);
     }, [friendInvitations, fetchUsers])
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (friendInvitations && friendInvitations.length) {
             loadInvitations();
         }

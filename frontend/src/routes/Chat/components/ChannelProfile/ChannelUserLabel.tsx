@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 
 import { useChannelsContext, useCurrentUser, } from "../../../../hooks/Hooks"
 
@@ -11,7 +11,7 @@ import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import { PofileChannelContext } from '../../Profile/ChannelProfile/ChannelProfile';
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
-import { CollectionElement } from "../../../../components/collections/CollectionElement";
+import { CollectionElement } from "../../../../components/collections/Collection";
 import { Channel, User } from "../../../../types";
 
 
@@ -28,109 +28,126 @@ import ownerIcon from '../../../../assets/House.svg'
 
 import './ChannelUserLabel.css'
 
-type TCollectionUsers = {
-    title: string,
-    users: User[],
-    isAdmin?: boolean,
-    currentUser?: User,
-    channel: Channel,
-}
 
-export function CollectionUsers(props: TCollectionUsers) {
-    const [renderUsers, setRenderUsers] = useState([]);
-    const { channels } = useChannelsContext();
+function MuteIcon(props: any) {
 
-    useEffect(() => {
-        setRenderUsers([]);
-        if (props.users && props.users.length)
-            setRenderUsers(props.users.map((user: any) =>
-                <ChannelUserLabel
-                    key={`${props.title}-${user.id}`}
-                    user={user}
-                    channel={props.channel}
-                    showChannelStatus={false}
-                    isAddable={false}
-                />
-            ))
-    }, [props.users, props.title, props.isAdmin, props.currentUser, channels])
+    const { muteUser, unmuteUser, isUserMuted } = useMuteUser(props.channel);
+    const { setUserAction, setConfirmView }: any = useContext(PofileChannelContext)
 
     return (
-        <CollectionElement
-            title={props.title}
-            collection={renderUsers}
-        />
+        <>
+            {
+                isUserMuted(props.user) ?
+                    <Icon
+                        icon={unmuteIcon}
+                        description="Unmute"
+                        onClick={() => {
+                            setConfirmView(true);
+                            setUserAction(
+                                {
+                                    user: props.user,
+                                    function: unmuteUser,
+                                    type: "unmute"
+                                }
+                            )
+                        }}
+                    />
+                    :
+                    <Icon
+                        icon={muteIcon}
+                        description="Mute"
+                        onClick={() => {
+                            setConfirmView(true);
+                            setUserAction(
+                                {
+                                    user: props.user,
+                                    function: muteUser,
+                                    type: "mute"
+                                }
+                            )
+                        }}
+                    />
+            }
+        </>
     )
 }
 
+function AdminIcon(props: any) {
+
+    const { isCurrentUserOwner } = useUserAccess(props.channel);
+    const { makeAdmin, removeAdmin, isUserAdministrators } = useAdinistrators(props.channel);
+    const { setUserAction, setConfirmView }: any = useContext(PofileChannelContext)
+
+    return (
+        <>
+            {
+                isCurrentUserOwner && !isUserAdministrators(props.user) &&
+                <Icon
+                    icon={adminIcon}
+                    description="make admin"
+                    onClick={() => {
+                        setConfirmView(true);
+                        setUserAction(
+                            {
+                                user: props.user,
+                                function: makeAdmin,
+                                type: "make admin"
+                            }
+                        )
+                    }}
+                />
+            }
+            {
+                isCurrentUserOwner && isUserAdministrators(props.user) &&
+                <Icon
+                    icon={unadminIcon}
+                    description="remove admin"
+                    onClick={() => {
+                        setConfirmView(true);
+                        setUserAction(
+                            {
+                                user: props.user,
+                                function: removeAdmin,
+                                type: "remove admin"
+                            }
+                        )
+                    }}
+                />
+            }
+        </>
+    )
+}
+
+
 type TChannelUserLabel = {
     user: User,
-    channel:Channel,
+    channel: Channel,
     showChannelStatus: boolean | number,
     isAddable: boolean,
 }
-
 
 export function ChannelUserLabel(props: TChannelUserLabel) {
 
     const { user } = useCurrentUser();
     const { isCurrentUserAdmin, isCurrentUserOwner } = useUserAccess(props.channel);
-
-    const { kickUser } = useKickUser(props.channel);
-    const { muteUser, unmuteUser, isUserMuted } = useMuteUser(props.channel);
-    const { banUser, unbanUser } = useBanUser(props.channel);
-    const { makeAdmin, removeAdmin, isUserAdministrators } = useAdinistrators(props.channel);
-    const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers(props.channel);
-
     const { setUserAction, setConfirmView }: any = useContext(PofileChannelContext)
 
-    const [mutedUser, setMutedUser] = useState(false);
+    const { kickUser } = useKickUser(props.channel);
+    const { banUser, unbanUser } = useBanUser(props.channel);
+    const { isUserAdministrators } = useAdinistrators(props.channel);
+    const { isUserMember, isUserOwner, isUserBanned, addMember } = useMembers(props.channel);
 
-    useEffect(() => {
-        setMutedUser(isUserMuted(props.user));
-    }, [props.channel, props.channel.muteList, isUserMuted, props.user])
-
-    function mutedIcon() {
-        if (mutedUser)
-            return (
-
-                <Icon
-                    icon={unmuteIcon}
-                    description="Unmute"
-                    onClick={() => {
-                        setConfirmView(true);
-                        setUserAction(
-                            {
-                                user: props.user,
-                                function: unmuteUser,
-                                type: "unmute"
-                            }
-                        )
-                    }}
-                />
-            )
-        else
-            return (
-
-                <Icon
-                    icon={muteIcon}
-                    description="Mute"
-                    onClick={() => {
-                        setConfirmView(true);
-                        setUserAction(
-                            {
-                                user: props.user,
-                                function: muteUser,
-                                type: "mute"
-                            }
-                        )
-                    }}
-                />
-            )
-    }
+    const canAct = useCallback(() => {
+        if (isCurrentUserAdmin &&
+            props.user && props.user.username !== (user && user.username) &&
+            props.channel.ownerId !== props.user.id &&
+            (!isUserAdministrators(props.user) || isCurrentUserOwner))
+            return (true);
+        return (false);
+    }, [props.user, props.channel, user, isCurrentUserAdmin]);
 
     function functionalities() {
-        if (props.user && isCurrentUserAdmin && props.user.username !== (user && user.username) &&
-            props.channel.ownerId !== props.user.id && (!isUserAdministrators(props.user) || isCurrentUserOwner)) {
+        if (canAct()) {
             if (isUserBanned(props.user)) {
                 return (
                     <div>
@@ -151,7 +168,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                     </div>
                 )
             }
-            else if (props.user && !isUserMember(props.user)) {
+            else if (!isUserMember(props.user)) {
                 if (props.isAddable) {
                     return (
                         <div>
@@ -172,46 +189,11 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                         </div>
                     )
                 }
-                else
-                    return (<p>Blocked</p>)
             }
             else if (props.user) {
                 return (
                     <>
-                        {
-                            isCurrentUserOwner && !isUserAdministrators(props.user) &&
-                                <Icon
-                                    icon={adminIcon}
-                                    description="make admin"
-                                    onClick={() => {
-                                        setConfirmView(true);
-                                        setUserAction(
-                                            {
-                                                user: props.user,
-                                                function: makeAdmin,
-                                                type: "make admin"
-                                            }
-                                        )
-                                    }}
-                                />
-                        }
-                        {
-                            isCurrentUserOwner && isUserAdministrators(props.user) &&
-                            <Icon
-                                icon={unadminIcon}
-                                description="remove admin"
-                                onClick={() => {
-                                    setConfirmView(true);
-                                    setUserAction(
-                                        {
-                                            user: props.user,
-                                            function: removeAdmin,
-                                            type: "remove admin"
-                                        }
-                                    )
-                                }}
-                            />
-                        }
+                        <AdminIcon {...props} />
                         <Icon
                             icon={exitIcon}
                             description="Kick"
@@ -226,9 +208,7 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                                 )
                             }}
                         />
-                        {
-                            mutedIcon()
-                        }
+                        <MuteIcon {...props} />
                         <Icon
                             icon={banIcon}
                             description="Ban"
@@ -272,14 +252,10 @@ export function ChannelUserLabel(props: TChannelUserLabel) {
                 profile={true}
                 user={props.user}
             />
-            <div className="channeluserlabel-icons flex-center"
-                style={{gap: '10px'}}
-            >
+            <div className="channeluserlabel-icons">
                 {
                     props.showChannelStatus ?
-                        showChannelStatus()
-                        :
-                        functionalities()
+                        showChannelStatus() : functionalities()
                 }
             </div>
         </div>

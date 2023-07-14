@@ -9,25 +9,18 @@ export default function ChannelName({ channel }: any) {
     const { isCurrentUserAdmin } = useUserAccess(channel);
     const { updateChannelName } = useChannels();
 
-    const [name, setName]: any = useState("")
+    const [name, setName]: any = useState(channel.name)
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
     const prevName: any = useRef("");
 
+    prevName.current = channel.name;
 
-    useEffect(() => {
-        if (channel && channel.name) {
-            setName(channel.name);
-            prevName.current = channel.name;
-        }
-    }, [channel, channel.name])
 
     function submitName() {
         let newName = name && name.trim();
         if (newName) {
-            if (newName.length > 20)
-                return (setError("20 chars max"));
             if (newName === prevName.current)
                 return;
             prevName.current = newName;
@@ -61,7 +54,6 @@ export default function ChannelName({ channel }: any) {
                         />
                     </>
                     :
-
                     <p>{name}</p>
             }
         </>

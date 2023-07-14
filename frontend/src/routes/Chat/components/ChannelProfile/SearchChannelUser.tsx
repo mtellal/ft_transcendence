@@ -6,9 +6,8 @@ import InfoInput from "../../../../components/Input/InfoInput";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import useFetchUsers from "../../../../hooks/useFetchUsers";
 import { getBlockList } from "../../../../requests/block";
-import { useChannelsContext, useCurrentUser } from "../../../../hooks/Hooks";
+import { useCurrentUser } from "../../../../hooks/Hooks";
 import { Block, Channel, User } from "../../../../types";
-import { useChannels } from "../../../../hooks/Chat/useChannels";
 
 
 type TSearchChannelUser = {
@@ -53,7 +52,6 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
 
     return (
         <>
-            <hr />
             <h2>{props.title}</h2>
             <InfoInput
                 id={props.inputTitle}
@@ -71,6 +69,7 @@ export default function SearchChannelUser(props: TSearchChannelUser) {
                     channel={props.channel}
                     showChannelStatus={!isCurrentUserAdmin && getUserAccess(searchUser)}
                     isAddable={!blockedUser}
+                    
                 />
             }
         </>

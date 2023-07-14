@@ -4,7 +4,7 @@ import { useChannelsContext, useFriendsContext, useCurrentUser, useChatSocket } 
 
 import useBanUser from "../../../../hooks/Chat/useBanUser";
 import useAdinistrators from "../../../../hooks/Chat/useAdministrators";
-import { ChannelUserLabel, CollectionUsers } from "../../components/ChannelProfile/ChannelUserLabel";
+import { ChannelUserLabel } from "../../components/ChannelProfile/ChannelUserLabel";
 
 import { ConfirmAction } from "./ConfirmAction";
 import ChannelName from "../../components/ChannelProfile/ChannelName";
@@ -14,15 +14,16 @@ import PickMenuAccess from "../../components/ChannelProfile/PickMenuAccess";
 import useMuteUser from "../../../../hooks/Chat/useMuteUser";
 import useMembers from "../../../../hooks/Chat/useMembers";
 import { Channel, User } from "../../../../types";
+import { CollectionChannelUsers } from "../../../../components/collections/Collection";
 
 export const PofileChannelContext = createContext({});
 
 type TChannelProfile = {
-    name: string, 
+    name: string,
     members: User[],
     administrators: number[],
     owner: number,
-    channel: Channel 
+    channel: Channel
 }
 
 export default function ChannelProfile(props: TChannelProfile) {
@@ -72,23 +73,23 @@ export default function ChannelProfile(props: TChannelProfile) {
             }}
         >
             <div className="scroll">
-                <div style={{padding: '5%'}}>
-                    <ChannelName 
-                        channel={props.channel} 
-                    />
-                    <ChannelPassword 
-                        channel={props.channel} 
-                    />
+                <div style={{ padding: '5%' }}>
+                    <ChannelName channel={props.channel} />
+                    <hr />
+                    <ChannelPassword channel={props.channel} />
+                    <hr />
                     <PickMenuAccess
                         channel={props.channel}
                         protectedAccess={() => setConfirmView(true)}
                     />
+                    <hr />
                     <SearchChannelUser
                         title="Search"
                         channel={props.channel}
                         inputTitle="Search user"
                         members={props.members}
                     />
+                    <hr />
                     <h2>Owner</h2>
                     <ChannelUserLabel
                         user={owner}
@@ -96,29 +97,37 @@ export default function ChannelProfile(props: TChannelProfile) {
                         showChannelStatus={true}
                         isAddable={false}
                     />
-                    <CollectionUsers
+                    <hr />
+                    <CollectionChannelUsers
                         title="Administrators"
                         users={admins}
                         channel={props.channel}
                         currentUser={user}
+                        showChannelStatus={user && owner && user.id !== owner.id}
                     />
-                    <CollectionUsers
+                    <hr />
+                    <CollectionChannelUsers
                         title="Members"
                         users={props.members}
                         channel={props.channel}
                         currentUser={user}
+                        showChannelStatus={false}
                     />
-                    <CollectionUsers
+                    <hr />
+                    <CollectionChannelUsers
                         title="Muted"
                         users={muted}
                         channel={props.channel}
                         currentUser={user}
+                        showChannelStatus={false}
                     />
-                    <CollectionUsers
+                    <hr />
+                    <CollectionChannelUsers
                         title="Banned"
                         users={banned}
                         channel={props.channel}
                         currentUser={user}
+                        showChannelStatus={false}
                     />
                 </div>
 

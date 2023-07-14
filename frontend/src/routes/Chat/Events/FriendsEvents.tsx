@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useCurrentUser, useFriendsContext } from "../../../hooks/Hooks";
 import { useFriends } from "../../../hooks/Chat/Friends/useFriends";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
+import { FriendRequest, User } from "../../../types";
 
 export default function FriendEvents({ children }: any) {
     const { userSocket } = useCurrentUser();
@@ -13,23 +14,23 @@ export default function FriendEvents({ children }: any) {
     useEffect(() => {
         if (userSocket) {
 
-            userSocket.on('receivedRequest', (request: any) => {
+            userSocket.on('receivedRequest', (request: FriendRequest) => {
                 addFriendRequest(request)
             })
 
-            userSocket.on('addedFriend', (friend: any) => {
+            userSocket.on('addedFriend', (friend: User) => {
                 if (friend && !isUserFriend(friend))
                 {
                     updateFriend(friend);
                 }
             })
 
-            userSocket.on('updatedFriend', (friend: any) => {
+            userSocket.on('updatedFriend', (friend: User) => {
                 if (friend)
                     updateFriend(friend);
             })
 
-            userSocket.on('removedFriend', (friend: any) => {
+            userSocket.on('removedFriend', (friend: User) => {
                 if (friend)
                 {
                     removeFriend(friend, false);
@@ -41,8 +42,6 @@ export default function FriendEvents({ children }: any) {
             if (userSocket)
             {
                 userSocket.off('updatedFriend')
-            }
-            if (userSocket) {
                 userSocket.off('receivedRequest');
                 userSocket.off('addedFriend');
                 userSocket.off('removedFriend');

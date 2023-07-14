@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
+import React, { useState } from "react"
 
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import InfoInput from "../../../../components/Input/InfoInput";
@@ -17,8 +17,6 @@ export default function ChannelPassword({ channel }: any) {
     function submitName() {
         let newPassword: string = password && password.trim();
         if (newPassword) {
-            if (newPassword.length > 15)
-                return (setError("Maximum length of 15 letters"));
             setSuccess("Password updated")
             updateChannelPassword(channel.id, newPassword)
         }
@@ -55,6 +53,7 @@ export default function ChannelPassword({ channel }: any) {
                             setValue={setPassword}
                             onChange={onChange}
                             submit={() => submitName()}
+                            maxLength={30}
                         />
                     </>
                     :

@@ -3,7 +3,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Icon from "../Icon";
 
-import './CollectionElement.css'
+import './Collection.css'
+import { Channel, User } from "../../types";
+import { ChannelUserLabel } from "../../routes/Chat/components/ChannelProfile/ChannelUserLabel";
 
 type TCollectionElement = {
     title: string, 
@@ -36,3 +38,34 @@ export function CollectionElement(props: TCollectionElement) {
         </div>
     )
 }
+
+
+type TCollectionUsers = {
+    title: string,
+    users: User[],
+    isAdmin?: boolean,
+    currentUser?: User,
+    channel: Channel,
+    showChannelStatus: boolean
+}
+
+export function CollectionChannelUsers(props: TCollectionUsers) {
+
+    return (
+        <CollectionElement
+            title={props.title}
+            collection={
+                props.users.map((user: any) =>
+                    <ChannelUserLabel
+                        key={`${props.title}-${user.id}`}
+                        user={user}
+                        channel={props.channel}
+                        showChannelStatus={props.showChannelStatus}
+                        isAddable={false}
+                    />
+                )
+            }
+        />
+    )
+}
+

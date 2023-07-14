@@ -10,7 +10,12 @@
     align-items: center;
 }
 
-.channeluserlabel-icons {}
+.channeluserlabel-icons {
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .channeluserlabel-icons>div {
     height: 40px;

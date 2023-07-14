@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 
 import useUserAccess from "../../../../hooks/Chat/useUserAccess";
 import PickMenu from "../../../../components/PickMenu";
@@ -9,15 +9,10 @@ export default function PickMenuAccess({ channel, protectedAccess }: any) {
     const { updateChannelType } = useChannels();
 
     const [success, setSuccess] = useState("");
-    const [type, setType] = useState("")
+    const [type, setType] = useState((channel && channel.type && channel.type.toLowerCase()) || "")
     const prevType = useRef("");
 
-    useEffect(() => {
-        if (channel && channel.type) {
-            setType(channel.type.toLowerCase());
-            prevType.current = channel.type.toLowerCase();
-        }
-    }, [channel, channel.type])
+    prevType.current = channel.type.toLowerCase();
 
     function select(element: any) {
         if (prevType.current !== element) {

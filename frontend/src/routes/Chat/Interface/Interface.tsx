@@ -1,18 +1,15 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import Banner from "../components/Banner/Banner";
 import Profile from "../Profile/Profile";
 import Messenger from "../Messenger/Messenger";
-
 import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../hooks/Hooks";
-
 import { useBlock } from "../../../hooks/Chat/useBlock";
 import useFetchUsers from "../../../hooks/useFetchUsers";
-
-import './Interface.css'
-import { Channel, User } from "../../../types";
+import { Channel } from "../../../types";
 import { useChannels } from "../../../hooks/Chat/useChannels";
+import './Interface.css'
 
 export const InterfaceContext: React.Context<any> = createContext(null);
 
@@ -24,15 +21,11 @@ export default function Interface() {
     const { isUserBlocked } = useBlock();
     const { friends }: any = useFriendsContext();
     const { selectWhisperChannel, createWhisperChannel } = useChannels();
-
-    const [currentChannel, setCurrentChannel]: any = useState(null);
-
     const { channels, channelsLoaded } = useChannelsContext();
 
+    const [currentChannel, setCurrentChannel]: any = useState(null);
     const [blockedFriend, setBlockedFriend]: [any, any] = useState(false);
-
     const [profile, setProfile] = useState(false);
-
     const [whisperUser, setWhisperUser] = useState();
 
 
@@ -69,14 +62,12 @@ export default function Interface() {
         }
     }, [channels, friends, channelsLoaded, params]);
 
-    console.log(currentChannel)
-
     useEffect(() => {
         loadInterface();
     }, [channels, friends, params])
 
 
-    React.useEffect(() => {
+    useEffect(() => {
         setProfile(false);
         if (whisperUser && user && currentChannel && currentChannel.type === "WHISPER") {
             if (isUserBlocked(whisperUser))
