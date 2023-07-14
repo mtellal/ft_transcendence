@@ -37,7 +37,25 @@ To route our application, we decided to use the library `react-router`. In fact,
 
 - https://developer.mozilla.org/fr/docs/Web - web docs/ressources from Mozilla
 
-#### REACT
+#### Design 
+##### Imgages / Illustration
+- https://dribbble.com/ 
+- https://www.pexels.com/fr-fr/
+- https://unsplash.com/fr 
+
+##### Colors contrast
+- https://coolors.co/d1ccdc-424c55-f5edf0-886f68-3d2c2e 
+- https://visme.co/blog/website-color-schemes/ 
+- https://color.adobe.com/fr/create/color-wheel 
+- https://colourcontrast.cc/ 
+
+##### Fonts / Icons
+- https://fonts.google.com/
+- https://www.fontpair.co/ 
+
+
+
+#### React
 - https://react.dev/ - React official documentation 
 
 #### Typescript 
