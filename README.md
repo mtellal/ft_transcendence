@@ -28,36 +28,20 @@ To route our application, we decided to use the library `react-router`. In fact,
 
 ## Docs:
 
-### REACT
-- https://react.dev/ - React official doc 
-- https://stackoverflow.com/questions/54576865/when-to-use-native-react-usereducer-hook-and-how-it-differentiate-from-redux - When to use `useReducer` or `Redux`
+- https://developer.mozilla.org/fr/docs/Web - web docs/ressources from Mozilla
 
-### CSS 
-- https://github.com/suitcss/suit - suitCSS - naming convention used by twitter 
-  ##### BEM
-  - https://yandex.com/dev/bem/ - BEM naming convention 
-  - https://webuild.envato.com/blog/how-to-scale-and-maintain-legacy-css-with-sass-and-smacss/ 
-  - https://www.york.ac.uk/pattern-library/about/css.html 
-
-#### AJAX / HTTP POLLING
-- https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/ - Async map array of promises + explications async/sync processes
-- https://stackoverflow.com/questions/12555043/my-understanding-of-http-polling-long-polling-http-streaming-and-websockets
+#### REACT
+- https://react.dev/ - React official documentation 
 
 #### Typescript 
-- https://mattbatman.com/typescript-and-webpack-and-images - import resolve tsc and webpack
+- https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html - Typescript documentation
 
 #### Web sockets
-- https://javascript.info/websocket -Websocket API
+- https://javascript.info/websocket - Websocket API
+- https://socket.io/docs/v4/ - Socket.io documentation
 
-#### Session / Local / Cookies
-- https://blog.logrocket.com/storing-retrieving-javascript-objects-localstorage/ - Local Storage / Sessions Storage / Cookies
-- https://stackoverflow.com/questions/19183180/how-to-save-an-image-to-localstorage-and-display-it-on-the-next-page - Serialize an image (in canvas) into Local Storage
-- https://dev.to/rdegges/please-stop-using-local-storage-1i04 - Bad use cases of Local Storage 
-  ##### More docs (security / XSS / local storage / session / cookies)
-  - https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html#Local_Storage
-  - https://jwt.io/ - javascript web token (encode data structure into a jwt)
-  - https://blog.codinghorror.com/protecting-your-cookies-httponly/ - cookies and xss attack
-  - https://michalzalecki.com/why-using-localStorage-directly-is-a-bad-idea/ - local storage errors safari / chrome and others ...
+#### Axios
+- https://axios-http.com/fr/docs/intro - Axios documentation
 
 <hr/>
 
