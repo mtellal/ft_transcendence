@@ -7,17 +7,12 @@ import { useChannelsContext, useFriendsContext, useCurrentUser } from "../../../
 
 import { FriendRequests } from "../components/FriendRequests";
 import { ChannelLabel } from "../../../components/channels/ChannelInfos";
-import SearchElement from "./SearchElement";
-import './MenuElement.css'
+import SearchElement from "./Search/SearchElement";
 import { Channel, User } from "../../../types";
-import Icon from "../../../components/Icon";
-
-
-import arrowTop from '../../../assets/arrowTop.svg'
-import arrowBot from '../../../assets/arrowBot.svg'
 
 import plusIcon from '../../../assets/Plus.svg'
-import joinIcon from '../../../assets/Login.svg'
+import { MenuCollectionChannel, MenuCollectionElement } from "./MenuCollection/MenuCollection";
+import './MenuElement.css'
 
 export default function MenuElement() {
 
@@ -111,85 +106,3 @@ export default function MenuElement() {
 }
 
 
-
-type TCollectionElement = {
-    title: string,
-    collection: any[],
-    borderTop?: boolean,
-    icon?: any
-}
-
-export function MenuCollectionElement(props: TCollectionElement) {
-    const [show, setShow] = useState(props.title === "Messages");
-    return (
-        <div className="menu-collection">
-            <div className="menu-collection-label pointer"
-                onClick={() => setShow((p: boolean) => !p)}
-            >
-                <h2 className="reset menu-collection-title">{props.title}</h2>
-                <p className="menu-collection-length"
-                    style={{}}
-                >{props.collection && props.collection.length}</p>
-                <div className="flex" style={{ marginLeft: 'auto' }}>
-                    <img src={show ? arrowBot : arrowTop} style={{ marginLeft: '10px' }} />
-                </div>
-            </div>
-            {
-                show &&
-                <div className="flex-column">
-                    {props.collection}
-                </div>
-            }
-        </div>
-    )
-}
-
-type TCollectionChannel = {
-    title: string,
-    collection: any[],
-    borderTop?: boolean,
-    icon?: any
-}
-
-export function MenuCollectionChannel(props: TCollectionChannel) {
-    const navigate = useNavigate();
-    const [show, setShow] = useState(false);
-
-    return (
-        <div className="menu-collection">
-            <div className="menu-collection-label pointer"
-                onClick={() => setShow((p: boolean) => !p)}
-            >
-                <h2 className="reset menu-collection-title">{props.title}</h2>
-                <p className="menu-collection-length"
-                    style={{}}
-                >{props.collection && props.collection.length}</p>
-                <div className="flex" style={{ marginLeft: 'auto' }}>
-                    <div className="flex " style={{ height: '30px', gap: '5px' }}>
-                        <Icon
-                            icon={plusIcon}
-                            onClick={() => {
-                                setShow((p: boolean) => !p);
-                                navigate("/chat/channel/create")
-                            }}
-                        />
-                        <Icon
-                            icon={joinIcon}
-                            onClick={() => {
-                                setShow((p: boolean) => !p);
-                                navigate("/chat/channel/join")
-                            }}
-                        />
-                    </div>
-                    <img src={show ? arrowBot : arrowTop} style={{ marginLeft: '10px' }} />
-                </div>
-            </div>
-            {
-                show &&
-                <div className="flex-column">
-                    {props.collection}
-                </div>
-            }
-        </div>
-    )
-}

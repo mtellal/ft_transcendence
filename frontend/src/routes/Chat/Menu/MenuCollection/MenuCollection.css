@@ -1,0 +1,41 @@
+
+/*      ///////     COLLECTION  ///// */
+
+
+.menu-collection {
+    width: 100%;
+    margin: 0;
+}
+
+.menu-collection-label {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-top: 1px solid black;
+    background-color: #ffffff;
+}
+
+
+.menu-collection-length {
+    margin-left: 5px;
+    padding: 1px 5px;
+    background-color: #FFF;
+    border-radius: 50%;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.50);
+    color: #000;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.menu-collection-title {
+    color: #000;
+    font-family: Inter;
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+

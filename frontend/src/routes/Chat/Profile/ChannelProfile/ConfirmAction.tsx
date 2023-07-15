@@ -185,7 +185,7 @@ export function ConfirmViewTypeProteced(props: TConfirmViewTypeProteced) {
                 onChange={onChange}
             />
             {error && <p className="red-c reset">{error}</p>}
-            <div style={{width: '60%'}}>
+            <div style={{marginTop: '10px' }}>
                 <ConfirmViewButtons
                     valid={submit}
                     cancel={props.cancel}
@@ -194,6 +194,59 @@ export function ConfirmViewTypeProteced(props: TConfirmViewTypeProteced) {
         </div>
     )
 }
+
+
+
+type TJoinProtectedChannel = {
+    channel: Channel,
+    valid: any,
+    cancel: any
+}
+
+export function JoinProtectedChannel(props: TJoinProtectedChannel) {
+
+    const { joinChannelProtected, addChannel } = useChannels();
+    const [password, setPassword]: any = useState("")
+    const [error, setError] = useState("");
+
+
+    function submit() {
+        let newPassword: string = password && password.trim();
+        if (newPassword) {
+            if (newPassword.length > 15)
+                return (setError("Password too long (15 letters max)"));
+            props.valid();
+            addChannel(props.channel, true);
+            joinChannelProtected(props.channel.id, password);
+        }
+    }
+
+    function onChange(e: any) {
+        setError("");
+    }
+
+    return (
+        <div className="flex-column confirmview-container red">
+            <h3>To join a protected channel you need a password</h3>
+            <InfoInput
+                id="init-password"
+                label="Password"
+                value={password}
+                setValue={setPassword}
+                submit={() => submit()}
+                onChange={onChange}
+            />
+            {error && <p className="red-c reset">{error}</p>}
+            <div style={{marginTop: '10px' }}>
+                <ConfirmViewButtons
+                    valid={submit}
+                    cancel={props.cancel}
+                />
+            </div>
+        </div>
+    )
+}
+
 
 
 type TConfirmViewButtons = {

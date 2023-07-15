@@ -13,6 +13,8 @@ import ligntningIcon from '../../../assets/lightning.svg'
 import gameIcon from '../../../assets/Gamepad.svg'
 
 
+import './MessengerConversation.css'
+
 function MessageNotification({ content }: any) {
     return (
         <div className="flex-center gray-c message-notification" >
@@ -24,7 +26,9 @@ function MessageNotification({ content }: any) {
 function BlockMessage({ username }: any) {
     return (
         <div className="flex-center sticky-bot">
-            <p className="flex-center reset-m">You have blocked <span className="friend-block">{username}</span></p>
+            <p className="flex-center reset-m">
+                You have blocked
+                <span className="friend-block">{username}</span></p>
         </div>
     )
 }
@@ -53,23 +57,25 @@ function InvitationMessage(props: TInvitationMessage) {
 
     return (
         <div className="flex-center">
-            <div
-                className="flex-ai"
-                style={{ width: '80%', margin: '5px 0', border: '1px solid black', borderRadius: '5px', boxShadow: '1px 2px 5px black', padding: '2%' }}
-            >
+            <div className="invitationmessage-label" >
                 <img src={gameIcon} style={{ height: '25px' }} />
                 <div className="fill flex-center">
-
                     {
                         props.author && props.message &&
-                        <p className="reset" style={{paddingRight: '10px'}} >{props.author.username} sends a game invitation in {props.message.gametype}</p>
+                        <p
+                            className="reset"
+                            style={{ paddingRight: '10px' }}
+                        >
+                            {props.author.username} sends a game invitation in {props.message.gametype}
+                        </p>
 
                     }
                     {
-                        props.message && !accepted && user && props.message.sendBy !== user.id &&
+                        props.message &&
+                        !accepted && user &&
+                        props.message.sendBy !== user.id &&
                         <button
-                            className="button"
-                            style={{ backgroundColor: '#fff3e6',  width: '100px', fontSize: 'medium', fontWeight: '500' }}
+                            className="invitationmessage-button"
                             onClick={() => {
                                 acceptInvitation(props.message.id);
                                 setAccepted(true);
@@ -95,7 +101,13 @@ type TMessengerConversation = {
 }
 
 
-export default function MessengerConversation({ messages, whisperUser, channel, blockedFriend, hidden }: TMessengerConversation) {
+export default function MessengerConversation({
+    messages,
+    whisperUser,
+    channel,
+    blockedFriend,
+    hidden
+}: TMessengerConversation) {
 
     const { fetchUser } = useFetchUsers();
     const { getMemberById, getMembersById, isUserIdMember } = useMembers(channel);
@@ -180,7 +192,11 @@ export default function MessengerConversation({ messages, whisperUser, channel, 
     }, [messagesContainerRef, authors, hidden])
 
     return (
-        <div style={{paddingBottom: '70px'}} className={hidden ? "messages-display hidden " : "messages-display visible"} ref={messagesContainerRef}>
+        <div
+            style={{ paddingBottom: '70px' }}
+            className={hidden ? "messages-display hidden " : "messages-display visible"}
+            ref={messagesContainerRef}
+        >
             {
                 !messages.length || !authors.length ?
                     <NoMessages /> : rendMessages()

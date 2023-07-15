@@ -1,0 +1,25 @@
+/* //////////   SEARCH INPUT       /////////// */
+
+.menu-searchinput {
+    display: flex;
+    align-items: center;
+    background-color: #EBEBEB;
+    width: 80%;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+#menu-searchinput-input {
+    border: none;
+    width: 100%;
+    background-color: #EBEBEB;
+    color: black;
+}
+
+#menu-searchinput-input:focus {
+    outline: none;
+}
+
+#menu-searchinput-input::placeholder {
+    color: black;
+}

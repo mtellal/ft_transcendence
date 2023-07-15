@@ -9,9 +9,7 @@ function Customization(props: any) {
    const [_warning, setWarning] = useState(false);
 
    return (
-      <div
-         style={{ marginTop: '20px' }}
-      >
+      <div style={{ marginTop: '20px' }} >
          <p className="reset play-page-title">Customization</p>
          <div
             className="flex"

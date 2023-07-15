@@ -60,57 +60,60 @@ export function CreateChannel() {
     }
 
     return (
-        <div className="scroll flex-column"
-            style={{ padding: '3%', flex: 3 }}
+        <div className="scroll"
+            style={{ flex: 3 }}
         >
-            <div className="flex">
-                {isMobileDisplay && <ArrowBackMenu />}
-                <h2 className="interface-page-title">Create a channel</h2>
-            </div>
-            <div className="flex-column" style={{ gap: '10px' }}>
+            <div style={{padding: '5%', width: '90%',  alignSelf: 'center'}}>
 
-                <div>
-                    <InfoInput
-                        id="name"
-                        label="Name"
-                        value={name}
-                        setValue={setName}
-                        submit={() => { }}
-                        maxLength={20}
-                    />
+                <div className="flex">
+                    {isMobileDisplay && <ArrowBackMenu />}
+                    <h2 className="interface-page-title">Create a channel</h2>
                 </div>
-                {
-                    type === "protected" &&
+                <div className="flex-column" style={{ gap: '10px' }}>
+
                     <div>
                         <InfoInput
-                            id="password"
-                            label="Password"
-                            value={password}
-                            setValue={setPassword}
+                            id="name"
+                            label="Name"
+                            value={name}
+                            setValue={setName}
                             submit={() => { }}
-                            maxLength={30}
+                            maxLength={20}
                         />
                     </div>
-                }
-                <div style={{ paddingBottom: '20px' }}>
+                    {
+                        type === "protected" &&
+                        <div>
+                            <InfoInput
+                                id="password"
+                                label="Password"
+                                value={password}
+                                setValue={setPassword}
+                                submit={() => { }}
+                                maxLength={30}
+                            />
+                        </div>
+                    }
+                    <div style={{ paddingBottom: '20px' }}>
 
-                    <h3>Access</h3>
-                    <PickMenu
-                        title="Visibility"
-                        collection={["public", "protected", "private"]}
-                        selected={type}
-                        setSelected={setType}
-                    />
-                    {error && <p className="red-c" >{error}</p>}
+                        <h3>Access</h3>
+                        <PickMenu
+                            title="Visibility"
+                            collection={["public", "protected", "private"]}
+                            selected={type}
+                            setSelected={setType}
+                        />
+                        {error && <p className="red-c" >{error}</p>}
+                    </div>
                 </div>
+                <button
+                    className="button white"
+                    style={{ width: '100px', height: '40px', fontSize: 'medium' }}
+                    onClick={() => submit()}
+                >
+                    Create
+                </button>
             </div>
-            <button
-                className="button white"
-                style={{ width: '100px', height: '40px', fontSize: 'medium' }}
-                onClick={() => submit()}
-            >
-                Create
-            </button>
         </div>
     )
 }

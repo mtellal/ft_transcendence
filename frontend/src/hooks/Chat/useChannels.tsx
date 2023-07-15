@@ -10,8 +10,6 @@ export function useChannels() {
     const navigate = useNavigate();
     const { channelId } = useParams();
 
-    console.log(channelId)
-
     const { user, token } = useCurrentUser();
     const { socket } = useChatSocket();
     const { fetchUsers } = useFetchUsers();

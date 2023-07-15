@@ -10,9 +10,9 @@ type TSetGameInvitation = {
 
 export function SetGameInvitation(props: TSetGameInvitation) {
     const [selected, setSelected] = useState("CLASSIC");
-    const { setAction } = useContext(ChatInterfaceContext);
     const { sendInvitation } = useInvitation();
 
+    const {setAction} = useContext(ChatInterfaceContext);
 
     return (
         <div
@@ -27,8 +27,8 @@ export function SetGameInvitation(props: TSetGameInvitation) {
             />
             <div style={{ paddingTop: '10px' }}>
                 <ConfirmViewButtons
-                    valid={() => { sendInvitation(props.channelId, selected); setAction(null) }}
-                    cancel={() => setAction(null)}
+                    valid={() => { sendInvitation(props.channelId, selected); setAction(false); }}
+                    cancel={() => {setAction(false)}}
                 />
             </div>
         </div>

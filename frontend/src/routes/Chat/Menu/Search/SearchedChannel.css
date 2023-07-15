@@ -1,0 +1,53 @@
+/* /////////    searchedchannel    ////////// */
+
+.searchedchannel {
+    box-shadow: 0 1px 3px black;
+    border-radius: 5px;
+    width: 90%;
+    display: flex;
+    padding: 2%;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+    height: 50px;
+    background-color: white;
+    margin: 0 auto 3px auto;
+}
+
+.searchedchannel-icon {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.searchedchannel-actions {
+    bottom: -70px;
+    right: 30px;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+
+.searchedchannel-actions-channel {
+    border: 1px solid black;
+    border-radius: 3px;
+}
+
+.searchedchannel-actions-channel>p {
+    margin: 0;
+    padding: 10px 15px;
+}
+
+
+.searchedchannel-actions>p {
+    margin: 0;
+    padding: 10px 15px;
+}
+
+.searchedchannel-action {
+    background-color: white;
+    cursor: pointer;
+}
+
+.searchedchannel-action:hover {
+    background-color: #EBEBEB;
+}

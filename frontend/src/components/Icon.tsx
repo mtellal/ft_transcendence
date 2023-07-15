@@ -8,6 +8,7 @@ type TIcon = {
     icon: any,
     description?: string,
     onClick?: () => {} | any,
+    style?: any
 }
 
 export default function Icon(props: TIcon) {
@@ -16,7 +17,7 @@ export default function Icon(props: TIcon) {
         <div className="icon-container pointer"
             onClick={props.onClick}
         >
-            <img src={props.icon} alt={props.description} />
+            <img src={props.icon} alt={props.description} style={props.style} />
             {props.description && <div className="icon-description">{props.description}</div>}
         </div>
     )

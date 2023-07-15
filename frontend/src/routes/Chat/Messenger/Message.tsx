@@ -1,7 +1,6 @@
 import React from "react";
- 
+
 import {
-    useChannelsContext,
     useCurrentUser
 } from "../../../hooks/Hooks";
 import ProfilePicture from "../../../components/users/ProfilePicture";
@@ -12,6 +11,8 @@ import { Channel, User } from "../../../types";
 import ownerIcon from '../../../assets/House.svg';
 import adminIcon from '../../../assets/ShieldCheck.svg'
 
+
+import './Message.css'
 
 type TAuthorAccess = {
     author: User,
@@ -30,23 +31,18 @@ function AuthorAccess(props: TAuthorAccess) {
             onClick={() => navigate(`/user/${props.author.id}`)}
             style={{ alignItems: 'flex-end' }}
         >
-
-            <p className="message-author"
-                style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                }}
-            >{props.author.username}</p>
-
-
+            <p className="message-author">{props.author.username}</p>
             <div className="flex" style={{ alignItems: 'flex-end' }}>
                 {
                     props.channel.type !== "WHISPER" && props.author &&
                     props.channel.ownerId === props.author.id &&
-                    <img src={ownerIcon} style={{height: '20px'}} />
+                    <img src={ownerIcon} style={{ height: '20px' }} />
                 }
-                {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
+                {
+                    props.author &&
+                    isUserAdministrators(props.author) &&
+                    <img src={adminIcon} style={{ height: '20px' }} />
+                }
             </div>
         </div>
     )
@@ -81,10 +77,15 @@ function AuthorMessage(props: TUserMessage) {
                 <div className="flex" style={{ alignItems: 'flex-end' }}>
                     {
                         props.author &&
-                        <div className="relative pointer" onClick={() => navigate(`/user/${props.author.id}`)}>
-                            <div style={{height: '30px', width: '30px'}} >
-                                <ProfilePicture image={props.author.url} boxShadow={true} />
-                            </div>
+                        <div
+                            className="relative pointer"
+                            onClick={() => navigate(`/user/${props.author.id}`)}
+                        >
+                            <ProfilePicture
+                                image={props.author.url}
+                                boxShadow={true}
+                                style={{ height: '30px', width: '30px' }}
+                            />
                         </div>
                     }
 
@@ -124,10 +125,12 @@ function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
     const { isUserAdministrators } = useAdinistrators(props.channel);
 
     return (
-        <div style={{padding: '0 2%'}}>
+        <div style={{ padding: '0 2%' }}>
             <div className="flex-column">
-                <div className="flex" style={{ justifyContent: 'flex-end', alignItems: 'flex-end' }} >
-
+                <div
+                    className="flex"
+                    style={{ justifyContent: 'flex-end', alignItems: 'flex-end' }}
+                >
                     <p className="message"
                         style={props.author ?
                             { marginRight: '5px' } :
@@ -137,29 +140,35 @@ function AuthorCurrentUserMessage(props: TMessengerCurrentUserLabel) {
                     </p>
                     {
                         props.author &&
-                        <div style={{height: '30px', width: '30px'}}>
-                            <ProfilePicture image={props.author.url} />
-                        </div>
+                        <ProfilePicture
+                            style={{ height: '30px', width: '30px' }}
+                            image={props.author.url}
+                        />
                     }
                 </div>
 
-                <div className="flex" style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingBottom: '2px' }}>
+                <div
+                    className="flex"
+                    style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingBottom: '2px' }}
+                >
                     {
                         props.channel && props.channel.type !== "WHISPER" &&
                         <div>
                             {
                                 props.channel.type !== "WHISPER" && props.author &&
                                 props.channel.ownerId === props.author.id &&
-                                <img src={ownerIcon} style={{height: '20px'}} />
+                                <img src={ownerIcon} style={{ height: '20px' }} />
                             }
-                            {props.author && isUserAdministrators(props.author) && <img src={adminIcon} style={{height: '20px'}} />}
+                            {
+                                props.author &&
+                                isUserAdministrators(props.author) &&
+                                <img src={adminIcon} style={{ height: '20px' }} />
+                            }
                         </div>
                     }
                     {
                         props.author &&
-                        <p className="message-author"
-                            style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70px' }}
-                        >{props.author.username}</p>
+                        <p className="message-author">{props.author.username}</p>
                     }
                 </div>
 

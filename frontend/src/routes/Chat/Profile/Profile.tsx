@@ -1,8 +1,5 @@
 import React from "react"
-
-import { useChannelsContext } from "../../../hooks/Hooks"
 import ChannelProfile from "./ChannelProfile/ChannelProfile";
-import './Profile.css'
 import { Channel } from "../../../types";
 
 type TProfile = {

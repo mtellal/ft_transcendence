@@ -41,46 +41,8 @@
     outline: none;
 }
 
-.message-div
-{
-    display: flex;
-    align-items: flex-end;
-    justify-content: left;
-    padding: 0 2%;
-}
 
-.message-infos
-{
-    margin-right: auto;
-}
 
-.message
-{
-    margin: 2px 0;
-    background-color: rgb(255, 255, 255);
-    border: 1px solid black;
-    padding: 5px 5px;
-    border-radius: 5px;
-    word-break: break-all;
-    font-size: 15px;
-
-    max-width: 90%;
-    margin-right: auto;
-
-}
-
-.message-author-infos
-{
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-.message-author
-{
-    font-size: small;
-    margin: 0;
-}
 
 .no-messages-div
 {

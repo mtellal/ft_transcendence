@@ -7,7 +7,7 @@ import { useFriendsContext } from "../../../hooks/Hooks";
 import useFetchUsers from "../../../hooks/useFetchUsers";
 import { useFriendRequest } from "../../../hooks/Chat/Friends/useFriendRequest";
 import { FriendRequest, User } from "../../../types";
-import { MenuCollectionElement } from "../Menu/MenuElement";
+import { MenuCollectionElement } from "../Menu/MenuCollection/MenuCollection";
 
 export function FriendRequests() {
 

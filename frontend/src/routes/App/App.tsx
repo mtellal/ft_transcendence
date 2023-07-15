@@ -37,6 +37,8 @@ export async function loader() {
             .then(res => {
                 if (res.status === 200 || res.statusText !== "OK")
                     user = res.data;
+                else 
+                    err = true;
             })
             .catch(() => err = true)
 
@@ -44,6 +46,8 @@ export async function loader() {
             .then(res => {
                 if (res.status === 200 && res.statusText === "OK")
                     image = window.URL.createObjectURL(new Blob([res.data]))
+                else
+                    err = true;
             })
             .catch(() => err = true)
 

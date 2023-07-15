@@ -6,6 +6,13 @@ import ProfilePicture from "../../components/users/ProfilePicture";
 import './ChannelInfos.css'
 import { Channel } from "../../types";
 import { NavLink, useParams } from "react-router-dom";
+import Icon from "../Icon";
+
+import shield from '../../assets/ShieldCheck.svg';
+import stopIcon from '../../assets/stop.svg'
+
+import { useChannels } from "../../hooks/Chat/useChannels";
+
 
 type TChannelInfos = {
     channel: Channel,
@@ -14,11 +21,23 @@ type TChannelInfos = {
 
 export default function ChannelInfos(props: TChannelInfos) {
 
+    const { isChannelProtected, isChannelPrivate } = useChannels();
+
     return (
         <div className="channelinfos-container" >
             <div className="channelinfos-infos flex-column" >
                 <p className="channelinfos-infos-username">{props.channel && props.channel.name}</p>
-                <p className="channelinfos-infos-username-status">{props.channel && props.channel.members.length} members</p>
+                <div className="flex">
+                    <p className="channelinfos-infos-username-status reset">{props.channel && props.channel.members.length} members</p>
+                    {
+                        isChannelProtected(props.channel) && 
+                        <img src={shield} style={{ paddingLeft: '5px', height: '20px', width: '20px' }} />
+                    }
+                     {
+                        isChannelPrivate(props.channel) && 
+                        <img src={stopIcon} style={{ paddingLeft: '5px', height: '20px', width: '20px' }} />
+                    }
+                </div>
             </div>
             <div className="flex-column">
                 <div className="channelinfos-members-container" >
@@ -43,7 +62,7 @@ export default function ChannelInfos(props: TChannelInfos) {
 }
 
 
-type TChannelLabel = {  
+type TChannelLabel = {
     channel: Channel,
     notifs?: number,
     onClick?: () => {} | any,

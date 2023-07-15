@@ -45,10 +45,7 @@ export default function GameResult(props: TGameResult) {
             props.gameResult && player && user &&
             <div className="flex-column-center label white gameresult-label" >
                <p className="gameresult-title">Results</p>
-               <img
-                  style={{ height: '200px' }}
-                  src={win}
-               />
+               <img style={{ height: '200px' }} src={win} />
 
                <div className="relative gameresult-users" >
 

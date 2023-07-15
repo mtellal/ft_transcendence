@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ChannelSearchLabel, SearchInput, SearchedChannel } from "./Menu/SearchElement";
+import { ChannelSearchLabel } from "./Menu/Search/SearchedChannel";
 import useFetchUsers from "../../hooks/useFetchUsers";
 import { useChannelsContext, useCurrentUser } from "../../hooks/Hooks";
 import { getAllChannels, getChannelByName, getChannels } from "../../requests/chat";
-import { ChannelLabel } from "../../components/channels/ChannelInfos";
 import { Channel } from "../../types";
 import ArrowBackMenu from "./components/ArrowBackMenu";
 import { useWindow } from "../../hooks/useWindow";
+import { SearchInput } from "./Menu/Search/SearchInput";
 
 
 function PublicChannels() {
@@ -50,7 +50,6 @@ function PublicChannels() {
                             key={c.id}
                             channel={c}
                             resetInput={() => { }}
-                            style={{ margin: '0 auto 3px auto' }}
                         />
                     )
                     :
@@ -105,40 +104,39 @@ export default function JoinChannel() {
     }
 
     return (
-        <div
-            className="scroll"
-            style={{ flex: '3', padding: '3%' }}
-        >
-            <div className="flex">
-                {isMobileDisplay && <ArrowBackMenu />}
-                <h2 className="interface-page-title">Join a channel</h2>
-            </div>
-            <div className="flex-column-center" style={{ marginTop: '30px' }}>
-                <SearchInput
-                    value={value}
-                    setValue={setValue}
-                    submit={() => searchUser()}
-                    onChange={() => { setChannelList([]); setError("") }}
-                    setInputRef={null}
-                />
-                {error && <p className="reset red-c" style={{ marginTop: '10px' }}>{error}</p>}
-            </div>
-            <div className="relative scroll" style={{ maxHeight: '400px', marginTop: '20px', width: 'auto' }}>
-                {
-                    channelList && channelList.length ?
-                        channelList.map((c: Channel) =>
-                            <ChannelSearchLabel
-                                key={c.id}
-                                channel={c}
-                                resetInput={() => resetInput()}
-                                style={{ margin: '0 auto 3px auto' }}
-                            />
-                        ) : null
-                }
-            </div>
+        <div className="scroll" style={{ flex: 3 }} >
+            <div style={{ padding: '5%', width: '90%', alignSelf: 'center' }}>
 
-            <div className="relative" style={{ marginTop: '50px' }}>
-                <PublicChannels />
+                <div className="flex">
+                    {isMobileDisplay && <ArrowBackMenu />}
+                    <h2 className="interface-page-title">Join a channel</h2>
+                </div>
+                <div className="flex-column-center" style={{ marginTop: '30px' }}>
+                    <SearchInput
+                        value={value}
+                        setValue={setValue}
+                        submit={() => searchUser()}
+                        onChange={() => { setChannelList([]); setError("") }}
+                        setInputRef={null}
+                    />
+                    {error && <p className="reset red-c" style={{ marginTop: '10px' }}>{error}</p>}
+                </div>
+                <div className="relative scroll" style={{ maxHeight: '400px', marginTop: '20px', width: 'auto' }}>
+                    {
+                        channelList && channelList.length ?
+                            channelList.map((c: Channel) =>
+                                <ChannelSearchLabel
+                                    key={c.id}
+                                    channel={c}
+                                    resetInput={() => resetInput()}
+                                />
+                            ) : null
+                    }
+                </div>
+
+                <div className="relative" style={{ marginTop: '50px' }}>
+                    <PublicChannels />
+                </div>
             </div>
         </div>
     )
