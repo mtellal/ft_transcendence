@@ -2,8 +2,8 @@
 
 set -e 
 npm i
-npm start  
+#npm start  
 
-#npm install -g serve
-#npm run build
-#serve -s build -l 8080
+npm install -g serve
+npm run build
+serve -s build -l 8080

@@ -116,7 +116,6 @@ export default function MessengerConversation({
 
     async function loadAuthors(messages: TMessage[], membersId: number[]) {
         let users: User[] = getMembersById(membersId);
-        console.log(users)
         let ids: number[] = membersId;
         await Promise.all(
             messages.map(async (m: TMessage, index: number) => {

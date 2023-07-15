@@ -47,7 +47,6 @@ export function CreateChannel() {
             password,
         }, token)
             .then(res => {
-                console.log(res);
                 if (res.data) {
                     channel = res.data;
                     addChannel(res.data, false)

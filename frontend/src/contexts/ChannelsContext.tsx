@@ -186,7 +186,6 @@ function reducer(channels: Channel[], action: any) {
             }
         }
         case ('addMessage'): {
-            console.log("add message", action.message)
             if (channels.length && action.message) {
                 return (
                     channels.map((c: Channel) => {
