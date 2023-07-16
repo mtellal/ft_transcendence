@@ -31,7 +31,8 @@ To route our application, we decided to use the library `react-router`. In fact,
 - **HTTP Queries** </br>
   For our calls with the backend API we decided to use `axios`, in particular because calls are less verbose than the XMLHtppRequest API of JavaScript, as well as for its simplicity in manipulating the fields of the header. After reflection, it would have been preferable to use the api in order to better understand, in details, how XMLHttpRequest requests and the ajax approach work.
 
-
+#### Figma
+- https://www.figma.com/community/file/1261335843107265770
 
 ## Docs:
 
