@@ -7,7 +7,7 @@
 - Clone the repository `git clone https://github.com/mtellal/ft_transcendence.git`
 - Run `docker compose up --build` </br> </br>
 - The frontend run on `http://localhost:8080`
-- The swagger backend api run on `http://localhost:3000`
+- The swagger backend api run on `http://localhost:3000/api`
 
 
 ## FRONTEND 
