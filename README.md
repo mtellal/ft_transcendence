@@ -9,6 +9,7 @@
 - The frontend run on `http://localhost:8080`
 - The swagger backend api run on `http://localhost:3000/api`
 
+! ! ! The main resource provider for this project added some protections. To verify if the project will work for you, try `https://yts.torrentbay.net/api/v2/list_movies.json`. If you are redirected to a cloudflare checking page then movies will not be displayed on search page and the projet will not work correctly! ! !
 
 ## FRONTEND 
 `http://localhost:8080`
